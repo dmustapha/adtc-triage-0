@@ -1,0 +1,74 @@
+{
+  "captured_at": "2026-08-22T06:25:00Z",
+  "evidence_classes": ["formal current submission","explicit current-event repository","registered participant","template fork","timing candidate","adjacent model","prior art"],
+  "entries": [
+    {
+      "project":"BuildMate AI","entrant":"Sultan-Othman-Adekoya","url":"https://github.com/Sultan-Othman-Adekoya/buildmate-ai-adtc2026","evidence_class":"explicit current-event repository","domain":"corporate_enterprise","threat":"HIGH","threat_reason":"Strongest public all-metric profiler evidence among inspected repos.","model":"Phi-3 Mini 3.8B Q4","optimization":"Q4; system prompt; public profiler run","localization":"English civil-engineering support positioned for African builders","pairing":"civil engineering knowledge workflow","proof":"submission.json reports 5.1 TPS, 3796 MB, ARC Easy acc_norm 0.76/50; non-reference Windows CPU","freshness":"event-window repository","source_quality":"B2 repository artifact; C3 self-reported comparability","confidence":"medium-high"
+    },
+    {
+      "project":"Baarali Edge","entrant":"benewende-dev","url":"https://github.com/benewende-dev/baarali-edge","evidence_class":"explicit current-event repository","domain":"corporate_enterprise","threat":"HIGH","threat_reason":"Deepest public candidate and quantization bake-off with Francophone African specificity.","model":"Qwen3.5-2B IQ4_XS","optimization":"five-model screen; quantization bake-off; context and prompt tuning","localization":"French and English; Burkinabe and Francophone enterprise workflows","pairing":"document and SME workflow","proof":"raw bench files; M1 final 32.23 TPS, 1615 MB, ARC Easy 0.68/50","freshness":"event-window repository","source_quality":"B2 raw repository evidence; C3 target-hardware comparability","confidence":"high on rigor, medium on official score"
+    },
+    {
+      "project":"Ondjila","entrant":"dimittri1","url":"https://github.com/dimittri1/ondjila","evidence_class":"explicit current-event repository","domain":"autonomous_ai_agents","threat":"HIGH","threat_reason":"Localized Angolan agent with public model artifact and claimed constrained-x86 measurements.","model":"Qwen3-1.7B Q4_K_M","optimization":"candidate comparison; Q4_K_M; RAG corpus and structured prompts","localization":"Portuguese, English, and Umbundu document corpus; model language ability is narrower than app claim","pairing":"civil-document agent","proof":"report claims 14.02 TPS and 1.90 GB on 4-vCPU AVX2; raw JSON not found","freshness":"event-window repository","source_quality":"B2 public artifact and corpus; C3 performance claim","confidence":"medium"
+    },
+    {
+      "project":"Aletheia","entrant":"paper authors","url":"https://arxiv.org/abs/2607.24814","evidence_class":"adjacent model","domain":"healthcare_medical","threat":"HIGH","threat_reason":"Research-backed East African clinical model with reported calibration and memory measurements.","model":"Qwen2.5-3B QLoRA then quantized","optimization":"QLoRA over 27k clinical reasoning examples","localization":"East African disease focus","pairing":"offline clinical decision support","proof":"paper reports Top-1 80%, Top-3 100%, ECE 0.275, about 3.63 GB peak","freshness":"2026 ADTC-context paper; no public Devpost page found","source_quality":"B2 paper; event participation unverified","confidence":"high as adjacent model, low as current submission"
+    },
+    {
+      "project":"Atlas Sanctum Health","entrant":"Devpost entrant","url":"https://devpost.com/software/atlas-sanctum-health","evidence_class":"timing candidate","domain":"healthcare_medical","threat":"MEDIUM","threat_reason":"Public event-linked project and a locally relevant medical RAG story, but no public profiler proof surfaced.","model":"not verified","optimization":"local medical RAG claimed","localization":"African health context claimed","pairing":"medical knowledge assistant","proof":"search-visible Devpost project page, but unpublished official gallery","freshness":"current event window","source_quality":"B2 Devpost page; C3 technical claims","confidence":"medium"
+    },
+    {
+      "project":"EduPulse-1.5B","entrant":"Devpost entrant","url":"https://devpost.com/software/edupulse-1-5b-zero-cost-offline-stem-reasoning-tutor","evidence_class":"timing candidate","domain":"math_scientific_reasoning","threat":"MEDIUM","threat_reason":"Public event-linked offline STEM entry using a small reasoning model, with no surfaced comparable metrics.","model":"DeepSeek-R1-Distill 1.5B quantized","optimization":"small quantized reasoning model","localization":"zero-cost offline tutoring","pairing":"STEM tutor","proof":"search-visible Devpost page, but unpublished official gallery","freshness":"current event window","source_quality":"B2 Devpost page; C3 performance unknown","confidence":"medium"
+    },
+    {
+      "project":"Enumerator","entrant":"Devpost entrant","url":"https://devpost.com/software/enumerator-og4dwz","evidence_class":"timing candidate","domain":"agriculture","threat":"LOW","threat_reason":"Public and locally grounded, but evidence does not prove compliant GGUF model evaluation.","model":"not verified","optimization":"not verified","localization":"ODK farming and rearing field workflow","pairing":"data collection","proof":"search-visible Devpost page, but unpublished official gallery","freshness":"current event window","source_quality":"B2 public page; low technical evidence","confidence":"medium"
+    },
+    {
+      "project":"KaroGuard","entrant":"kherin","url":"https://github.com/kherin/karoguard-adtc-2026-submission","evidence_class":"explicit current-event repository","domain":"agriculture","threat":"MEDIUM","threat_reason":"Strong compliance and Mauritius cyclone-agriculture story; public target metrics remain unverified.","model":"Qwen3-4B-Instruct-2507 Q4_K_M","optimization":"Q4_K_M and prompt packaging","localization":"Mauritius cyclone and farmer context","pairing":"cyclone agriculture advisor","proof":"public checksum and credential-free artifact; no verified raw profiler result","freshness":"event-window repository","source_quality":"B2 artifact; C3 score potential","confidence":"medium"
+    },
+    {
+      "project":"AgriDoc","entrant":"Cruso003","url":"https://huggingface.co/Cruso003/AgriDoc-Qwen2.5-1.5B-GGUF","evidence_class":"adjacent model","domain":"agriculture","threat":"MEDIUM","threat_reason":"Public agriculture-tuned GGUF with explicit safety evaluation, but narrow disease recall remains weak.","model":"Qwen2.5-1.5B Q4_0 935 MB","optimization":"279 behavior dialogues and Q4_0","localization":"African farming scenarios claimed","pairing":"application RAG, which does not lift model-only score","proof":"model card claims 114 sampled and adversarial chats","freshness":"current-event relevance","source_quality":"B2 model card; C3 evaluations","confidence":"medium"
+    },
+    {
+      "project":"StacksNG","entrant":"dannwaneri","url":"https://github.com/dannwaneri/stacksng","evidence_class":"explicit current-event repository","domain":"coding_assistants","threat":"MEDIUM","threat_reason":"Nigerian payment-code wedge is relevant, but 7B footprint nearly exhausts the RAM budget.","model":"Qwen2.5-Coder-7B Q4_K_M","optimization":"Q4_K_M; constrained Docker test","localization":"Nigerian payment integrations","pairing":"code assistant","proof":"submission.json reports 4.82 TPS and 7053.67 MB, with no accuracy or thermal","freshness":"event-window repository","source_quality":"B2 public JSON; C3 non-reference comparability","confidence":"medium-high"
+    },
+    {
+      "project":"Clair v5","entrant":"Kedarcv","url":"https://github.com/Kedarcv/adtc-2026-submission","evidence_class":"explicit current-event repository","domain":"coding_assistants","threat":"MEDIUM","threat_reason":"Usable artifact, but contradictory throughput and memory claims weaken trust.","model":"3.09B Q4_K_M","optimization":"Q4_K_M and coding prompt","localization":"not materially evidenced","pairing":"coding assistant","proof":"repo claims 5-8 and 10-12 TPS, plus 6.8 and 3.2 GB in different places","freshness":"event-window repository","source_quality":"C3 conflicting repository claims","confidence":"low-medium"
+    },
+    {
+      "project":"EfficientQA 6GB winner","entrant":"FAIR Paris and London","url":"https://proceedings.mlr.press/v133/min21a.html","evidence_class":"prior art","domain":"corporate_enterprise","threat":"LOW","threat_reason":"Not a current entrant, but the best constrained-memory precedent for specialized retrieval and representation compression.","model":"DPR/GAR plus FiD/T5 system","optimization":"corpus and representation compression under 6 GB","localization":"none","pairing":"retrieval plus reader","proof":"official competition paper and baseline repository","freshness":"2020 prior art","source_quality":"A1 official competition and paper","confidence":"high"
+    },
+    {
+      "project":"FarmSpeak","entrant":"ADTC 2025 winner","url":"https://africadeeptech.org/challenge-2025/","evidence_class":"prior art","domain":"agriculture","threat":"LOW","threat_reason":"Not current competition, but proves judges reward an offline, physical, farmer-centered African use case.","model":"not applicable to 2026 benchmark","optimization":"offline voice and field workflow","localization":"farmer use case","pairing":"speech and agriculture","proof":"official 2025 winner listing","freshness":"prior edition","source_quality":"A1 organizer source","confidence":"high"
+    },
+    {
+      "project":"Qwen3.5-2B GGUF","entrant":"Qwen and community quantizer","url":"https://huggingface.co/bartowski/Qwen_Qwen3.5-2B-GGUF","evidence_class":"adjacent model","domain":"unknown","threat":"MEDIUM","threat_reason":"Likely crowded balance point, but new architecture support in pinned llama.cpp is a kill gate.","model":"Qwen3.5-2B Q4_K_M about 1.40 GB","optimization":"Q4_K_M","localization":"general multilingual capability; no specific African proof","pairing":"none","proof":"official source card plus community GGUF","freshness":"current model generation","source_quality":"B2 source; C3 quantization","confidence":"medium"
+    },
+    {
+      "project":"Tiny Aya Earth GGUF","entrant":"Cohere Labs","url":"https://huggingface.co/CohereLabs/tiny-aya-earth-GGUF","evidence_class":"adjacent model","domain":"creative_writing","threat":"MEDIUM","threat_reason":"Exceptional African-language coverage but noncommercial license is a strategic dependency risk.","model":"Tiny Aya Earth 3.35B Q4_K_M 2.14 GB","optimization":"Q4_K_M","localization":"67 African and West Asian languages","pairing":"language-first assistant","proof":"official model and GGUF card","freshness":"current model","source_quality":"B2 official card","confidence":"high"
+    },
+    {
+      "project":"AGBE","entrant":"Nwokolo Victor Oluebubechukwu","url":"https://github.com/nevodesigns/agbe","evidence_class":"template fork","domain":"agriculture","threat":"HIGH","threat_reason":"Strongest public custom-model development trail and high measured TPS, offset by thermal failure.","model":"AGBE-1B Q4_K_M","optimization":"curated corpus, custom training, adversarial evaluation, Q4_K_M","localization":"agricultural-extension use case","pairing":"offline extension workflow","proof":"submission.json: 24.29 TPS, 1039.06 MB, ARC Easy acc_norm 0.56/50, 99 C and throttled","freshness":"48-fork material audit, event window","source_quality":"B2 artifacts; B3 self-reported profiler","confidence":"high on artifact, medium on official reproducibility"
+    },
+    {
+      "project":"Code Persona","entrant":"Israel Olawuyi","url":"https://github.com/Overwatch886/team-codewatch-adtc-2026-submission","evidence_class":"template fork","domain":"coding_assistants","threat":"HIGH","threat_reason":"Best public accuracy result on an eligible CPU class while remaining below the thermal threshold.","model":"Granite 4.0 h tiny 6.94B IQ4_XS","optimization":"IQ4_XS, GBNF and Socratic prompt work","localization":"English only","pairing":"coding assistant","proof":"submission.json: 8.57 TPS, 3623.38 MB, ARC Easy acc_norm 0.86/50, 81 C, no throttle","freshness":"event-window material fork and upstream PRs","source_quality":"B2 artifacts; B3 self-reported profiler","confidence":"high on artifact, medium-high on target comparability"
+    },
+    {
+      "project":"Ayekoo","entrant":"Nana Opoku Gyamfi Asante","url":"https://github.com/nogasante/ayekoo","evidence_class":"template fork","domain":"agriculture","threat":"HIGH","threat_reason":"Exceptional efficiency plus unusually deep Ghana-specific grounding.","model":"Qwen2.5-0.5B-Instruct Q4_K_M 0.63B","optimization":"Q4_K_M with indexed offline corpus","localization":"Ghana-specific agriculture","pairing":"offline local RAG","proof":"submission.json: 9.77 TPS and 544.65 MB; accuracy and temperature absent","freshness":"event-window material fork","source_quality":"B2 artifacts; B3 self-reported profiler","confidence":"medium"
+    },
+    {
+      "project":"Siyana AI","entrant":"Mohamed Ibrahim","url":"https://github.com/shaba40/siyana-ai","evidence_class":"template fork","domain":"corporate_enterprise","threat":"HIGH","threat_reason":"Deep multilingual evaluation discipline and a load-bearing industrial-maintenance workflow.","model":"Qwen3-4B Q4_K_M","optimization":"multilingual eval corpus; 4-core and 16-thread artifacts; application validation","localization":"English, French, and Arabic industrial context","pairing":"industrial maintenance","proof":"repository evaluation artifacts and profiler logs; no root submission.json","freshness":"event-window material fork","source_quality":"B2 repository artifacts","confidence":"medium-high"
+    }
+  ],
+  "counts": {
+    "registry_entries": 19,
+    "formal_current_submission": 0,
+    "explicit_current_event_repository": 6,
+    "registered_participant": 0,
+    "template_fork": 4,
+    "timing_candidate": 3,
+    "adjacent_model": 4,
+    "prior_art": 2,
+    "high_threat": 8
+  }
+}

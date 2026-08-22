@@ -1,0 +1,251 @@
+{
+  "version": "2.0",
+  "created_at": "2026-08-22T06:08:35Z",
+  "updated_at": "2026-08-22T06:36:09Z",
+  "working_dir": "/Users/MAC/adtc-2026",
+  "hackathon": {
+    "name": "Africa Deep Tech Challenge 2026",
+    "url": "https://adtc-2026.devpost.com/",
+    "platform": "devpost",
+    "hard_deadline": "2026-08-25T06:45:00Z",
+    "soft_deadline": "2026-08-25T00:00:00Z",
+    "videoLengthRequirement": 120,
+    "tracks": [
+      "math_scientific_reasoning",
+      "healthcare_medical",
+      "agriculture",
+      "creative_writing",
+      "coding_assistants",
+      "corporate_enterprise",
+      "autonomous_ai_agents"
+    ],
+    "judging_criteria": "Accuracy and quality 50%; throughput 30%; memory efficiency 20%; African use-case bonus; thermal penalty; OOM or crash disqualification",
+    "discord_servers": [],
+    "telegram_groups": [],
+    "sponsors": [
+      "Africa Deep Tech Foundation",
+      "Future Africa",
+      "Nduzi Foundation",
+      "Africa AI XPrize",
+      "Udu Technologies",
+      "MIT Kuo Sharper Center for Prosperity and Entrepreneurship",
+      "3MTT",
+      "ARVR Africa",
+      "GDG Lagos",
+      "ISN Hubs"
+    ],
+    "judges": [
+      "Oji Udezue",
+      "Yannick Djoumbou Feunang",
+      "Oluwatobi Oyinlola",
+      "Christine Abernathy",
+      "Omoju Miller",
+      "Peter Ing",
+      "Mbangula Lameck Amugongo",
+      "Ola Fadiran",
+      "Houda Ghozzi"
+    ]
+  },
+  "manifest": {
+    "research_depth": 10,
+    "team": [
+      {
+        "name": "Damilola Mustapha",
+        "email": "dmz4pf@users.noreply.github.com",
+        "github": "dmustapha",
+        "twitter": ""
+      }
+    ],
+    "demoFormat": "recorded",
+    "demo": {
+      "logo_description": "",
+      "music_vibe": "none",
+      "creative_overrides": "let skill decide"
+    },
+    "dry_run": false,
+    "dry_run_goal": null,
+    "copilot_pat_available": false
+  },
+  "pipeline": {
+    "project_name": "pending",
+    "current_phase": "intel",
+    "phases": {
+      "intel": {
+        "status": "complete",
+        "dispatched_at": "2026-08-22T06:09:05Z",
+        "completed_at": "2026-08-22T06:36:09Z"
+      },
+      "warroom": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "forge": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "critique": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "url_preverify": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "build": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "debug": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "wire": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "verify_milestone": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "design_forge": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "stress_test": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "polish": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "deploy": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "livetest": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "interrogate": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "demo_rehearsal": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "demo": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "package": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      },
+      "verify_preflight": {
+        "status": "pending",
+        "dispatched_at": null,
+        "completed_at": null
+      }
+    }
+  },
+  "artifacts": {
+    "intel": {
+      "research_path": "/Users/MAC/adtc-2026/research/research-brief.md",
+      "config_path": "/Users/MAC/adtc-2026/config.json",
+      "state_path": "/Users/MAC/adtc-2026/intel-state.json",
+      "competitor_audit_path": "/Users/MAC/adtc-2026/research/competitor-audit"
+    }
+  },
+  "intelState": {
+    "status": "complete",
+    "sourceCount": 61
+  },
+  "warroomState": null,
+  "forgeState": null,
+  "critiqueState": null,
+  "buildState": null,
+  "debugState": null,
+  "wireState": null,
+  "verifyMilestoneState": null,
+  "verifyPreflightState": null,
+  "demoState": null,
+  "deployState": null,
+  "packageState": null,
+  "designForge": null,
+  "stressTestState": null,
+  "polishState": null,
+  "livetestState": null,
+  "interrogateState": null,
+  "demoRehearsalState": null,
+  "builder_profile": null,
+  "credentials_location": "/Users/MAC/.codex/credentials/pipeline-credentials.env",
+  "confirmed_urls": {},
+  "existing_research": {
+    "hackathon_brief": "/Users/MAC/.codex/skills/hackathon-briefs/adtc-2026.md",
+    "competitor_spec": "/Users/MAC/adtc-2026/research/COMPETITOR-INTEL-SPEC.md",
+    "compute_plan": "/Users/MAC/adtc-2026/research/COMPUTE-PLAN.md",
+    "official_profiler": "/Users/MAC/adtc-profiler"
+  },
+  "dispatch_context": {
+    "mode": "fresh",
+    "target_skill": "hackathon-intel",
+    "attempt": 1,
+    "max_attempts": 3,
+    "working_dir": "/Users/MAC/adtc-2026",
+    "gap_list": [],
+    "cascade_diagnosis": null,
+    "deploy_targets": [],
+    "deploy_env_vars": {}
+  },
+  "continuation_manifest": {
+    "continuation_count": 0,
+    "max_continuations": 5,
+    "last_completed_phase": "intel",
+    "next_expected_phase": "warroom",
+    "spawned_at": null
+  },
+  "retry_ledger": {},
+  "checkpoints_answered": {
+    "manifest": true,
+    "idea_selection": {
+      "answered": false,
+      "choice": null,
+      "modifications": null,
+      "project_name": null
+    },
+    "post_forge_credentials": {
+      "answered": false,
+      "collected": [],
+      "skipped": []
+    },
+    "design_handoff": {
+      "answered": false,
+      "gate": null
+    },
+    "demo_rehearsal_blocked": {
+      "answered": false
+    },
+    "demo_blocked": {
+      "answered": false
+    }
+  }
+}

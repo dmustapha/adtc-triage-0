@@ -1,0 +1,208 @@
+{
+  "hackathon_name": "Africa Deep Tech Challenge 2026",
+  "url": "https://adtc-2026.devpost.com/",
+  "platform": "Devpost",
+  "deadline": "2026-08-25T06:45:00Z",
+  "prize_pool_usd": 16500,
+  "prize_package_usd": 20000,
+  "intel_depth": 10,
+  "tracks": [
+    "math_scientific_reasoning",
+    "healthcare_medical",
+    "agriculture",
+    "creative_writing",
+    "coding_assistants",
+    "corporate_enterprise",
+    "autonomous_ai_agents"
+  ],
+  "chain": null,
+  "team_size_max": 3,
+  "submission_requirements": [
+    "Public GitHub repository based on the official template",
+    "Completed metadata.json with exactly two participant prompts",
+    "Credential-free idempotent download_model.sh",
+    "Public GGUF weights excluded from Git",
+    "llama.cpp runtime with zero network access during evaluation",
+    "REPORT.md with problem, constraints, alternatives, decisions, tools, benchmarks, and visual proof",
+    "Full participant profiler output in submission.json",
+    "Short video no longer than 120 seconds",
+    "Plain numeric self-reported Sperf and Seff fields on Devpost"
+  ],
+  "required_integrations": [
+    "llama.cpp",
+    "GGUF",
+    "ADTC profiler"
+  ],
+  "products": [
+    "ADTC submission template",
+    "ADTC profiler",
+    "llama.cpp"
+  ],
+  "docs_url": "https://africadeeptech.org/challenge-2026/",
+  "toolkit_url": "https://github.com/Africa-Deep-Tech-Foundation/adtc-2026-submission-template",
+  "telegram": null,
+  "registration_form": "https://adtc-2026.devpost.com/",
+  "submission_form": "https://devpost.com/submit-to/30091-africa-deep-tech-challenge-2026/manage/submissions",
+  "demoFormat": "recorded",
+  "demo_video_requirements": {
+    "max_seconds": 120,
+    "formats": [],
+    "platform": null,
+    "content_notes": "Explain the solution and development journey. Screenshots or short clips should also show the build in action. The rules do not publish accepted file formats or hosting requirements."
+  },
+  "submission_form_fields": [
+    "Project name",
+    "Project story/details",
+    "Public GitHub repository URL",
+    "Demo video",
+    "Screenshots or short clips",
+    "Primary standardized domain",
+    "Self Reported Profiler Performance Score (Sperf)",
+    "Self Reported Profiler Efficiency Score (Seff)"
+  ],
+  "disqualifiers": [
+    "Participant is not resident in an eligible African country or is below the legal age of majority",
+    "Team has more than three members",
+    "Venture or organized team is older than 12 months as of 2026-06-16",
+    "Product is fully commercialized, has active MRR, or has been a mature deployed MVP for more than six months",
+    "External dilutive capital plus non-dilutive grants exceeds USD 25,000",
+    "Submission is not original work or open-source dependencies are not cited",
+    "Repository is not public or does not use the approved template",
+    "Model is not GGUF or does not run through llama.cpp",
+    "Inference requires network access",
+    "Evaluation exceeds 8 GB RAM, OOMs, or crashes the sandbox",
+    "metadata.json contains placeholders, an invalid domain, or not exactly two participant prompts",
+    "download_model.sh requires credentials or does not place the file at _runtime.model_path",
+    "Submission misses the Gate 1 deadline"
+  ],
+  "workshops": [
+    {
+      "name": "The Last Mile of AI: Designing for Real-World Constraints",
+      "speaker": "Oji Udezue",
+      "topic": "Problem selection, real-world adoption, domain opportunities, and global innovation lessons",
+      "strategy_signal": "Judges want a sharply framed problem and adoption evidence, not a benchmark-only demo."
+    },
+    {
+      "name": "GPU Access for African AI Builders",
+      "speaker": "Alex Tsado",
+      "topic": "Expanding low-resource AI innovation using cloud GPUs",
+      "strategy_signal": "Training is permitted and supported, but compute scarcity is a known constraint rather than an eligibility gate."
+    },
+    {
+      "name": "DWMCS-AI: Decentralized Wireless Mesh Connectivity Suite with Embedded AI",
+      "speaker": "Dapo Sosanya",
+      "topic": "Offline and resilient AI paired with mesh connectivity",
+      "strategy_signal": "A load-bearing systems pairing can strengthen the integration award if the model remains evaluable in isolation."
+    },
+    {
+      "name": "Low Rank Compression of Neural Network Weights to Optimize for Local Models",
+      "speaker": "Quintin Makwe",
+      "topic": "Singular Value Decomposition for low-compute model compression",
+      "strategy_signal": "Model compression beyond routine quantization is organizer-endorsed, but must preserve accuracy."
+    }
+  ],
+  "sponsor_bounties": [],
+  "sidetracks": [
+    {
+      "name": "Best African Use Case",
+      "amount": 1500,
+      "eligibility": "Meaningful applicability to a real African use case"
+    },
+    {
+      "name": "Finalist GPU credits",
+      "amount": 250,
+      "eligibility": "Up to ten Gate 3 finalists"
+    },
+    {
+      "name": "Semifinalist GPU credits",
+      "amount": 50,
+      "eligibility": "Up to twenty semifinalists selected from complete Gate 2 packages"
+    }
+  ],
+  "network": {
+    "chain": null,
+    "chain_id": null,
+    "rpc": null,
+    "testnet_name": null,
+    "faucet_url": null,
+    "deploy_requirement": "No blockchain or network deployment. Evaluation is CPU-only and offline."
+  },
+  "judging_criteria": [
+    {
+      "name": "Model Accuracy & Quality",
+      "weight_pct": 50
+    },
+    {
+      "name": "Model Throughput Performance",
+      "weight_pct": 30
+    },
+    {
+      "name": "Model Efficiency",
+      "weight_pct": 20
+    },
+    {
+      "name": "African Use Case Bonus",
+      "weight_pct": null,
+      "notes": "Devpost says up to 10 bonus points. Organizer site also publishes different bonus wording, so additive arithmetic is unresolved."
+    },
+    {
+      "name": "Hardware & Thermal Penalty",
+      "weight_pct": null,
+      "notes": "Minus 10 points for temperature at or above 85 C or throttling. OOM or sandbox crash disqualifies."
+    }
+  ],
+  "judges": [
+    "Oji Udezue",
+    "Yannick Djoumbou Feunang",
+    "Oluwatobi Oyinlola",
+    "Christine Abernathy",
+    "Omoju Miller",
+    "Peter Ing",
+    "Mbangula Lameck Amugongo",
+    "Ola Fadiran",
+    "Houda Ghozzi"
+  ],
+  "prizes": [
+    {
+      "track": "Grand Prize",
+      "amount_usd": 8000,
+      "notes": "One winner"
+    },
+    {
+      "track": "Second Place",
+      "amount_usd": 4000,
+      "notes": "One winner"
+    },
+    {
+      "track": "Third Place / Best Integration",
+      "amount_usd": 3000,
+      "notes": "Devpost and organizer challenge page use different labels"
+    },
+    {
+      "track": "Best African Use Case / Best Localisation",
+      "amount_usd": 1500,
+      "notes": "Devpost and organizer challenge page use different labels"
+    }
+  ],
+  "builder_profile": {
+    "skills": [
+      "full-stack engineering",
+      "ML systems integration",
+      "technical writing",
+      "hackathon execution"
+    ],
+    "tools": [
+      "Codex collaboration agents",
+      "GitHub Actions",
+      "llama.cpp",
+      "ADTC profiler"
+    ],
+    "preferences": [
+      "open source",
+      "offline-first",
+      "proof before pitch",
+      "minimal scope",
+      "no-training fallback"
+    ]
+  }
+}

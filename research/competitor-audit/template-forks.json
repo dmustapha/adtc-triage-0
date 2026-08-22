@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-08-22T06:25:00Z",
+  "upstream": "https://github.com/Africa-Deep-Tech-Foundation/adtc-2026-submission-template",
+  "upstream_forks_api_count": 118,
+  "profiler_forks_api_count": 31,
+  "source": "GitHub repository API",
+  "audit_funnel": {
+    "all_forks": 118,
+    "forks_ahead_of_upstream": 48,
+    "forks_not_ahead_with_common_history": 67,
+    "forks_with_no_common_ancestor": 3,
+    "forks_with_root_metadata_json": 46,
+    "forks_with_placeholders_removed": 41,
+    "forks_with_root_report_md": 48,
+    "forks_with_public_gguf_url": 42,
+    "forks_with_profiler_json": 6,
+    "reproducible_high_threat_entries": 7
+  },
+  "high_threat_material_repositories": [
+    {
+      "project": "AGBE",
+      "url": "https://github.com/nevodesigns/agbe",
+      "reason": "Custom 1B agriculture model with training evidence and profiler JSON, though its published run throttles at 99 C."
+    },
+    {
+      "project": "Code Persona",
+      "url": "https://github.com/Overwatch886/team-codewatch-adtc-2026-submission",
+      "reason": "Profiler-backed 0.86 ARC Easy acc_norm with a thermally safe 6.94B IQ4_XS model."
+    },
+    {
+      "project": "Ayekoo",
+      "url": "https://github.com/nogasante/ayekoo",
+      "reason": "Very low memory with deep Ghana-specific agriculture grounding, but no published accuracy result."
+    },
+    {
+      "project": "Siyana AI",
+      "url": "https://github.com/shaba40/siyana-ai",
+      "reason": "Multilingual industrial-maintenance assistant with unusually deep evaluation artifacts."
+    },
+    {
+      "project": "BuildMate AI",
+      "url": "https://github.com/Sultan-Othman-Adekoya/buildmate-ai-adtc2026",
+      "reason": "Public profiler JSON includes generation, RAM, and accuracy evidence."
+    },
+    {
+      "project": "Baarali Edge",
+      "url": "https://github.com/benewende-dev/baarali-edge",
+      "reason": "Multiple raw model and quantization bake-offs plus local-language enterprise positioning."
+    },
+    {
+      "project": "Ondjila",
+      "url": "https://github.com/dimittri1/ondjila",
+      "reason": "Claims constrained x86 measurements, public artifact, corpus provenance, and an Angolan document-agent wedge."
+    }
+  ],
+  "methodology": "Enumerated every fork through GitHub REST pagination, compared upstream main with each default branch, then inspected root metadata.json, REPORT.md, download_model.sh, and submission.json through GitHub GraphQL blob reads.",
+  "classification_rule": "A fork is intent evidence only. It is not a submission unless a published Devpost project page proves that class.",
+  "admiralty": "A2 for GitHub API fork counts; B2/C3 for repository content"
+}

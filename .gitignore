@@ -14,3 +14,9 @@ __pycache__/
 # Local profiler output
 submission.json
 audit.json
+
+# Local conductor runtime
+.conductor-lock/
+.conductor-state.json.bak
+.crossmodel-gate/
+.watchdog-last-alert
