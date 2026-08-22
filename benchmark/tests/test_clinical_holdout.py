@@ -26,6 +26,10 @@ class ClinicalHoldoutTests(unittest.TestCase):
         self.assertEqual(extract_answer("B"), "B")
         self.assertEqual(extract_answer("Answer: C"), "C")
         self.assertEqual(extract_answer("The correct choice is D."), "D")
+        self.assertEqual(
+            extract_answer("<think>The answer may be A.</think>\nAnswer: B"),
+            "B",
+        )
         self.assertIsNone(extract_answer("I cannot determine this."))
 
     def test_weighted_score_prioritizes_critical_safety(self):

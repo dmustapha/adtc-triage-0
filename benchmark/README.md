@@ -28,6 +28,8 @@ The manually triggered GitHub Actions workflow:
 10. Deletes each runner-local GGUF before advancing to the next candidate.
 11. Uploads profiler, clinical, artifact, environment, and log evidence for 14 days.
 
+The MedPsy models inherit Qwen3 reasoning behavior, and the 4B backbone is thinking-only. The clinical suite therefore allows up to 1,024 generated tokens rather than forcing a short greedy answer. It uses the publisher-recommended `temperature=0.6`, `top_p=0.95`, and `top_k=20`, with a fixed seed and recorded finish reason. A response truncated before its final answer remains a failure and is visible in the evidence.
+
 The clinical set is a development holdout modeled on likely safety and reasoning demands. It is not the organizer's hidden benchmark. Safety-critical cases receive weight 2; other cases receive weight 1.
 
 ## Selection rule
@@ -57,6 +59,7 @@ This is a selection caveat, not a legal conclusion. The final report must cite t
 - A GitHub-hosted runner is useful for comparative x86 evidence, but it is not the ADTC reference laptop.
 - Cloud virtual machines do not provide valid physical laptop temperature or throttling proof.
 - The official profiler's local accuracy task is development evidence. Organizers retain private prompts and qualitative judging.
+- The proxy normalizes performance against the profiler's provisional 15 TPS reference. The organizer page also describes normalization against the fastest observed submission, so final reporting must show raw TPS and both interpretations if that inconsistency remains unresolved.
 - Reported memory and throughput must be labeled with the actual host and must not be presented as final target-laptop measurements.
 
 ## Sources

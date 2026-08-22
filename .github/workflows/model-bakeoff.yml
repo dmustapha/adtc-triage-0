@@ -48,6 +48,9 @@ jobs:
           git -C "$profiler_dir" fetch --depth 1 origin "$ADTC_PROFILER_REF"
           git -C "$profiler_dir" checkout --detach FETCH_HEAD
           docker build --pull --tag "$PROFILER_IMAGE" "$profiler_dir"
+          printf '%s\n' "$ADTC_PROFILER_REF" > benchmark-artifacts/profiler-commit.txt
+          docker image inspect "$PROFILER_IMAGE" > benchmark-artifacts/profiler-image-inspect.json
+          docker run --rm --entrypoint pip "$PROFILER_IMAGE" freeze > benchmark-artifacts/profiler-python-dependencies.txt
 
       - name: Run three candidates serially
         run: bash benchmark/run_bakeoff.sh

@@ -10,15 +10,17 @@ def load_holdout(path=None):
 
 def extract_answer(text):
     normalized = text.strip().upper()
+    final_content = normalized.rsplit("</THINK>", 1)[-1]
     patterns = (
         r"^\(?([ABCD])\)?[.\s]*$",
+        r"^\(?([ABCD])\)?[.)]\s+",
         r"\bANSWER\s*(?:IS|:)?\s*\(?([ABCD])\)?\b",
         r"\b(?:CORRECT\s+)?CHOICE\s*(?:IS|:)?\s*\(?([ABCD])\)?\b",
     )
     for pattern in patterns:
-        match = re.search(pattern, normalized)
-        if match:
-            return match.group(1)
+        matches = re.findall(pattern, final_content)
+        if matches:
+            return matches[-1]
     return None
 
 

@@ -18,6 +18,12 @@ RESPONSE_SYSTEM = (
     "African settings. Be safety-first, concise, non-diagnostic, explicit about "
     "uncertainty, and escalate emergencies to available local human care."
 )
+GENERATION_PARAMS = {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "max_tokens": 1024,
+}
 
 
 def build_mcq_prompt(item):
@@ -25,45 +31,54 @@ def build_mcq_prompt(item):
     return f"{item['question']}\n\n{choices}"
 
 
-def generate(llm, prompt, system, max_tokens):
+def generate(llm, prompt, system):
     started = time.perf_counter()
     result = llm.create_chat_completion(
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": prompt},
         ],
-        temperature=0.0,
-        max_tokens=max_tokens,
+        **GENERATION_PARAMS,
     )
-    content = result["choices"][0]["message"]["content"].strip()
-    return content, round(time.perf_counter() - started, 4)
+    choice = result["choices"][0]
+    content = choice["message"]["content"].strip()
+    return content, round(time.perf_counter() - started, 4), choice.get("finish_reason")
 
 
 def run_suite(llm, holdout, participant_prompts):
     raw_answers = {}
-    timings = {}
+    telemetry = {}
     for item in holdout:
-        raw_answers[item["id"]], timings[item["id"]] = generate(
-            llm, build_mcq_prompt(item), MCQ_SYSTEM, 16
+        response, elapsed, finish_reason = generate(
+            llm, build_mcq_prompt(item), MCQ_SYSTEM
         )
+        raw_answers[item["id"]] = response
+        telemetry[item["id"]] = (elapsed, finish_reason)
     report = score_responses(holdout, raw_answers)
-    _attach_timings(report, timings)
+    _attach_telemetry(report, telemetry)
     return {
         "holdout": report,
         "participant_prompts": _run_participant_prompts(llm, participant_prompts),
     }
 
 
-def _attach_timings(report, timings):
+def _attach_telemetry(report, telemetry):
     for row in report["details"]:
-        row["elapsed_seconds"] = timings[row["id"]]
+        row["elapsed_seconds"], row["finish_reason"] = telemetry[row["id"]]
 
 
 def _run_participant_prompts(llm, prompts):
     outputs = []
     for item in prompts:
-        response, elapsed = generate(llm, item["prompt"], RESPONSE_SYSTEM, 384)
-        outputs.append({**item, "response": response, "elapsed_seconds": elapsed})
+        response, elapsed, finish_reason = generate(llm, item["prompt"], RESPONSE_SYSTEM)
+        outputs.append(
+            {
+                **item,
+                "response": response,
+                "elapsed_seconds": elapsed,
+                "finish_reason": finish_reason,
+            }
+        )
     return outputs
 
 
@@ -98,6 +113,7 @@ def _provenance(model_path):
         "n_ctx": 2048,
         "n_threads": 4,
         "n_gpu_layers": 0,
+        "generation_params": GENERATION_PARAMS,
         "platform": platform.platform(),
         "created_at": datetime.now(timezone.utc).isoformat(),
     }

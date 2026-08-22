@@ -8,7 +8,11 @@ class FakeLlama:
         self.answers = iter(answers)
 
     def create_chat_completion(self, **kwargs):
-        return {"choices": [{"message": {"content": next(self.answers)}}]}
+        return {
+            "choices": [
+                {"message": {"content": next(self.answers)}, "finish_reason": "stop"}
+            ]
+        }
 
 
 class ClinicalRunnerTests(unittest.TestCase):
@@ -40,7 +44,9 @@ class ClinicalRunnerTests(unittest.TestCase):
         result = run_suite(FakeLlama(["Answer: A", "A safe response"]), holdout, prompts)
 
         self.assertEqual(result["holdout"]["weighted_accuracy"], 1.0)
+        self.assertEqual(result["holdout"]["details"][0]["finish_reason"], "stop")
         self.assertEqual(result["participant_prompts"][0]["response"], "A safe response")
+        self.assertEqual(result["participant_prompts"][0]["finish_reason"], "stop")
         self.assertGreaterEqual(result["participant_prompts"][0]["elapsed_seconds"], 0)
 
 

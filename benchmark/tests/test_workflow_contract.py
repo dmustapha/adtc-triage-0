@@ -22,9 +22,12 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertGreaterEqual(runner.count("--memory 7.5g"), 2)
         self.assertGreaterEqual(runner.count("--cpus 4"), 2)
         self.assertIn("sha256sum --check", runner)
+        self.assertIn("size mismatch", runner)
         self.assertIn("--mode audit", runner)
         self.assertIn("benchmark.clinical_runner", runner)
         self.assertIn('rm -f "$model_path"', runner)
+        self.assertIn('"$script_path" --candidate "$candidate_id"', runner)
+        self.assertIn("overall_status=1", runner)
 
 
 if __name__ == "__main__":
