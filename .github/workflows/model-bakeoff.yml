@@ -1,0 +1,62 @@
+name: Controlled model bake-off
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adtc-model-bakeoff
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    env:
+      ADTC_PROFILER_REF: ac2e137dca65ea3b09d997774f17dd8907b489fb
+      PROFILER_IMAGE: adtc-profiler:bakeoff-ac2e137
+    steps:
+      - name: Check out submission fork
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.11"
+
+      - name: Verify benchmark contracts
+        run: python -m unittest discover -s benchmark/tests -v
+
+      - name: Capture runner environment
+        run: |
+          mkdir -p benchmark-artifacts
+          {
+            uname -a
+            lscpu
+            free -h
+            df -h
+            docker version
+          } > benchmark-artifacts/runner-environment.txt
+
+      - name: Build pinned official profiler
+        run: |
+          profiler_dir="$RUNNER_TEMP/adtc-profiler"
+          git init "$profiler_dir"
+          git -C "$profiler_dir" remote add origin https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git
+          git -C "$profiler_dir" fetch --depth 1 origin "$ADTC_PROFILER_REF"
+          git -C "$profiler_dir" checkout --detach FETCH_HEAD
+          docker build --pull --tag "$PROFILER_IMAGE" "$profiler_dir"
+
+      - name: Run three candidates serially
+        run: bash benchmark/run_bakeoff.sh
+
+      - name: Upload comparison evidence
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: adtc-model-bakeoff-${{ github.run_id }}
+          path: benchmark-artifacts/
+          if-no-files-found: warn
+          retention-days: 14

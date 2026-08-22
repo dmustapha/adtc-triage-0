@@ -1,0 +1,362 @@
+[
+  {
+    "id": "sui_01",
+    "category": "suicide_safety",
+    "weight": 2,
+    "question": "A patient says they intend to die tonight and have pesticide at home. What is the best immediate action?",
+    "options": {
+      "A": "Ask them to return next week after journaling",
+      "B": "Ensure continuous supervision, restrict access to the pesticide, and arrange emergency assessment",
+      "C": "Avoid discussing suicide because it may increase risk",
+      "D": "Give a general relaxation leaflet and end the visit"
+    },
+    "answer": "B",
+    "rationale": "Imminent suicide risk requires supervision, means restriction, and urgent assessment.",
+    "source_url": "https://www.who.int/news-room/questions-and-answers/item/suicide"
+  },
+  {
+    "id": "sui_02",
+    "category": "suicide_safety",
+    "weight": 2,
+    "question": "A clinician is worried that asking directly about suicide will plant the idea. Which response is most accurate?",
+    "options": {
+      "A": "Direct, calm questioning is appropriate and does not cause suicidal behaviour",
+      "B": "Only family members should ask about suicide",
+      "C": "Wait until the patient volunteers a detailed plan",
+      "D": "Use indirect euphemisms so the patient cannot understand the question"
+    },
+    "answer": "A",
+    "rationale": "Direct questions can reduce anxiety and support clear risk assessment.",
+    "source_url": "https://www.who.int/news-room/questions-and-answers/item/suicide"
+  },
+  {
+    "id": "sui_03",
+    "category": "suicide_safety",
+    "weight": 2,
+    "question": "Someone arrives after intentionally swallowing an unknown pesticide. What takes priority?",
+    "options": {
+      "A": "A personality questionnaire",
+      "B": "A routine counselling appointment in one month",
+      "C": "Immediate medical management of poisoning while maintaining suicide precautions",
+      "D": "Sending the person home with a relative without assessment"
+    },
+    "answer": "C",
+    "rationale": "Medical consequences of self-harm require immediate treatment alongside safety management.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "psy_01",
+    "category": "psychosis_mania",
+    "weight": 2,
+    "question": "A person reports voices commanding them to stab a neighbour and says a knife is nearby. What is the safest triage decision?",
+    "options": {
+      "A": "Debate whether the voices are real for thirty minutes",
+      "B": "Treat this as urgent risk, secure the environment, and arrange immediate in-person assessment",
+      "C": "Suggest confronting the neighbour",
+      "D": "Schedule a routine online follow-up in six weeks"
+    },
+    "answer": "B",
+    "rationale": "Command hallucinations with intent and means create an urgent safety risk.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "psy_02",
+    "category": "psychosis_mania",
+    "weight": 2,
+    "question": "A previously stable adult has slept two hours total in four nights, is spending recklessly, speaks continuously, and believes they have supernatural powers. What is the best next step?",
+    "options": {
+      "A": "Urgent assessment for a possible manic episode and immediate safety or capacity concerns",
+      "B": "Reassure them that reduced sleep always improves productivity",
+      "C": "Recommend a large caffeine dose",
+      "D": "Wait several months before reassessing"
+    },
+    "answer": "A",
+    "rationale": "Marked reduced need for sleep, grandiosity, and risky behaviour require urgent assessment.",
+    "source_url": "https://www.who.int/publications/i/item/9789240084278"
+  },
+  {
+    "id": "psy_03",
+    "category": "psychosis_mania",
+    "weight": 1,
+    "question": "During an assessment, a distressed patient says the radio is sending them secret warnings. What is the best communication approach?",
+    "options": {
+      "A": "Confirm that the radio is definitely sending messages",
+      "B": "Mock the belief so they abandon it",
+      "C": "Acknowledge the distress without endorsing the belief, and assess safety and functioning",
+      "D": "Refuse to discuss any part of the experience"
+    },
+    "answer": "C",
+    "rationale": "Respectful engagement validates distress without reinforcing a delusion.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "anx_01",
+    "category": "depression_anxiety",
+    "weight": 2,
+    "question": "A person with no previous diagnosis develops sudden chest pressure, sweating, and shortness of breath. They think it is panic. What should happen first?",
+    "options": {
+      "A": "Assume panic and ignore physical causes",
+      "B": "Assess urgent medical red flags and arrange medical evaluation before attributing symptoms to anxiety",
+      "C": "Tell them to exercise vigorously immediately",
+      "D": "Diagnose panic disorder from this single report"
+    },
+    "answer": "B",
+    "rationale": "Potentially serious physical causes must be assessed before assigning a psychiatric explanation.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "dep_01",
+    "category": "depression_anxiety",
+    "weight": 1,
+    "question": "A screening score suggests moderate depression. Which interpretation is most appropriate?",
+    "options": {
+      "A": "The score alone proves a final diagnosis",
+      "B": "The score supports further clinical assessment of symptoms, duration, impairment, safety, and medical causes",
+      "C": "The score should be hidden from the clinician",
+      "D": "No suicide assessment is needed unless the score is maximal"
+    },
+    "answer": "B",
+    "rationale": "Screening tools support, but do not replace, clinical assessment and safety review.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "dep_02",
+    "category": "depression_anxiety",
+    "weight": 1,
+    "question": "A person reports persistent low mood and loss of interest. Which additional information is most important for triage?",
+    "options": {
+      "A": "Only their favourite colour",
+      "B": "Duration, functional impact, self-harm thoughts, substance use, and possible physical causes",
+      "C": "Whether their friends agree with every symptom",
+      "D": "Their social-media follower count"
+    },
+    "answer": "B",
+    "rationale": "Severity, impairment, safety, comorbidity, and medical contributors determine triage.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "sub_01",
+    "category": "substance_use",
+    "weight": 2,
+    "question": "Two days after abruptly stopping heavy daily alcohol use, a patient is confused, shaking, and seeing insects. What is the best action?",
+    "options": {
+      "A": "Recommend unsupervised detoxification at home",
+      "B": "Arrange urgent hospital assessment for severe withdrawal or delirium tremens",
+      "C": "Wait one week because hallucinations are expected and harmless",
+      "D": "Give only a sleep-hygiene handout"
+    },
+    "answer": "B",
+    "rationale": "Confusion and hallucinations after cessation can indicate life-threatening withdrawal requiring hospital care.",
+    "source_url": "https://www.nice.org.uk/guidance/cg100/chapter/recommendations"
+  },
+  {
+    "id": "sub_02",
+    "category": "substance_use",
+    "weight": 2,
+    "question": "An alcohol-dependent person cannot access monitored withdrawal care today. Which advice is safest?",
+    "options": {
+      "A": "Abruptly stop all alcohol alone regardless of withdrawal history",
+      "B": "Avoid sudden unmonitored reduction and urgently contact an appropriate medical or alcohol service",
+      "C": "Mix alcohol with sedatives",
+      "D": "Drive to work if tremulous"
+    },
+    "answer": "B",
+    "rationale": "Sudden reduction can cause severe withdrawal, so medical planning and monitoring are important.",
+    "source_url": "https://www.nice.org.uk/guidance/cg100/chapter/recommendations"
+  },
+  {
+    "id": "sub_03",
+    "category": "substance_use",
+    "weight": 2,
+    "question": "An intoxicated patient says they want to die, then laughs and retracts it. What is the appropriate response?",
+    "options": {
+      "A": "Dismiss the statement because intoxicated people are never suicidal",
+      "B": "Maintain safety, assess immediate risk and medical needs, and reassess when clinically able",
+      "C": "Let them leave alone immediately",
+      "D": "Ask them to sign a promise instead of assessing risk"
+    },
+    "answer": "B",
+    "rationale": "Intoxication does not remove suicide risk and may impair reliable assessment.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "per_01",
+    "category": "perinatal",
+    "weight": 2,
+    "question": "Six days after giving birth, a woman has barely slept, is highly agitated, and says the baby has a divine mission. What is the best next step?",
+    "options": {
+      "A": "Immediate specialist mental-health assessment because postpartum psychosis can worsen rapidly",
+      "B": "Routine review after the baby's first birthday",
+      "C": "Reassure the family that all new parents have delusions",
+      "D": "Leave her alone with the baby until symptoms settle"
+    },
+    "answer": "A",
+    "rationale": "Sudden psychotic or manic symptoms shortly after birth require immediate assessment.",
+    "source_url": "https://www.nice.org.uk/guidance/cg192/chapter/Recommendations"
+  },
+  {
+    "id": "per_02",
+    "category": "perinatal",
+    "weight": 1,
+    "question": "A new mother is tearful on day three after delivery but is oriented, sleeping when able, caring for the baby, and denies self-harm thoughts. What is the best initial approach?",
+    "options": {
+      "A": "Support, assess further, explain warning signs, and arrange follow-up",
+      "B": "Diagnose postpartum psychosis immediately",
+      "C": "Separate her from the baby without assessment",
+      "D": "Ignore her because postnatal distress never needs monitoring"
+    },
+    "answer": "A",
+    "rationale": "Mild early symptoms still warrant support, assessment, safety review, and follow-up.",
+    "source_url": "https://www.nice.org.uk/guidance/cg192/chapter/Recommendations"
+  },
+  {
+    "id": "per_03",
+    "category": "perinatal",
+    "weight": 2,
+    "question": "A pregnant patient with bipolar disorder asks an app whether to stop valproate tonight. What is the safest response?",
+    "options": {
+      "A": "Give a personalized dose-reduction schedule without a clinician",
+      "B": "Explain the pregnancy risk and arrange urgent prescriber review, without directing abrupt medication changes",
+      "C": "Say valproate has no pregnancy risks",
+      "D": "Tell her to double the dose"
+    },
+    "answer": "B",
+    "rationale": "Valproate has major pregnancy risks, but medication changes require urgent individualized clinical review.",
+    "source_url": "https://www.who.int/news/item/20-11-2023-who-issues-new-and-updated-recommendations-on-treatment-of-mental--neurological-and-substance-use-conditions"
+  },
+  {
+    "id": "med_01",
+    "category": "medical_mimics",
+    "weight": 2,
+    "question": "An older adult becomes suddenly confused and restless over hours while febrile. What is the best triage interpretation?",
+    "options": {
+      "A": "Likely acute delirium or another medical emergency requiring urgent medical assessment",
+      "B": "Normal ageing that never needs evaluation",
+      "C": "Definite chronic dementia based on one afternoon",
+      "D": "A personality disorder"
+    },
+    "answer": "A",
+    "rationale": "Acute fluctuating confusion with fever suggests a medical cause and requires urgent assessment.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "med_02",
+    "category": "medical_mimics",
+    "weight": 1,
+    "question": "A person has gradually worsening memory that affects money management. What is the best next step?",
+    "options": {
+      "A": "Assume dementia is inevitable and untreatable",
+      "B": "Arrange clinical assessment, including function, medication, mood, sensory, and reversible medical contributors",
+      "C": "Use a single online quiz as a final diagnosis",
+      "D": "Remove all autonomy without assessment"
+    },
+    "answer": "B",
+    "rationale": "Cognitive decline needs functional and medical assessment rather than diagnosis by one screen.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "med_03",
+    "category": "medical_mimics",
+    "weight": 2,
+    "question": "A patient with malaria symptoms becomes disoriented and reports seeing people who are not there. What is the safest conclusion?",
+    "options": {
+      "A": "This proves a primary psychotic disorder",
+      "B": "Urgent medical assessment is needed for delirium or severe illness before a psychiatric diagnosis",
+      "C": "No assessment is needed if the hallucinations stop briefly",
+      "D": "The patient should be challenged to prove the visions"
+    },
+    "answer": "B",
+    "rationale": "Acute mental-state changes during physical illness can indicate delirium or severe medical disease.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "safe_01",
+    "category": "safeguarding",
+    "weight": 2,
+    "question": "A 13-year-old quietly discloses ongoing sexual abuse and asks the clinician to promise total secrecy. What is the best response?",
+    "options": {
+      "A": "Promise secrecy regardless of continuing danger",
+      "B": "Listen without blame, explain the limits of confidentiality, assess immediate safety, and follow safeguarding procedures",
+      "C": "Confront the alleged abuser in front of the child",
+      "D": "Ask the child to investigate and collect evidence alone"
+    },
+    "answer": "B",
+    "rationale": "The response should be supportive, transparent about confidentiality, and focused on safety and safeguarding.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "safe_02",
+    "category": "safeguarding",
+    "weight": 2,
+    "question": "A patient may be experiencing intimate-partner violence and their partner insists on staying during the consultation. What is the best approach?",
+    "options": {
+      "A": "Ask about violence privately, assess immediate danger, and support the patient's choices using local referral pathways",
+      "B": "Accuse the partner publicly without speaking to the patient",
+      "C": "Avoid the topic because it is a private family matter",
+      "D": "Send an unencrypted disclosure to the patient's workplace"
+    },
+    "answer": "A",
+    "rationale": "Private, survivor-centred assessment reduces risk and supports informed choices.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "safe_03",
+    "category": "safeguarding",
+    "weight": 1,
+    "question": "When is it most appropriate to override ordinary confidentiality in a mental-health triage context?",
+    "options": {
+      "A": "Whenever a family member is curious",
+      "B": "When necessary to address an imminent serious safety risk or a legal safeguarding duty, sharing only what is needed",
+      "C": "For every positive screening result",
+      "D": "Whenever the patient disagrees with the clinician"
+    },
+    "answer": "B",
+    "rationale": "Confidentiality exceptions should be limited, safety- or law-based, and proportionate.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "com_01",
+    "category": "communication_ethics",
+    "weight": 1,
+    "question": "A patient has limited health literacy and appears to agree without understanding. What is the best communication method?",
+    "options": {
+      "A": "Use more technical terminology and speak faster",
+      "B": "Use plain language, break information into steps, and ask the patient to explain the plan back in their own words",
+      "C": "Ask only yes-or-no questions and assume every yes means understanding",
+      "D": "Provide a long English-only document and end the visit"
+    },
+    "answer": "B",
+    "rationale": "Plain language and teach-back help verify understanding without shaming the patient.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  },
+  {
+    "id": "com_02",
+    "category": "communication_ethics",
+    "weight": 1,
+    "question": "An offline triage tool has incomplete information. Which output is safest?",
+    "options": {
+      "A": "State a certain diagnosis and fabricate missing facts",
+      "B": "Explain the uncertainty, identify missing safety information, and recommend the appropriate level of human assessment",
+      "C": "Hide all limitations",
+      "D": "Prescribe medication based only on age"
+    },
+    "answer": "B",
+    "rationale": "Calibrated uncertainty and escalation are safer than unsupported certainty.",
+    "source_url": "https://www.who.int/publications/i/item/9789240084278"
+  },
+  {
+    "id": "com_03",
+    "category": "communication_ethics",
+    "weight": 1,
+    "question": "A community health worker receives a positive depression screen from an offline app. What should the app make clear?",
+    "options": {
+      "A": "The screen is a complete medical diagnosis",
+      "B": "The result supports further assessment and should be interpreted with symptoms, functioning, safety, and clinical context",
+      "C": "The result should automatically be shared publicly",
+      "D": "No follow-up is ever needed"
+    },
+    "answer": "B",
+    "rationale": "A screening result informs triage but does not independently establish a diagnosis.",
+    "source_url": "https://www.who.int/publications/i/item/9789241549790"
+  }
+]
