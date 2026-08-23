@@ -21,3 +21,5 @@ audit.json
 .conductor-state.json.bak
 .crossmodel-gate/
 .watchdog-last-alert
+benchmark-artifacts/
+.benchmark-work/
