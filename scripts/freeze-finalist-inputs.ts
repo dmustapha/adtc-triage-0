@@ -9,7 +9,8 @@ const paths = {
   corpus: "config/finalist-corpus.json",
   rubric: "config/finalist-rubric.json",
   finalists: "config/model-finalists.json",
-  generationPolicy: "config/generation-policy.json"
+  generationPolicy: "config/generation-policy.json",
+  rawProducer: "scripts/run-raw-finalist.ts"
 } as const;
 const bytes = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readFile(path)]))) as Record<keyof typeof paths, Buffer>;
 const corpus = JSON.parse(bytes.corpus.toString("utf8"));

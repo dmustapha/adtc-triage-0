@@ -4,7 +4,7 @@ import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
 const candidateId = "olmo-2-0425-1b-instruct-q4-k-m";
-const llamaArgs = ["-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0"];
+const llamaArgs = ["-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "-no-cnv"];
 const [modeOrOutput, requestedOutput] = process.argv.slice(2);
 const planOnly = modeOrOutput === "--plan-only";
 const outputPath = planOnly ? requestedOutput : modeOrOutput;

@@ -21,9 +21,11 @@ const cases = [...corpus.splits.pediatricHoldout, ...corpus.splits.generalMedica
 const run = promisify(execFile);
 const rows = [];
 for (const item of cases) {
-  const args = ["-m", modelPath, "-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "--no-display-prompt", "-p", item.prompt];
-  const result = await run("llama-cli", args, { maxBuffer: 4_000_000 });
+  const args = ["-m", modelPath, "-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "--no-display-prompt", "-no-cnv", "-p", item.prompt];
+  console.error(`START raw case ${item.id}`);
+  const result = await run("llama-cli", args, { maxBuffer: 4_000_000, timeout: 120_000, killSignal: "SIGKILL" });
   rows.push(JSON.stringify({ candidateId, caseId: item.id, command: ["llama-cli", ...args], rawStdout: result.stdout, rawStderr: result.stderr }));
+  console.error(`COMPLETE raw case ${item.id}`);
 }
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, rows.join("\n") + "\n", { flag: "wx" });

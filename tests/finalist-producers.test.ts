@@ -20,6 +20,7 @@ test("producer manifest freezes corpus, rubric, splits, raw paths, commands, hos
   assert.equal(manifest.corpus.splits.pediatricHoldout, 50);
   assert.equal(manifest.corpus.splits.generalMedicalHoldout, 50);
   assert.equal(manifest.rubric.generatedTokenLimit, 128);
+  assert.match(manifest.inputHashes.rawProducer, /^[a-f0-9]{64}$/);
   assert.match(manifest.host.label, /darwin|linux|win32/);
   for (const candidate of Object.values(manifest.candidates) as any[]) {
     assert.match(candidate.rawResponsePath, /^evidence\/finalists\/raw\//);
