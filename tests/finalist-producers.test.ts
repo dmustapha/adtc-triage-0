@@ -140,6 +140,7 @@ test("OLMo-2 7B producer pins the approved evidence-only workflow and frozen sem
   assert.match(workflow, /MODEL_BYTES: "4472020256"/);
   assert.match(workflow, /e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95/);
   assert.match(workflow, /LLAMA_REVISION: c8ade30036139e32108fee53d8b7164dbfda4bee/);
+  assert.match(workflow, /env -u CANDIDATE_ID npm test/);
   assert.match(workflow, /--continue-at -/);
   assert.match(workflow, /sha256sum --check --strict/);
   assert.ok(workflow.indexOf("sha256sum --check --strict") < workflow.indexOf('mv "model/$CANDIDATE_ID.gguf.partial"'));

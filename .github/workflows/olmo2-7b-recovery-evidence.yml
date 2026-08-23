@@ -34,7 +34,7 @@ jobs:
 
       - name: Verify harness before model download
         run: |
-          npm test
+          env -u CANDIDATE_ID npm test
           npm run typecheck
 
       - name: Freeze recovery producer and verify lineage
