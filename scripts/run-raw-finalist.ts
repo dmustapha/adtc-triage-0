@@ -10,6 +10,7 @@ if (!candidateId || !lineagePath || !outputPath) throw new Error("usage: run-raw
 let lineage: any;
 try { lineage = JSON.parse(await readFile(lineagePath, "utf8")); } catch { throw new Error("training-lineage prerequisite is not a verified pass"); }
 if (lineage.status !== "pass" || lineage.result?.reviewed !== true) throw new Error("training-lineage prerequisite is not a verified pass");
+if (lineage.model?.candidateId !== candidateId) throw new Error("training-lineage candidate does not match raw finalist");
 const finalists = JSON.parse(await readFile("config/model-finalists.json", "utf8"));
 const model = finalists[candidateId];
 if (!model) throw new Error(`unknown finalist: ${candidateId}`);

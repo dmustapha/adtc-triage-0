@@ -37,5 +37,19 @@
     "quantization": "GGUF Q4_K_M",
     "parametersEstimate": "1B",
     "license": "Apache-2.0"
+  },
+  "olmo-2-1124-7b-instruct-q4-k-m": {
+    "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+    "name": "OLMo-2-1124-7B-Instruct-Q4_K_M",
+    "revision": "410e0069f64869e4b1d17d8de04810b881fd824b",
+    "url": "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct-GGUF/resolve/410e0069f64869e4b1d17d8de04810b881fd824b/olmo-2-1124-7B-instruct-Q4_K_M.gguf?download=true",
+    "filename": "olmo-2-1124-7B-instruct-Q4_K_M.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 4472020256,
+    "sha256": "e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "7B",
+    "license": "Apache-2.0",
+    "runtimeArchitecture": "olmo2"
   }
 }

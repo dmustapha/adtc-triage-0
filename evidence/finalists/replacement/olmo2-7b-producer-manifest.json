@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+  "quantization": "GGUF Q4_K_M",
+  "producer": "github-actions",
+  "llamaRevision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  "llamaArgs": [
+    "-t",
+    "4",
+    "-ngl",
+    "0",
+    "-c",
+    "2048",
+    "-n",
+    "128",
+    "--temp",
+    "0",
+    "--jinja",
+    "--single-turn"
+  ],
+  "corpus": {
+    "path": "config/finalist-corpus.json",
+    "splits": {
+      "pediatricHoldout": 50,
+      "generalMedicalHoldout": 50
+    }
+  },
+  "inputHashes": {
+    "corpus": "6fd2a1351bf2bcb9ef7927aacf55ecf0aff65f7505d82243a00ece83df4a5f50",
+    "rubric": "6d89cf637fb2a7e61553eef943c402e6e245e4ae8ad6c77c93e48d9df872eb00",
+    "generationPolicy": "53ee56807c9c61c43bf2347f1289dd1df53786a8c59f943392c4351631a101ca",
+    "rawProducer": "35eef5e743f36d72964970a573ca9ed9d064d254b8804c99fa6f1856656840e7",
+    "evidenceProducer": "ad5d1b31ae08604226c7e92464983954e30870628b480ce5639ab8a3000a2538",
+    "workflow": "5f708e32509ec2d0d90b3a59c6ca9b2b3b30f6ce47fe6f22120d43d2b87cfee6"
+  },
+  "gates": {
+    "humanRubric": {
+      "status": "unresolved",
+      "reason": "requires two independent human reviewers"
+    },
+    "targetLaptopResources": {
+      "status": "unresolved",
+      "observedTier": "remote-ci",
+      "reason": "a hosted CI runner cannot certify the frozen target-laptop tier"
+    }
+  }
+}

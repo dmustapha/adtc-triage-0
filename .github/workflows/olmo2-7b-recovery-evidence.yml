@@ -1,0 +1,86 @@
+name: OLMo-2 7B recovery Phase 1 evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: olmo2-7b-recovery-phase-1
+  cancel-in-progress: false
+
+jobs:
+  raw-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      CANDIDATE_ID: olmo-2-1124-7b-instruct-q4-k-m
+      MODEL_URL: https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct-GGUF/resolve/410e0069f64869e4b1d17d8de04810b881fd824b/olmo-2-1124-7B-instruct-Q4_K_M.gguf?download=true
+      MODEL_BYTES: "4472020256"
+      MODEL_SHA256: e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95
+      LLAMA_REVISION: c8ade30036139e32108fee53d8b7164dbfda4bee
+      RAW_RESPONSE_PATH: evidence/finalists/replacement/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Verify harness before model download
+        run: |
+          npm test
+          npm run typecheck
+
+      - name: Freeze recovery producer and verify lineage
+        run: |
+          node --import tsx scripts/produce-replacement-ci-evidence.ts --plan-only evidence/finalists/replacement/ci-olmo2-7b-producer-manifest.json
+          node --import tsx scripts/run-lineage-gate.ts "$CANDIDATE_ID" \
+            https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct/raw/470b1fba1ae01581f270116362ee4aa1b97f4c84/README.md \
+            1c64f5f2cb6158d24a2fa1241687cd93854154bc6cce6c2b86f6dc3e69cc87de \
+            evidence/finalists/replacement/sources/ci-olmo2-7b-instruct.md \
+            evidence/finalists/replacement/ci-olmo2-7b-training-lineage.json
+
+      - name: Build pinned CPU-only llama.cpp
+        run: |
+          git init "$RUNNER_TEMP/llama.cpp"
+          git -C "$RUNNER_TEMP/llama.cpp" remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C "$RUNNER_TEMP/llama.cpp" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$RUNNER_TEMP/llama.cpp" checkout --detach FETCH_HEAD
+          cmake -S "$RUNNER_TEMP/llama.cpp" -B "$RUNNER_TEMP/llama.cpp/build" -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/llama.cpp/build" --config Release --target llama-cli --parallel 2
+          echo "$RUNNER_TEMP/llama.cpp/build/bin" >> "$GITHUB_PATH"
+
+      - name: Download and verify immutable GGUF
+        run: |
+          mkdir -p model
+          curl --fail --location --retry 8 --retry-all-errors --retry-delay 10 --connect-timeout 30 --max-time 10800 --http1.1 --continue-at - --output "model/$CANDIDATE_ID.gguf.partial" "$MODEL_URL"
+          test "$(stat -c %s "model/$CANDIDATE_ID.gguf.partial")" = "$MODEL_BYTES"
+          echo "$MODEL_SHA256  model/$CANDIDATE_ID.gguf.partial" | sha256sum --check --strict
+          mv "model/$CANDIDATE_ID.gguf.partial" "model/$CANDIDATE_ID.gguf"
+
+      - name: Capture template and frozen raw responses
+        run: |
+          node --import tsx scripts/extract-gguf-chat-template.ts "$CANDIDATE_ID" "model/$CANDIDATE_ID.gguf" "evidence/finalists/replacement/$CANDIDATE_ID-template.json"
+          node --import tsx scripts/run-raw-finalist.ts "$CANDIDATE_ID" evidence/finalists/replacement/ci-olmo2-7b-training-lineage.json "$RAW_RESPONSE_PATH"
+          node --import tsx scripts/produce-replacement-ci-evidence.ts evidence/finalists/replacement/ci-olmo2-7b-status.json
+
+      - name: Remove model bytes before evidence upload
+        if: always()
+        run: rm -f "model/$CANDIDATE_ID.gguf" "model/$CANDIDATE_ID.gguf.partial"
+
+      - name: Upload raw Phase 1 evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: olmo2-7b-recovery-phase-1-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            evidence/finalists/replacement/
+            !evidence/finalists/replacement/**/*.gguf
