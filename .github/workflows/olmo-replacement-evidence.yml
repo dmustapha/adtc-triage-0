@@ -59,9 +59,10 @@ jobs:
       - name: Download and verify immutable GGUF
         run: |
           mkdir -p model
-          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --http1.1 --output "model/$CANDIDATE_ID.gguf" "$MODEL_URL"
-          test "$(stat -c %s "model/$CANDIDATE_ID.gguf")" = "$MODEL_BYTES"
-          echo "$MODEL_SHA256  model/$CANDIDATE_ID.gguf" | sha256sum --check --strict
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --http1.1 --continue-at - --output "model/$CANDIDATE_ID.gguf.partial" "$MODEL_URL"
+          test "$(stat -c %s "model/$CANDIDATE_ID.gguf.partial")" = "$MODEL_BYTES"
+          echo "$MODEL_SHA256  model/$CANDIDATE_ID.gguf.partial" | sha256sum --check --strict
+          mv "model/$CANDIDATE_ID.gguf.partial" "model/$CANDIDATE_ID.gguf"
 
       - name: Capture template and frozen raw responses
         run: |
@@ -71,7 +72,7 @@ jobs:
 
       - name: Remove model bytes before evidence upload
         if: always()
-        run: rm -f "model/$CANDIDATE_ID.gguf"
+        run: rm -f "model/$CANDIDATE_ID.gguf" "model/$CANDIDATE_ID.gguf.partial"
 
       - name: Upload raw Phase 1 evidence only
         if: always()
