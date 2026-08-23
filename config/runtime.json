@@ -1,0 +1,14 @@
+{
+  "llamaBinary": "llama-server",
+  "llamaHost": "127.0.0.1",
+  "llamaPort": 8080,
+  "appHost": "127.0.0.1",
+  "appPort": 3000,
+  "threads": 4,
+  "gpuLayers": 0,
+  "contextTokens": 2048,
+  "startupTimeoutMs": 120000,
+  "requestTimeoutMs": 90000,
+  "maxWaiting": 0,
+  "llamaRevision": "8144f3192e5a3131cd043f284525e6ceebf82d0f"
+}

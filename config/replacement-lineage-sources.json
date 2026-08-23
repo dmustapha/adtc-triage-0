@@ -1,0 +1,19 @@
+{
+  "olmo-2-0425-1b-instruct-q4-k-m": {
+    "modelLicense": "Apache-2.0",
+    "rightsConclusion": "Apache-2.0 model redistribution is explicit; the complete published training chain and dataset mixtures are content-addressed below. Preference data discloses non-commercial subsets and third-party generation terms, so those terms remain a provenance caveat rather than being concealed.",
+    "sources": [
+      {"id":"instruct","url":"https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md","sha256":"5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8"},
+      {"id":"rlvr1","url":"https://huggingface.co/allenai/OLMo-2-0425-1B-RLVR1/raw/12cb33498d26b411c38ac3ca9df27180a1d291b8/README.md","sha256":"fb0e3b00e7a5a6f39eb06e363d285a24a9e2e58e2c0d98a87653b8dce504bbad"},
+      {"id":"dpo","url":"https://huggingface.co/allenai/OLMo-2-0425-1B-DPO/raw/c4b0485961ab24c2433b090f3b922f0913a9290f/README.md","sha256":"c1a1aae666e26275d38848cef3fc947e56fa8d7ac873feeec31d7dab31393fc2"},
+      {"id":"sft","url":"https://huggingface.co/allenai/OLMo-2-0425-1B-SFT/raw/0d85a3d037876ce6ac7d4311d994400fc66ac27f/README.md","sha256":"14728d3bf4881b2e9ca5bb16e78351cd6be7a30b0d6771b68c8ab20b1208e9c8"},
+      {"id":"base","url":"https://huggingface.co/allenai/OLMo-2-0425-1B/raw/a1847dff35000b4271fa70afc5db10fd29fedbdf/README.md","sha256":"8e09b3ce741d945b340e51530dd95f49c646a210d0342b1a831a19e36928758b"},
+      {"id":"gguf","url":"https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct-GGUF/raw/62f8c199538474c3e33ed5d7e0580abd66686a27/README.md","sha256":"8de51d287941803af969f367b722078e7da40366c708efad9cda21f26a083ef2"},
+      {"id":"olmo-mix","url":"https://huggingface.co/datasets/allenai/olmo-mix-1124/raw/99ee6aaace88779d1ef099d36251b91101c1679b/README.md","sha256":"8a0a0c243be08a014bb85062f1117c4fbe97d6caeb22a69545ffdf58c3a49ae5"},
+      {"id":"dolmino-mix","url":"https://huggingface.co/datasets/allenai/dolmino-mix-1124/raw/a319f19eef1e257417b11ea8c30da266ae175557/README.md","sha256":"f687a2e72e4e30eb978438317ff4c724c8bcba4a3c7bd230c3a1a067d3809cf7"},
+      {"id":"tulu-sft","url":"https://huggingface.co/datasets/allenai/tulu-3-sft-olmo-2-mixture-0225/raw/d91a0785ade02942520280fb484866fce41e448f/README.md","sha256":"34fa51ecdd374bc6de590f80ea935f5ac12773686b8a785c6969909cb4981045"},
+      {"id":"preference-mix","url":"https://huggingface.co/datasets/allenai/olmo-2-0425-1b-preference-mix/raw/c6454f3d364622718a8ecd3d307e524febbba569/README.md","sha256":"7366a4853066fb46ed6a6c31c37bf307c179c779c67c375a87583db7284af2ee"},
+      {"id":"rlvr-math","url":"https://huggingface.co/datasets/allenai/RLVR-MATH/raw/bd2a93551b503a395fadd1a740d957559cfe6f3c/README.md","sha256":"914ce21d301adafd9177d87337bd938b6c4f477f14eea14aebe628bc7b00ee6d"}
+    ]
+  }
+}

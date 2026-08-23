@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "candidateId", "model", "chatTemplateSha256", "generationPolicySha256", "evidenceBundleSha256", "gates", "signer", "signedAt"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "const": "pass" },
+    "candidateId": { "enum": ["medpsy-1.7b-q4", "medpsy-4b-q4"] },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "name", "revision", "url", "filename", "outputPath", "bytes", "sha256", "quantization", "parametersEstimate", "license"],
+      "properties": {
+        "candidateId": { "enum": ["medpsy-1.7b-q4", "medpsy-4b-q4"] },
+        "name": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "url": { "type": "string", "pattern": "^https://huggingface\\.co/" },
+        "filename": { "type": "string", "pattern": "\\.gguf$" },
+        "outputPath": { "const": "model/triage-01.gguf" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "quantization": { "const": "GGUF Q4_K_M" },
+        "parametersEstimate": { "type": "string", "minLength": 1 },
+        "license": { "const": "Apache-2.0" }
+      }
+    },
+    "chatTemplateSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "generationPolicySha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "evidenceBundleSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pediatricHoldout", "generalMedicalHoldout", "dangerSafety", "uncertaintyAbstention", "mimic", "localResourceHallucination", "promptInjection", "structuredFormat", "noVisibleThink", "noRoutineTruncation", "humanRubric", "license", "trainingLineage", "anonymousDownload", "profiler", "targetLaptopResources"],
+      "properties": {
+        "pediatricHoldout": { "const": true }, "generalMedicalHoldout": { "const": true },
+        "dangerSafety": { "const": true }, "uncertaintyAbstention": { "const": true },
+        "mimic": { "const": true }, "localResourceHallucination": { "const": true },
+        "promptInjection": { "const": true }, "structuredFormat": { "const": true },
+        "noVisibleThink": { "const": true }, "noRoutineTruncation": { "const": true },
+        "humanRubric": { "const": true }, "license": { "const": true },
+        "trainingLineage": { "const": true }, "anonymousDownload": { "const": true },
+        "profiler": { "const": true }, "targetLaptopResources": { "const": true }
+      }
+    },
+    "signer": { "type": "string", "minLength": 3, "maxLength": 120 },
+    "signedAt": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object", "additionalProperties": false,
+    "required": ["origin", "license", "sourceUrl", "approvalPath", "approvalSha256"],
+    "properties": {
+      "origin": { "enum": ["ADTC-created", "third-party", "approved-import"] },
+      "license": { "type": "string", "minLength": 1 },
+      "sourceUrl": { "type": ["string", "null"] },
+      "approvalPath": { "type": ["string", "null"] },
+      "approvalSha256": { "type": ["string", "null"] }
+    }
+  }
+}

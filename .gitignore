@@ -1,21 +1,22 @@
-# Model weights — never commit these to git
 model/*.gguf
 model/*.bin
 model/*.safetensors
-
-# macOS
+model/*.partial
+model/*.partial.*
+model/*.fresh
+model/*.corrupt.*
+node_modules/
+dist/
+.env
+.release-private-key.pem
+*.log
 .DS_Store
-
-# Python
+evidence/tmp/
 __pycache__/
 *.pyc
 .venv/
-
-# Local profiler output
 submission.json
 audit.json
-
-# Local conductor runtime
 .conductor-lock/
 .conductor-state.json.bak
 .crossmodel-gate/

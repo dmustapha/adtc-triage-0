@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "reviewedAt", "reviewedBy", "files"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "reviewedAt": { "type": "string", "format": "date-time" },
+    "reviewedBy": { "type": "string", "minLength": 3 },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "origin", "sha256", "createdCommit", "license", "reviewer", "sourceUrl", "approvalPath", "approvalSha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "origin": { "enum": ["ADTC-created", "third-party", "approved-import"] },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "createdCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+          "license": { "type": "string", "minLength": 1 },
+          "reviewer": { "type": "string", "minLength": 3 },
+          "sourceUrl": { "type": ["string", "null"] },
+          "approvalPath": { "type": ["string", "null"] },
+          "approvalSha256": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

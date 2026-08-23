@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "selectedCandidateId": null,
+  "producerManifest": {
+    "path": "evidence/finalists/producer-manifest.json",
+    "sha256": "13bcf3083d23fa23ac6aa62c8f2150a2976562d6d1479867eb435159ebb19a7c"
+  },
+  "candidates": {
+    "medpsy-1.7b-q4": {
+      "prerequisite": "trainingLineage",
+      "status": "rejected",
+      "evidencePath": "evidence/finalists/1.7b-training-lineage.json",
+      "evidenceSha256": "0a9e5f45041f149e3af49cf973f1d87df1d593cb459c1fc3e1937e90e691a92c",
+      "reason": "Training disclosure includes a new health domain not yet publicly released and unspecified open-source medical QA prompts, with no itemized dataset/right/license ledger; redistribution and medical-submission suitability are not established.",
+      "rawInference": "not-run-after-prerequisite-failure"
+    },
+    "medpsy-4b-q4": {
+      "prerequisite": "trainingLineage",
+      "status": "rejected",
+      "evidencePath": "evidence/finalists/4b-training-lineage.json",
+      "evidenceSha256": "ee81ff1fa89218162a5b8e75a6df592260cc1526de34bc842370fbdf4761895a",
+      "reason": "Training disclosure includes a new health domain not yet publicly released and unspecified open-source medical QA prompts, with no itemized dataset/right/license ledger; redistribution and medical-submission suitability are not established.",
+      "rawInference": "not-run-after-prerequisite-failure"
+    }
+  }
+}

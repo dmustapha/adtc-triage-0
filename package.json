@@ -1,0 +1,30 @@
+{
+  "name": "triage-01",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.17" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:e2e": "TRIAGE01_E2E=1 node --import tsx --test tests/server.test.ts",
+    "start": "tsx src/server.ts",
+    "create-release-key": "tsx scripts/create-release-key.ts",
+    "extract-chat-template": "tsx scripts/extract-gguf-chat-template.ts",
+    "build-finalist-bundle": "tsx scripts/build-finalist-bundle.ts",
+    "finalist-gate": "tsx scripts/run-finalist-gate.ts",
+    "freeze-model": "tsx scripts/freeze-model.ts",
+    "verify-sources": "tsx scripts/verify-sources.ts",
+    "attest-source": "tsx scripts/attest-source.ts",
+    "verify-provenance": "tsx scripts/verify-provenance.ts",
+    "generate-provenance": "tsx scripts/generate-provenance.ts",
+    "sign-provenance": "tsx scripts/sign-provenance.ts",
+    "aggregate-physical": "tsx scripts/aggregate-physical-release.ts",
+    "seed-demo": "tsx scripts/seed-demo.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

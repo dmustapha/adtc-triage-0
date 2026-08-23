@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "sources": "official publisher repositories and immutable primary model/dataset cards only",
+  "candidates": [
+    {"candidateId":"olmo-2-0425-1b-instruct-q4-k-m","disposition":"freeze-for-raw-gate","reason":"Official publisher GGUF; Apache-2.0 model; fully linked base/SFT/DPO/RLVR chain and content-addressed training mixtures; 935515296-byte Q4 is plausible under 8 GB."},
+    {"candidateId":"smollm2-360m-instruct-q8","disposition":"rejected-lineage","reason":"Official card discloses new filtered and curated datasets not fully released, failing unchanged F-08 evidence standard."},
+    {"candidateId":"granite-3.3-2b-instruct-q2-k","disposition":"rejected-lineage-and-format-risk","reason":"Official card describes select proprietary and synthetic data without the promised detailed attribution; model also emits visible thinking tags by design."}
+  ]
+}

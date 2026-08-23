@@ -1,0 +1,85 @@
+name: OLMo replacement Phase 1 evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: olmo-replacement-phase-1
+  cancel-in-progress: false
+
+jobs:
+  raw-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      CANDIDATE_ID: olmo-2-0425-1b-instruct-q4-k-m
+      MODEL_URL: https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct-GGUF/resolve/62f8c199538474c3e33ed5d7e0580abd66686a27/OLMo-2-0425-1B-Instruct-Q4_K_M.gguf?download=true
+      MODEL_BYTES: "935515296"
+      MODEL_SHA256: abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6
+      LLAMA_REVISION: c8ade30036139e32108fee53d8b7164dbfda4bee
+      RAW_RESPONSE_PATH: evidence/finalists/replacement/raw/olmo-2-0425-1b-instruct-q4-k-m-responses.jsonl
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Verify harness before model download
+        run: |
+          npm test
+          npm run typecheck
+
+      - name: Verify frozen replacement inputs and lineage
+        run: |
+          node --import tsx scripts/freeze-finalist-inputs.ts evidence/finalists/replacement/ci-producer-manifest.json "$CANDIDATE_ID"
+          node --import tsx scripts/run-lineage-gate.ts "$CANDIDATE_ID" \
+            https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md \
+            5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8 \
+            evidence/finalists/replacement/sources/ci-instruct.md \
+            evidence/finalists/replacement/ci-training-lineage.json
+
+      - name: Build pinned CPU-only llama.cpp
+        run: |
+          git init "$RUNNER_TEMP/llama.cpp"
+          git -C "$RUNNER_TEMP/llama.cpp" remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C "$RUNNER_TEMP/llama.cpp" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$RUNNER_TEMP/llama.cpp" checkout --detach FETCH_HEAD
+          cmake -S "$RUNNER_TEMP/llama.cpp" -B "$RUNNER_TEMP/llama.cpp/build" -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/llama.cpp/build" --config Release --target llama-cli --parallel 2
+          echo "$RUNNER_TEMP/llama.cpp/build/bin" >> "$GITHUB_PATH"
+
+      - name: Download and verify immutable GGUF
+        run: |
+          mkdir -p model
+          curl --fail --location --retry 3 --output "model/$CANDIDATE_ID.gguf" "$MODEL_URL"
+          test "$(stat -c %s "model/$CANDIDATE_ID.gguf")" = "$MODEL_BYTES"
+          echo "$MODEL_SHA256  model/$CANDIDATE_ID.gguf" | sha256sum --check --strict
+
+      - name: Capture template and frozen raw responses
+        run: |
+          node --import tsx scripts/extract-gguf-chat-template.ts "$CANDIDATE_ID" "model/$CANDIDATE_ID.gguf" "evidence/finalists/replacement/$CANDIDATE_ID-template.json"
+          node --import tsx scripts/run-raw-finalist.ts "$CANDIDATE_ID" evidence/finalists/replacement/ci-training-lineage.json "$RAW_RESPONSE_PATH"
+          node --import tsx scripts/produce-replacement-ci-evidence.ts evidence/finalists/replacement/ci-status.json
+
+      - name: Remove model bytes before evidence upload
+        if: always()
+        run: rm -f "model/$CANDIDATE_ID.gguf"
+
+      - name: Upload raw Phase 1 evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: olmo-replacement-phase-1-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            evidence/finalists/replacement/
+            !evidence/finalists/replacement/**/*.gguf

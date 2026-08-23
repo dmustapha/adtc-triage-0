@@ -1,0 +1,41 @@
+{
+  "medpsy-1.7b-q4": {
+    "candidateId": "medpsy-1.7b-q4",
+    "name": "MedPsy-1.7B-Q4_K_M-imatrix",
+    "revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "url": "https://huggingface.co/qvac/MedPsy-1.7B-GGUF/resolve/fd4cecc90c2de8dce4b112795456a54be9c59363/medpsy-1.7b-q4_k_m-imat.gguf",
+    "filename": "medpsy-1.7b-q4_k_m-imat.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "2.03B",
+    "license": "Apache-2.0"
+  },
+  "medpsy-4b-q4": {
+    "candidateId": "medpsy-4b-q4",
+    "name": "MedPsy-4B-Q4_K_M-imatrix",
+    "revision": "ad85e5a6f745027a576595df9acf745b071353b3",
+    "url": "https://huggingface.co/qvac/MedPsy-4B-GGUF/resolve/ad85e5a6f745027a576595df9acf745b071353b3/medpsy-4b-q4_k_m-imat.gguf",
+    "filename": "medpsy-4b-q4_k_m-imat.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 2716068640,
+    "sha256": "2ecbf622a2856f631001f20f593669aa03acba39977f521bef80cd8600864980",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "4B",
+    "license": "Apache-2.0"
+  },
+  "olmo-2-0425-1b-instruct-q4-k-m": {
+    "candidateId": "olmo-2-0425-1b-instruct-q4-k-m",
+    "name": "OLMo-2-0425-1B-Instruct-Q4_K_M",
+    "revision": "62f8c199538474c3e33ed5d7e0580abd66686a27",
+    "url": "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct-GGUF/resolve/62f8c199538474c3e33ed5d7e0580abd66686a27/OLMo-2-0425-1B-Instruct-Q4_K_M.gguf",
+    "filename": "OLMo-2-0425-1B-Instruct-Q4_K_M.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 935515296,
+    "sha256": "abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "1B",
+    "license": "Apache-2.0"
+  }
+}

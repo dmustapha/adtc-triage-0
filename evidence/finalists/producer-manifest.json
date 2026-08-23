@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "freezeRule": "inputs and producers frozen before any candidate response is observed",
+  "status": "frozen-prerequisites-pending",
+  "host": {
+    "label": "darwin-arm64-25.0.0",
+    "hostname": "dami",
+    "ramBytes": 8589934592,
+    "tier": "development"
+  },
+  "corpus": {
+    "path": "config/finalist-corpus.json",
+    "splits": {
+      "pediatricHoldout": 50,
+      "generalMedicalHoldout": 50
+    }
+  },
+  "rubric": {
+    "path": "config/finalist-rubric.json",
+    "generatedTokenLimit": 128,
+    "temperature": 0
+  },
+  "inputHashes": {
+    "corpus": "6fd2a1351bf2bcb9ef7927aacf55ecf0aff65f7505d82243a00ece83df4a5f50",
+    "rubric": "6d89cf637fb2a7e61553eef943c402e6e245e4ae8ad6c77c93e48d9df872eb00",
+    "finalists": "7c5fccf32cdf66dc9588db86567519f527fb45eb5e9940151bb041142adaf927",
+    "generationPolicy": "53ee56807c9c61c43bf2347f1289dd1df53786a8c59f943392c4351631a101ca"
+  },
+  "candidates": {
+    "medpsy-1.7b-q4": {
+      "modelPath": "model/medpsy-1.7b-q4.gguf",
+      "rawResponsePath": "evidence/finalists/raw/1.7b-responses.jsonl",
+      "chatTemplatePath": "evidence/finalists/1.7b-template.json",
+      "lineageSource": {
+        "url": "https://huggingface.co/qvac/MedPsy-1.7B/raw/59335b96dd541b0061d748d7a6e9536e92274985/README.md",
+        "sha256": "437a67d37127fe87f310e04bb8a1258c917b92c3682c73c09da3dd4a59fd3c7e",
+        "snapshotPath": "evidence/finalists/sources/1.7b-model-card.md"
+      },
+      "lineageProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-lineage-gate.ts",
+        "medpsy-1.7b-q4",
+        "https://huggingface.co/qvac/MedPsy-1.7B/raw/59335b96dd541b0061d748d7a6e9536e92274985/README.md",
+        "437a67d37127fe87f310e04bb8a1258c917b92c3682c73c09da3dd4a59fd3c7e",
+        "evidence/finalists/sources/1.7b-model-card.md",
+        "evidence/finalists/1.7b-training-lineage.json"
+      ],
+      "templateProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/extract-gguf-chat-template.ts",
+        "medpsy-1.7b-q4",
+        "model/medpsy-1.7b-q4.gguf",
+        "evidence/finalists/1.7b-template.json"
+      ],
+      "rawProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-raw-finalist.ts",
+        "medpsy-1.7b-q4",
+        "evidence/finalists/1.7b-training-lineage.json",
+        "evidence/finalists/raw/1.7b-responses.jsonl"
+      ]
+    },
+    "medpsy-4b-q4": {
+      "modelPath": "model/medpsy-4b-q4.gguf",
+      "rawResponsePath": "evidence/finalists/raw/4b-responses.jsonl",
+      "chatTemplatePath": "evidence/finalists/4b-template.json",
+      "lineageSource": {
+        "url": "https://huggingface.co/qvac/MedPsy-4B/raw/77aec3ab8c6eae92e18951e0a86c68c84a067d28/README.md",
+        "sha256": "cba279f9b8a226acd540bd9f14212adbdaa6578b32a34eae52aaa3cfa3ae0239",
+        "snapshotPath": "evidence/finalists/sources/4b-model-card.md"
+      },
+      "lineageProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-lineage-gate.ts",
+        "medpsy-4b-q4",
+        "https://huggingface.co/qvac/MedPsy-4B/raw/77aec3ab8c6eae92e18951e0a86c68c84a067d28/README.md",
+        "cba279f9b8a226acd540bd9f14212adbdaa6578b32a34eae52aaa3cfa3ae0239",
+        "evidence/finalists/sources/4b-model-card.md",
+        "evidence/finalists/4b-training-lineage.json"
+      ],
+      "templateProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/extract-gguf-chat-template.ts",
+        "medpsy-4b-q4",
+        "model/medpsy-4b-q4.gguf",
+        "evidence/finalists/4b-template.json"
+      ],
+      "rawProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-raw-finalist.ts",
+        "medpsy-4b-q4",
+        "evidence/finalists/4b-training-lineage.json",
+        "evidence/finalists/raw/4b-responses.jsonl"
+      ]
+    }
+  }
+}

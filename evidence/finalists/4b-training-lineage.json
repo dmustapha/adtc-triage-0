@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "gate": "trainingLineage",
+  "status": "fail",
+  "model": {
+    "candidateId": "medpsy-4b-q4",
+    "name": "MedPsy-4B-Q4_K_M-imatrix",
+    "revision": "ad85e5a6f745027a576595df9acf745b071353b3",
+    "url": "https://huggingface.co/qvac/MedPsy-4B-GGUF/resolve/ad85e5a6f745027a576595df9acf745b071353b3/medpsy-4b-q4_k_m-imat.gguf",
+    "filename": "medpsy-4b-q4_k_m-imat.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 2716068640,
+    "sha256": "2ecbf622a2856f631001f20f593669aa03acba39977f521bef80cd8600864980",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "4B",
+    "license": "Apache-2.0"
+  },
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "scripts/run-lineage-gate.ts",
+    "medpsy-4b-q4",
+    "https://huggingface.co/qvac/MedPsy-4B/raw/77aec3ab8c6eae92e18951e0a86c68c84a067d28/README.md",
+    "cba279f9b8a226acd540bd9f14212adbdaa6578b32a34eae52aaa3cfa3ae0239",
+    "evidence/finalists/sources/4b-model-card.md",
+    "evidence/finalists/4b-training-lineage.json"
+  ],
+  "inputs": {
+    "sourceCardSha256": "cba279f9b8a226acd540bd9f14212adbdaa6578b32a34eae52aaa3cfa3ae0239"
+  },
+  "host": {
+    "tier": "development",
+    "bootId": "dami",
+    "cpu": "darwin-arm64",
+    "ramBytes": 8589934592
+  },
+  "result": {
+    "reviewed": false,
+    "sourceUrl": "https://huggingface.co/qvac/MedPsy-4B/raw/77aec3ab8c6eae92e18951e0a86c68c84a067d28/README.md",
+    "sourceCardSha256": "cba279f9b8a226acd540bd9f14212adbdaa6578b32a34eae52aaa3cfa3ae0239",
+    "reason": "Training disclosure includes a new health domain not yet publicly released and unspecified open-source medical QA prompts, with no itemized dataset/right/license ledger; redistribution and medical-submission suitability are not established."
+  }
+}
