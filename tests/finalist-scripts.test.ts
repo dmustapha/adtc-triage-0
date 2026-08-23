@@ -60,7 +60,8 @@ test("replacement workflow pins artifact/runtime and never uploads model weights
 
 test("raw producer forces one-shot completion and bounds every case", async () => {
   const producer = await readFile("scripts/run-raw-finalist.ts", "utf8");
-  assert.match(producer, /"-no-cnv"/);
+  assert.match(producer, /"--jinja", "--single-turn", "-p", item\.prompt/);
+  assert.doesNotMatch(producer, /"-no-cnv"/);
   assert.match(producer, /timeout:\s*120_000/);
   assert.match(producer, /START raw case/);
   assert.match(producer, /COMPLETE raw case/);
@@ -76,5 +77,5 @@ test("CI evidence producer leaves human and physical gates unresolved", async ()
   assert.equal(status.gates.humanRubric.status, "unresolved");
   assert.equal(status.gates.targetLaptopResources.status, "unresolved");
   assert.equal(status.gates.targetLaptopResources.observedTier, "remote-ci");
-  assert.deepEqual(status.llamaArgs, ["-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "-no-cnv"]);
+  assert.deepEqual(status.llamaArgs, ["-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "--jinja", "--single-turn"]);
 });

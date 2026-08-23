@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "workflowRunId": "32652354894",
+  "status": "withdrawn",
+  "withdrawnAt": "2026-08-23T16:58:38Z",
+  "reason": "The producer used -no-cnv, which disabled conversation mode and bypassed the GGUF embedded chat template. The raw rows and independent behavioral verdict from this run are invalid for model selection.",
+  "behavioralCredit": false,
+  "supersededBy": "a fresh unchanged-corpus run using pinned llama.cpp --jinja --single-turn -p",
+  "pinnedRuntimeDocumentation": {
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/c8ade30036139e32108fee53d8b7164dbfda4bee/tools/main/README.md",
+    "sha256": "7991a8243b906fde1ad0dc6bb7cf99da65d5883e20af69830568fae3fec72c60",
+    "documentedCommand": "./llama-cli -m <model.gguf> --jinja --single-turn -p <prompt>"
+  }
+}
