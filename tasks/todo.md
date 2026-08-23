@@ -1,5 +1,13 @@
 # ADTC 2026 Pipeline
 
+## Build attempt 4: final Phase 1 model recovery
+
+- [x] Read the ADTC brief, PULSE, controlling override, conductor beacon/state, Build state, and locked OLMo-2 7B recovery artifacts.
+- [x] Pass the conductor resume, FSM, and Build pre-dispatch gates.
+- [x] Atomically record attempt 4 and refresh the beacon plus phase-ownership snapshot.
+- [ ] Dispatch the existing Build orchestrator through the conductor with the locked candidate and unchanged 100-case gate.
+- [ ] Accept only a fully signed passing model decision; otherwise stop fail-closed without another search.
+
 ## Build attempt 3 — Phase 1 producer compliance fix
 
 - [x] RED: prove the raw producer bypasses the embedded template with `-no-cnv`.
@@ -74,6 +82,11 @@
   - [x] Select exactly one passing canonical GGUF or stop honestly if neither passes — stopped with zero candidates selected.
   - [x] Reopen model choice and evaluate replacement candidates under the unchanged Phase 1 truth gate — OLMo was the sole lineage-cleared candidate and failed the corrected templated raw gate.
   - [ ] Run the user-authorized fourth and final recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M under the unchanged Phase 1 gate.
+    - [x] Freeze exact candidate identity and historical-candidate invariants under TDD.
+    - [x] Prove the immutable public Base → SFT → DPO → RLVR lineage chain.
+    - [x] Freeze and verify the 7B evidence-only producer before inference.
+    - [x] Run and retrieve the exact GitHub Actions evidence workflow — authoritative run `32669387576`, 100 rows, no weights returned.
+    - [x] Apply unchanged fatal gates; candidate rejected, so human/physical gates were not run and no decision was signed.
   - [ ] Execute the remaining frozen `PLAN.md` tasks with TDD and clean-build provenance.
 - [ ] Build, debug, wire, profile, and verify on constrained hardware.
 - [ ] Complete design, stress testing, deployment, live testing, and interrogation.

@@ -38,3 +38,9 @@
 2026-08-23T16:58:38Z | hackathon-build | START | phase-1-producer-template-compliance-fix | Attempt 3 resumed; prior behavioral verdict withdrawn and pinned embedded-template producer correction started under TDD.
 2026-08-23T17:02:00Z | hackathon-build | START | phase-1-template-corrected-raw-gate | GitHub Actions run 32653499076 dispatched from commit 2cff7a3 after corrected producer freeze and green verification.
 2026-08-23T17:11:54Z | hackathon-build | BLOCKED | phase-1-producer-template-compliance-fix | Corrected templated run 32653499076 fails multiple unchanged fatal raw gates; zero candidates selected and Phase 2 remains forbidden.
+2026-08-23T17:16:08Z | build | COMPLETE | build | gate=pass
+2026-08-23T17:16:08Z | build | BLOCKED | build | type=fundamental action=escalate
+2026-08-23T21:41:55Z | conductor | START | resume | Resuming from url_preverify
+2026-08-23T21:42:02Z | build | START | build | Dispatching build
+2026-08-23T21:48:00Z | hackathon-build | START | contract-sources-and-real-finalist-gate | Resume attempt 4 with locked OLMo-2 7B candidate and unchanged evidence gate
+2026-08-23T22:45:10Z | hackathon-build | BLOCKED | phase-1-olmo-2-7b-final-recovery | Run 32669387576 fails multiple unchanged fatal raw gates; no model decision and Phase 2 remains forbidden.

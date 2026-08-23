@@ -2,10 +2,10 @@
   "project": "Triage-01",
   "currentPhase": "phase-1-contract-sources-finalist-gate",
   "currentStep": "1.3",
-  "currentSubStep": "replacement-template-corrected-raw-gate-blocked",
+  "currentSubStep": "attempt-4-raw-gate-rejected",
   "status": "blocked",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -32,6 +32,12 @@
       "started_at": "2026-08-23T16:58:38Z",
       "completed_at": "2026-08-23T17:11:54Z",
       "evidence": "BLOCKED: corrected run 32653499076 applies --jinja --single-turn, but independent review still rejects OLMo Q4 on fatal raw gates; selectedCandidateId remains null"
+    },
+    {
+      "phase": "olmo-2-7b-final-recovery",
+      "started_at": "2026-08-23T21:48:00Z",
+      "completed_at": "2026-08-23T22:45:10Z",
+      "evidence": "BLOCKED: authoritative run 32669387576 rejects OLMo-2 7B on multiple unchanged fatal raw gates; model decision absent and Phase 2 unauthorized"
     }
   ],
   "fileGroups": {
@@ -39,10 +45,12 @@
     "1.2": {"files": ["config/provenance.schema.json", "config/provenance-origins.schema.json", "config/provenance-origins.json", "config/organizer-approval-trust.json", "PROVENANCE.json", "config/clinical-sources.json", "scripts/attest-source.ts", "scripts/verify-sources.ts"], "written": true, "verified": true},
     "1.3": {"files": ["scripts/create-release-key.ts", "scripts/extract-gguf-chat-template.ts", "scripts/build-finalist-bundle.ts", "scripts/run-finalist-gate.ts", "tests/finalist.test.ts", "config/finalist-corpus.json", "config/finalist-rubric.json", "scripts/freeze-finalist-inputs.ts", "scripts/run-lineage-gate.ts", "scripts/run-raw-finalist.ts", "scripts/summarize-finalist-status.ts", "tests/finalist-producers.test.ts", "evidence/finalists/producer-manifest.json", "evidence/finalists/status.json"], "written": true, "verified": true},
     "1.3-replacement": {"files": ["config/replacement-lineage-sources.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/corrected-producer-manifest.json", "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json", "evidence/finalists/replacement/recovery-status.json", "evidence/remote-run-32652354894/independent-raw-gate-review.json", ".github/workflows/olmo-replacement-evidence.yml", "scripts/produce-replacement-ci-evidence.ts"], "written": true, "verified": true},
-    "1.3-template-compliance-fix": {"files": ["scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", "tests/finalist-scripts.test.ts", "evidence/finalists/replacement/template-corrected-producer-manifest.json", "evidence/remote-run-32652354894/WITHDRAWN.json", "evidence/remote-run-32653499076/independent-raw-gate-review.json", "evidence/finalists/replacement/compliance-fix-status.json"], "written": true, "verified": true}
+    "1.3-template-compliance-fix": {"files": ["scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", "tests/finalist-scripts.test.ts", "evidence/finalists/replacement/template-corrected-producer-manifest.json", "evidence/remote-run-32652354894/WITHDRAWN.json", "evidence/remote-run-32653499076/independent-raw-gate-review.json", "evidence/finalists/replacement/compliance-fix-status.json"], "written": true, "verified": true},
+    "1.3-attempt-4-producer-freeze": {"files": ["tests/finalist-producers.test.ts", "config/model-finalists.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "config/replacement-lineage-sources.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json", "scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", ".github/workflows/olmo2-7b-recovery-evidence.yml", "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"], "written": true, "verified": true},
+    "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true}
   },
   "deviations": [],
-  "phaseExecutors": {"phase-1": "subagent; orchestrator dispatch-failure recovery verification"},
+  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification"},
   "contractAddresses": {},
   "env": {},
   "devPort": 3000,
@@ -67,13 +75,32 @@
     ,{"command": "GitHub Actions run 32653499076", "exitCode": 0, "result": "100 correctly templated raw cases captured; weights removed; evidence-only artifact uploaded"}
     ,{"command": "independent corrected raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs; raw sha256 beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10; no GGUF; all commands use --jinja --single-turn"}
     ,{"command": "independent corrected raw safety/format review", "exitCode": 2, "result": "candidate rejected: unsafe danger behavior, invented resources, injection compliance, 0/100 JSON, visible reasoning, and 84% truncation proxy"}
+    ,{"command": "attempt-4 TDD RED identity/lineage/producer tests", "exitCode": 1, "result": "expected missing 7B candidate, lineage, and workflow failures observed before implementation"}
+    ,{"command": "npm test", "exitCode": 0, "result": "attempt-4 producer suite: 26 pass, 0 fail"}
+    ,{"command": "npm run typecheck", "exitCode": 0, "result": "attempt-4 strict TypeScript clean"}
+    ,{"command": "workflow YAML parse", "exitCode": 0, "result": "olmo2-7b-recovery-evidence.yml parses: YAML_OK"}
+    ,{"command": "fresh OLMo-2 7B lineage producer", "exitCode": 0, "result": "verified 11 immutable primary lineage sources"}
+    ,{"command": "historical frozen-control hash assertions", "exitCode": 0, "result": "7 frozen corpus/rubric/policy and historical evidence artifacts match pre-attempt SHA-256 values"}
+    ,{"command": "git push submission main", "exitCode": 0, "result": "fast-forwarded public main to reviewed producer commit 34b2e51161ac8558c1bcc209a32e042058f69fb2"}
+    ,{"command": "gh workflow run olmo2-7b-recovery-evidence.yml", "exitCode": 0, "result": "dispatched run 32669216111 from reviewed head 34b2e51161ac8558c1bcc209a32e042058f69fb2"}
+    ,{"command": "GitHub Actions run 32669216111", "exitCode": 1, "result": "pre-download harness failed 25 pass, 1 fail because job-wide 7B CANDIDATE_ID contaminated a historical default 1B producer test; no model download or behavioral output"}
+    ,{"command": "neutral-environment regression RED", "exitCode": 1, "result": "focused workflow test rejected missing env -u CANDIDATE_ID guard"}
+    ,{"command": "neutral-environment regression GREEN and full verification", "exitCode": 0, "result": "focused tests pass; full suite 26 pass, 0 fail; typecheck clean; YAML_OK; producer manifest byte-matches regenerated plan"}
+    ,{"command": "GitHub Actions run 32669387576", "exitCode": 0, "result": "authoritative workflow completed from head 6b03b4f0a13fc0a9f911653e108119cc747faf15; exact model byte/hash checks passed; 100 raw rows captured; GGUF removed before evidence upload"}
+    ,{"command": "independent OLMo-2 7B raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs; 1,156,235 bytes; raw sha256 d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988; exact frozen commands; no GGUF or partial file"}
+    ,{"command": "independent OLMo-2 7B raw fatal-gate review", "exitCode": 2, "result": "rejected: danger safety, uncertainty/abstention, mimic, local resources, injection, 0/100 JSON, visible reasoning, 83% truncation proxy, and both holdouts fail"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-23T17:11:54Z",
-  "resume_attempt": 3,
-  "recovery_scope": "producer compliance fix only; frozen raw gate and OLMo model bytes unchanged",
-  "blocked_reason": "The correctly templated OLMo Q4 raw run fails multiple unchanged fatal gates; MedPsy candidates remain rejected on lineage. No canonical GGUF can be selected.",
+  "timestamp": "2026-08-23T22:45:10Z",
+  "workflow_run_id": "32669387576",
+  "workflow_head_sha": "6b03b4f0a13fc0a9f911653e108119cc747faf15",
+  "failed_workflow_runs": [
+    {"runId": "32669216111", "headSha": "34b2e51161ac8558c1bcc209a32e042058f69fb2", "stage": "pre-download harness", "modelBytesObserved": false, "behavioralOutputObserved": false, "rootCause": "job-wide CANDIDATE_ID leaked into historical default producer test"}
+  ],
+  "resume_attempt": 4,
+  "recovery_scope": "final locked OLMo-2 7B attempt; unchanged lineage, corpus, evaluator, producer semantics, fatal thresholds, and remote evidence-only boundary",
+  "blocked_reason": "Final authorized OLMo-2 7B candidate fails multiple unchanged fatal raw gates in authoritative run 32669387576. Human and target-laptop gates were not run or credited; no model decision exists and Phase 2 remains forbidden.",
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -85,7 +112,10 @@
     "Screened OLMo, SmolLM2, and Granite from immutable official sources; only OLMo cleared the lineage/download shortlist.",
     "Withdrew run 32652354894 because -no-cnv bypassed the embedded GGUF template and assigned it zero behavioral credit.",
     "Ran OLMo Q4 through all 100 frozen cases using pinned CPU-only llama.cpp --jinja --single-turn in GitHub Actions run 32653499076 and independently verified the returned evidence.",
-    "Rejected the correctly templated OLMo output for unsafe danger behavior, invented resources, prompt-injection compliance, zero valid structured responses, visible analysis, and routine truncation."
+    "Rejected the correctly templated OLMo output for unsafe danger behavior, invented resources, prompt-injection compliance, zero valid structured responses, visible analysis, and routine truncation.",
+    "Froze OLMo-2 7B identity, 11-source immutable lineage, unchanged evaluator/corpus/producer identities, and the evidence-only workflow before inference.",
+    "Ran authoritative GitHub Actions workflow 32669387576 and independently verified all 100 rows, exact command flags, artifact hashes, and absence of model weights.",
+    "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work."
   ],
-  "what_is_needed": "A different publicly redistributable, lineage-cleared GGUF that passes the unchanged 100-case raw gate, followed by two independent human reviewers and the frozen 8 GB / 4-thread target-laptop resource run."
+  "what_is_needed": "Explicit requirements revision or submission pivot. The fourth and final authorized recovery candidate failed the unchanged raw gate; no additional model search or downstream Build is authorized."
 }

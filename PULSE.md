@@ -211,45 +211,12 @@
 ---
 ### critique — 2026-08-23T13:47:58Z
 **Status:** COMPLETE
-**Session(s):** 1
-
 #### Done
 - Completed one full-depth frozen-blueprint Critique with 16 dispositioned findings.
 - Rated positioning differentiated, ADTC integration deep-by-design, and narrative compelling.
 - Accepted five concrete elevations into Build P0 without editing frozen Forge documents.
+*[Pruned — full section in .pre-prune.bak]*
 
-#### Additions (not in PRD/Architecture)
-- None. Critique produced only `CRITIQUE-REPORT.md`, `.critique-state.json`, and this handoff.
-
-#### Deviations
-- [USER] Skipped PRD/Architecture/Plan application because the blueprint is frozen and edits were forbidden.
-- [SKILL] Claude positioning re-derivation degraded to unavailable after HTTP 401 expired OAuth; event recorded once.
-
-#### Verified Facts
-- [VF-C1] Raw finalist safety/format/lineage evidence is contractual, not completed Build proof — Source: Forge artifacts.
-- [VF-C2] Product policy owns clinical state; the model repeats allowlisted worker fields and cannot determine urgency — Source: Architecture Sections 6–9.
-- [VF-C3] Five Forge residuals remain mandatory Build/release acceptance gates — Source: PLAN.md Section 1.
-- [VF-C4] QVAC is absent from P0 and removable without affecting scorer or text workflow — Source: Architecture Section 16.
-
-#### Assumptions
-- [A-C1] Target-class Ubuntu 22.04 laptop access will be secured before release claims — WILL-BREAK.
-- [A-C2] MedPsy lineage/redistribution evidence will clear or the candidate will be cut — WILL-BREAK.
-- [A-C3] Named clinical and rights reviewers can attest WHO-derived records — WILL-BREAK.
-
-#### Blockers for Downstream
-- None for Build start. The three assumptions above block release claims, not implementation entry.
-
-#### Key Decisions
-- [SKILL] [D-C1] Start Build now under conditional P0 gates; Phase 1 stops honestly if no finalist passes.
-- [SKILL] [D-C2] Narrow parity to identical GGUF bytes plus embedded-template identity unless broader behavior is proven.
-- [SKILL] [D-C3] Keep QVAC cut and target a 110–115 second rehearsal with a hard 120-second media gate.
-
-#### For Next Skill
-- Build must consume all 16 dispositions and all five carried acceptance gates from `CRITIQUE-REPORT.md`.
-- Execute raw finalist truth first; do not let app safety, post-filtering, or prose rescue a failing model.
-- Preserve clean-build provenance; no Triage-0 imports while organizer trust is unavailable.
-
----
 ### url_preverify — 2026-08-23T13:55:00Z
 **Status:** COMPLETE
 **Session(s):** 1
@@ -352,3 +319,24 @@
 #### For Next Skill
 - Conductor must keep Build BLOCKED. Do not create a signed model decision, enter Phase 2, or create UI/lifecycle files.
 - Recovery requires a different public, credential-free, lineage-cleared GGUF to pass the unchanged 100-case gate, followed by two-person review and target-laptop evidence.
+
+---
+### build — 2026-08-23T22:45:10Z
+**Status:** BLOCKED
+**Session(s):** 4
+
+#### Done
+- Froze the final OLMo-2 7B candidate, 11-source lineage, unchanged 100-case gate, and evidence-only producer before inference.
+- Completed authoritative GitHub Actions run `32669387576`; retrieved 100 raw rows and independently verified evidence integrity with no model weights retained.
+- Applied every unchanged fatal raw threshold and rejected the candidate fail-closed.
+
+#### Verified Facts
+- [VF-B11] Raw JSONL is 1,156,235 bytes, SHA-256 `d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988`, with exactly 100 unique frozen IDs and exact locked commands.
+- [VF-B12] The model fails danger, uncertainty/abstention, mimic, local-resource, injection, structure, visible-reasoning, truncation, and both holdout gates.
+- [VF-B13] Artifact `9501433785` contains no GGUF/partial file; `evidence/model-decision.json` is absent and Phase 2 is unauthorized.
+
+#### Blockers for Downstream
+- The fourth and final authorized recovery candidate failed the unchanged raw gate. Human and physical gates were not run or credited.
+
+#### For Next Skill
+- Stop for explicit requirements revision or submission pivot. Do not search for another model or dispatch Phase 2/UI.

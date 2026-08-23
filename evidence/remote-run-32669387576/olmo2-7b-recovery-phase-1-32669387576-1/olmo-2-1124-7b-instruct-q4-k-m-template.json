@@ -1,0 +1,9 @@
+{
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+  "modelPath": "model/olmo-2-1124-7b-instruct-q4-k-m.gguf",
+  "modelBytes": 4472020256,
+  "modelSha256": "e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95",
+  "key": "tokenizer.chat_template",
+  "templateBytes": 508,
+  "sha256": "fe689ffbd6a4e2d0532d7480696b065b10e0e1eff3f9b9fc4bea415761e4bf4a"
+}

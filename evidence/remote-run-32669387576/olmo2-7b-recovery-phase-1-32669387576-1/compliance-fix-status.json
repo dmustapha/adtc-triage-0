@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "selectedCandidateId": null,
+  "supersedesBehavioralVerdictFromRun": "32652354894",
+  "authoritativeRawRun": "32653499076",
+  "producerSha256": "dedfe51b60d790c26c3ca66a11cbc3b53f27de5ab011a96ced39fdd28558f275",
+  "rawSha256": "beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10",
+  "reason": "OLMo Q4 fails unchanged fatal raw gates after correct embedded-template application; MedPsy candidates remain rejected on lineage.",
+  "phase2Authorized": false,
+  "modelDecisionCreated": false
+}

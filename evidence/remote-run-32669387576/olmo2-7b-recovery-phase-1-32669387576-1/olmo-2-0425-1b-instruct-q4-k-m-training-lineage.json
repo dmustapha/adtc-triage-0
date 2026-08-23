@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "gate": "trainingLineage",
+  "status": "pass",
+  "model": {
+    "candidateId": "olmo-2-0425-1b-instruct-q4-k-m",
+    "name": "OLMo-2-0425-1B-Instruct-Q4_K_M",
+    "revision": "62f8c199538474c3e33ed5d7e0580abd66686a27",
+    "url": "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct-GGUF/resolve/62f8c199538474c3e33ed5d7e0580abd66686a27/OLMo-2-0425-1B-Instruct-Q4_K_M.gguf",
+    "filename": "OLMo-2-0425-1B-Instruct-Q4_K_M.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 935515296,
+    "sha256": "abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "1B",
+    "license": "Apache-2.0"
+  },
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "scripts/run-lineage-gate.ts",
+    "olmo-2-0425-1b-instruct-q4-k-m",
+    "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md",
+    "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8",
+    "evidence/finalists/replacement/sources/olmo-2-0425-1b-instruct-q4-k-m-instruct.md",
+    "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json"
+  ],
+  "inputs": {
+    "instruct": "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8",
+    "rlvr1": "fb0e3b00e7a5a6f39eb06e363d285a24a9e2e58e2c0d98a87653b8dce504bbad",
+    "dpo": "c1a1aae666e26275d38848cef3fc947e56fa8d7ac873feeec31d7dab31393fc2",
+    "sft": "14728d3bf4881b2e9ca5bb16e78351cd6be7a30b0d6771b68c8ab20b1208e9c8",
+    "base": "8e09b3ce741d945b340e51530dd95f49c646a210d0342b1a831a19e36928758b",
+    "gguf": "8de51d287941803af969f367b722078e7da40366c708efad9cda21f26a083ef2",
+    "olmo-mix": "8a0a0c243be08a014bb85062f1117c4fbe97d6caeb22a69545ffdf58c3a49ae5",
+    "dolmino-mix": "f687a2e72e4e30eb978438317ff4c724c8bcba4a3c7bd230c3a1a067d3809cf7",
+    "tulu-sft": "34fa51ecdd374bc6de590f80ea935f5ac12773686b8a785c6969909cb4981045",
+    "preference-mix": "7366a4853066fb46ed6a6c31c37bf307c179c779c67c375a87583db7284af2ee",
+    "rlvr-math": "914ce21d301adafd9177d87337bd938b6c4f477f14eea14aebe628bc7b00ee6d"
+  },
+  "host": {
+    "tier": "development",
+    "bootId": "dami",
+    "cpu": "darwin-arm64",
+    "ramBytes": 8589934592
+  },
+  "result": {
+    "reviewed": true,
+    "sourceUrl": "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md",
+    "sourcesVerified": 11,
+    "modelLicense": "Apache-2.0",
+    "rightsConclusion": "Apache-2.0 model redistribution is explicit; the complete published training chain and dataset mixtures are content-addressed below. Preference data discloses non-commercial subsets and third-party generation terms, so those terms remain a provenance caveat rather than being concealed.",
+    "caveat": "Preference mixture includes non-commercial subsets and third-party terms; exact upstream terms are preserved."
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "gate": "trainingLineage",
+  "status": "pass",
+  "model": {
+    "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+    "name": "OLMo-2-1124-7B-Instruct-Q4_K_M",
+    "revision": "410e0069f64869e4b1d17d8de04810b881fd824b",
+    "url": "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct-GGUF/resolve/410e0069f64869e4b1d17d8de04810b881fd824b/olmo-2-1124-7B-instruct-Q4_K_M.gguf?download=true",
+    "filename": "olmo-2-1124-7B-instruct-Q4_K_M.gguf",
+    "outputPath": "model/triage-01.gguf",
+    "bytes": 4472020256,
+    "sha256": "e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "7B",
+    "license": "Apache-2.0",
+    "runtimeArchitecture": "olmo2"
+  },
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "scripts/run-lineage-gate.ts",
+    "olmo-2-1124-7b-instruct-q4-k-m",
+    "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct/raw/470b1fba1ae01581f270116362ee4aa1b97f4c84/README.md",
+    "1c64f5f2cb6158d24a2fa1241687cd93854154bc6cce6c2b86f6dc3e69cc87de",
+    "evidence/finalists/replacement/sources/ci-olmo2-7b-instruct.md",
+    "evidence/finalists/replacement/ci-olmo2-7b-training-lineage.json"
+  ],
+  "inputs": {
+    "gguf": "6e73ea9d0a87fff00dbdddf8f0ee9447d64aaf04b752fe0e791f8de6208258ff",
+    "instruct": "1c64f5f2cb6158d24a2fa1241687cd93854154bc6cce6c2b86f6dc3e69cc87de",
+    "rlvr-data": "e2f2661221f2705d3bd3ab16e3dcadf36dbac81b2d5b5f7aa8e467ba21481171",
+    "dpo": "06c240a6019c6ffc7184dc93cf7e131d2077d96f951d1a2e4564a55d14748af0",
+    "preference-mix": "29e0913921006d6ec23884922f6d4e6239ef1fc88e249f91e6588f276e08cdcf",
+    "sft": "94bb567d1c6f5959510c4f4ef7aab9e874aaa1ca53b18ea308a1ce039777b848",
+    "tulu-sft": "c42daf8049547ceed2c9e14c911e0a2962573975c8a3c710299f233461642776",
+    "base": "a87d5b59422c6040caf0fc62cbcb5f7ace6c71489c1173cf6d9e000777eac962",
+    "olmo-mix": "8a0a0c243be08a014bb85062f1117c4fbe97d6caeb22a69545ffdf58c3a49ae5",
+    "dolmino-mix": "f687a2e72e4e30eb978438317ff4c724c8bcba4a3c7bd230c3a1a067d3809cf7",
+    "apache-license": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  "host": {
+    "tier": "development",
+    "bootId": "runnervm76f27",
+    "cpu": "linux-x64",
+    "ramBytes": 16766414848
+  },
+  "result": {
+    "reviewed": true,
+    "sourceUrl": "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct/raw/470b1fba1ae01581f270116362ee4aa1b97f4c84/README.md",
+    "sourcesVerified": 11,
+    "modelLicense": "Apache-2.0",
+    "rightsConclusion": "Apache-2.0 model redistribution is explicit across the official model chain. The published SFT, preference, and RLVR mixtures are content-addressed below; preference data includes non-commercial subsets and varying upstream terms, which remain an explicit provenance restriction.",
+    "caveat": "Preference mixture includes non-commercial subsets and third-party terms; exact upstream terms are preserved."
+  }
+}

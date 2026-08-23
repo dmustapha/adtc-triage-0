@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "status": "blocked",
   "selectedCandidateId": null,
-  "candidateId": "olmo-2-0425-1b-instruct-q4-k-m",
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
   "disposition": "rejected-raw-gate",
-  "workflowRunId": "32652354894",
-  "rawEvidenceSha256": "e52cb4b7d5261fbbe19513e2c50e7992a3a5a89de0d1f1c65de2484c0c3d7494",
-  "reviewPath": "evidence/remote-run-32652354894/independent-raw-gate-review.json",
+  "workflowRunId": "32669387576",
+  "rawEvidenceSha256": "d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988",
+  "reviewPath": "evidence/remote-run-32669387576/independent-raw-gate-review.json",
   "modelDecisionCreated": false,
   "phase2Authorized": false,
-  "reason": "OLMo Q4 failed fatal raw danger-safety, abstention/off-domain, invented-resource, prompt-injection, structured-format, visible-reasoning, truncation, and holdout gates. Human and target-laptop gates also remain unresolved."
+  "reason": "OLMo-2 7B Q4_K_M fails unchanged fatal danger-safety, uncertainty/abstention, mimic, local-resource, prompt-injection, structured-format, visible-reasoning, truncation, and both holdout gates. Human and target-laptop gates were not run or credited."
 }
