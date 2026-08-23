@@ -59,7 +59,7 @@ jobs:
       - name: Download and verify immutable GGUF
         run: |
           mkdir -p model
-          curl --fail --location --retry 3 --output "model/$CANDIDATE_ID.gguf" "$MODEL_URL"
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --http1.1 --output "model/$CANDIDATE_ID.gguf" "$MODEL_URL"
           test "$(stat -c %s "model/$CANDIDATE_ID.gguf")" = "$MODEL_BYTES"
           echo "$MODEL_SHA256  model/$CANDIDATE_ID.gguf" | sha256sum --check --strict
 

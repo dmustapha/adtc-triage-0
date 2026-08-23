@@ -51,6 +51,7 @@ test("replacement workflow pins artifact/runtime and never uploads model weights
   assert.match(workflow, /abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6/);
   assert.match(workflow, /935515296/);
   assert.match(workflow, /c8ade30036139e32108fee53d8b7164dbfda4bee/);
+  assert.match(workflow, /curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --http1\.1/);
   assert.match(workflow, /scripts\/run-raw-finalist\.ts/);
   assert.doesNotMatch(workflow, /path:\s*model\//);
 });
