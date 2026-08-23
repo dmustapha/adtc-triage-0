@@ -1,10 +1,82 @@
 # ADTC 2026 Pipeline
 
+## Build attempt 3 — Phase 1 producer compliance fix
+
+- [x] RED: prove the raw producer bypasses the embedded template with `-no-cnv`.
+- [x] GREEN: use pinned llama.cpp `--jinja --single-turn -p` without changing frozen gate inputs.
+- [x] Re-freeze producer evidence and dispatch the evidence-only GitHub Actions run (`32653499076`).
+- [x] Download and independently audit the corrected 100-row raw artifact.
+- [x] Select one model only if every unchanged gate passes; otherwise block Phase 2 honestly (blocked; zero selected).
+
 - [x] Bootstrap the official brief, prompt log, and conductor state.
 - [x] Complete maximum-depth hackathon intelligence.
+- [x] Audit Triage-0 as a candidate before resuming warroom.
+  - [x] Resolve and clone the exact GitHub repository without changing it.
+  - [x] Inventory architecture, dependencies, QVAC surfaces, licensing, model assets, history, and proof.
+  - [x] Re-verify ADTC rules, template, profiler, runtime, and packaging requirements.
+  - [x] Test static and local compatibility where feasible.
+  - [x] Compare against the named competitor field and model the likely ADTC score.
+  - [x] Decide keep, hybridize, replace, or migrate for every major component.
+  - [x] Write and verify the complete candidate-fit report.
+- [x] Reassess Triage-0 provenance and make ADTC technology load-bearing after user correction.
+- [x] Complete deep component-level migration design.
+  - [x] Inventory every Triage-0 runtime, model, data, safety, API, UX, test, and deployment component.
+  - [x] Trace each component to code and current dependency behavior.
+  - [x] Score evaluator visibility, provenance, hardware, safety, reproducibility, and competitive value.
+  - [x] Compare three migration architectures and select a recommendation.
+  - [x] Define the ADTC-native target component graph, data flows, failure modes, and acceptance gates.
+  - [x] Write the complete migration matrix and integration-depth report.
+  - [x] Present the design for user approval before implementation.
+- [ ] Complete approved Approach C scope and controlled model bake-off.
+  - [x] Re-verify submission, hosting, eligibility, judging, and Devpost field requirements.
+  - [x] Decide canonical local frontend versus optional hosted showcase.
+  - [x] Map every submission requirement to implementation, test, evidence, and final artifact.
+  - [x] Inventory every working Triage-0 capability and assign rebuild, combine, approved-port, improve, defer, or exclude.
+  - [x] Create caveat, deficit, dependency, safety, provenance, and deadline closure matrices.
+  - [x] Qualify MedPsy Q4, MedPsy Q5, and one licensed 3B to 4B medical challenger through the first comparative x86 screen.
+  - [x] Build and locally verify the serialized profiler, clinical holdout, two-prompt, license, checksum, and reproducibility harness.
+  - [x] Complete GitHub Actions run 32583637000 and review all three candidate evidence bundles.
+  - [ ] Run a source-backed pediatric and general-medical finalist holdout on the top two eligible candidates.
+  - [ ] Define target-class x86, 8 GB, thermal, offline, and clean-clone preflight.
+  - [x] Produce the complete Approach C scope, feature integration-depth, and provisional model decision reports.
+  - [x] Define the scoped closure sequence from evaluator-only integration to a load-bearing ADTC clinical application.
+  - [ ] Freeze the narrow P0 clinical taxonomy and exact supported product claim.
+  - [ ] Freeze required versus optional feature parity and the deadline cut order.
+  - [ ] Freeze application, model, and optional QVAC resource budgets.
+  - [x] Consolidate all approved decisions into a controlling Forge intake.
+  - [x] Audit and adapt every downstream conductor phase for ADTC-specific caveats.
+- [ ] Obtain written organizer approval before reusing any Triage-0 implementation or artifacts.
+- [x] Create the new submission repository as a public fork of the official ADTC template.
+- [ ] Build the direct llama.cpp clinical core from scratch while reuse approval is pending.
 - [ ] Run the local ARM bake-off and constrained x86 GitHub Actions evaluation.
-- [ ] Run warroom and confirm the winning idea and project name.
-- [ ] Forge the PRD, architecture, and implementation plan.
+- [x] Conductor only: reconcile the paused Warroom state and confirm the project name without restarting idea generation.
+  - [x] Build competitor opportunity, market reality, and winner-pattern maps.
+  - [x] User selected the Triage-0 clinical concept with Approach C.
+  - [x] Record the selected concept through conductor Checkpoint 2.
+  - [x] Confirm the final project name as Triage-01.
+  - [x] Mark Warroom user-skipped through conductor-owned state while preserving partial artifacts.
+- [x] Forge the PRD, architecture, and implementation plan.
+  - [x] Complete Forge setup, direct-idea elaboration, and technical spike.
+  - [x] Write and independently audit the root `PRD.md`.
+  - [x] Freeze the root `ARCHITECTURE.md` after structural/type/test gates passed; carry residual proof work into Build gates.
+    - [x] Replace generic/caller-declared finalist claims with fixed real producers and raw-artifact verification.
+    - [ ] Close release-pair stage/backup filesystem rollback paths.
+    - [ ] Reconcile clean-worktree/offline ordering with immutable per-run physical host aggregation.
+    - [ ] Obtain or explicitly waive an externally trust-pinned organizer approval key; builder self-declaration is not sufficient.
+    - [ ] Make shutdown testing prove restart suppression for both app and detached llama lifecycle.
+  - [x] Write the root `PLAN.md` with 53/53 file mapping and exact tasks.
+  - [x] Generate `FEATURE-OBSERVABLES.md`, `.env.example`, Forge state, and PULSE handoff.
+- [x] Complete one full-depth Critique and disposition all findings.
+- [x] Complete ADTC URL Preverification for repository, model finalists, report, profiler, and video status.
+- [x] Obtain explicit user approval before dispatching Build.
+- [ ] Execute conductor-owned Build without broadening P0.
+  - [x] Run the fixed raw-artifact-backed finalist truth gate before UI breadth — both finalists rejected on insufficient training-lineage evidence.
+  - [x] Select exactly one passing canonical GGUF or stop honestly if neither passes — stopped with zero candidates selected.
+  - [x] Reopen model choice and evaluate replacement candidates under the unchanged Phase 1 truth gate — OLMo was the sole lineage-cleared candidate and failed the corrected templated raw gate.
+  - [ ] Run the user-authorized fourth and final recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M under the unchanged Phase 1 gate.
+  - [ ] Execute the remaining frozen `PLAN.md` tasks with TDD and clean-build provenance.
 - [ ] Build, debug, wire, profile, and verify on constrained hardware.
 - [ ] Complete design, stress testing, deployment, live testing, and interrogation.
 - [ ] Produce the 2-minute demo, package the Devpost submission, and run preflight.
+- [ ] Keep Lightsail provisioning deferred until explicitly re-approved; use GitHub Actions for the first controlled x86 comparison.
+- [x] Save the completed pre-Build state and copy-paste resume prompt through `/handoff` before starting Build in a new chat.

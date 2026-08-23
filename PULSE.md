@@ -26,6 +26,7 @@
 | AF-B2 | build | [USER] Finalist recovery authorization | Build blocked on both MedPsy candidates -> reopen model choice while preserving the complete frozen raw gate and all P0 boundaries |
 | AF-B3 | build | [USER] Prior OLMo behavioral verdict | run 32652354894 rejected OLMo -> verdict withdrawn because `-no-cnv` bypassed the embedded GGUF template |
 | AF-B4 | build | [TEST] Corrected OLMo raw gate | invalid untemplated evidence -> run 32653499076 uses `--jinja --single-turn`, preserves all frozen inputs, and still fails multiple fatal gates |
+| AF-B5 | build | [USER] Final recovery candidate | zero selected models -> lock `allenai/OLMo-2-1124-7B-Instruct-GGUF` Q4_K_M as the single authorized fourth-attempt candidate under the unchanged Phase 1 gate |
 
 ## Decisions Log
 | # | Skill | Decision | Why | Affects |
@@ -49,6 +50,7 @@
 | 17 | forge | [USER] End Architecture review loop and proceed | Structural/type/test evidence is strong enough; remaining gaps are executable release-proof obligations, not reasons to redesign the product | critique, build, debug, verify_preflight |
 | 18 | build | [USER] Reopen finalist model choice after both MedPsy candidates failed lineage | No sufficient new MedPsy evidence was supplied; replacement candidates may be evaluated only under the unchanged content-addressed raw gate | build, debug, package, verify_preflight |
 | 19 | build | [USER] Correct the OLMo producer with pinned llama.cpp `--jinja --single-turn -p` | `-no-cnv` disables conversation/template application, so the prior behavioral verdict was invalid and could not be reused | build, debug, package, verify_preflight |
+| 20 | build | [USER] Lock OLMo-2-1124-7B-Instruct Q4_K_M as the final recovery candidate | It is the only screened option combining an official anonymous GGUF, complete public training chain, pinned `olmo2` runtime compatibility, and materially greater capacity than the rejected 1B model | conductor, build, debug, package, verify_preflight |
 
 ## Downstream Items
 <!-- Owner-routed, non-blocking deferred work. Every skill reads on entry, actions rows it owns. See PULSE-PROTOCOL § Downstream Items. -->

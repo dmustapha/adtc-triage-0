@@ -1,7 +1,7 @@
 {
   "version": "2.0",
   "created_at": "2026-08-22T06:08:35Z",
-  "updated_at": "2026-08-22T06:36:09Z",
+  "updated_at": "2026-08-23T18:46:00Z",
   "working_dir": "/Users/MAC/adtc-2026",
   "hackathon": {
     "name": "Africa Deep Tech Challenge 2026",
@@ -67,8 +67,8 @@
     "copilot_pat_available": false
   },
   "pipeline": {
-    "project_name": "pending",
-    "current_phase": "intel",
+    "project_name": "Triage-01",
+    "current_phase": "build",
     "phases": {
       "intel": {
         "status": "complete",
@@ -76,29 +76,30 @@
         "completed_at": "2026-08-22T06:36:09Z"
       },
       "warroom": {
-        "status": "pending",
-        "dispatched_at": null,
-        "completed_at": null
+        "status": "skipped",
+        "dispatched_at": "2026-08-22T06:36:57Z",
+        "completed_at": "2026-08-23T09:29:45Z",
+        "note": "User-superseded after partial generation. Preserve partial artifacts; selected outcome is the Triage-0 clinical thesis with Approach C. Do not restart generators."
       },
       "forge": {
-        "status": "pending",
-        "dispatched_at": null,
-        "completed_at": null
+        "status": "complete",
+        "dispatched_at": "2026-08-23T10:04:00Z",
+        "completed_at": "2026-08-23T13:31:44Z"
       },
       "critique": {
-        "status": "pending",
-        "dispatched_at": null,
-        "completed_at": null
+        "status": "complete",
+        "dispatched_at": "2026-08-23T13:41:15Z",
+        "completed_at": "2026-08-23T13:51:30Z"
       },
       "url_preverify": {
-        "status": "pending",
-        "dispatched_at": null,
-        "completed_at": null
+        "status": "complete",
+        "dispatched_at": "2026-08-23T13:52:24Z",
+        "completed_at": "2026-08-23T13:55:01Z"
       },
       "build": {
-        "status": "pending",
-        "dispatched_at": null,
-        "completed_at": null
+        "status": "blocked",
+        "dispatched_at": "2026-08-23T16:56:00Z",
+        "completed_at": "2026-08-23T17:12:30Z"
       },
       "debug": {
         "status": "pending",
@@ -173,16 +174,98 @@
       "config_path": "/Users/MAC/adtc-2026/config.json",
       "state_path": "/Users/MAC/adtc-2026/intel-state.json",
       "competitor_audit_path": "/Users/MAC/adtc-2026/research/competitor-audit"
+    },
+    "forge": {
+      "prd_path": "/Users/MAC/adtc-2026/PRD.md",
+      "architecture_path": "/Users/MAC/adtc-2026/ARCHITECTURE.md",
+      "plan_path": "/Users/MAC/adtc-2026/PLAN.md",
+      "observables_path": "/Users/MAC/adtc-2026/FEATURE-OBSERVABLES.md",
+      "env_example_path": "/Users/MAC/adtc-2026/.env.example",
+      "state_path": "/Users/MAC/adtc-2026/.forge-state.json"
+    },
+    "critique": {
+      "report_path": "/Users/MAC/adtc-2026/CRITIQUE-REPORT.md",
+      "state_path": "/Users/MAC/adtc-2026/.critique-state.json"
+    },
+    "url_preverify": {
+      "report_path": "/Users/MAC/adtc-2026/URL-PREVERIFICATION.md"
+    },
+    "pre_build": {
+      "readiness_path": "/Users/MAC/adtc-2026/PRE-BUILD-READINESS.md"
+    },
+    "build": {
+      "report_path": "/Users/MAC/adtc-2026/BUILD-REPORT.md",
+      "state_path": "/Users/MAC/adtc-2026/.build-state.json",
+      "finalist_manifest_path": "/Users/MAC/adtc-2026/evidence/finalists/producer-manifest.json",
+      "finalist_status_path": "/Users/MAC/adtc-2026/evidence/finalists/status.json"
     }
   },
   "intelState": {
     "status": "complete",
     "sourceCount": 61
   },
-  "warroomState": null,
-  "forgeState": null,
-  "critiqueState": null,
-  "buildState": null,
+  "warroomState": {
+    "status": "skipped",
+    "selected_idea": "Triage-0 clinical thesis with Approach C",
+    "decision_basis": "Explicit user selection after the Triage-0 fit, provenance, migration, and controlled x86 model audits",
+    "partial_state_path": "/Users/MAC/adtc-2026/warroom/.warroom-state.json",
+    "partial_artifacts_preserved": true,
+    "generators_restarted": false
+  },
+  "forgeState": {
+    "status": "complete",
+    "projectName": "Triage-01",
+    "stack": [
+      "TypeScript",
+      "Shell",
+      "JSON",
+      "Node.js",
+      "Fastify",
+      "llama.cpp"
+    ],
+    "hasFrontend": false,
+    "hasContracts": false,
+    "prdLines": 611,
+    "architectureLines": 2958,
+    "planLines": 376
+  },
+  "critiqueState": {
+    "status": "complete",
+    "competitive_assessment": "differentiated",
+    "narrative_score": "compelling",
+    "elevation_count": 5,
+    "approved_count": 5
+  },
+  "buildState": {
+    "status": "blocked",
+    "currentPhase": "phase-1-contract-sources-finalist-gate",
+    "currentStep": "1.3-replacement-template-corrected-raw-gate-blocked",
+    "selectedCandidateId": null,
+    "contractAddresses": {},
+    "deviationCount": 0,
+    "untestedDeviationCount": 0,
+    "knownRiskCount": 2,
+    "blockedReason": "The correctly templated OLMo Q4 raw run fails multiple unchanged fatal gates; MedPsy candidates remain rejected on lineage. No canonical GGUF can be selected.",
+    "recoveryAuthorization": "User explicitly authorized a fourth and final conductor-owned Build Phase 1 recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M; dispatch begins only in the new chat",
+    "producerCorrection": "Run 32652354894 withdrawn; run 32653499076 used --jinja --single-turn and is authoritative",
+    "rawArtifactSha256": "beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10",
+    "whatIsNeeded": "In the new chat, resume the conductor and execute user-authorized Build attempt 4 for the locked OLMo-2 7B Q4_K_M candidate under the unchanged Phase 1 gate.",
+    "approvedRecoveryCandidate": {
+      "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+      "repository": "allenai/OLMo-2-1124-7B-Instruct-GGUF",
+      "revision": "410e0069f64869e4b1d17d8de04810b881fd824b",
+      "filename": "olmo-2-1124-7B-instruct-Q4_K_M.gguf",
+      "bytes": 4472020256,
+      "sha256": "e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0",
+      "immutableUrl": "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct-GGUF/resolve/410e0069f64869e4b1d17d8de04810b881fd824b/olmo-2-1124-7B-instruct-Q4_K_M.gguf?download=true"
+    },
+    "nextAttempt": 4,
+    "nextAttemptAuthorized": true,
+    "recoveryDesignPath": "docs/plans/2026-08-23-olmo2-7b-final-recovery-design.md",
+    "recoveryPlanPath": "docs/plans/2026-08-23-olmo2-7b-final-recovery-plan.md"
+  },
   "debugState": null,
   "wireState": null,
   "verifyMilestoneState": null,
@@ -198,7 +281,51 @@
   "demoRehearsalState": null,
   "builder_profile": null,
   "credentials_location": "/Users/MAC/.codex/credentials/pipeline-credentials.env",
-  "confirmed_urls": {},
+  "confirmed_urls": {
+    "repository": {
+      "url": "https://github.com/dmustapha/adtc-2026-submission-template",
+      "status": "pass_public_not_build_current",
+      "http": 200,
+      "remote_head": "845a3b674ee6193c4a9a25ea719529d35fbc9f44"
+    },
+    "report": {
+      "url": "https://raw.githubusercontent.com/dmustapha/adtc-2026-submission-template/main/REPORT.md",
+      "status": "url_pass_content_fail_template",
+      "http": 200,
+      "bytes": 1619
+    },
+    "model_finalists": [
+      {
+        "id": "medpsy-1.7b-q4",
+        "url": "https://huggingface.co/qvac/MedPsy-1.7B-GGUF/resolve/fd4cecc90c2de8dce4b112795456a54be9c59363/medpsy-1.7b-q4_k_m-imat.gguf",
+        "status": "pass_anonymous_immutable",
+        "bytes": 1282439360,
+        "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+      },
+      {
+        "id": "medpsy-4b-q4",
+        "url": "https://huggingface.co/qvac/MedPsy-4B-GGUF/resolve/ad85e5a6f745027a576595df9acf745b071353b3/medpsy-4b-q4_k_m-imat.gguf",
+        "status": "pass_anonymous_immutable",
+        "bytes": 2716068640,
+        "sha256": "2ecbf622a2856f631001f20f593669aa03acba39977f521bef80cd8600864980"
+      }
+    ],
+    "canonical_model": {
+      "status": "pending_finalist_gate"
+    },
+    "profiler": {
+      "url": "https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler/commit/ac2e137dca65ea3b09d997774f17dd8907b489fb",
+      "revision": "ac2e137dca65ea3b09d997774f17dd8907b489fb",
+      "status": "pass_public_pinned"
+    },
+    "video": {
+      "status": "pending_not_available"
+    },
+    "hosted_app": {
+      "status": "not_required_offline_localhost"
+    },
+    "checked_at": "2026-08-23T13:55:01Z"
+  },
   "existing_research": {
     "hackathon_brief": "/Users/MAC/.codex/skills/hackathon-briefs/adtc-2026.md",
     "competitor_spec": "/Users/MAC/adtc-2026/research/COMPETITOR-INTEL-SPEC.md",
@@ -206,37 +333,38 @@
     "official_profiler": "/Users/MAC/adtc-profiler"
   },
   "dispatch_context": {
-    "mode": "fresh",
-    "target_skill": "hackathon-intel",
-    "attempt": 1,
-    "max_attempts": 3,
+    "mode": "resume",
+    "target_skill": "hackathon-build",
+    "attempt": 3,
+    "max_attempts": 4,
     "working_dir": "/Users/MAC/adtc-2026",
-    "gap_list": [],
+    "gap_list": [
+      "Resume only Build Phase 1 through the conductor for user-authorized attempt 4",
+      "Evaluate only locked OLMo-2-1124-7B-Instruct Q4_K_M identity under the unchanged 100-case gate",
+      "Do not enter Phase 2/UI unless every raw, human, and target-laptop gate passes and evidence/model-decision.json is signed",
+      "If the candidate fails, stop and return for an explicit requirement revision or submission pivot"
+    ],
     "cascade_diagnosis": null,
     "deploy_targets": [],
-    "deploy_env_vars": {}
+    "deploy_env_vars": {},
+    "next_attempt": 4,
+    "user_authorized_retry_override": true,
+    "approved_candidate_id": "olmo-2-1124-7b-instruct-q4-k-m"
   },
   "continuation_manifest": {
     "continuation_count": 0,
     "max_continuations": 5,
-    "last_completed_phase": "intel",
-    "next_expected_phase": "warroom",
+    "last_completed_phase": "url_preverify",
+    "next_expected_phase": "build",
     "spawned_at": null
   },
-  "retry_ledger": {},
+  "retry_ledger": {
+    "build": {}
+  },
   "checkpoints_answered": {
     "manifest": true,
-    "idea_selection": {
-      "answered": false,
-      "choice": null,
-      "modifications": null,
-      "project_name": null
-    },
-    "post_forge_credentials": {
-      "answered": false,
-      "collected": [],
-      "skipped": []
-    },
+    "idea_selection": true,
+    "post_forge_credentials": true,
     "design_handoff": {
       "answered": false,
       "gate": null
@@ -246,6 +374,20 @@
     },
     "demo_blocked": {
       "answered": false
+    }
+  },
+  "checkpoint_details": {
+    "idea_selection": {
+      "answered": true,
+      "choice": "Triage-0 clinical thesis with Approach C",
+      "modifications": "New ADTC-native clean implementation named Triage-01; preserve explicit provenance distinction from Triage-0",
+      "project_name": "Triage-01"
+    },
+    "post_forge_credentials": {
+      "answered": true,
+      "collected": [],
+      "skipped": [],
+      "note": "No credentials required: public GitHub, anonymous GGUF, direct localhost llama.cpp, no cloud inference; user explicitly required credential-free deployment."
     }
   }
 }
