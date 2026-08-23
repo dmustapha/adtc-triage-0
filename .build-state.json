@@ -1,0 +1,73 @@
+{
+  "project": "Triage-01",
+  "currentPhase": "phase-1-contract-sources-finalist-gate",
+  "currentStep": "1.3",
+  "currentSubStep": "replacement-candidate-corrected-remote-raw-capture",
+  "status": "blocked",
+  "autonomous_mode": true,
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed"],
+  "expected_phases": [
+    "contract-sources-and-real-finalist-gate",
+    "atomic-freeze-downloader-and-parity",
+    "direct-runtime-and-deterministic-clinical-spine",
+    "local-ui-lifecycle-and-no-egress-proof",
+    "profiler-physical-evidence-and-early-checkpoint",
+    "provenance-report-inputs-and-release-freeze"
+  ],
+  "phase_ledger": [
+    {
+      "phase": "contract-sources-and-real-finalist-gate",
+      "started_at": "2026-08-23T14:26:38Z",
+      "completed_at": "2026-08-23T14:48:00Z",
+      "evidence": "BLOCKED: evidence/finalists/status.json rejects both finalists at the immutable training-lineage prerequisite; selectedCandidateId is null"
+    },
+    {
+      "phase": "replacement-candidate-recovery",
+      "started_at": "2026-08-23T15:06:00Z",
+      "completed_at": "2026-08-23T16:49:20Z",
+      "evidence": "BLOCKED: evidence/finalists/replacement/recovery-status.json rejects OLMo Q4 on multiple fatal raw gates; selectedCandidateId remains null"
+    }
+  ],
+  "fileGroups": {
+    "1.1": {"files": ["package.json", "tsconfig.json", ".gitignore", "src/types.ts", "src/release-evidence.ts", "config/model-finalists.json", "config/model-decision.schema.json", "config/runtime.json", "config/generation-policy.json", "DOMAIN-GUIDE.md"], "written": true, "verified": true},
+    "1.2": {"files": ["config/provenance.schema.json", "config/provenance-origins.schema.json", "config/provenance-origins.json", "config/organizer-approval-trust.json", "PROVENANCE.json", "config/clinical-sources.json", "scripts/attest-source.ts", "scripts/verify-sources.ts"], "written": true, "verified": true},
+    "1.3": {"files": ["scripts/create-release-key.ts", "scripts/extract-gguf-chat-template.ts", "scripts/build-finalist-bundle.ts", "scripts/run-finalist-gate.ts", "tests/finalist.test.ts", "config/finalist-corpus.json", "config/finalist-rubric.json", "scripts/freeze-finalist-inputs.ts", "scripts/run-lineage-gate.ts", "scripts/run-raw-finalist.ts", "scripts/summarize-finalist-status.ts", "tests/finalist-producers.test.ts", "evidence/finalists/producer-manifest.json", "evidence/finalists/status.json"], "written": true, "verified": true},
+    "1.3-replacement": {"files": ["config/replacement-lineage-sources.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/corrected-producer-manifest.json", "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json", "evidence/finalists/replacement/recovery-status.json", "evidence/remote-run-32652354894/independent-raw-gate-review.json", ".github/workflows/olmo-replacement-evidence.yml", "scripts/produce-replacement-ci-evidence.ts"], "written": true, "verified": true}
+  },
+  "deviations": [],
+  "phaseExecutors": {"phase-1": "subagent; orchestrator dispatch-failure recovery verification"},
+  "contractAddresses": {},
+  "env": {},
+  "devPort": 3000,
+  "depsVerified": true,
+  "verification_commands": [
+    {"command": "npm test", "exitCode": 0, "result": "17 pass, 0 fail"},
+    {"command": "npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean"},
+    {"command": "npm run verify-sources", "exitCode": 1, "result": "expected fail-closed: source review incomplete: WHO-IMCI-RESP-2022"},
+    {"command": "run-lineage-gate for both immutable model cards", "exitCode": 2, "result": "both rejected: insufficient itemized training lineage/rights evidence"},
+    {"command": "replacement producer focused tests", "exitCode": 0, "result": "6 pass, 0 fail"},
+    {"command": "remote npm test and npm run typecheck", "exitCode": 0, "result": "run 32648939418 passed before model download"},
+    {"command": "remote anonymous GGUF byte/hash verification", "exitCode": 0, "result": "935515296 bytes; sha256 abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6"},
+    {"command": "npm test", "exitCode": 0, "result": "corrected producer suite: 22 pass, 0 fail"},
+    {"command": "npm run typecheck", "exitCode": 0, "result": "corrected producer strict TypeScript clean"},
+    {"command": "workflow YAML parse", "exitCode": 0, "result": "corrected workflow YAML parses"},
+    {"command": "GitHub Actions run 32652354894", "exitCode": 0, "result": "100 raw cases captured; weights removed; evidence-only artifact uploaded"},
+    {"command": "independent raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs, exact command flags, raw sha256 e52cb4b7d5261fbbe19513e2c50e7992a3a5a89de0d1f1c65de2484c0c3d7494, no GGUF in artifact"},
+    {"command": "independent raw safety/format review", "exitCode": 2, "result": "candidate rejected on fatal danger, abstention, resource hallucination, prompt injection, structure, visible reasoning, truncation, and holdout gates"}
+  ],
+  "screenshot_paths": [],
+  "context_percentage": 0,
+  "timestamp": "2026-08-23T16:49:20Z",
+  "resume_attempt": 2,
+  "recovery_scope": "replacement candidate search only; frozen raw gate unchanged",
+  "blocked_reason": "The only lineage-cleared replacement, OLMo-2-0425-1B-Instruct Q4_K_M, fails multiple fatal raw gates; MedPsy candidates remain rejected on lineage. No canonical GGUF can be selected.",
+  "what_was_tried": [
+    "Frozen 100 unique cases, evaluator-equivalent rubric, split IDs, producer commands, raw-response paths, host label, and content hashes before comparison.",
+    "Fetched and hash-pinned both immutable primary model cards and ran the lineage producer for each candidate.",
+    "Verified 22 corrected tests pass, strict TypeScript passes, and workflow YAML parses.",
+    "Screened OLMo, SmolLM2, and Granite from immutable official sources; only OLMo cleared the lineage/download shortlist.",
+    "Ran OLMo Q4 through all 100 frozen cases on pinned CPU-only llama.cpp in GitHub Actions and independently verified the returned evidence.",
+    "Rejected OLMo for empty danger responses, unsafe dose calculation, invented local resources, prompt-injection compliance, zero valid structured responses, visible analysis, and routine truncation."
+  ],
+  "what_is_needed": "A different publicly redistributable, lineage-cleared GGUF that passes the unchanged 100-case raw gate, followed by two independent human reviewers and the frozen 8 GB / 4-thread target-laptop resource run."
+}
