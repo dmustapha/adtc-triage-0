@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "olmo-2-0425-1b-instruct-q4-k-m",
+  "quantization": "GGUF Q4_K_M",
+  "producer": "github-actions",
+  "llamaRevision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  "llamaArgs": [
+    "-t",
+    "4",
+    "-ngl",
+    "0",
+    "-c",
+    "2048",
+    "-n",
+    "128",
+    "--temp",
+    "0",
+    "--jinja",
+    "--single-turn"
+  ],
+  "gates": {
+    "humanRubric": {
+      "status": "unresolved",
+      "reason": "requires two independent human reviewers"
+    },
+    "targetLaptopResources": {
+      "status": "unresolved",
+      "observedTier": "remote-ci",
+      "reason": "a hosted CI runner cannot certify the frozen target-laptop tier"
+    }
+  },
+  "producedAt": "2026-08-23T17:09:54.288Z",
+  "workflowRunId": "32653499076",
+  "workflowRunAttempt": "1",
+  "runner": {
+    "os": "Linux",
+    "arch": "X64",
+    "cpuOnly": true
+  },
+  "rawEvidence": {
+    "path": "evidence/finalists/replacement/raw/olmo-2-0425-1b-instruct-q4-k-m-responses.jsonl",
+    "bytes": 1201746,
+    "sha256": "beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10",
+    "responseCount": 100
+  }
+}

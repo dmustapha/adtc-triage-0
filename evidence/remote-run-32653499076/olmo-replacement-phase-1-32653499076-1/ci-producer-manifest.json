@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "freezeRule": "inputs and producers frozen before any candidate response is observed",
+  "status": "frozen-prerequisites-pending",
+  "host": {
+    "label": "linux-x64-6.17.0-1022-azure",
+    "hostname": "runnervm76f27",
+    "ramBytes": 16766414848,
+    "tier": "development"
+  },
+  "corpus": {
+    "path": "config/finalist-corpus.json",
+    "splits": {
+      "pediatricHoldout": 50,
+      "generalMedicalHoldout": 50
+    }
+  },
+  "rubric": {
+    "path": "config/finalist-rubric.json",
+    "generatedTokenLimit": 128,
+    "temperature": 0
+  },
+  "inputHashes": {
+    "corpus": "6fd2a1351bf2bcb9ef7927aacf55ecf0aff65f7505d82243a00ece83df4a5f50",
+    "rubric": "6d89cf637fb2a7e61553eef943c402e6e245e4ae8ad6c77c93e48d9df872eb00",
+    "finalists": "7f0d8151d60715320a789809198839d400cce13fb423e8b51a8f1dd57828f2ba",
+    "generationPolicy": "53ee56807c9c61c43bf2347f1289dd1df53786a8c59f943392c4351631a101ca",
+    "rawProducer": "dedfe51b60d790c26c3ca66a11cbc3b53f27de5ab011a96ced39fdd28558f275"
+  },
+  "candidates": {
+    "olmo-2-0425-1b-instruct-q4-k-m": {
+      "modelPath": "model/olmo-2-0425-1b-instruct-q4-k-m.gguf",
+      "rawResponsePath": "evidence/finalists/replacement/raw/olmo-2-0425-1b-instruct-q4-k-m-responses.jsonl",
+      "chatTemplatePath": "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-template.json",
+      "lineageSource": {
+        "url": "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md",
+        "sha256": "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8",
+        "snapshotPath": "evidence/finalists/replacement/sources/olmo-2-0425-1b-instruct-q4-k-m-instruct.md"
+      },
+      "lineageProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-lineage-gate.ts",
+        "olmo-2-0425-1b-instruct-q4-k-m",
+        "https://huggingface.co/allenai/OLMo-2-0425-1B-Instruct/raw/48d788eca847d4d7548f375ad03d3c9312f6139e/README.md",
+        "5f5b891d66a46079920172f8d5957ec386825f76cfc14ae2e79c7208d4dca4d8",
+        "evidence/finalists/replacement/sources/olmo-2-0425-1b-instruct-q4-k-m-instruct.md",
+        "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json"
+      ],
+      "templateProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/extract-gguf-chat-template.ts",
+        "olmo-2-0425-1b-instruct-q4-k-m",
+        "model/olmo-2-0425-1b-instruct-q4-k-m.gguf",
+        "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-template.json"
+      ],
+      "rawProducer": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/run-raw-finalist.ts",
+        "olmo-2-0425-1b-instruct-q4-k-m",
+        "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json",
+        "evidence/finalists/replacement/raw/olmo-2-0425-1b-instruct-q4-k-m-responses.jsonl"
+      ]
+    }
+  }
+}

@@ -24,6 +24,8 @@
 | AF-F2 | forge | [SKILL] Build blueprint | Plan/observables absent -> 53-file emergency-real-P0 plan and 12/12 behavioral observables complete |
 | AF-B1 | build | [TEST] Raw finalist gate | two unfrozen MedPsy finalists -> both rejected for insufficient itemized training-lineage/rights evidence; no canonical GGUF selected |
 | AF-B2 | build | [USER] Finalist recovery authorization | Build blocked on both MedPsy candidates -> reopen model choice while preserving the complete frozen raw gate and all P0 boundaries |
+| AF-B3 | build | [USER] Prior OLMo behavioral verdict | run 32652354894 rejected OLMo -> verdict withdrawn because `-no-cnv` bypassed the embedded GGUF template |
+| AF-B4 | build | [TEST] Corrected OLMo raw gate | invalid untemplated evidence -> run 32653499076 uses `--jinja --single-turn`, preserves all frozen inputs, and still fails multiple fatal gates |
 
 ## Decisions Log
 | # | Skill | Decision | Why | Affects |
@@ -46,6 +48,7 @@
 | 16 | conductor-resume | [USER] Name the new project Triage-01 | Preserves product-thesis lineage while requiring explicit clean-build provenance separation from Triage-0 | forge, critique, build, demo, package |
 | 17 | forge | [USER] End Architecture review loop and proceed | Structural/type/test evidence is strong enough; remaining gaps are executable release-proof obligations, not reasons to redesign the product | critique, build, debug, verify_preflight |
 | 18 | build | [USER] Reopen finalist model choice after both MedPsy candidates failed lineage | No sufficient new MedPsy evidence was supplied; replacement candidates may be evaluated only under the unchanged content-addressed raw gate | build, debug, package, verify_preflight |
+| 19 | build | [USER] Correct the OLMo producer with pinned llama.cpp `--jinja --single-turn -p` | `-no-cnv` disables conversation/template application, so the prior behavioral verdict was invalid and could not be reused | build, debug, package, verify_preflight |
 
 ## Downstream Items
 <!-- Owner-routed, non-blocking deferred work. Every skill reads on entry, actions rows it owns. See PULSE-PROTOCOL § Downstream Items. -->
@@ -319,3 +322,31 @@
 
 #### For Next Skill
 - Conductor must keep Build BLOCKED and must not dispatch Phase 2 or any UI work.
+
+---
+### build — 2026-08-23T18:11:54+01:00
+**Status:** BLOCKED
+**Session(s):** 3
+
+#### Done
+- Withdrew all behavioral credit from run `32652354894` because `-no-cnv` bypassed the embedded OLMo GGUF template.
+- Used TDD to replace the defective invocation with pinned llama.cpp's documented `--jinja --single-turn -p`, retaining the exact corpus, rubric, splits, model bytes/hash, CPU-only flags, context, token limit, temperature, timeout, and evidence-only upload contract.
+- Froze corrected producer SHA-256 `dedfe51b60d790c26c3ca66a11cbc3b53f27de5ab011a96ced39fdd28558f275` before inference and dispatched GitHub Actions run `32653499076`.
+- Retrieved and independently audited the new 100-row artifact; no model weights were returned.
+
+#### Verified Facts
+- [VF-B7] Focused TDD observed 0/2 pass before the fix and 3/3 after it; the full suite is 22/22, strict TypeScript passes, and workflow YAML parses.
+- [VF-B8] Corrected raw JSONL is 1,201,746 bytes, hashes to `beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10`, contains 100 unique frozen IDs, and every command uses `--jinja --single-turn`.
+- [VF-B9] OLMo fails valid fatal evidence: unsafe SpO2/stridor behavior, invented-resource behavior, injection compliance, 0/100 structured JSON, visible reasoning, and 84% missing-end-marker truncation proxy.
+- [VF-B10] `evidence/model-decision.json` is absent; selected candidate count is zero.
+
+#### Key Decisions
+- [SKILL] [D-B3] Reject OLMo Q4 using only corrected templated evidence. The invalid prior run is preserved solely as withdrawn provenance.
+
+#### Blockers for Downstream
+- No evaluated candidate passes Phase 1: MedPsy remains blocked on lineage and correctly templated OLMo fails multiple fatal raw gates.
+- Human review and target-laptop gates remain unresolved but cannot rescue the already-failing raw candidate.
+
+#### For Next Skill
+- Conductor must keep Build BLOCKED. Do not create a signed model decision, enter Phase 2, or create UI/lifecycle files.
+- Recovery requires a different public, credential-free, lineage-cleared GGUF to pass the unchanged 100-case gate, followed by two-person review and target-laptop evidence.
