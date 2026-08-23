@@ -2,7 +2,7 @@
   "project": "Triage-01",
   "currentPhase": "phase-1-contract-sources-finalist-gate",
   "currentStep": "1.3",
-  "currentSubStep": "replacement-candidate-corrected-remote-raw-capture",
+  "currentSubStep": "replacement-candidate-raw-gate-blocked",
   "status": "blocked",
   "autonomous_mode": true,
   "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed"],
