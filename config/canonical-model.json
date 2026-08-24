@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "medpsy-1.7b-q4",
+  "name": "MedPsy-1.7B-Q4_K_M-imatrix",
+  "revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+  "url": "https://huggingface.co/qvac/MedPsy-1.7B-GGUF/resolve/fd4cecc90c2de8dce4b112795456a54be9c59363/medpsy-1.7b-q4_k_m-imat.gguf",
+  "filename": "medpsy-1.7b-q4_k_m-imat.gguf",
+  "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+  "bytes": 1282439360,
+  "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+  "quantization": "GGUF Q4_K_M",
+  "parametersEstimate": "2.03B",
+  "license": "Apache-2.0",
+  "languageScope": ["en"],
+  "officialRuntime": "llama.cpp",
+  "productRuntime": {
+    "name": "QVAC SDK",
+    "version": "0.13.3",
+    "modelPath": "model/medpsy-1.7b-q4_k_m-imat.gguf"
+  }
+}

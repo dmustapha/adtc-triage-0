@@ -440,3 +440,21 @@
 
 #### For Next Skill
 - Begin Task 4 with only the frozen MedPsy revision/file/hash; never retain model weights.
+
+---
+### build — 2026-08-24T13:43:00Z
+**Status:** PARTIAL
+**Session(s):** 9, Task 4 canonical MedPsy parity
+
+#### Done
+- Froze the exact MedPsy identity across canonical JSON, official metadata, finalist record, checksum, and atomic downloader.
+- Passed safe stubbed TDD 6/6, strict TypeScript, JSON/diff, and empty project/tracked weight scans.
+
+#### Deviations
+- [RECOVERED] Initial legacy downloader RED fetched 101 MB only into a temporary fixture; exact processes stopped and the directory moved to Trash. No project bytes remain.
+
+#### Blockers for Downstream
+- Phase 2 remains blocked pending fresh evidence and a truthful signed decision.
+
+#### For Next Skill
+- Bind QVAC and profiler metadata to the same canonical GGUF without downloading weights.

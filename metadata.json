@@ -1,6 +1,6 @@
 {
   "team_id": "your-team-id",
-  "domain": "coding_assistants",
+  "domain": "healthcare_medical",
   "language_scope": ["en"],
   "african_alpha_claim": false,
   "budget_laptop_claim": true,
@@ -25,13 +25,13 @@
     }
   ],
   "model": {
-    "name": "SmolLM2-135M-Instruct-Q4_K_M",
+    "name": "MedPsy-1.7B-Q4_K_M-imatrix",
     "runtime": "llama.cpp",
     "quantization": "GGUF Q4_K_M",
-    "parameters_estimate": "135M",
+    "parameters_estimate": "2.03B",
     "packaging": "binary_bundle"
   },
   "_runtime": {
-    "model_path": "model/SmolLM2-135M-Instruct-Q4_K_M.gguf"
+    "model_path": "model/medpsy-1.7b-q4_k_m-imat.gguf"
   }
 }

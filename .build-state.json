@@ -1,11 +1,11 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "shared-medpsy-healthcare-recovery",
-  "currentStep": "4",
-  "currentSubStep": "canonical-medpsy-parity-not-started",
+  "currentStep": "5",
+  "currentSubStep": "shared-runtime-binding-not-started",
   "status": "in_progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import", "4-canonical-medpsy-parity"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -80,6 +80,12 @@
       "started_at": "2026-08-24T12:06:12Z",
       "completed_at": "2026-08-24T13:33:00Z",
       "evidence": "PASS: one authorized full npm install completed; 76/76 immutable Git-object imports verified (64 reused exact, 12 modified-for-ADTC); focused 9/9, full 179 total/155 pass/0 fail/24 skip, typecheck, manifest, JSON, diff, and no-weight gates pass"
+    },
+    {
+      "phase": "canonical-medpsy-parity",
+      "started_at": "2026-08-24T13:35:00Z",
+      "completed_at": "2026-08-24T13:43:00Z",
+      "evidence": "PASS: exact MedPsy identity frozen across canonical contract, metadata, finalist, checksum, and atomic downloader; focused 6/6 and typecheck pass; no project or tracked model bytes"
     }
   ],
   "fileGroups": {
@@ -93,12 +99,14 @@
     "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json", "evidence/finalists/phase1-contract-v1/revision-status.json", "evidence/remote-run-32684188985/independent-calibration-review.json", "evidence/remote-run-32684188985/raw/calibration.jsonl", "evidence/remote-run-32684188985/calibration-evaluation.json"], "written": true, "verified": true},
     "2-legal-provenance": {"files": ["PROVENANCE.md", "PROVENANCE.json", "config/import-manifest.schema.json", "config/import-manifest.json", "config/model-license-decision.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json"], "written": true, "verified": true},
     "3-exact-baseline-import": {"files": ["PROVENANCE.json", "config/import-manifest.json", "config/import-manifest.schema.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json", "package-lock.json", "tsconfig.json", "src", "public", "data", "tests/unit", "tests/integration"], "written": true, "verified": true}
+    ,"4-canonical-medpsy-parity": {"files": ["metadata.json", "config/model-finalists.json", "config/canonical-model.json", "config/canonical-model.schema.json", "download_model.sh", "evidence/medpsy-shared-runtime-v1/model.sha256", "tests/canonical-model.test.ts", "tests/downloader.test.ts"], "written": true, "verified": true}
   },
   "deviations": [
     {"step": "3", "id": "DEV-001", "description": "Dependency installation could not complete because the host filesystem exhausted free space", "reason": "The merged QVAC dependency graph plus npm extraction/cache exceeded available disk during three bounded attempts", "class": "UNTESTED", "impact": "Task 3 typecheck, full tests, lock reconciliation, and completion-ledger GREEN remain unverified"},
     {"step": "3", "id": "DEV-002", "description": "Two overlapping npm install processes were launched during the first attempt", "reason": "Implementation-worker execution error", "class": "UNTESTED", "impact": "Increased disk pressure; no source, evidence, or model artifact was changed"},
     {"step": "3", "id": "DEV-003", "description": "The stalled third npm install was terminated after repeated ENOSPC warnings", "reason": "Implementation-worker judgment error while disk free space approached exhaustion", "class": "UNTESTED", "impact": "Exit 143; no successful dependency install or downstream verification"}
     ,{"step": "3", "id": "DEV-004", "description": "The sole final-retry dependency install exited with npm registry EIDLETIMEOUT", "reason": "registry.npmjs.org connection became idle while downloading large QVAC transitive artifacts", "class": "UNTESTED", "impact": "Dependency tree and lockfile remain incomplete; focused/full tests, typecheck, manifest GREEN, Task 3 commit, and Task 4 are blocked"}
+    ,{"step": "4", "id": "DEV-005", "description": "The initial downloader RED test invoked the imported legacy SmolLM2 network downloader instead of a stub", "reason": "Implementation-worker test isolation error", "class": "RECOVERED", "impact": "Exact test/curl processes were stopped immediately; temporary bytes were removed automatically; no project weight, publication, or commit occurred; all further downloader tests are network-stubbed"}
   ],
   "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification", "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening", "exact-baseline-import": "subagent implementation; orchestrator independently verified all final gates and owns the narrow commit"},
   "contractAddresses": {},
@@ -176,10 +184,13 @@
     ,{"command": "Task 3 npm run verify-import-manifest", "exitCode": 0, "result": "76 completed imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
     ,{"command": "Task 3 independent immutable parity", "exitCode": 0, "result": "76 total; 64 reused exact; 12 modified-for-ADTC with precise reasons and destination hashes; 0 pending; 0 errors"}
     ,{"command": "Task 3 JSON/diff/no-weight/no-partial boundaries", "exitCode": 0, "result": "required JSON parses; git diff check clean; no tracked GGUF, partial, or private key"}
+    ,{"command": "Task 4 safe stubbed canonical/downloader RED", "exitCode": 1, "result": "6 tests, 0 pass, 6 fail; missing canonical files and legacy downloader rejected by network-blocking curl stub"}
+    ,{"command": "node --import tsx --test tests/canonical-model.test.ts tests/downloader.test.ts", "exitCode": 0, "result": "6 tests, 6 pass, 0 fail, 0 skipped, 0 todo"}
+    ,{"command": "Task 4 typecheck/JSON/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; JSON 4/4; diff clean; project/tracked GGUF and partial scans empty"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T13:33:00Z",
+  "timestamp": "2026-08-24T13:43:00Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -214,7 +225,7 @@
     ,"After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining."
     ,"Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute."
   ],
-  "what_is_needed": "Begin approved Task 4 canonical MedPsy parity only. Use the frozen qvac/MedPsy-1.7B-GGUF revision and exact file/hash; do not retain weights or enter Phase 2 without a truthful signed decision.",
+  "what_is_needed": "Begin approved Task 5 and bind the product and official profiler metadata to the same canonical GGUF contract. Do not download or retain weights, and do not enter Phase 2 without a truthful signed decision.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",

@@ -374,3 +374,9 @@ The one newly authorized clean `npm install` completed successfully (320 package
 The English text baseline removes only excluded speech and translation surfaces. TDD recorded the modality-exclusion characterization RED (1/1 failed before implementation) and GREEN (1/1 passed). Final verification is green: focused provenance 9/9; full suite 179 total, 155 passed, zero failed, 24 environment-dependent RAG/store skips, zero todo; strict TypeScript; 76-entry manifest verification; JSON parsing; immutable Git-object parity; dependency-tree validation; `git diff --check`; and no tracked GGUF, partial model, or private key.
 
 `applicationImported=true` is now truthful. Task 3 is complete. Task 4 may begin only with the exact frozen MedPsy artifact; weights must not be retained and Phase 2 remains blocked pending truthful fresh evidence and a signed decision.
+
+Task 4 deviation `DEV-005 RECOVERED`: the initial RED test accidentally invoked the imported legacy SmolLM2 downloader in a temporary directory. Build stopped the exact test, shell, and curl processes immediately; the temporary directory was removed, and no project model bytes, evidence, publication, or commit resulted. All subsequent downloader tests must stub network access and use local deterministic fixtures.
+
+### Task 4 — canonical MedPsy artifact
+
+The canonical contract now freezes `medpsy-1.7b-q4` at revision `fd4cecc90c2de8dce4b112795456a54be9c59363`, file `medpsy-1.7b-q4_k_m-imat.gguf`, 1,282,439,360 bytes, SHA-256 `41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880`, English scope, official llama.cpp runtime, and QVAC SDK 0.13.3 product runtime over the same bytes. The credential-free downloader uses a partial path, validates size/hash, and atomically renames only verified bytes. Stubbed focused tests pass 6/6, TypeScript is clean, and project/tracked model scans are empty.

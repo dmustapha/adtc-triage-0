@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://triage-01.local/schemas/canonical-model.schema.json",
+  "title": "Canonical MedPsy shared-runtime identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "candidateId", "name", "revision", "url", "filename", "path",
+    "bytes", "sha256", "quantization", "parametersEstimate", "license",
+    "languageScope", "officialRuntime", "productRuntime"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "candidateId": { "const": "medpsy-1.7b-q4" },
+    "name": { "const": "MedPsy-1.7B-Q4_K_M-imatrix" },
+    "revision": { "const": "fd4cecc90c2de8dce4b112795456a54be9c59363" },
+    "url": { "type": "string", "format": "uri", "pattern": "^https://huggingface\\.co/" },
+    "filename": { "const": "medpsy-1.7b-q4_k_m-imat.gguf" },
+    "path": { "const": "model/medpsy-1.7b-q4_k_m-imat.gguf" },
+    "bytes": { "const": 1282439360 },
+    "sha256": { "const": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880" },
+    "quantization": { "const": "GGUF Q4_K_M" },
+    "parametersEstimate": { "const": "2.03B" },
+    "license": { "const": "Apache-2.0" },
+    "languageScope": { "const": ["en"] },
+    "officialRuntime": { "const": "llama.cpp" },
+    "productRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "modelPath"],
+      "properties": {
+        "name": { "const": "QVAC SDK" },
+        "version": { "const": "0.13.3" },
+        "modelPath": { "const": "model/medpsy-1.7b-q4_k_m-imat.gguf" }
+      }
+    }
+  }
+}
