@@ -806,4 +806,362 @@
 ### Prompt 51
 > continu with condu tour till demo rehearsal
 
-**Action:** Interpreted this as authorization to resume the hackathon conductor and continue through Demo Rehearsal, subject to all existing FSM gates and resolution of the missing signed model decision; no individual pipeline skill was invoked directly.
+**Action:** Resumed the hackathon conductor, archived a stale lock safely, passed resume/FSM/Build pre-gates, and dispatched one product-contract requirements-revision cycle. The revised constrained contract passed 35/35 local tests but OLMo-2 7B failed the exact frozen 12-case remote calibration, so the conductor stopped at Build before the untouched evaluation, human/physical gates, model signing, Phase 2, or UI; Demo Rehearsal was not reached.
+
+### Prompt 52
+> yes, go with yes for future autns
+
+**Action:** Recorded a preference to proceed with recommended reversible in-scope defaults, but did not treat the ambiguous yes as selecting between a submission pivot and a new requirements revision or as waiving mandatory conductor checkpoints.
+
+### Prompt 53
+> continue
+
+**Action:** Treated this as explicit approval of the immediately preceding recommended submission pivot and began conductor-managed resume preparation, preserving all failed evidence and mandatory human/external-action gates.
+
+### Prompt 54
+> yes, use /handoff so we continue in a new chat
+
+**Action:** Recorded explicit approval to leave healthcare and change the project identity, saved the complete creative-writing pivot handoff context, and prepared a copy-paste resume prompt without starting implementation.
+
+### Prompt 55
+> how are the blovkers. especially the one in build phase 1. im about to go to work so i need to make sure that we've fixed all blockers so you can completee all the skills before im back
+
+**Action:** Began a blocker audit and clarified that the Build Phase 1 clinical blocker was not cleared; the turn was interrupted before the final status response.
+
+### Prompt 56
+> why are we leaving healthcare. why is the migration failing. what caused this issue.
+
+**Action:** Reconstructed and documented the root cause: the clean ADTC clinical rebuild could not obtain a truthful signed model decision because OLMo-2 7B failed clinical semantics even after the prompt-contract and constrained-output defects were isolated.
+
+### Prompt 57
+> wdym by this: 2. ADTC requires a new, direct llama.cpp implementation. Prior Triage-0 code and artifacts cannot be imported without organizer approval.
+>
+> im giving you approval already
+> why cant we use the same llm we used for triage-0. then find somewhere else to use the llama.cpp while maintaining the deep adtc integration. we dont have much time left but i dont want us to pivot. we have a fully built project, so pivoting to another idea is too late. we need to figure this one out. so take your time to research and ultrathink
+
+**Action:** Stopped the creative-writing direction, recorded the user's healthcare-retention correction, and began an evidence-based audit of Triage-0 model reuse, ADTC prior-work eligibility, and load-bearing `llama.cpp` architecture options before any implementation or conductor resume.
+
+### Prompt 58
+> go with 1
+>
+> so check all of our docs and review them. we need to get this right and make sure our implementation is airtight. check for all the blockers please. then you review the docs before we continue building
+
+**Action:** Recorded approval of the shared-MedPsy Triage-0 reuse design, wrote the design document, and began the required complete documentation, state, blocker, and implementation-plan audit before any Build code or conductor dispatch.
+
+### Prompt 59
+> lets start build in a new chat. give me a detailed prompt. hope we've resolved all blockers
+
+**Action:** Saved the complete shared-MedPsy Build handoff and prepared a detailed fresh-chat conductor resume prompt. Clarified that strategy/documentation blockers are resolved while conductor, provenance, evidence, human, physical, and external release gates remain intentionally open.
+
+### Prompt 60
+> lets do these rn then: We have resolved the strategic and documentation blockers. We have not yet closed the operational, evidence, human-review, physical-hardware, and publication gates.
+
+**Action:** Recorded authorization to begin conductor-managed shared-MedPsy recovery immediately, while preserving the requirement for real human and physical evidence and verified external-action targets.
+
+### Prompt 61
+> continue
+
+**Action:** Saved the interrupted legal/provenance Build checkpoint, recovered the conductor-managed shared-MedPsy execution state, and continued from the in-flight TDD gate without re-dispatching completed or running work.
+
+### Prompt 62
+> where are we. why are you taking so long
+
+**Action:** Reported that the legal/provenance gate had passed implementation and independent review but was waiting at the Build-owner commit boundary; identified the double-review and interrupted turns as the delay.
+
+### Prompt 63
+> do we need to do all these before buildn starts? are they blockers?
+
+**Action:** Clarified that Build was already running and classified human, source-rights, physical, x86, and publication requirements as staged claim/transition gates rather than universal Build-start blockers.
+
+### Prompt 64
+> but are these things that you can make decisions on during the build? are they exact blockers that would ruin the whole build till we fix them?
+
+**Action:** Defined which unresolved gates can be dispositioned autonomously through testing, claim narrowing, or optional-feature cuts, and which mandatory official-artifact failures would block the protected transition.
+
+### Prompt 65
+> i think for each unresolved gate, you should be able to iterate and make the correct decision yourself. im about to go to work, so i wont be able to check up on you. i just expect you to be done with the entire build and all the skills and stop before demo rehearsal. what do you think
+
+**Action:** Recorded bounded autonomous authority to run the conductor through Interrogate and stop before Demo Rehearsal, including reviewed publication to the existing public repository but excluding fabricated evidence, Devpost submission, video publication, spending, destructive actions, and model search.
+
+### Prompt 66
+> so we should continue with build in new chat. use /handoff
+
+**Action:** Paused the partial pinned-baseline import, saved a comprehensive conductor-resume snapshot, released the conductor lock for the new chat, and prepared a copy-paste Build resume prompt.
+
+### Prompt 67
+> Resume the conductor-managed ADTC 2026 healthcare Build in /Users/MAC/adtc-2026.
+>
+> First read the complete handoff:
+> /Users/MAC/adtc-2026/docs/context/conversation_2026-08-24_0738.md
+>
+> Then read the full hackathon-conductor skill, the active ADTC brief, PULSE.md, research/ADTC-PIPELINE-SKILL-OVERRIDES.md, docs/plans/2026-08-24-healthcare-retention-shared-medpsy-design.md, docs/reviews/2026-08-24-shared-medpsy-document-and-blocker-review.md, docs/plans/2026-08-24-shared-medpsy-healthcare-retention-implementation.md, .conductor-resume.md, .conductor-state.json, and .build-state.json.
+>
+> The healthcare pivot-back is approved. The architecture is transparent reuse of the exact public Triage-0 baseline at commit 74424721bc75f564808eacce42d7f7f42676ae0f, using one locked MedPsy GGUF for the proven QVAC product runtime and a new direct official llama.cpp profiler path over the same exact bytes. Do not revive creative writing, import from the mutable Triage-0 tree, search for models, use OLMo, claim African-language support, rewrite failed clinical evidence, or retain GGUF weights.
+>
+> The legal/provenance gate is complete at commits 680d06d and c99c13d. Do not rerun it. Build Task 3 is partially complete: all 76 pinned objects were extracted, but package/lockfile reconciliation, destination parity, modification reasons, final import flags, full verification, and commit are pending. config/import-manifest.json and PROVENANCE.json correctly still say applicationImported false. The focused Task 3 suite has a real RED: 8 tests, 7 pass, 1 fail because the completed-import claim is false.
+>
+> Inspect git status and confirm there are no live worker agents. Run the conductor resume gate, FSM gate, and Build pre-gate, then dispatch hackathon-build through the conductor in resume mode, never directly and never fresh. Finish Task 3 under TDD: verify all 76 pinned objects, minimally merge package.json/package-lock.json/tsconfig.json, record exact modified-for-ADTC reasons and hashes, run the focused provenance suite, npm test, npm run typecheck, npm run verify-import-manifest, JSON/diff/no-weight checks, reconcile exact test counts, update state/PULSE/beacon atomically, and narrowly commit verified Task 3 files only.
+>
+> Then continue the approved plan autonomously through Build, Debug, Wire, Verify Milestone, Design Forge or truthful inapplicability, Stress, Polish auto-skip, Deploy to the existing public GitHub repository, Livetest, and Interrogate DEEP. Stop before Demo Rehearsal. Reviewed publication to the existing public repo is authorized only at Deploy. Devpost final submission, final video publication, spending, destructive actions, fabricated human or physical evidence, model search, and weakened official gates are not authorized.
+>
+> Use only qvac/MedPsy-1.7B-GGUF revision fd4cecc90c2de8dce4b112795456a54be9c59363, file medpsy-1.7b-q4_k_m-imat.gguf, 1,282,439,360 bytes, SHA-256 41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880. Use remote evidence-only GitHub Actions and retain no weights. Never advance Phase 2 without a truthful signed model decision. For unresolved staged gates, choose only real completion, a documented non-official waiver paired with claim removal, or a truthful block. Never impersonate a clinician or promote CI/Apple evidence to physical Ubuntu evidence.
+
+**Action:** Loaded the complete handoff, conductor, ADTC brief, controlling recovery artifacts, Build protocols, and saved an additional read-boundary snapshot before entering resume gates.
+
+### Prompt 68
+> continue
+
+**Action:** Continued loading authoritative Build state and conductor references after the interrupted turn.
+
+### Prompt 69
+> continue
+
+**Action:** Saved the mandated context snapshot, confirmed only the root agent is live, and continued toward the conductor resume gate without changing Task 3 implementation files.
+
+### Prompt 70
+> how can we clear space. check our docker
+
+**Action:** Saved the blocked Task 3 boundary and began a read-only Docker and host-storage audit without pruning or deleting data.
+
+### Prompt 71
+> check docker for space, check other locations, where we can free up space
+
+**Action:** Audited Colima, Docker Desktop, developer caches, toolchains, application data, projects, screen recordings, and inactive Anvil state; ranked reclaim candidates without deleting anything.
+
+### Prompt 72
+> delete Anvil temp snapshots
+
+**Action:** Revalidated and deleted only three inactive generated Anvil state directories, reclaiming roughly 54 GiB and increasing filesystem availability from 2.4 GiB to 57 GiB.
+
+### Prompt 73
+> authorize one npm retry
+
+**Action:** Recorded one narrowly scoped retry authorization to reopen conductor-managed Build and attempt one complete npm installation after the registry timeout, without weakening Task 3 verification.
+
+### Prompt 74
+> Task 3’s final evidence is fully green: 179 total, 155 pass, 0 fail, 24 skips;
+>
+> why 24 skips? answer this after youre done with task 4. dont stop your current processes. give me
+
+**Action:** Kept Build running, confirmed Task 4 was already complete, reconstructed all 24 cold-workspace RAG/citation-dependent skips from the Task 3 test definitions, and explained their evidence boundary.
+
+### Prompt 75
+> continue
+
+**Action:** Saved the exact 24-skip breakdown and answered without interrupting the active Task 5 worker.
+
+### Prompt 76
+> okay, continue from there then
+
+**Action:** Saved the continuation boundary and resumed supervision of the existing conductor-dispatched Build from Task 5 without restarting any phase or gate.
+
+### Prompt 77
+> so what do we do as build has reached this issue.
+
+**Action:** Identified the Task 9 evidence/publication deadlock and documented the shortest truthful recovery path: a narrow pre-Deploy workflow publication exception, verified remote evidence, named clinical review, and real physical Ubuntu evidence before signing the model decision.
+
+### Prompt 78
+> which existing repo;and does the 5step process solve the blocker?
+
+**Action:** Verified the configured remotes and canonical submission repository, distinguished it from the organizer upstream and Triage-0 provenance source, and mapped each recovery step to the exact Task 9 blockers.
+
+### Prompt 79
+> what phase of build are we in btw. how far are we in %
+
+**Action:** Calculated exact shared-MedPsy plan progress and a separately labeled overall conductor-pipeline estimate from the approved 12-task plan and current phase ledger.
+
+### Prompt 80
+> I authorize a narrow pre-Deploy push of commits ed1886a through a366077 to the existing public repository and dispatch of the MedPsy evidence-only GitHub Actions} workflow, provided it incurs no paid spend and retains no weights.
+> continue with the 5 step process
+
+**Action:** Recorded the narrow publication/dispatch authorization and ran the no-mutation preflight. Verified the public standard Ubuntu runner is free and weight exclusions are enforced, but stopped before pushing because `submission/main` requires ten unmentioned ancestor commits in addition to the six explicitly authorized commits.
+
+### Prompt 81
+> I authorize the narrow pre-Deploy push of the exact contiguous range c2adbb8 through a366077 to submission/main, followed by one MedPsy evidence-workflow dispatch,
+> with no paid spend or retained weights.
+
+**Action:** Recorded the corrected exact-range and one-dispatch authorization and began reopening conductor-managed Build at Task 9 after the completed repository, cost, authentication, ancestry, and no-weight preflight.
+
+### Prompt 82
+> dont stop. continue till demo rehearsal. im about to sleep. so lets continue in a new chat. give me a comprehensive prompt
+
+**Action:** Recorded unattended continuation authority through Interrogate with the existing stop-before-Demo-Rehearsal boundary and prepared an authoritative disk snapshot for automatic context compaction.
+
+### Prompt 83
+> or we dont need to?
+
+**Action:** Determined that a new chat is unnecessary because automatic compaction and conductor snapshots preserve continuity; continued the current conductor lineage unattended.
+
+### Prompt 84
+> do extensive critique and extensive research. how do we properly fix this blocker
+
+**Action:** Performed a read-only, primary-source-backed root-cause analysis of the terminal MedPsy calibration failure across evaluator framing, model semantics, calibration specification, product-path parity, official profiler behavior, and submission readiness; wrote a scoped requirements-revision recommendation without rerunning or changing the locked model.
+
+### Prompt 85
+> and how important is it. the rest can proceed without this? what part/feature is blocked
+
+**Action:** Mapped the failed evidence gate to the exact model-backed `/triage` feature, release claims, signed decision, profiler/submission artifacts, and downstream conductor phases; distinguished those from deterministic and model-free work that can technically continue under a claim-limited requirements revision.
+
+### Prompt 86
+> so you know the proper fix and the submission importance. create a comprehensive plan, review it critically and then proceed when youre sure of its correctness/effectiveness.
+
+**Action:** Began the approved requirements revision: inspected the live product and evidence boundaries, designed a structured danger-sign and split-evidence architecture, and prepared a comprehensive TDD plan for critical review before conductor-managed implementation.
+
+### Prompt 87
+> how many hours left do we have. we need to know if we can finish this. last time i asked, we weere in task 9 or 12
+
+**Action:** Calculated 13.23 hours to the hard deadline, reconciled the old Task 9-of-12 position with the new 2-of-10 repair plan, and defined Task 3 as the deadline cutover checkpoint for a truthful claim-limited fallback.
+
+### Prompt 88
+> okay, i agree with that
+
+**Action:** Recorded approval of the deadline strategy: continue the active Build, protect the clinical safety core, reassess after Task 3, and cut nonessential breadth if needed to preserve a truthful submission-ready fallback.
+
+### Prompt 89
+> remember we have othe skills to run and video to make
+> i also have to test the app out myself to make sure its working
+
+**Action:** Rebalanced the deadline critical path to reserve a runnable-app user acceptance testing window, downstream conductor phases, and demo-video production instead of allowing Build to consume the entire remaining schedule.
+
+### Prompt 90
+> lets go
+
+**Action:** Continued the active conductor-managed Build toward the runnable-app checkpoint while preserving the user-test, downstream-phase, and video-production reserves.
+
+### Prompt 91
+> why not complete build before i test? or are you done? is there a particular reason you want me to test rn
+
+**Action:** Clarified that Build was not complete, corrected the premature UAT checkpoint, closed only the temporary model-free preview, and continued Build toward a coherent complete local test handoff.
+
+### Prompt 92
+> this isnt how traige-0 original ui is
+
+**Action:** Accepted the screenshot-backed UI fidelity correction, began comparing Task 4 against the exact pinned Triage-0 baseline, and scoped a minimal tested restoration that retains structured safety controls without replacing the original product experience.
+
+### Prompt 93
+> continue
+
+**Action:** Continued the conductor-managed Build through split evidence implementation while retaining the queued original-UI fidelity correction before final verification and UAT.
+
+### Prompt 94
+> dont forget the tzks you were on before that:
+> • I’m using the systematic debugging and UI-fidelity workflow here because this is a screenshot-backed regression, not a request for a new visual direction. The first check is whether Task 4 changed only the form controls or also displaced baseline structure and styling.
+> • Viewed Image
+
+**Action:** Confirmed the UI-fidelity thread remained active through root-cause isolation and corrective commit, then completed independent tests and proceeded to inspect the committed before/after Chrome screenshots while Task 7 continued.
+
+### Prompt 95
+> continue then.  contexxt too much? give me a comprehensive prompt so we continue all our processes in a new chat
+
+**Action:** Captured the live Task 9 dirty boundary, all revision commits and evidence, UI correction, deadline strategy, conductor resume sequence, downstream scope, and authorization limits in a comprehensive filesystem handoff and produced a paste-ready new-chat resume prompt.
+
+### Prompt 96
+> Resume the conductor-managed ADTC 2026 healthcare Build in /Users/MAC/adtc-2026.
+>
+> First read the complete authoritative handoff:
+>
+> /Users/MAC/adtc-2026/docs/context/conversation_2026-08-24_1833-comprehensive-new-chat-resume.md
+>
+> Then completely read:
+>
+> - /Users/MAC/.codex/skills/hackathon-conductor/SKILL.md and its required references
+> - /Users/MAC/.codex/skills/hackathon-build/SKILL.md
+> - /Users/MAC/.codex/skills/hackathon-briefs/adtc-2026.md
+> - /Users/MAC/.codex/skills/PIPELINE-COMMON.md
+> - /Users/MAC/.codex/skills/hackathon-pulse/PULSE-PROTOCOL.md
+> - PULSE.md
+> - research/ADTC-PIPELINE-SKILL-OVERRIDES.md
+> - .conductor-resume.md
+> - .conductor-state.json
+> - .build-state.json
+> - docs/plans/2026-08-24-structured-danger-evidence-plane-revision-design.md
+> - docs/plans/2026-08-24-structured-danger-evidence-plane-revision-implementation.md
+> - docs/reviews/2026-08-24-structured-danger-evidence-plane-plan-review.md
+> - docs/reviews/2026-08-24-medpsy-terminal-calibration-root-cause-and-unblock-review.md
+>
+> This is a resume, never a fresh pipeline and never a direct hackathon-build invocation.
+>
+> Inspect git status, HEAD, Build state, processes, and live workers. If an existing worker or test is active, supervise it and do not duplicate or interrupt it. Otherwise
+> run the conductor resume gate, FSM gate, and Build pre-gate, then redispatch hackathon-build through the conductor in resume mode.
+>
+> Current exact boundary:
+>
+> - Local HEAD at handoff: 0132ca8.
+> - Revision Tasks 1–8 are committed.
+> - Task 9 is active under TDD.
+> - Task 9 RED: 31 total, 27 pass, 4 expected failures.
+> - Independent review caught a mixed deterministic/model-row gate and a pre-loop QVAC-load leak. Fix these before GREEN.
+> - Preserve the current uncommitted Task 9 files:
+>   - .github/workflows/medpsy-evidence-v2.yml
+>   - scripts/medpsy-product-v2/run-qvac.ts
+>   - scripts/medpsy-raw-profiler-v2/run-raw.ts
+>   - scripts/medpsy-product-v2/evaluate.ts
+>   - tests/medpsy-product-v2.test.ts
+>   - tests/medpsy-raw-profiler-v2.test.ts
+> - Do not reset, overwrite, or discard them.
+>
+> Complete Task 9 with focused RED/GREEN, independent YAML and producer review, typecheck, full tests, import-manifest verification, JSON/YAML parsing, diff checks, no-
+> weight/no-partial/no-cache/no-secret scans, exact skip reconciliation, and a narrow verified commit.
+>
+> Then complete Task 10 local reconciliation, FOR[Dami].md, Build report/state, PULSE, and beacon using their owning atomic mechanisms. Run the Build post-gate and
+> continue only through the conductor FSM and per-phase gates.
+>
+> After Build, continue the authorized pipeline through:
+>
+> Debug → Wire → Verify Milestone → Design Forge or truthful inapplicability → Stress → Polish auto-skip → Deploy → Livetest → Interrogate DEEP.
+>
+> Stop before Demo Rehearsal unless I explicitly change that boundary. Reserve time for video production, but final video publication and Devpost submission remain
+> unauthorized.
+>
+> Do not invite me to test a partial preview. After the coherent locally testable Build is complete, start the final supported local app and give me a concise end-to-end
+> UAT checklist. Reserve one focused fix loop after my feedback.
+>
+> The UI fidelity regression is already corrected and independently verified:
+>
+> - Commit 06865d2.
+> - Original compact Triage-0 hierarchy restored.
+> - Structured assessment uses progressive disclosure.
+> - Unsupported speech/translation controls remain absent.
+> - Root verified 20/20 tests, typecheck, 76-entry provenance, diff checks, and all three Chrome screenshots.
+> - Carry these observations into Stress/Verify:
+>   1. “Online” badge versus “No network was used.”
+>   2. Pre-run “This ran on the device” copy with an empty store/no resident model.
+>
+> Immutable identity:
+>
+> - Triage-0 baseline commit: 74424721bc75f564808eacce42d7f7f42676ae0f
+> - Model: qvac/MedPsy-1.7B-GGUF
+> - Revision: fd4cecc90c2de8dce4b112795456a54be9c59363
+> - File: medpsy-1.7b-q4_k_m-imat.gguf
+> - Bytes: 1,282,439,360
+> - SHA-256: 41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880
+> - Product runtime: QVAC SDK 0.13.3
+> - Official raw/profiler runtime: pinned direct official llama.cpp over the identical bytes
+>
+> Preserve failed run 32742482642 and all historical evidence unchanged.
+>
+> Never:
+>
+> - search for models or revive OLMo;
+> - tune against the failed 12 cases;
+> - inspect sealed holdouts before frozen calibration passes;
+> - fabricate clinical labels, named review, or physical evidence;
+> - claim African-language support;
+> - weaken official gates;
+> - retain/upload/track GGUF weights;
+> - promote CI or Apple evidence to physical Ubuntu evidence;
+> - sign a model decision or enter claim-bearing Phase 2 without every applicable passing gate;
+> - broad-stage the dirty worktree.
+>
+> No new push, workflow dispatch, paid spend, final video publication, Devpost submission, destructive action, or external mutation is authorized. The prior one-workflow
+> authorization was consumed by run 32742482642.
+>
+> For unresolved gates, choose only:
+>
+> 1. real completion;
+> 2. a documented non-official waiver paired with claim removal;
+> 3. a truthful block.
+>
+> Keep logging user prompts and preserve the UAT, downstream-phase, and video time reserves. Continue autonomously.
+
+**Action:** Resumed the conductor-managed Build from the exact Task 9 boundary, preserved and completed the existing producer work under TDD, finished local Task 10 reconciliation, and repaired the remaining Build ownership and post-gate compliance artifacts without changing producer/workflow bytes, historical evidence, or conductor-owned state. Local Build is complete only under the documented claim-limited scope; external clinical, physical, identity, and signing gates remain unresolved.

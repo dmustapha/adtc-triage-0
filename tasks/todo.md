@@ -1,5 +1,37 @@
 # ADTC 2026 Pipeline
 
+## Authoritative current boundary (2026-08-24)
+
+- [x] Resume the conductor-managed Build through the reviewed structured-danger revision.
+- [x] Complete revision Tasks 1 through 9 under focused TDD and narrow commits.
+- [x] Complete Task 10 local executable reconciliation at `840af49`.
+- [x] Correct the corpus-method artifact hash at `8d264bd`.
+- [x] Complete Build ownership and compliance reconciliation.
+  - [x] Update `FOR[Dami].md` to the actual structured-danger and split-evidence architecture.
+  - [x] Reconcile this task ledger to the local claim-limited Build result.
+  - [x] Log the complete resume prompt and action in `docs/prompts/prompt-log.md`.
+  - [x] Replace only `.build-state.json` test-summary `todo` wording with equivalent `pending` wording.
+  - [x] Record claim-limited downstream scope in Build report, state, PULSE, and codebase manifest.
+  - [x] Preserve Task 9 producer/workflow bytes and historical run `32742482642` evidence.
+- [x] Mark local Build complete only under the documented claim-limited scope.
+- [ ] Run Debug through Interrogate DEEP sequentially through the conductor and per-phase gates.
+  - [ ] Debug the local build without claiming validated real QVAC product evidence.
+  - [ ] Wire and verify only paths supported by current local evidence.
+  - [ ] Run Verify Milestone with external claim gates explicit.
+  - [ ] Run Design Forge or record truthful inapplicability.
+  - [ ] Stress the two queued UI truthfulness issues: `Online` wording and pre-run device wording.
+  - [ ] Auto-skip Polish.
+  - [ ] Run Deploy and Livetest without external mutation unless separately authorized.
+  - [ ] Run Interrogate in DEEP mode.
+- [ ] Stop before Demo Rehearsal.
+- [ ] Start the final supported local app after downstream hardening and provide one concise end-to-end UAT checklist.
+- [ ] Reserve one focused fix loop after user UAT feedback.
+- [ ] Preserve time for video production; final video publication and Devpost submission remain unauthorized.
+- [ ] External claim gates remain unresolved: real supported-platform QVAC calibration, independent sealed holdouts, named clinical review, physical Ubuntu proof, submitter identities, and signed model decision.
+- [x] Keep `phase2Authorized=false` and `modelDecisionExists=false`.
+
+The ledger below is historical execution context. Any unchecked item that conflicts with the authoritative boundary above is superseded and must not reopen completed Build work.
+
 ## Build attempt 4: final Phase 1 model recovery
 
 - [x] Read the ADTC brief, PULSE, controlling override, conductor beacon/state, Build state, and locked OLMo-2 7B recovery artifacts.
@@ -98,12 +130,52 @@
 - [ ] Resume the conductor through Demo Rehearsal under the user-authorized requirements revision.
   - [x] Save the authorization and recover the stale conductor lock safely.
   - [x] Pass the conductor resume gate, FSM gate, and Build pre-dispatch gate.
-  - [ ] Re-dispatch Build to formalize and test the compact constrained product prompt contract against the same OLMo-2 7B.
+  - [x] Re-dispatch Build to formalize and test the compact constrained product prompt contract against the same OLMo-2 7B (frozen calibration rejected it).
   - [ ] Require a signed passing model decision before Phase 2.
   - [ ] Continue sequentially through Debug, Wire, Verify Milestone, Design Forge or justified skip, Stress Test, Deploy, Livetest, Interrogate, and Demo Rehearsal.
-  - [ ] Stop at Demo Rehearsal or earlier if any mandatory FSM gate blocks.
+  - [x] Stop at Demo Rehearsal or earlier if any mandatory FSM gate blocks (stopped at Build's fundamental calibration gate).
 - [ ] Build, debug, wire, profile, and verify on constrained hardware.
 - [ ] Complete design, stress testing, deployment, live testing, and interrogation.
 - [ ] Produce the 2-minute demo, package the Devpost submission, and run preflight.
 - [ ] Keep Lightsail provisioning deferred until explicitly re-approved; use GitHub Actions for the first controlled x86 comparison.
 - [x] Save the completed pre-Build state and copy-paste resume prompt through `/handoff` before starting Build in a new chat.
+- [x] Investigate and design the user-requested healthcare-retention recovery before any pivot or conductor resume.
+  - [x] Verify exact Triage-0 model, runtime, prompt, retrieval, safety, and evidence paths.
+  - [x] Verify official ADTC prior-work and build-from-scratch requirements from organizer-controlled sources.
+  - [x] Determine whether the exact Triage-0 model has a compliant public GGUF and direct `llama.cpp` path.
+  - [x] Evaluate single-runtime, dual-runtime, and shared-GGUF healthcare architectures against scoring, offline, memory, provenance, and deadline constraints.
+  - [x] Present 2 to 3 evidence-backed designs and obtain explicit approval before implementation.
+- [x] Audit all controlling documents and state artifacts for the approved shared-MedPsy recovery.
+  - [x] Inventory stale clean-build, OLMo-only, creative-writing, model-gate, and prior-work assumptions.
+  - [x] Build a blocker ledger with owner, severity, evidence, and disposition.
+  - [x] Write the implementation plan through `writing-plans`.
+  - [x] Review the design and implementation plan before conductor resume or code.
+- [ ] Execute the conductor-authorized shared-MedPsy healthcare recovery.
+  - [x] Record the recovery transaction and dispatch Build through the conductor.
+  - [x] Freeze and verify the exact Triage-0 import provenance before importing application files.
+  - [ ] Import the exact public baseline and reconcile its dependency/test contract. (IN PROGRESS: 76/76 pinned objects present; package, lockfile, TypeScript config, parity, verification, state, PULSE, beacon, and narrow commit pending.)
+  - [ ] Lock one canonical MedPsy artifact across metadata, downloader, QVAC, and profiler.
+  - [ ] Characterize and preserve the proven two-pass clinical product contract.
+  - [ ] Produce fresh remote evidence-only MedPsy artifacts with no retained weights.
+  - [ ] Reconcile historical and fresh quality evidence without rewriting prior failures.
+  - [ ] Stop for named human clinical review and physical target-laptop evidence.
+  - [ ] Sign the model decision only after every applicable evidence gate passes.
+  - [ ] Replace submission placeholders and return to the conductor for downstream phases.
+- [ ] Resolve the terminal MedPsy calibration blocker through an explicit requirements decision.
+  - [x] Preserve remote run `32742482642` as immutable failed historical evidence.
+  - [x] Diagnose CLI framing, semantic extraction, calibration-specification, product-parity, and submission-metadata failure layers.
+  - [x] Map the exact blocked feature and distinguish work that can proceed technically from work forbidden by the current conductor gate.
+  - [x] Research the pinned profiler, llama.cpp grammar behavior, MedPsy usage contract, and health-AI safety guidance from primary sources.
+  - [x] Write a scoped blocker critique and recommended repair sequence without implementing or rerunning it.
+  - [ ] Obtain explicit user approval for the requirements revision before changing gates, product behavior, metadata, or evidence producers.
+  - [ ] Execute the user-approved requirements revision under the conductor.
+    - [x] Treat the user's plan-review-and-proceed instruction as approval of the previously recommended structured-danger and split-evidence architecture.
+    - [x] Reinspect the current `/triage`, QVAC, severity, UI, test, raw-evidence, and profiler boundaries.
+    - [x] Write the controlling design and comprehensive TDD implementation plan.
+    - [x] Critically review safety, scoring, leakage, migration, provenance, and operational effectiveness; revise until no critical or major finding remains.
+    - [ ] Run the conductor resume gate, FSM gate, and Build pre-gate in resume mode.
+    - [ ] Dispatch `hackathon-build` through the conductor to execute the reviewed plan without model search, gate weakening, paid spend, retained weights, or unauthorized publication.
+    - [x] Record the user-approved deadline strategy: Task 3 is the cutover checkpoint; preserve a truthful claim-limited fallback if fewer than roughly 10 hours remain or the critical path slips.
+    - [ ] Deliver the complete locally testable Build and concise user acceptance test script by roughly 2026-08-24T21:30Z, preserving time for one fix loop; do not ask the user to accept a partial preview.
+    - [ ] Reserve downstream conductor and demo-video time; cut nonessential Build breadth before consuming those windows.
+    - [x] Correct the Task 4 UI fidelity regression against pinned Triage-0 commit `74424721bc75f564808eacce42d7f7f42676ae0f`, preserving structured safety controls as a minimal additive change; root independently verified tests, provenance, and all three committed Chrome screenshots.

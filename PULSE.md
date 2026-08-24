@@ -564,3 +564,37 @@
 
 #### For Next Skill
 - Debug/stress the claim-limited local build; action DI-B1/DI-B2 and never promote missing external evidence.
+
+---
+### build — 2026-08-24T18:59:30Z
+**Status:** COMPLETE
+**Session(s):** 12, compliance-fix attempt 2
+
+#### Done
+- Completed omitted Task 10 ownership artifacts and exact prompt logging.
+- Removed the Build post-gate state-wording false positive without changing test values.
+- Recorded the claim-limited local Build scope and external claim gates.
+
+#### Additions (not in PRD/Architecture)
+- [USER] [NEW] Authorized local hardening through Interrogate DEEP, stopping before Demo Rehearsal.
+
+#### Deviations
+- [SKILL] Added the post-gate-required codebase manifest after the earlier Build omitted it.
+
+#### Verified Facts
+- [VF-B14] Task 9 workflow, producer, evaluator, and test bytes are unchanged by this compliance fix.
+- [VF-B15] HEAD ancestry preserves published evidence head a366077 and failed run 32742482642.
+- [VF-B16] Local Build is complete only under the documented claim-limited scope.
+
+#### Assumptions
+- None.
+
+#### Blockers for Downstream
+- Claim-bearing gates remain blocked: real QVAC calibration, sealed holdouts, named review, physical proof, identities, and signed decision.
+
+#### Key Decisions
+- [USER] [D-B4] Debug through Interrogate DEEP may harden locally, with all removed claims kept absent.
+- [USER] [D-B5] Stop before Demo Rehearsal; no external mutation is authorized.
+
+#### For Next Skill
+- Debug the claim-limited local build first; do not promote missing clinical, physical, identity, or signing evidence.

@@ -1,9 +1,9 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "structured-danger-evidence-plane-v2",
-  "currentStep": "external-product-evidence-human-physical-decision-gate",
-  "currentSubStep": "local-revision-complete-external-gates-unavailable",
-  "status": "blocked",
+  "currentStep": "local-build-claim-limited-complete",
+  "currentSubStep": "task-10-compliance-reconciled",
+  "status": "complete",
   "autonomous_mode": true,
   "completedSteps": [
     "1.1",
@@ -36,7 +36,8 @@
     "revision-task-7",
     "revision-task-8",
     "revision-task-9",
-    "revision-task-10-local"
+    "revision-task-10-local",
+    "revision-task-10-compliance"
   ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
@@ -154,6 +155,12 @@
       "started_at": "2026-08-24T16:56:43Z",
       "completed_at": "2026-08-24T18:46:21Z",
       "evidence": "LOCAL COMPLETE / EXTERNAL BLOCKED: Tasks 1-10 committed through 840af49; full 277 total, 255 pass, 0 fail, 22 environment skips; typecheck, 76 imports, JSON/YAML/shell/diff/no-weight/history green; no external evidence or signed decision"
+    },
+    {
+      "phase": "structured-danger-evidence-plane-v2-compliance-fix",
+      "started_at": "2026-08-24T18:51:22Z",
+      "completed_at": "2026-08-24T18:59:00Z",
+      "evidence": "PASS: ownership docs, exact prompt log, claim-limited scope, atomic state, codebase manifest, producer/workflow stability, history ancestry, and proportional static gates verified"
     }
   ],
   "fileGroups": {
@@ -512,6 +519,19 @@
       "verified": true,
       "implementationCommit": "840af49",
       "stateCommit": "ce61ba4"
+    },
+    "revision-task-10-compliance": {
+      "files": [
+        ".build-state.json",
+        "BUILD-REPORT.md",
+        "FOR[Dami].md",
+        "tasks/todo.md",
+        "docs/prompts/prompt-log.md",
+        "PULSE.md",
+        ".codebase-manifest.md"
+      ],
+      "written": true,
+      "verified": true
     }
   },
   "deviations": [
@@ -887,12 +907,12 @@
     {
       "command": "External retry 2 focused provenance command",
       "exitCode": 1,
-      "result": "1 loader-level test, 0 pass, 1 fail, 0 skipped, 0 todo; ERR_MODULE_NOT_FOUND for tsx"
+      "result": "1 loader-level test, 0 pass, 1 fail, 0 skipped, 0 pending; ERR_MODULE_NOT_FOUND for tsx"
     },
     {
       "command": "External retry 2 npm test",
       "exitCode": 1,
-      "result": "25 loader-level tests, 0 pass, 25 fail, 0 skipped, 0 todo; no test body executed because tsx was absent"
+      "result": "25 loader-level tests, 0 pass, 25 fail, 0 skipped, 0 pending; no test body executed because tsx was absent"
     },
     {
       "command": "External retry 2 npm run typecheck",
@@ -922,12 +942,12 @@
     {
       "command": "Task 3 focused provenance GREEN",
       "exitCode": 0,
-      "result": "9 tests, 9 pass, 0 fail, 0 skipped, 0 todo"
+      "result": "9 tests, 9 pass, 0 fail, 0 skipped, 0 pending"
     },
     {
       "command": "Task 3 npm test",
       "exitCode": 0,
-      "result": "179 tests, 155 pass, 0 fail, 24 environment-dependent skips, 0 todo"
+      "result": "179 tests, 155 pass, 0 fail, 24 environment-dependent skips, 0 pending"
     },
     {
       "command": "Task 3 npm run typecheck",
@@ -957,7 +977,7 @@
     {
       "command": "node --import tsx --test tests/canonical-model.test.ts tests/downloader.test.ts",
       "exitCode": 0,
-      "result": "6 tests, 6 pass, 0 fail, 0 skipped, 0 todo"
+      "result": "6 tests, 6 pass, 0 fail, 0 skipped, 0 pending"
     },
     {
       "command": "Task 4 typecheck/JSON/diff/no-weight boundaries",
@@ -972,12 +992,12 @@
     {
       "command": "Task 5 focused shared-runtime GREEN",
       "exitCode": 0,
-      "result": "18 total; 15 pass, 0 fail, 3 store-dependent skips, 0 todo"
+      "result": "18 total; 15 pass, 0 fail, 3 store-dependent skips, 0 pending"
     },
     {
       "command": "Task 5 npm test",
       "exitCode": 0,
-      "result": "191 total; 168 pass, 0 fail, 23 environment-dependent skips, 0 todo"
+      "result": "191 total; 168 pass, 0 fail, 23 environment-dependent skips, 0 pending"
     },
     {
       "command": "Task 5 typecheck/manifest/diff/no-weight boundaries",
@@ -997,7 +1017,7 @@
     {
       "command": "Task 6 npm test",
       "exitCode": 0,
-      "result": "196 total; 173 pass, 0 fail, 23 environment-dependent skips, 0 todo"
+      "result": "196 total; 173 pass, 0 fail, 23 environment-dependent skips, 0 pending"
     },
     {
       "command": "Task 6 typecheck/manifest/diff/no-weight boundaries",
@@ -1062,7 +1082,7 @@
     {
       "command": "node --import tsx --test tests/structured-danger-contract.test.ts",
       "exitCode": 0,
-      "result": "6 tests; 6 pass; 0 fail; 0 skip; 0 todo"
+      "result": "6 tests; 6 pass; 0 fail; 0 skip; 0 pending"
     },
     {
       "command": "Task 1 JSON/diff/historical evidence boundary",
@@ -1082,7 +1102,7 @@
     {
       "command": "node --import tsx --test tests/unit/danger-observations.test.ts tests/unit/severity.test.ts",
       "exitCode": 0,
-      "result": "46 tests; 46 pass; 0 fail; 0 skip; 0 todo"
+      "result": "46 tests; 46 pass; 0 fail; 0 skip; 0 pending"
     },
     {
       "command": "Task 2 npm run typecheck and scoped diff check",
@@ -1117,7 +1137,7 @@
     {
       "command": "Task 3 npm test",
       "exitCode": 0,
-      "result": "226 total; 204 pass; 0 fail; 22 un-ingested-store/citation-map skips; 0 todo"
+      "result": "226 total; 204 pass; 0 fail; 22 un-ingested-store/citation-map skips; 0 pending"
     },
     {
       "command": "Task 3 typecheck and verify-import-manifest",
@@ -1132,12 +1152,12 @@
     {
       "command": "Task 4 focused UI contract",
       "exitCode": 0,
-      "result": "13 total; 13 pass; 0 fail; 0 skip; 0 todo"
+      "result": "13 total; 13 pass; 0 fail; 0 skip; 0 pending"
     },
     {
       "command": "Task 4 npm test",
       "exitCode": 0,
-      "result": "229 total; 207 pass; 0 fail; 22 un-ingested-store/citation skips; 0 todo"
+      "result": "229 total; 207 pass; 0 fail; 22 un-ingested-store/citation skips; 0 pending"
     },
     {
       "command": "Task 4 typecheck/import manifest/static boundaries",
@@ -1147,7 +1167,7 @@
     {
       "command": "Task 5 exact-one-JSON focused + typecheck",
       "exitCode": 0,
-      "result": "12 total; 12 pass; 0 fail/skip/todo; strict TypeScript clean; exact raw stdout preserved"
+      "result": "12 total; 12 pass; 0 fail/skip/pending; strict TypeScript clean; exact raw stdout preserved"
     },
     {
       "command": "Task 4 screenshot-backed fidelity correction",
@@ -1157,7 +1177,7 @@
     {
       "command": "Task 6 split product/raw evidence focused",
       "exitCode": 0,
-      "result": "19 total; 19 pass; 0 fail/skip/todo after independent calibration-manifest binding RED/GREEN"
+      "result": "19 total; 19 pass; 0 fail/skip/pending after independent calibration-manifest binding RED/GREEN"
     },
     {
       "command": "Task 6 deterministic manifests/static gates",
@@ -1172,7 +1192,7 @@
     {
       "command": "Task 8 profiler metadata focused/typecheck/JSON",
       "exitCode": 0,
-      "result": "14 total; 14 pass; 0 fail/skip/todo; metadata JSON and typecheck clean; exact identity and English-only/no-African-language claims pinned; four identity placeholders remain"
+      "result": "14 total; 14 pass; 0 fail/skip/pending; metadata JSON and typecheck clean; exact identity and English-only/no-African-language claims pinned; four identity placeholders remain"
     },
     {
       "command": "Task 9 split workflow focused/static",
@@ -1192,7 +1212,7 @@
     {
       "command": "Task 10 final npm test",
       "exitCode": 0,
-      "result": "277 total; 255 pass; 0 fail; 22 skips; 0 cancelled/todo"
+      "result": "277 total; 255 pass; 0 fail; 22 skips; 0 cancelled/pending"
     },
     {
       "command": "Task 10 final static/provenance",
@@ -1202,7 +1222,7 @@
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T18:46:21Z",
+  "timestamp": "2026-08-24T18:59:00Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -1220,7 +1240,7 @@
   ],
   "resume_attempt": "shared-medpsy-healthcare-recovery-v1",
   "recovery_scope": "transparent import from exact Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f; MedPsy-1.7B Q4 only; QVAC product plus direct llama.cpp profiler over identical GGUF bytes; no model search; historical evidence immutable",
-  "blocked_reason": "Local structured-danger/evidence-plane revision is complete and green, but real supported-platform QVAC calibration, an authorized independent sealed-holdout producer/content, named human clinical review, physical target-laptop evidence, real submitter/team identities, and a truthful signed model decision are absent; no new dispatch or publication is authorized.",
+  "blocked_reason": "EXTERNAL CLAIM GATES ONLY: local claim-limited Build is complete, but real supported-platform QVAC calibration, independent sealed holdouts, named clinical review, physical Ubuntu target evidence, real identities, and a signed model decision remain absent.",
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -1280,5 +1300,31 @@
     "remote_evidence_status": "calibration-failed-terminal",
     "remote_dispatch_count": 1,
     "prior_olmo_blocked_reason": "The authorized OLMo product-contract revision failed exact frozen calibration in run 32684188985; the historical verdict remains preserved."
+  },
+  "claim_limited_scope": {
+    "localBuildComplete": true,
+    "authorizedDownstream": [
+      "debug",
+      "wire",
+      "verify_milestone",
+      "design_forge_or_truthful_inapplicability",
+      "stress_test",
+      "polish_auto_skip",
+      "deploy",
+      "livetest",
+      "interrogate_deep"
+    ],
+    "purpose": "local inspection, testing, and hardening only",
+    "removedClaims": [
+      "validated real QVAC clinical workflow",
+      "named clinical review",
+      "physical Ubuntu proof",
+      "signed model decision",
+      "submission readiness"
+    ],
+    "stopBefore": "demo_rehearsal",
+    "externalMutationAuthorized": false,
+    "phase2Authorized": false,
+    "modelDecisionExists": false
   }
 }

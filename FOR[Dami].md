@@ -1,175 +1,201 @@
-# FOR[Dami]: Why Triage-0 Fits ADTC 2026
+# FOR[Dami]: Triage-0 ADTC Build Handbook
 
-> For the complete file-by-file explanation of ADTC itself, read `docs/ADTC-CONTRACT-EXPLAINED.md` first.
+## 1. What This Project Does
 
-## The one idea to remember
+Triage-0 ADTC is a local, English-only clinical decision-support prototype for trained or supervised frontline workers. It combines a structured respiratory assessment, deterministic safety rules, local protocol citations, and a bounded MedPsy workflow while keeping the official ADTC raw-profiler path separate. The current local Build is testable, but it is not clinically validated and is not submission-ready.
 
-ADTC does not score the application process. It downloads one GGUF and runs that file directly through `llama.cpp`.
+## 2. Vocabulary
 
-That changes both the architecture boundary and the provenance decision:
+**ADTC**
+The Africa Deep Tech Challenge 2026 Laptop LLM competition. Its evaluator downloads one GGUF and runs it through official `llama.cpp` on constrained hardware.
 
-```text
-Official ADTC template
-└── MedPsy GGUF
-    ├── official profiler scores quality, speed, and RAM
-    └── direct llama.cpp powers the new clinical product
-        └── optional QVAC adds supporting local capabilities
-```
+**GGUF**
+The model-file format used by `llama.cpp`. This repository locks one MedPsy file by revision, byte count, and SHA-256, but never tracks or retains the weight file.
 
-QVAC can stay because it is local, open-source, and useful. It cannot be the canonical LLM runtime because the organizer's evaluator never starts it. Direct llama.cpp should power both the official evaluation path and the product's reasoning path.
+**MedPsy**
+The single locked model, `qvac/MedPsy-1.7B-GGUF`, used by the QVAC product path and official raw-profiler path over identical bytes.
 
-## Why the repository decision changed
+**QVAC SDK 0.13.3**
+The pinned local product runtime. It owns model lifecycle, embeddings, retrieval, and the two-pass product orchestration, but it is not the official ADTC profiler runtime.
 
-The public rules do not expressly ban prior work, but an official community manager told another entrant that eligibility depended on the submitted project being built from scratch for this challenge. Triage-0 was built for the QVAC hackathon. Creating a new repository cannot reset that fact.
+**Official raw-profiler path**
+Pinned direct official `llama.cpp` execution over the locked GGUF. It proves artifact identity, runtime compatibility, and raw telemetry, not product safety or clinical effectiveness.
 
-The safe path is:
+**Structured danger assessment**
+The patient age and seven respiratory observations submitted with a case. Six observations can trigger emergency escalation; lower chest-wall indrawing is a separate age-scoped pneumonia-classification sign.
 
-1. Fork the official ADTC template into a new project repository.
-2. Build the model, direct llama.cpp runtime, profiler loop, packaging, and minimal clinical workflow specifically for ADTC.
-3. Ask the organizer whether disclosed Triage-0 components may be imported.
-4. Import prior code only if written approval arrives.
+**Deterministic safety policy**
+Pure code that owns assessment-required behavior, emergency precedence, age-scoped chest-indrawing routing, citations, and structured severity. Free text and model-authored `red_flags` cannot override it.
 
-This preserves eligibility safety without wasting model or profiler work. If reuse is approved, one canonical GGUF can still serve the official evaluator and the richer product.
+**Assessment required**
+The fail-closed result when age is unsupported or a necessary observation is missing, `NOT_ASSESSED`, or internally conflicting and no known emergency observation is present.
 
-## What is already valuable
+**Evidence plane**
+A namespace with a narrow proof claim. `medpsy-product-v2` covers the real supported-platform QVAC product path; `medpsy-raw-profiler-v2` covers direct official `llama.cpp`.
 
-- A 1.28 GB public medical GGUF.
-- Offline community-health workflow.
-- Deterministic WHO protocol decisions and dose citations.
-- Abstention and danger-sign gates.
-- Voice, translation, local retrieval, and polished UX.
-- Real regression history rather than a last-day wrapper.
+**Calibration**
+The pre-registered development set that must pass before sealed holdouts can run. The current v2 labels remain provisional until named clinical review.
 
-## What must change
+**Sealed holdout**
+An independent unseen evaluation set. Only IDs and coverage requirements exist now; content was not created or inspected during Build.
 
-- Add the official template root and exact metadata contract.
-- Provide an idempotent, credential-free model downloader.
-- Run the pinned profiler on Ubuntu 22.04 x86.
-- Fix the fresh-clone offline model-path mismatch.
-- Separate raw-model claims from application claims.
-- Replace the old three-minute QVAC video with a sub-120-second ADTC video.
-- Make the official profiler a continuous model-selection and acceptance gate.
-- Ask for written approval before importing Triage-0 code or artifacts.
-- If reuse is approved, add `PROVENANCE.md` with the exact prior commit and ADTC delta.
+**Model decision**
+The signed release artifact that would authorize claim-bearing Phase 2. It does not exist because product, holdout, human, and physical gates are incomplete.
 
-## What not to do
+**Evidence tier**
+The hardware and execution class attached to a result. Apple development and GitHub CI evidence cannot be promoted to physical Ubuntu target-laptop proof.
 
-- Do not merge the cloud branch.
-- Do not copy Triage-0 into a new repository and describe it as contest-created work.
-- Do not call QVAC the official runtime.
-- Do not claim that RAG or deterministic app logic improved profiler accuracy.
-- Do not upgrade the SDK or fine-tune merely to look busy.
-- Do not claim production clinical validation.
+**Import manifest**
+The 76-entry provenance ledger tying reused Triage-0 files to exact Git objects from commit `74424721bc75f564808eacce42d7f7f42676ae0f`.
 
-## Current evidence
+**No-egress guard**
+The local runtime boundary that records or blocks unexpected network access after provisioning.
 
-The exact MedPsy Q4 file loads under the profiler's pinned llama.cpp build. On an Apple M1 CPU-only compatibility run it generated 21.93 tokens/sec with about 1.08 GiB maximum RSS. This is encouraging, but only the Ubuntu x86 run can support the final submission telemetry.
+## 3. How the Code Is Organized
 
-The public fresh clone typechecks. Its full test run is 119 pass, 1 fail, and 28 skips. The failure exposes a real contract mismatch between a remote default model URL and the test's local-offline expectation; the skips expose missing external WHO/RAG and speech assets.
+`src/server.ts` hosts the localhost app, validates requests, exposes health telemetry, and gates structured cases before any QVAC acquisition. `src/triage/` contains request schemas, structured-danger policy, routing, deterministic severity, source mapping, and the model-backed triage pipeline. `src/qvac/` owns QVAC lifecycle, engine calls, offline guards, and performance logs. `src/rag/` owns protocol ingestion and the local retrieval store.
 
-## Strategic conclusion
+`config/` contains immutable machine-readable contracts. The canonical model identity lives in `config/canonical-model.json`; structured safety lives in `config/structured-danger-v1/contract.json`; the two v2 evidence planes have separate contracts. `scripts/medpsy-product-v2/` and `scripts/medpsy-raw-profiler-v2/` produce and evaluate different evidence claims. `public/` contains the compact worker UI. `tests/` mirrors safety, integration, evidence, provenance, and UI behavior.
 
-Triage-0's clinical thesis should become the ADTC candidate. The submitted implementation should be ADTC-native unless the organizer explicitly approves prior-code reuse. Its winning message is that the official template, GGUF, llama.cpp, profiler, and standard-laptop budgets are the operating system of a private, auditable community-health workflow, while optional QVAC capabilities remain supporting technology.
+The primary data flow is:
 
-## The component decision in plain language
+1. The worker enters case text, age, and all seven observations in `public/app.html`.
+2. `public/assets/js/triage.js` serializes the structured request to `POST /triage`.
+3. `src/server.ts` validates the request and runs `evaluateDangerPolicy` before QVAC, routing, retrieval, or MedPsy.
+4. Emergency, assessment-required, and supported chest-indrawing branches return deterministic results with source-bound citations.
+5. Only a supported all-absent assessment enters QVAC retrieval and the two-pass MedPsy path.
+6. The server reconciles the model output with deterministic policy, emits safe SSE events, and never exposes raw reasoning.
 
-The right answer is not “QVAC or ADTC.” It is a hierarchy:
+## 4. Prompting Tips for This Codebase
 
-1. ADTC's manifest, downloader, GGUF, direct llama.cpp runtime, profiler, and laptop limits form the spine.
-2. A narrow clinical layer makes the model safe and useful for community health workers.
-3. QVAC adds local speech and retrieval around that spine.
+1. Name the evidence plane. Ask about `medpsy-product-v2` for product behavior or `medpsy-raw-profiler-v2` for official-runtime behavior.
+2. Include the exact model identity when changing provisioning, parity, or evidence code. Never ask to search for a replacement model.
+3. For safety changes, cite `config/structured-danger-v1/contract.json`, `src/triage/danger-observations.ts`, and the relevant focused tests.
+4. For UI changes, require comparison with baseline commit `74424721` and preserve compact progressive disclosure.
+5. For evidence changes, specify whether remote execution, publication, model download, holdout inspection, or external mutation is authorized. The default here is no.
+6. For a bug report, include the request body, deterministic route, HTTP or SSE output, whether QVAC was acquired, and the exact focused test command.
+7. Ask for claim review separately from code review. Passing local tests does not create clinical validation, physical proof, or submission readiness.
 
-QVAC should act like the product's ears, voice, and evidence finder. It should not act as a second medical brain. The exact GGUF judged by ADTC must also be the model answering inside the product.
+## 5. Domain Knowledge
 
-The existing two-pass model flow should become one direct, schema-constrained llama.cpp pass. Emergency severity, citations, treatment facts, and dose information should then be bound deterministically from verified sources. This improves latency and prevents the language model from inventing the most safety-sensitive facts.
+### Structured safety ownership
 
-The profiler and the application create different evidence. The profiler measures the raw model. The application demonstrates clinical usefulness and safety. A winning report must show both without pretending that app-level RAG or rules improved the raw-model score.
+An unmentioned clinical sign is not the same as an assessed-absent sign. The seven explicit observations make that distinction auditable. If this boundary is misunderstood, omitted fields can silently bypass safety checks.
 
-## What the Devpost screenshots changed
+### Chest indrawing versus emergency signs
 
-The form itself is now part of the engineering contract. It requires a direct GitHub URL to the Markdown report, exactly two test prompts, the selected problem domain, and plain numeric `Sperf` and `Seff` values. Those values cannot be improvised at submission time. They must come from the same frozen model, metadata, and final profiler run.
+Lower chest-wall indrawing is age-scoped and does not automatically mean emergency referral in the frozen respiratory policy. The other six listed observations can establish emergency escalation. Treating all seven identically recreates the original critical design defect.
 
-The form does not require a deployed web application. The canonical product should remain a localhost app that proves offline inference. The public repository and two-minute video cover the try-it-out and media surfaces, while a Vercel showcase would add work without proving the scored system.
+### Product evidence versus profiler evidence
 
-## What happens to each feature
+The QVAC product path includes retrieval, two model passes, schema handling, retries, deterministic reconciliation, and citations. The direct `llama.cpp` path does not. A raw-profiler pass therefore cannot prove the product workflow is safe or effective.
 
-- Text triage, citation-first results, deterministic urgency, abstention, and a narrow source-backed plan are rebuilt as P0.
-- QVAC speech-to-text, text-to-speech, and retrieval are P1 only after Ubuntu x86, memory, offline, and license tests.
-- French and Spanish translation are P2 because clinical meaning must survive translation testing.
-- QVAC LLM completion, P2P inference, cloud fallback, a second medical model, and Vercel as the canonical app are excluded.
-- The 4B model is not automatically better. It must offset lower TPS and higher RSS with enough measured quality gain.
-- `african_alpha_claim` is currently ambiguous. The template calls it an African Use Case Bonus claim, but the organizer FAQ ties African Alpha to meaningful African-language functionality. Keep it `false` for English-only Triage-0 unless the organizer clarifies or we validate a real African-language path.
-- Current QVAC documentation lists Ubuntu 22+ and Linux x64 with CPU fallback. That makes QVAC support plausible on the ADTC laptop, but each native speech or retrieval adapter still has to pass `qvac doctor`, clean-host, offline, memory, and unload tests.
+### Calibration before holdout
 
-The complete decision and feature ledger is in `research/APPROACH-C-SCOPE-AND-SUBMISSION-PLAN.md`.
+The frozen calibration must pass under its registered contract before sealed holdouts run. Looking at holdouts early or tuning against failed cases destroys the independence of the evidence.
 
-## Why our pipeline is different for ADTC
+### Hardware evidence tiers
 
-The usual pipeline treats deployment as putting a frontend on the public internet. ADTC treats deployment as making the repository and exact GGUF publicly reproducible while inference stays local. That changes the proof objects, but not the quality bar.
+GitHub Ubuntu CI is useful for Linux compatibility and raw execution. It is not a physical target-class Ubuntu laptop and cannot support target thermal, throttling, or official-equivalent throughput claims.
 
-- Deploy publishes the GitHub repository and credential-free GGUF.
-- Livetest performs a clean clone, direct model load, profiler run, and offline localhost workflow.
-- Wire proves the chain from public model URL to checksum to metadata to `llama.cpp` to app to profiler to Devpost.
-- Integration depth means the ADTC contract is load-bearing, not that many sponsor SDK calls exist.
-- Stress includes process-tree memory, four-thread CPU, no-egress, malformed model output, and thermal soak.
-- Interrogate uses healthcare safety, licensing, reproducibility, and judge-skeptic perspectives rather than wallet or on-chain personas.
-- Demo proves local inference and labels every metric by hardware.
-- Package fills the exact Devpost fields and omits irrelevant contract and explorer sections.
+## 6. Gotchas and Non-Obvious Behavior
 
-The most important deadline rule is also different. Emergency mode cannot replace the medical model or safety behavior with mocks. If time runs out, optional QVAC and UI features are cut until the remaining product is small, real, reproducible, and safe.
+**A missing checklist does not mean all absent**
+What it looks like: An older client sends only `caseText`.
+What actually happens: The server normalizes missing observations to `NOT_ASSESSED` and returns assessment-required without invoking MedPsy.
+How to avoid it: Always submit supported age plus all seven explicit observations.
 
-The full controlling handoff is `FORGE-INTAKE.md`. The phase-by-phase execution contract is `research/ADTC-PIPELINE-SKILL-OVERRIDES.md`.
+**Deterministic cases must not load QVAC**
+What it looks like: Initializing QVAC once before the corpus loop seems simpler.
+What actually happens: It can download or load large assets before a case that should have short-circuited.
+How to avoid it: Keep QVAC acquisition lazy inside the named QVAC branch and test zero boundary events for deterministic routes.
 
-## Why Forge stopped at Architecture
+**A valid JSON shape can still be clinically wrong**
+What it looks like: Grammar-constrained output parses successfully.
+What actually happens: A grammar controls syntax, not semantic fact selection.
+How to avoid it: Apply frozen semantic gates, deterministic policy, and independent clinical review.
 
-The fifth independent Architecture audit passed every structural check, the extracted strict TypeScript check, and all 24 runnable tests. It still rejected five evidence contracts because they could let the system claim stronger proof than it actually observed: generic finalist-gate producers, incomplete transactional rollback, conflicting physical/offline evidence ordering, a builder-declared organizer trust key, and a shutdown test that did not prove restart suppression.
+**`Online` can be misread as internet connectivity**
+What it looks like: A badge may mean the localhost service responds.
+What actually happens: Users may read it as proof that networking is enabled or required.
+How to avoid it: Stress must relabel the status with explicit localhost and offline semantics.
 
-This is a useful stop, not lost work. The PRD and most of the Architecture are strong; the remaining question is whether to spend another tightly bounded repair on proof plumbing or explicitly narrow those claims to `unavailable` until Build can supply real artifacts. The conductor correctly prevented Plan and Build from inheriting unverifiable promises.
+**Pre-run device copy can overclaim**
+What it looks like: “This ran on the device” appears before any request completes.
+What actually happens: An empty store or absent resident model means no inference has yet run.
+How to avoid it: Stress must qualify the copy by pre-run, deterministic-only, and real-inference states.
 
-## What the pre-Build phases ultimately decided
+## 7. Debugging Guide
 
-Forge is now complete, and Critique confirms we should start implementation rather than keep revisiting the blueprint. The key distinction is between **Build readiness** and **release readiness**: the architecture is ready to implement, while model quality, target-laptop behavior, source review, public report content, and video proof can only become real during Build and release work.
+### Structured request and deterministic policy
 
-The first Build task is therefore not the UI. It is the raw-model truth gate between the 1.7B Q4 and 4B Q4 finalists. If neither model passes blinded medical/safety/format/resource checks, deterministic application rules cannot turn that into a passing raw-model submission. Once one model passes, its immutable URL, bytes, checksum, and embedded template become the single contract shared by downloader, app, tests, profiler, report, and demo.
+Run `node --import tsx --test tests/unit/danger-observations.test.ts tests/unit/severity.test.ts`. Unexpected QVAC activity on missing or emergency inputs usually means validation moved after `triageContext` or a model flag regained authority.
 
-URL Preverification confirms the public foundation exists: both finalist files and the pinned profiler are reachable without credentials. It also exposes the honest release gap: the public repository is still behind local work, `REPORT.md` is still the template, no canonical model is selected, and no video exists. Build and packaging must close those gaps; a hosted frontend is still unnecessary.
+### HTTP and SSE
 
-## Why Build stopped at the finalist truth gate
+Run `node --import tsx --test tests/integration/http-validation.test.ts tests/integration/sse-contract.test.ts`. Check status codes, event ordering, deterministic citation behavior, and whether the runtime observer records any forbidden boundary.
 
-Build implemented the Phase 1 evidence machinery before any UI: 100 frozen cases, a fixed rubric and split, immutable producer commands, host labels, raw-output paths, and content hashes. Both MedPsy model cards publish Apache-2.0 weights and identify Qwen backbones, but they also describe a health corpus that is not yet public and medical-QA prompts without an itemized dataset, rights, and license ledger.
+### QVAC and RAG
 
-That gap matters because permission to redistribute model weights is not the same as evidence that every training source is suitable for a medical submission. The frozen F-08 gate therefore rejected both candidates before raw inference. Triage-01 selected no GGUF, created no model-decision artifact, and did not begin UI work. Build can resume only with stronger MedPsy lineage evidence or an explicitly reopened model search whose candidate passes the complete raw gate.
+Run `npm run ingest` only when the local protocol sources and store prerequisites are intentionally present, then start the server separately. The server and ingest process must not open the single-writer store at the same time. Store-dependent tests skip truthfully when that prerequisite is absent.
 
-## Why the OLMo result had to be rerun
+### Evidence producers
 
-The first OLMo command solved a hang by adding `-no-cnv`, but that flag also disabled the model's embedded chat template. Instruct models are trained to recognize a particular conversation envelope; testing the bare prompt is therefore not the same behavioral test. We withdrew that verdict instead of defending a convenient failure.
+Run the focused v2 suites, `npm run typecheck`, JSON parsing, and YAML parsing. Never execute `run-qvac.ts` without real supported-platform evidence and exact GGUF bytes. Never run the sealed holdout stage before a passing, manifest-bound calibration evaluation.
 
-Pinned llama.cpp documents the correct one-turn combination as `--jinja --single-turn -p`: apply the GGUF's immutable template, process one user turn, then exit. Tests first proved the old flags were still live, and only then did the producer change. The corrected run kept every scientific control unchanged and produced 100 auditable rows.
+### Provenance and model-byte safety
 
-The correction did not save OLMo. With its real template applied, it still made unsafe clinical statements, repeated or validated invented resources, followed prompt injections, exposed reasoning, produced no valid structured JSON, and routinely exhausted the 128-token budget. That is the point of a fail-closed truth gate: implementation correctness makes the negative result trustworthy; it does not obligate us to select the model.
+Run `npm run verify-import-manifest`, `git diff --check`, and scans for `.gguf`, `.partial`, `.part`, QVAC cache paths, and secrets. A clean source diff does not replace the no-weight scan.
 
-## Why the final recovery uses OLMo-2 7B
+## 8. Mistakes Log
 
-The rejected OLMo run used the 1B model. The final recovery does not reinterpret that evidence; it evaluates a different, larger 7B artifact from the same transparent Ai2 family. The reason is narrow: the 7B model preserves the public Base-to-SFT-to-DPO-to-RLVR training chain and official Apache-2.0 GGUF while offering materially more behavioral capacity.
+**2026-08-24: Live QVAC started during an intended RED test**
+What happened: Invalid-request testing reached the legacy runtime and began an incomplete embedding-model download.
+Why it happened: Structured validation had not yet been placed before `triageContext`.
+How to avoid: Assert the no-runtime and no-network boundary before rerunning invalid-input tests.
 
-Before inference, we froze the exact 4.47 GB file identity, verified 11 content-addressed lineage records, and generated a producer manifest that hashes the unchanged corpus, rubric, generation policy, raw producer, evidence producer, and workflow. This prevents result-dependent tuning: once the first response exists, the test inputs and command semantics cannot quietly change. The 7B model still earns nothing unless all 100 raw cases, two human reviews, and the physical 8 GB laptop gates pass.
+**2026-08-24: The first structured form displaced the baseline UI**
+What happened: Seven always-visible tri-state controls dominated the compact intake screen.
+Why it happened: Safety behavior was tested without screenshot-backed fidelity acceptance.
+How to avoid: Preserve the baseline hierarchy and use native progressive disclosure for required detail.
 
-## Why the final 7B recovery stopped
+**2026-08-24: Active profiler prompts drifted from metadata**
+What happened: Healthcare metadata changed while the active profiler policy retained stale Python prompts.
+Why it happened: Focused metadata tests did not bind the separate active policy.
+How to avoid: Test prompt parity across every active configuration owner.
 
-The remote workflow itself worked: it downloaded the exact 4.47 GB file, verified its byte count and SHA-256, ran all 100 frozen prompts with the locked CPU command, deleted the weights, and returned only small evidence files. This separates infrastructure success from model-quality failure.
+## 9. Quizzes
 
-The model failed the unchanged contract decisively. None of its 100 responses was valid required JSON; 83 appeared token-truncated; and specific cases downgraded danger signs, asserted unknown facts, invented or validated local resources, followed injected instructions, exposed reasoning, and mishandled the medical-mimic case. Because any one of these gates is fatal, later human review and laptop profiling could not rescue the candidate and were intentionally not credited.
+### Conceptual
 
-No canonical model decision was created. The responsible next move is a conscious requirements revision or submission pivot, not another unapproved candidate search or UI work built on an unsafe model.
+1. Why can direct official `llama.cpp` evidence not prove the QVAC product is clinically safe?
+2. Why must missing danger observations become `NOT_ASSESSED` instead of `ABSENT`?
+3. Why is chest indrawing separated from the six emergency-capable observations?
 
-## What changed in the approved product-contract revision
+### Practical
 
-The old run asked the model to solve the whole case in free text. The revised experiment asks it to do a smaller job: extract a fixed set of atomic observations into grammar-constrained JSON. The patient text is fenced as untrusted data, and a literal fence collision is rejected before inference.
+1. A known emergency observation is present, but age is missing. Which branch wins and should MedPsy run?
+2. A calibration evaluation passes but references a different producer-manifest hash. May the holdout run?
+3. GitHub CI reports good throughput. Can `REPORT.md` call it physical Ubuntu target-laptop performance?
 
-The most important boundary is ownership. The model cannot emit an aggregate danger verdict, urgency, action, explanation, diagnosis, treatment, citation, number, or resource. It can only label atomic observations such as cannot drink, convulsions, chest indrawing, calm stridor, or explicit low oxygen as present, absent, unknown, or conflicting. Deterministic code then applies fixed precedence and produces the safety state. This makes the safety policy inspectable even when model extraction is imperfect.
+### Code reading
 
-Twelve separate calibration cases must all appear exactly once and pass before the untouched 100-case evaluation begins. Their IDs and prompt hashes are disjoint from the holdouts, and the complete prompt, grammar, schema, evaluator, producer, workflow, model identity, and historical attempt-4 hashes are frozen in one manifest before inference.
+1. Read `src/triage/danger-observations.ts` around `evaluateDangerPolicy` at line 56. What branch precedence does it enforce?
+2. Read `src/server.ts` around `POST /triage` at line 164. What would break if structured parsing moved below `triageContext`?
 
-The calibration stopped the revision before the real holdouts. Grammar successfully kept every response inside the bounded JSON shape, but the model still assigned the wrong atomic facts: after accounting only for llama.cpp's terminal marker, none of 12 cases exactly matched and just 2 of 12 produced the correct deterministic danger state. The system therefore failed for semantic extraction quality, not because it leaked prose or ignored the grammar.
+### Answer key
 
-This is why constrained decoding is helpful but not magical. A grammar can control the shape of an answer; it cannot make the selected facts correct. The fail-closed pipeline prevented a clean-looking JSON object from being mistaken for clinically reliable evidence.
+1. The product has retrieval, two passes, retries, deterministic reconciliation, citations, and QVAC lifecycle behavior that direct raw execution does not exercise.
+2. Not mentioned is not clinically equivalent to assessed absent, so absence would create a silent unsafe default.
+3. The frozen protocol treats isolated chest indrawing as an age-scoped pneumonia sign, not automatic emergency referral.
+4. Emergency wins, a deterministic referral result is returned, and MedPsy must not run.
+5. No. The prerequisite is cryptographically inconsistent and must fail closed.
+6. No. CI evidence must stay labeled as CI and cannot be promoted to physical evidence.
+7. Emergency present, then assessment required, then supported chest-indrawing routing, then all-absent QVAC.
+8. Invalid or deterministic requests could acquire QVAC, touch the network, or load assets before they are allowed to short-circuit.
+
+## Current Build Boundary
+
+Local Tasks 1 through 10 are complete under a claim-limited scope. The local suite last recorded 277 total, 255 pass, 0 fail, and 22 prerequisite skips. Real supported-platform QVAC calibration, independent sealed holdouts, named clinical review, physical Ubuntu proof, real submitter identities, and a signed model decision remain absent. `phase2Authorized=false` and `modelDecisionExists=false` remain mandatory.
+
+Authorized downstream work is limited to local inspection and hardening from Debug through Interrogate DEEP. It must stop before Demo Rehearsal and cannot claim a validated real QVAC clinical workflow, named clinical review, physical Ubuntu proof, a signed model decision, or submission readiness. No push, workflow dispatch, paid spend, video publication, Devpost submission, model download, or other external mutation is authorized.
