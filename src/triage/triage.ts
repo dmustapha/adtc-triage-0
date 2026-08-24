@@ -20,6 +20,10 @@ import {
   type PlanCitation,
 } from "./schema.js";
 import { finalizeSeverity, finalizeSeverityV2, hasEmergencySign } from "./severity.js";
+import {
+  DANGER_OBSERVATION_KEYS,
+  type DangerDecision,
+} from "./danger-observations.js";
 import { routeCase, type RouteResult } from "./class-router.js";
 import {
   lookupProtocol,
@@ -57,6 +61,21 @@ const DEFAULT_REASON_PREDICT = Number(process.env.REASON_PREDICT) || 1024;
  *  size — it never truncates a legitimate "brief" extract, but bounds a runaway well under ctx so the
  *  worst case is a retry, not a crashed request. */
 const DEFAULT_EXTRACT_PREDICT = Number(process.env.EXTRACT_PREDICT) || 512;
+
+export type TriageExecutionBoundary = "qvac-context" | "semantic-routing" | "grounding" | "medpsy";
+let executionObserver: ((boundary: TriageExecutionBoundary) => void) | undefined;
+
+export function setTriageExecutionObserver(
+  observer?: (boundary: TriageExecutionBoundary) => void,
+): () => void {
+  const previous = executionObserver;
+  executionObserver = observer;
+  return () => { executionObserver = previous; };
+}
+
+export function observeTriageExecution(boundary: TriageExecutionBoundary): void {
+  executionObserver?.(boundary);
+}
 
 const GROUNDING_RULE =
   "CLASSIFICATION RULE: First identify the child's MAIN clinical problem from the case — focus on the " +
@@ -161,9 +180,17 @@ export interface TriageResult {
   citationChunk: SearchHit | null;
   attempts: number;
   /** "semantic" | "keyword" | "abstain" — which retrieval/skip path produced the card. */
-  retrieval: "semantic" | "keyword" | "abstain";
+  retrieval: "semantic" | "keyword" | "abstain" | "deterministic";
   /** The WHO classification the model concluded — drives the plan-component retrievals (Task #22). */
   classification: string;
+}
+
+export interface TriageOptions {
+  onReasonDelta?: (chunk: string) => void;
+  reasonPredict?: number;
+  retrieval?: "semantic" | "keyword";
+  shortlist?: { cls: string; score: number }[];
+  structuredDanger?: DangerDecision;
 }
 
 function stripThink(s: string): string {
@@ -214,6 +241,46 @@ function abstainCard(reason?: string): TriageCard {
   };
 }
 
+export function makeStructuredDangerResult(
+  decision: DangerDecision,
+  protocolLookup: (classification: string) => ProtocolEntry | undefined = lookupProtocol,
+): TriageResult {
+  if (decision.route === "ASSESSMENT_REQUIRED") {
+    return {
+      card: {
+        severity: "UNKNOWN",
+        action: "Complete the structured danger assessment before continuing.",
+        protocol_citation: { doc: "Assessment required", page: "—", section: "Structured danger assessment incomplete or outside supported age band" },
+        reasoning: decision.summary,
+        red_flags: [],
+      },
+      citationChunk: null,
+      attempts: 0,
+      retrieval: "deterministic",
+      classification: "ASSESSMENT_REQUIRED",
+    };
+  }
+
+  const classification = decision.route === "DETERMINISTIC_EMERGENCY"
+    ? "SEVERE PNEUMONIA OR VERY SEVERE DISEASE"
+    : "PNEUMONIA";
+  const entry = protocolLookup(classification);
+  const citation = entry
+    ? { doc: docFor(entry.protocol), page: entry.citation.page, section: entry.citation.text }
+    : { doc: "Citation integrity failure", page: "—", section: "Required fixed protocol entry was unavailable" };
+  const action = entry?.action.text ?? (decision.route === "DETERMINISTIC_EMERGENCY"
+    ? "Refer urgently for emergency clinical assessment."
+    : "Escalate for clinical review; the fixed pneumonia citation is unavailable.");
+  const redFlags = DANGER_OBSERVATION_KEYS.filter((key) => decision.observations[key] === "PRESENT");
+  return {
+    card: { severity: decision.severity, action, protocol_citation: citation, reasoning: decision.summary, red_flags: redFlags },
+    citationChunk: null,
+    attempts: 0,
+    retrieval: "deterministic",
+    classification,
+  };
+}
+
 /**
  * Triage on a set of ALREADY-GROUNDED chunks (non-empty; groundedHits[0] is cited). Splitting this out
  * of retrieval gives a clean test seam for E-1: an injection test can pass a hand-crafted poisoned hit
@@ -224,7 +291,7 @@ export async function triageFromHits(
   caseText: string,
   groundedHits: SearchHit[],
   ctx: TriageContext,
-  opts?: { onReasonDelta?: (chunk: string) => void; reasonPredict?: number; retrieval?: "semantic" | "keyword"; shortlist?: { cls: string; score: number }[] },
+  opts?: TriageOptions,
 ): Promise<TriageResult> {
   const grounded = groundedHits[0];
   const retrieval = opts?.retrieval ?? "semantic";
@@ -242,6 +309,7 @@ export async function triageFromHits(
   const extractUserBody = `${excerptBlock(groundedHits, 3, 500)}\n\n${caseBlock}`;
 
   // REASON pass — let the model think; it concludes the classification + action correctly in prose.
+  observeTriageExecution("medpsy");
   const reasonRun = await completionTimed({
     modelId: ctx.medpsyId,
     history: [
@@ -294,6 +362,7 @@ export async function triageFromHits(
         content: `Your previous output was invalid: ${lastErr}. Re-emit the JSON with ALL required fields (classification, action, reasoning, red_flags).`,
       });
     }
+    observeTriageExecution("medpsy");
     const extractRun = await completionTimed({
       modelId: ctx.medpsyId,
       history,
@@ -352,8 +421,8 @@ export async function triageFromHits(
       cls = reconcileSelfHarm(cls, caseText);
       let entry = lookupProtocol(cls);
       const severity = entry
-        ? finalizeSeverityV2(cls, ex.action, caseText, ex.red_flags)
-        : finalizeSeverity(cls, ex.action, caseText, ex.red_flags);
+        ? finalizeSeverityV2(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger)
+        : finalizeSeverity(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger);
       // RECONCILE the classification with the danger-sign gate (the 2014 IMCI pneumonia merge): when the
       // model over-names a pure chest-indrawing case "SEVERE PNEUMONIA" but the gate downgraded severity
       // below EMERGENCY, route to the home-treatment sibling so the plan + action agree with the band
@@ -372,7 +441,7 @@ export async function triageFromHits(
             action: entry.action.text,
             protocol_citation: { doc: docFor(entry.protocol), page: entry.citation.page, section: entry.citation.text },
             reasoning: deterministicReasoning(cls, entry),
-            red_flags: ex.red_flags,
+            red_flags: visibleStructuredFlags(opts?.structuredDanger, ex.red_flags),
             confidence: ex.confidence,
           }
         : {
@@ -384,7 +453,7 @@ export async function triageFromHits(
               section: (grounded.citation.section || grounded.text.slice(0, 160)).replace(/\s+/g, " ").trim(),
             },
             reasoning: ex.reasoning,
-            red_flags: ex.red_flags,
+            red_flags: visibleStructuredFlags(opts?.structuredDanger, ex.red_flags),
             confidence: ex.confidence,
           };
       return { card, citationChunk: grounded, attempts: attempt, retrieval, classification: cls };
@@ -401,7 +470,7 @@ export async function triageFromHits(
 export async function runTriage(
   caseText: string,
   ctx: TriageContext,
-  opts?: { onReasonDelta?: (chunk: string) => void; reasonPredict?: number },
+  opts?: TriageOptions,
 ): Promise<TriageResult> {
   // PHASE 2: the semantic class-router owns the abstain decision (off-domain gate), decoupled from the
   // chunk-retrieval score. In degraded/no-embed mode there is no router, so fall back to the legacy
@@ -410,12 +479,14 @@ export async function runTriage(
   const degraded = config.residentMode === "fallback" || !ctx.embedId;
   let shortlist: RouteResult["shortlist"] | undefined;
   if (!degraded) {
+    observeTriageExecution("semantic-routing");
     const route = await routeCase(english, ctx.embedId!);
     if (route.offDomain) {
       return { card: abstainCard(), citationChunk: null, attempts: 0, retrieval: "abstain", classification: "" };
     }
     shortlist = route.shortlist;
   }
+  observeTriageExecution("grounding");
   const { groundedHits, retrieval, topHits } = await retrieveGrounding(english, ctx);
   // Grounding is best-effort now (abstain already decided): use the threshold-passing hits when present,
   // else the top chunks so an in-domain case still gets citation + reason excerpts.
@@ -436,6 +507,11 @@ export async function runTriage(
   // The streaming server path assembles it separately so the card lands first (progressive enhancement).
   result.card.plan = await assemblePlan(result.classification, result.card.severity, grounding, ctx);
   return result;
+}
+
+function visibleStructuredFlags(decision: DangerDecision | undefined, modelFlags: string[]): string[] {
+  if (!decision) return modelFlags;
+  return DANGER_OBSERVATION_KEYS.filter((key) => decision.observations[key] === "PRESENT");
 }
 
 /**

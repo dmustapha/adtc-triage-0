@@ -43,10 +43,11 @@ export const PLANNED_SOURCE_PATHS = [
 const MODIFIED_FOR_ADTC = new Set<string>([
   "package-lock.json", "package.json", "public/app.html", "public/assets/js/triage.js",
   "src/config.ts", "src/qvac/engine.ts", "src/server.ts",
-  "src/triage/triage.ts", "tests/integration/http-validation.test.ts",
+  "src/triage/schema.ts", "src/triage/severity.ts", "src/triage/triage.ts",
+  "tests/integration/http-validation.test.ts",
   "tests/integration/server.test.ts", "tests/integration/sse-contract.test.ts",
   "tests/integration/triage.test.ts", "tests/unit/config.test.ts",
-  "tsconfig.json",
+  "tests/unit/severity.test.ts", "tsconfig.json",
 ]);
 
 const MODIFICATION_REASONS: Record<string, string> = {
@@ -56,13 +57,16 @@ const MODIFICATION_REASONS: Record<string, string> = {
   "public/assets/js/triage.js": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow.",
   "src/config.ts": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection.",
   "src/qvac/engine.ts": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline.",
-  "src/server.ts": "Preserved English text triage, added fail-closed shared-model identity, and withheld raw reasoning deltas while retaining first-token telemetry.",
-  "src/triage/triage.ts": "Removed translation dependencies so routing, grounding, and triage operate on English text only.",
-  "tests/integration/http-validation.test.ts": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered.",
+  "src/server.ts": "Preserved English text triage while parsing structured age and danger observations before QVAC context, semantic routing, retrieval, or MedPsy; deterministic emergency, assessment-required, and age-scoped chest-indrawing branches now short-circuit before runtime work.",
+  "src/triage/schema.ts": "Added strict structured patient-age and seven-field danger-observation request schemas with missing observations normalized to NOT_ASSESSED and request-level CONFLICT rejected.",
+  "src/triage/severity.ts": "Added authoritative structured danger state to severity entry points so free text and model red_flags cannot control the seven frozen atoms while non-respiratory and self-harm safeguards remain deterministic.",
+  "src/triage/triage.ts": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags.",
+  "tests/integration/http-validation.test.ts": "Retained excluded-audio assertions and added invalid structured-age/value rejection proving requests reach neither triageContext nor runtime/download boundaries.",
   "tests/integration/server.test.ts": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities.",
-  "tests/integration/sse-contract.test.ts": "Updated the English text SSE contract to prohibit visible chain-of-thought while preserving citation, telemetry, card, plan, and terminal event order.",
-  "tests/integration/triage.test.ts": "Removed multilingual integration cases that require the excluded translation models.",
+  "tests/integration/sse-contract.test.ts": "Added model-free SSE coverage for omitted, partial, emergency, and chest-indrawing assessments with zero observed QVAC, semantic-routing, retrieval, or MedPsy calls; grounded model cases now send supported all-absent structured state.",
+  "tests/integration/triage.test.ts": "Replaced the model-dependent danger case with deterministic fixed-citation and citation-integrity coverage, and required supported all-absent grounded QVAC cases to observe a MedPsy call.",
   "tests/unit/config.test.ts": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection.",
+  "tests/unit/severity.test.ts": "Added regressions proving authoritative structured state controls respiratory emergency and chest-indrawing decisions while model prose/red_flags cannot override all-absent state and non-respiratory safeguards remain intact.",
   "tsconfig.json": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract.",
 };
 

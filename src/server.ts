@@ -12,8 +12,19 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { config } from "./config.js";
 import { orchestrator } from "./qvac/orchestrator.js";
-import { runTriage, retrieveGrounding, triageFromHits, assemblePlan, makeAbstainCard, type TriageContext } from "./triage/triage.js";
+import {
+  runTriage,
+  retrieveGrounding,
+  triageFromHits,
+  assemblePlan,
+  makeAbstainCard,
+  makeStructuredDangerResult,
+  observeTriageExecution,
+  type TriageContext,
+} from "./triage/triage.js";
 import { routeCase, ensureClassPrototypes } from "./triage/class-router.js";
+import { StructuredDangerRequestSchema } from "./triage/schema.js";
+import { evaluateDangerPolicy } from "./triage/danger-observations.js";
 import { readPerfRows, perfCsvPath } from "./qvac/perf-logger.js";
 import { chunkCount, citationMapHealthy } from "./rag/store.js";
 import { guard } from "./qvac/egress-guard.js";
@@ -158,6 +169,17 @@ app.post("/triage", async (req: Request, res: Response) => {
   if (caseText.length > MAX_CASE_CHARS) {
     return res.status(400).json({ error: "Case description is too long. Please shorten it to the key signs and symptoms." });
   }
+  const structuredRequest = StructuredDangerRequestSchema.safeParse({
+    patientAge: req.body?.patientAge,
+    dangerObservations: req.body?.dangerObservations,
+  });
+  if (!structuredRequest.success) {
+    return res.status(400).json({ error: "Invalid structured danger assessment." });
+  }
+  const structuredDanger = evaluateDangerPolicy(
+    structuredRequest.data.patientAge,
+    structuredRequest.data.dangerObservations,
+  );
 
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -182,11 +204,34 @@ app.post("/triage", async (req: Request, res: Response) => {
   };
   const endStream = () => { if (!closed && !res.writableEnded) res.end(); };
 
+  if (structuredDanger.route !== "QVAC") {
+    send("stage", { key: "detect", label: "Structured danger assessment", detail: "deterministic pre-model policy", lang: "en" });
+    const result = makeStructuredDangerResult(structuredDanger);
+    if (structuredDanger.route === "ASSESSMENT_REQUIRED") {
+      send("assessment_required", { card: result.card, classification: result.classification });
+    } else {
+      const citation = result.card.protocol_citation;
+      send("citation", {
+        protocol: "IMCI",
+        doc: citation.doc,
+        page: citation.page,
+        section: citation.section,
+        score: 1,
+        retrieval: "deterministic",
+      });
+      send("card", { card: result.card, classification: result.classification, citationChunk: null, attempts: 0, perf: lastCompletionPerf() });
+    }
+    send("done", { ok: true });
+    endStream();
+    return;
+  }
+
   try {
     // Serialize the whole inference sequence: the engine is single-job, so two concurrent /triage
     // requests must queue, not interleave (else one gets "Cannot set new job"). The stream stays open
     // and silent while waiting its turn, then runs normally.
     await withInferenceLock(() => withTimeout((async () => {
+    observeTriageExecution("qvac-context");
     const ctx = await triageContext();
 
     const english = caseText;
@@ -207,6 +252,7 @@ app.post("/triage", async (req: Request, res: Response) => {
     // non-medical, veterinary) matches no class well enough → abstain before the model is ever called.
     // `lang` is passed so the abstain card renders in the case's language, not English.
     const degraded = config.residentMode === "fallback" || !ctx.embedId;
+    if (!degraded) observeTriageExecution("semantic-routing");
     const route = degraded ? null : await routeCase(english, ctx.embedId!);
     if (route?.offDomain) {
       send("abstain", { card: makeAbstainCard(), retrieval: "abstain", lang: sourceLang });
@@ -214,6 +260,7 @@ app.post("/triage", async (req: Request, res: Response) => {
       return endStream();
     }
 
+    observeTriageExecution("grounding");
     const { groundedHits, retrieval, topHits } = await retrieveGrounding(english, ctx);
     // Grounding is best-effort now (abstain already decided by the router): threshold-passing hits when
     // present, else the top chunks so an in-domain case still gets a citation panel + reason excerpts.
@@ -245,6 +292,7 @@ app.post("/triage", async (req: Request, res: Response) => {
     const result = await triageFromHits(english, grounding, ctx, {
       retrieval,
       shortlist: route?.shortlist,
+      structuredDanger,
       onReasonDelta: (chunk) => {
         if (!firstDeltaSent) {
           firstDeltaSent = true;

@@ -18,13 +18,13 @@ const { app } = await import("../../src/server.js");
 const { orchestrator } = await import("../../src/qvac/orchestrator.js");
 const { chunkCount } = await import("../../src/rag/store.js");
 const { ManagementPlanSchema } = await import("../../src/triage/schema.js");
+const { setTriageExecutionObserver } = await import("../../src/triage/triage.js");
 
 const skip = chunkCount() > 0 ? false : "store not ingested — run `npm run ingest` first";
 
 let server: { address(): { port: number } | string | null; close(): void };
 let base = "";
 before(async () => {
-  if (skip) return;
   await new Promise<void>((ready) => { server = app.listen(0, () => ready()) as never; });
   const addr = (server as { address(): { port: number } }).address();
   base = `http://127.0.0.1:${typeof addr === "object" && addr ? addr.port : 0}`;
@@ -57,15 +57,76 @@ async function readSse(res: Response): Promise<Array<{ event: string; data: any 
   return out;
 }
 
-const triage = (caseText: string) =>
+const ABSENT = {
+  cannotDrinkOrBreastfeed: "ABSENT",
+  vomitsEverything: "ABSENT",
+  convulsions: "ABSENT",
+  lethargicOrUnconscious: "ABSENT",
+  chestIndrawing: "ABSENT",
+  stridorWhenCalm: "ABSENT",
+  lowOxygenOrCentralCyanosis: "ABSENT",
+};
+
+const triage = (caseText: string, extra: Record<string, unknown> = {}) =>
   fetch(`${base}/triage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ caseText }),
+    body: JSON.stringify({ caseText, ...extra }),
   });
 
+async function observeRequest(body: Record<string, unknown>) {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  try {
+    return { events: await readSse(await triage(String(body.caseText), body)), boundaries };
+  } finally {
+    restore();
+  }
+}
+
+test("omitted and partial structured assessments fail closed before routing or MedPsy", async () => {
+  for (const body of [
+    { caseText: "nine month old child with cough" },
+    { caseText: "nine month old child with cough", patientAge: { value: 9, unit: "months" }, dangerObservations: { convulsions: "ABSENT" } },
+  ]) {
+    const { events, boundaries } = await observeRequest(body);
+    assert.deepEqual(events.filter((event) => event.event !== "stage").map((event) => event.event), ["assessment_required", "done"]);
+    assert.equal(events.find((event) => event.event === "assessment_required")!.data.card.severity, "UNKNOWN");
+    assert.deepEqual(boundaries, [], "no QVAC context, semantic routing, retrieval, or MedPsy boundary ran");
+  }
+});
+
+test("known structured emergency precedes missing age and fields without routing or MedPsy", async () => {
+  const { events, boundaries } = await observeRequest({
+    caseText: "free text says the child is well",
+    dangerObservations: { cannotDrinkOrBreastfeed: "PRESENT" },
+  });
+  const cardEvent = events.find((event) => event.event === "card")!.data;
+  assert.equal(cardEvent.card.severity, "EMERGENCY");
+  assert.deepEqual(cardEvent.card.red_flags, ["cannotDrinkOrBreastfeed"]);
+  assert.match(cardEvent.card.protocol_citation.doc, /IMCI/i);
+  assert.ok(events.some((event) => event.event === "citation"));
+  assert.deepEqual(boundaries, []);
+});
+
+test("supported isolated chest indrawing is deterministic pneumonia; outside age fails closed", async () => {
+  const chest = { ...ABSENT, chestIndrawing: "PRESENT" };
+  const supported = await observeRequest({ caseText: "model prose says severe", patientAge: { value: 2, unit: "months" }, dangerObservations: chest });
+  const card = supported.events.find((event) => event.event === "card")!.data;
+  assert.equal(card.classification, "PNEUMONIA");
+  assert.equal(card.card.severity, "URGENT");
+  assert.deepEqual(card.card.red_flags, ["chestIndrawing"]);
+  assert.deepEqual(supported.boundaries, []);
+
+  const outside = await observeRequest({ caseText: "model prose says severe", patientAge: { value: 60, unit: "months" }, dangerObservations: chest });
+  assert.ok(outside.events.some((event) => event.event === "assessment_required"));
+  assert.deepEqual(outside.boundaries, []);
+});
+
 test("grounded /triage: full event ORDER citation<first_token<card<plan<done without chain-of-thought", { skip, timeout: 300_000 }, async () => {
-  const r = await triage("2-year-old, cough 3 days, chest indrawing, breathing 52 a minute, alert and drinking, no danger signs.");
+  const r = await triage("2-year-old, cough 3 days, breathing 52 a minute, alert and drinking, no chest indrawing or danger signs.", {
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+  });
   assert.match(r.headers.get("content-type") || "", /text\/event-stream/);
   const events = await readSse(r);
   const kinds = events.map((e) => e.event);
@@ -89,7 +150,9 @@ test("grounded /triage: full event ORDER citation<first_token<card<plan<done wit
 });
 
 test("grounded /triage: per-event payload SCHEMA (citation / first_token / card / plan)", { skip, timeout: 300_000 }, async () => {
-  const events = await readSse(await triage("2-year-old, cough 3 days, chest indrawing, breathing 52 a minute, alert and drinking, no danger signs."));
+  const events = await readSse(await triage("2-year-old, cough 3 days, breathing 52 a minute, alert and drinking, no chest indrawing or danger signs.", {
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+  }));
   const get = (k: string) => events.find((e) => e.event === k)?.data;
 
   // citation: protocol/doc/page/section/score/retrieval.
@@ -124,7 +187,9 @@ test("grounded /triage: per-event payload SCHEMA (citation / first_token / card 
 });
 
 test("abstain /triage: [stage(detect), abstain, done], card.severity UNKNOWN, lang set, no citation/card/plan", { skip, timeout: 120_000 }, async () => {
-  const events = await readSse(await triage("What is the best recipe for chocolate cake?"));
+  const events = await readSse(await triage("What is the best recipe for chocolate cake?", {
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+  }));
   const kinds = events.map((e) => e.event);
   // A `detect` stage is emitted before the abstain gate so the readout shows and the abstain localizes;
   // the load-bearing (non-stage) contract stays exactly [abstain, done].

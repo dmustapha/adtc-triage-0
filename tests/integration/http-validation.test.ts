@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 // Import the app WITHOUT pre-warm: app.listen(0) below does not pre-warm (only startServer on a real
 // port does), so importing `app` directly keeps this suite model-free.
 const { app } = await import("../../src/server.js");
+const { setTriageExecutionObserver } = await import("../../src/triage/triage.js");
 
 let server: { address(): { port: number } | string | null; close(): void };
 let base = "";
@@ -61,6 +62,28 @@ test("POST /triage over 2000 chars -> 400 friendly 'too long' (no embedder overf
   const j = await r.json();
   assert.match(j.error, /too long/i);
   assert.doesNotMatch(j.error, /\//, "friendly message leaks no path");
+});
+
+test("POST /triage rejects invalid structured age and danger values before inference", async () => {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  const invalidBodies = [
+    { caseText: "child coughing", patientAge: { value: -1, unit: "months" } },
+    { caseText: "child coughing", patientAge: { value: 2, unit: "weeks" } },
+    { caseText: "child coughing", patientAge: { value: "2", unit: "months" } },
+    { caseText: "child coughing", dangerObservations: { convulsions: "CONFLICT" } },
+    { caseText: "child coughing", dangerObservations: { convulsions: "YES" } },
+  ];
+  try {
+    for (const body of invalidBodies) {
+      const r = await postJson("/triage", body);
+      assert.equal(r.status, 400);
+      assert.deepEqual(await r.json(), { error: "Invalid structured danger assessment." });
+    }
+    assert.deepEqual(boundaries, [], "invalid requests reach neither triageContext nor any runtime/download boundary");
+  } finally {
+    restore();
+  }
 });
 
 // ── excluded optional modalities ───────────────────────────────────────────────────

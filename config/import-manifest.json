@@ -536,10 +536,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "2603ac0a1120163e4d3757f10883a0dd408f4e1aaf08943e7e2ad837665bceed",
+      "destinationSha256": "ec116019ea9eb7814ad32a8fc5c2cde6cabd12996f26890cd67a5ceaebc9d0cf",
       "modification": {
         "status": "modified",
-        "reason": "Preserved English text triage, added fail-closed shared-model identity, and withheld raw reasoning deltas while retaining first-token telemetry."
+        "reason": "Preserved English text triage while parsing structured age and danger observations before QVAC context, semantic routing, retrieval, or MedPsy; deterministic emergency, assessment-required, and age-scoped chest-indrawing branches now short-circuit before runtime work."
       }
     },
     {
@@ -568,9 +568,13 @@
       "sourceGitObject": "02d8614e59cd4ee7b7c417eb644426ba77ddb980",
       "sourceSha256": "cc030a671d0b27b26a5c32be68216dd428911de016926563d8da75358b36d3d4",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "cc030a671d0b27b26a5c32be68216dd428911de016926563d8da75358b36d3d4"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "9e1a3f19412a490dab3a51b1693fea82b82b51bbf55f860b326285494a5bb103",
+      "modification": {
+        "status": "modified",
+        "reason": "Added strict structured patient-age and seven-field danger-observation request schemas with missing observations normalized to NOT_ASSESSED and request-level CONFLICT rejected."
+      }
     },
     {
       "sourcePath": "src/triage/severity.ts",
@@ -578,9 +582,13 @@
       "sourceGitObject": "8c01c3158aa02fdba2490e77b5f557acdbc81f51",
       "sourceSha256": "de18a009ffc9cfd49be8ea2e36fa5c131111eb51c44069844649428920799da7",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "de18a009ffc9cfd49be8ea2e36fa5c131111eb51c44069844649428920799da7"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "3c16311f4dbd9c472664d70e1faa0292b31792dde55989542c09da9d28f3dde0",
+      "modification": {
+        "status": "modified",
+        "reason": "Added authoritative structured danger state to severity entry points so free text and model red_flags cannot control the seven frozen atoms while non-respiratory and self-harm safeguards remain deterministic."
+      }
     },
     {
       "sourcePath": "src/triage/triage.ts",
@@ -590,10 +598,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "f3310b703dc963d50a38932492bf9e0ae86a17e0225a01e47f21211e8c583a24",
+      "destinationSha256": "96c8870d011d4414cece8861a9ee0676beab83cbf2e12d5ea652094be8817c9c",
       "modification": {
         "status": "modified",
-        "reason": "Removed translation dependencies so routing, grounding, and triage operate on English text only."
+        "reason": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags."
       }
     },
     {
@@ -624,10 +632,10 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "d2c4ed4583176223f782a4094f0e127998ca094696279452a42e879a9696bfa0",
+      "destinationSha256": "21fd2bc85f8e471dc3e686b61c488cf84a815c24eed36197fd9e6f6be3fe862d",
       "modification": {
         "status": "modified",
-        "reason": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered."
+        "reason": "Retained excluded-audio assertions and added invalid structured-age/value rejection proving requests reach neither triageContext nor runtime/download boundaries."
       }
     },
     {
@@ -672,10 +680,10 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "b0411695ac082578ea26438e90e8badbf17559ce6db2f5f2f5470c0aa87f22ba",
+      "destinationSha256": "28fce03de039d5ba90b051e628fe39ab83a904bb0699cb6cdcf314560a28184e",
       "modification": {
         "status": "modified",
-        "reason": "Updated the English text SSE contract to prohibit visible chain-of-thought while preserving citation, telemetry, card, plan, and terminal event order."
+        "reason": "Added model-free SSE coverage for omitted, partial, emergency, and chest-indrawing assessments with zero observed QVAC, semantic-routing, retrieval, or MedPsy calls; grounded model cases now send supported all-absent structured state."
       }
     },
     {
@@ -686,10 +694,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "b5079093ae2386e72ddce28754285b5a382a704c23160606d0fae79fa3857df1",
+      "destinationSha256": "4428a583fd2da765a94f7a868edfeb3d68c62851474265ed5c34340dc1d46ddb",
       "modification": {
         "status": "modified",
-        "reason": "Removed multilingual integration cases that require the excluded translation models."
+        "reason": "Replaced the model-dependent danger case with deterministic fixed-citation and citation-integrity coverage, and required supported all-absent grounded QVAC cases to observe a MedPsy call."
       }
     },
     {
@@ -812,9 +820,13 @@
       "sourceGitObject": "006559d5e2301d00a41684b87700a967808bd1ad",
       "sourceSha256": "8d088337f7d56cc661149d0579218da8eee5862dc25e3453b6ff9217c64e6f0f",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "8d088337f7d56cc661149d0579218da8eee5862dc25e3453b6ff9217c64e6f0f"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "3a2b739d2631b90ed32ecee89978985125ead77c441caa3fb49cb44c5cdd4b3a",
+      "modification": {
+        "status": "modified",
+        "reason": "Added regressions proving authoritative structured state controls respiratory emergency and chest-indrawing decisions while model prose/red_flags cannot override all-absent state and non-respiratory safeguards remain intact."
+      }
     },
     {
       "sourcePath": "tests/unit/store-save.test.ts",
