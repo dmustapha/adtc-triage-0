@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "namespace": "medpsy-product-v2",
+  "evidenceTier": "supported-platform-qvac-product",
+  "thresholds": {
+    "completeValidRate": 1,
+    "minimumModelInvokedSupportedCases": 1,
+    "maximumCitationFailures": 0,
+    "maximumEgressViolations": 0,
+    "maximumProductPathFailures": 0
+  },
+  "requiredProducerKind": "production-qvac-orchestration",
+  "requiredEvidenceKind": "real-product-execution",
+  "forbiddenArtifactSuffixes": [".gguf", ".partial", ".part"],
+  "calibrationMustPassBeforeHoldout": true,
+  "unitFixturesAreFinalEvidence": false,
+  "unresolvedNonCreditedGates": [
+    "namedHumanClinicalReview",
+    "physicalTargetLaptopEvidence",
+    "signedModelDecision"
+  ]
+}
