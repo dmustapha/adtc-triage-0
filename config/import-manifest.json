@@ -384,9 +384,13 @@
       "sourceGitObject": "00ae6e548f1b9cae6b82e6cf5afba0324079ceff",
       "sourceSha256": "dc91b946d5905417c1383c0178606b7b86bffc82ccbe73061b876c8b7e849faf",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "dc91b946d5905417c1383c0178606b7b86bffc82ccbe73061b876c8b7e849faf"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "3d252392555ea5f8719c65c897652faaf0b1f7603bfddb2836f97ca4e038e8bc",
+      "modification": {
+        "status": "modified",
+        "reason": "Replaced imported speech, treatment, performance, benchmark, and unconditional offline claims with claim-limited English-text and runtime-readiness copy."
+      }
     },
     {
       "sourcePath": "public/logo.png",

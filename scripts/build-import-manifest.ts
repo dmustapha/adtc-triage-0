@@ -41,7 +41,7 @@ export const PLANNED_SOURCE_PATHS = [
 ] as const;
 
 const MODIFIED_FOR_ADTC = new Set<string>([
-  "package-lock.json", "package.json", "public/app.html", "public/assets/css/app.css", "public/assets/js/net.js", "public/assets/js/triage.js",
+  "package-lock.json", "package.json", "public/app.html", "public/index.html", "public/assets/css/app.css", "public/assets/js/net.js", "public/assets/js/triage.js",
   "src/config.ts", "src/qvac/engine.ts", "src/server.ts",
   "src/triage/schema.ts", "src/triage/severity.ts", "src/triage/triage.ts",
   "tests/integration/http-validation.test.ts",
@@ -54,6 +54,7 @@ const MODIFICATION_REASONS: Record<string, string> = {
   "package-lock.json": "Reconciled one lockfile for the merged ADTC evidence and Triage-0 application dependency contract.",
   "package.json": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and corrected integration-test package contract.",
   "public/app.html": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow.",
+  "public/index.html": "Replaced imported speech, treatment, performance, benchmark, and unconditional offline claims with claim-limited English-text and runtime-readiness copy.",
   "public/assets/css/app.css": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system.",
   "public/assets/js/net.js": "Distinguished browser network reachability from server-enforced on-device egress proof so UI badges cannot imply cloud inference or completed offline evidence.",
   "public/assets/js/triage.js": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display.",

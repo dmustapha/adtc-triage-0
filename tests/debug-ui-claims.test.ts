@@ -51,3 +51,16 @@ test("configured model identity does not render as resident-model proof", async 
   assert.equal(proof.hidden, true);
   assert.doesNotMatch(proof.textContent ?? "", /MedPsy|runs on this Mac/i);
 });
+
+test("landing page stays inside the claim-limited English text and evidence boundary", () => {
+  const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const text = new JSDOM(html).window.document.body.textContent?.replace(/\s+/g, " ").trim() ?? "";
+
+  assert.doesNotMatch(text, /speak|voice|read aloud|listen and act/i);
+  assert.doesNotMatch(text, /nothing leaves|no network,? ever|works in airplane mode|with the network off/i);
+  assert.doesNotMatch(text, /1\.6|38\.4|\bGPU\b|\b994\b|62\.62|51\.20/i);
+  assert.doesNotMatch(text, /amoxicillin|first dose|treat now|management plan/i);
+  assert.match(text, /English text workflow/i);
+  assert.match(text, /evidence appears only after a verified local run/i);
+  assert.match(text, /not diagnosis or treatment/i);
+});
