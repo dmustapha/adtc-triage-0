@@ -100,3 +100,6 @@
 2026-08-24T17:50:13Z | hackathon-build | START | structured-danger-revision-task-5 | Exact-one-JSON framing adapter started under TDD; local-only and no model bytes.
 2026-08-24T17:56:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-5 | Exact-one-JSON framing committed at 4aabd44; focused 12/12 and typecheck green.
 2026-08-24T17:56:00Z | hackathon-build | START | structured-danger-revision-task-6 | Split product/raw evidence planes started under TDD; local-only, no inference or weights.
+2026-08-24T18:08:00Z | hackathon-build | COMPLETE | structured-danger-task-4-fidelity | Screenshot-backed compact hierarchy correction committed at 06865d2; focused 14/14, typecheck, provenance, and model-free Chrome evidence green.
+2026-08-24T18:10:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-6 | Split evidence planes committed at 856e5d9; focused 19/19 after manifest-binding RED/GREEN; historical evidence unchanged.
+2026-08-24T18:10:00Z | hackathon-build | START | structured-danger-revision-task-7 | Fresh disjoint product calibration and sealed-holdout design started; no inference or holdout inspection.

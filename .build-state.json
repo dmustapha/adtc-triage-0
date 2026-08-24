@@ -1,8 +1,8 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "structured-danger-evidence-plane-v2",
-  "currentStep": "revision-task-6",
-  "currentSubStep": "task-6-tdd-red",
+  "currentStep": "revision-task-7",
+  "currentSubStep": "task-7-tdd-red",
   "status": "in-progress",
   "autonomous_mode": true,
   "completedSteps": [
@@ -31,7 +31,8 @@
     "revision-task-2",
     "revision-task-3",
     "revision-task-4",
-    "revision-task-5"
+    "revision-task-5",
+    "revision-task-6"
   ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
@@ -148,7 +149,7 @@
       "phase": "structured-danger-evidence-plane-v2",
       "started_at": "2026-08-24T16:56:43Z",
       "completed_at": null,
-      "evidence": "IN PROGRESS: Tasks 1-5 committed through 4aabd44; Task 5 exact-one-JSON focused 12/12 and typecheck green; Task 6 split evidence planes started"
+      "evidence": "IN PROGRESS: Tasks 1-6 committed; Task 4 screenshot-backed fidelity correction 06865d2; Task 6 split evidence planes 856e5d9 with focused 19/19; Task 7 fresh corpus design started"
     }
   ],
   "fileGroups": {
@@ -423,7 +424,13 @@
       ],
       "written": true,
       "verified": true,
-      "commit": "8367bd8"
+      "commit": "8367bd8",
+      "fidelityCorrectionCommit": "06865d2",
+      "screenshots": [
+        "output/playwright/task4-before-8367bd8.png",
+        "output/playwright/task4-after-compact-assessment.png",
+        "output/playwright/task4-after-expanded-assessment.png"
+      ]
     },
     "revision-task-5": {
       "files": [
@@ -433,6 +440,22 @@
       "written": true,
       "verified": true,
       "commit": "4aabd44"
+    },
+    "revision-task-6": {
+      "files": [
+        "config/medpsy-product-v2/contract.json",
+        "config/medpsy-product-v2/fatal-gates.json",
+        "config/medpsy-raw-profiler-v2/contract.json",
+        "scripts/medpsy-product-v2/freeze-manifest.ts",
+        "scripts/medpsy-product-v2/evaluate.ts",
+        "scripts/medpsy-raw-profiler-v2/freeze-manifest.ts",
+        "scripts/medpsy-raw-profiler-v2/evaluate.ts",
+        "tests/medpsy-product-v2.test.ts",
+        "tests/medpsy-raw-profiler-v2.test.ts"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "856e5d9"
     }
   },
   "deviations": [
@@ -491,6 +514,14 @@
       "reason": "The legacy server parses only caseText and entered triageContext before the new structured-request pre-runtime guard existed",
       "class": "RECOVERED",
       "impact": "77,922,304 incomplete bytes and exact run-created corestore/lock were isolated and removed; no complete cache, project artifact, source, evidence, history, or retained model byte remains; tests are blocked from rerun until pre-runtime parsing is implemented"
+    },
+    {
+      "step": "revision-task-4",
+      "id": "DEV-008",
+      "description": "Initial structured checklist dominated the pinned compact patient-entry viewport",
+      "reason": "DOM and safety tests did not include screenshot-backed visual-fidelity acceptance",
+      "class": "RECOVERED",
+      "impact": "Corrected at 06865d2 with compact progressive disclosure, 14/14 tests, and before/after/expanded Chrome evidence; safety behavior unchanged"
     }
   ],
   "phaseExecutors": {
@@ -1053,11 +1084,26 @@
       "command": "Task 5 exact-one-JSON focused + typecheck",
       "exitCode": 0,
       "result": "12 total; 12 pass; 0 fail/skip/todo; strict TypeScript clean; exact raw stdout preserved"
+    },
+    {
+      "command": "Task 4 screenshot-backed fidelity correction",
+      "exitCode": 0,
+      "result": "14/14 focused; typecheck; 76-entry provenance; before/compact-after/expanded-after Chrome evidence; no model path"
+    },
+    {
+      "command": "Task 6 split product/raw evidence focused",
+      "exitCode": 0,
+      "result": "19 total; 19 pass; 0 fail/skip/todo after independent calibration-manifest binding RED/GREEN"
+    },
+    {
+      "command": "Task 6 deterministic manifests/static gates",
+      "exitCode": 0,
+      "result": "product d1ee10384c6a92953364567835a9cd9281ee2d4d86cc301af017f4a6af45a2f4; raw 0ce11a2df420f59846cf7e244b2dfc11b104ad1294c460fbc8112e1833589d01; JSON 7/7; typecheck; no weights; history unchanged"
     }
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T17:55:38Z",
+  "timestamp": "2026-08-24T18:09:28Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -1103,7 +1149,9 @@
     "Task 3 RED exposed the intended pre-runtime validation leak but also triggered QVAC provisioning; interrupted immediately, audited exact process/path provenance, removed only incomplete run-created bytes, and added a mandatory no-triageContext/no-network observer regression before rerun.",
     "Implemented and committed production pre-model structured-danger gating at ff6d829; deterministic branches prove zero runtime calls, exact import ledger reconciled, and full suite passes 204/0/22.",
     "Implemented worker-facing age and seven-observation checklist at 8367bd8; tampered age units remain disabled, chest indrawing is labeled non-emergency, model red_flags are not rendered, and full suite passes 207/0/22.",
-    "Implemented and committed exact-one-JSON framing at 4aabd44 after 10 expected adversarial failures; prefixes, suffixes, multiple values, truncation, malformed JSON, and mutated terminal markers fail closed."
+    "Implemented and committed exact-one-JSON framing at 4aabd44 after 10 expected adversarial failures; prefixes, suffixes, multiple values, truncation, malformed JSON, and mutated terminal markers fail closed.",
+    "Corrected the screenshot-confirmed Task 4 visual-fidelity regression at 06865d2 by moving mandatory structured assessment behind native progressive disclosure while retaining the pinned compact English workflow.",
+    "Implemented split product/raw v2 evidence planes at 856e5d9; independent review added exact calibration-evaluation-to-producer-manifest binding before holdout."
   ],
   "what_is_needed": "Complete local Tasks 1-10 under the approved structured-danger and split-evidence revision; external publication, remote product evidence, named human review, physical target-laptop evidence, and model-decision signing remain separate unauthorized checkpoints.",
   "healthcare_recovery": {
@@ -1120,7 +1168,7 @@
     "planned_import_count": 76,
     "import_status": "complete",
     "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
-    "import_resume_hint": "Structured-danger revision Tasks 1-5 are complete. Resume at Task 6 split product/raw evidence planes; preserve immutable historical evidence and no-weight boundaries.",
+    "import_resume_hint": "Structured-danger revision Tasks 1-6 are complete, including screenshot-backed Task 4 correction. Resume at Task 7 fresh disjoint product evaluation design; do not inspect holdouts or run inference.",
     "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,
