@@ -64,13 +64,15 @@
 | DI-I1 | intel | stress_test | P1 | Run serialized three-candidate x86 workflow under 4 CPU, 8 GB, offline cgroup | Raw logs and candidate comparison saved; no claim of official-equivalent TPS or thermals | done |
 | DI-I2 | intel | verify_preflight | P1 | Run three cold-boot profiler passes on borrowed target-class Ubuntu 22.04 laptop | CPU SKU, governor, ambient, hashes, TPS, RSS, accuracy, and thermals recorded | open |
 | DI-I3 | intel | package | P1 | Recheck registered Devpost form and unresolved team-ID field | Form fields and hosting constraints are captured; team-ID semantics still require final confirmation | partial |
-| DI-T1 | candidate-fit-audit | build | P0 | Create template-derived ADTC root with one canonical GGUF and optional QVAC app | Required root artifacts validate; model remains runnable if app directory is removed | open |
+| DI-T1 | candidate-fit-audit | build | P0 | Create template-derived ADTC root with one canonical GGUF and optional QVAC app | Required root artifacts validate; model remains runnable if app directory is removed | done |
 | DI-T2 | candidate-fit-audit | debug | P0 | Resolve fresh-clone model-path contract failure and distinguish required-asset skips | Full test summary has no unexplained failures; offline default and docs agree | open |
 | DI-T3 | candidate-fit-audit | verify_preflight | P0 | Run pinned profiler on target-class Ubuntu x86 | Fresh-clone hash, TPS, RSS, thermals, and submission JSON recorded | open |
-| DI-T4 | candidate-fit-audit | build | P0 | Resolve the prior-work boundary through transparent reuse | Freeze commit `74424721`, enumerate imported files and hashes, preserve notices, and disclose the prior QVAC submission | open |
+| DI-T4 | candidate-fit-audit | build | P0 | Resolve the prior-work boundary through transparent reuse | Freeze commit `74424721`, enumerate imported files and hashes, preserve notices, and disclose the prior QVAC submission | done |
 | DI-S1 | scope-handoff | forge | P0 | Freeze the narrow clinical taxonomy, exact claim, resource budgets, and feature observables | PRD and architecture encode real P0 behavior and cuttable QVAC adapters | done |
 | DI-S2 | scope-handoff | build | P0 | Reach an early valid Devpost submission-survival checkpoint before P1 work | Required repository, report, prompts, profiler values, video plan, and saved draft are present | open |
 | DI-S3 | scope-handoff | verify_preflight | P0 | Close every item in the ADTC-specific Definition of Done | Clean clone, offline app, parity, safety, provenance, physical evidence, and submitted Devpost entry pass | open |
+| DI-B1 | build | stress_test | P1 | Clarify the header `Online` badge so it cannot imply internet connectivity | Offline/localhost semantics are explicit and screenshot-tested | open |
+| DI-B2 | build | stress_test | P1 | Hide or qualify pre-run `This ran on the device` copy until inference evidence exists | Pre-run, deterministic-only, and real-inference states make no premature execution claim | open |
 
 ## Skill Sections
 
@@ -542,3 +544,23 @@
 
 #### For Next Skill
 - Stop for an explicit requirements revision. Never retry or tune against this calibration evidence without new authority.
+
+---
+### build — 2026-08-24T18:44:50Z
+**Status:** BLOCKED
+**Session(s):** 11, structured-danger/evidence-plane revision
+
+#### Done
+- Committed local Tasks 1–10 through `840af49`; structured danger owns severity before QVAC.
+- Split product/raw evidence, froze fresh provisional calibration, and preserved sealed holdouts/history.
+- Passed 255/0/22 full tests, typecheck, 76-import provenance, workflow/static/no-weight gates.
+
+#### Deviations
+- [USER] Recovered dominant inline-checklist regression via compact progressive disclosure and Chrome evidence at `06865d2`.
+- [SKILL] Reconciled active profiler policy after the fresh full suite exposed stale Python prompts.
+
+#### Blockers for Downstream
+- Real QVAC calibration, independent holdouts, named clinical review, physical evidence, identities, and signed decision are absent.
+
+#### For Next Skill
+- Debug/stress the claim-limited local build; action DI-B1/DI-B2 and never promote missing external evidence.

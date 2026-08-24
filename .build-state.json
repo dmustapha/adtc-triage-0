@@ -1,9 +1,9 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "structured-danger-evidence-plane-v2",
-  "currentStep": "revision-task-9",
-  "currentSubStep": "task-9-tdd-red",
-  "status": "in-progress",
+  "currentStep": "external-product-evidence-human-physical-decision-gate",
+  "currentSubStep": "local-revision-complete-external-gates-unavailable",
+  "status": "blocked",
   "autonomous_mode": true,
   "completedSteps": [
     "1.1",
@@ -34,7 +34,9 @@
     "revision-task-5",
     "revision-task-6",
     "revision-task-7",
-    "revision-task-8"
+    "revision-task-8",
+    "revision-task-9",
+    "revision-task-10-local"
   ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
@@ -150,8 +152,8 @@
     {
       "phase": "structured-danger-evidence-plane-v2",
       "started_at": "2026-08-24T16:56:43Z",
-      "completed_at": null,
-      "evidence": "IN PROGRESS: Tasks 1-8 committed through e56f891; profiler metadata focused 14/14, English-only and placeholders explicit; Task 9 local workflow started"
+      "completed_at": "2026-08-24T18:46:21Z",
+      "evidence": "LOCAL COMPLETE / EXTERNAL BLOCKED: Tasks 1-10 committed through 840af49; full 277 total, 255 pass, 0 fail, 22 environment skips; typecheck, 76 imports, JSON/YAML/shell/diff/no-weight/history green; no external evidence or signed decision"
     }
   ],
   "fileGroups": {
@@ -483,6 +485,33 @@
       "written": true,
       "verified": true,
       "commit": "e56f891"
+    },
+    "revision-task-9": {
+      "files": [
+        ".github/workflows/medpsy-evidence-v2.yml",
+        "scripts/medpsy-product-v2/evaluate.ts",
+        "scripts/medpsy-product-v2/run-qvac.ts",
+        "scripts/medpsy-raw-profiler-v2/run-raw.ts",
+        "tests/medpsy-product-v2.test.ts",
+        "tests/medpsy-raw-profiler-v2.test.ts"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "bcfb84e"
+    },
+    "revision-task-10-local": {
+      "files": [
+        "config/profiler-prompt-policy.json",
+        "tests/medpsy-raw-profiler-v2.test.ts",
+        ".build-state.json",
+        "BUILD-REPORT.md",
+        "PULSE.md",
+        "pipeline-log.md"
+      ],
+      "written": true,
+      "verified": true,
+      "implementationCommit": "840af49",
+      "stateCommit": "pending-current-narrow-commit"
     }
   },
   "deviations": [
@@ -549,6 +578,14 @@
       "reason": "DOM and safety tests did not include screenshot-backed visual-fidelity acceptance",
       "class": "RECOVERED",
       "impact": "Corrected at 06865d2 with compact progressive disclosure, 14/14 tests, and before/after/expanded Chrome evidence; safety behavior unchanged"
+    },
+    {
+      "step": "revision-task-10",
+      "id": "DEV-009",
+      "description": "Fresh full suite found active profiler policy still embedded obsolete Python prompts after metadata moved to healthcare scope",
+      "reason": "Task 8 focused tests pinned metadata but did not bind the separate active profiler policy",
+      "class": "RECOVERED",
+      "impact": "Focused RED then commit 840af49 reconciled only active policy; historical finalist generation-policy hash remains unchanged; final full suite passes"
     }
   ],
   "phaseExecutors": {
@@ -1136,11 +1173,36 @@
       "command": "Task 8 profiler metadata focused/typecheck/JSON",
       "exitCode": 0,
       "result": "14 total; 14 pass; 0 fail/skip/todo; metadata JSON and typecheck clean; exact identity and English-only/no-African-language claims pinned; four identity placeholders remain"
+    },
+    {
+      "command": "Task 9 split workflow focused/static",
+      "exitCode": 0,
+      "result": "33/33 focused; typecheck; 76 imports; YAML; all workflow bash blocks; diff/no-weight/cache green; no external execution"
+    },
+    {
+      "command": "Task 10 initial npm test",
+      "exitCode": 1,
+      "result": "277 total; 254 pass; 1 active profiler-policy mismatch; 22 environment skips; recovered under focused TDD"
+    },
+    {
+      "command": "Task 10 profiler policy focused GREEN",
+      "exitCode": 0,
+      "result": "16/16 across product-contract and raw-profiler suites; historical finalist generation policy unchanged"
+    },
+    {
+      "command": "Task 10 final npm test",
+      "exitCode": 0,
+      "result": "277 total; 255 pass; 0 fail; 22 skips; 0 cancelled/todo"
+    },
+    {
+      "command": "Task 10 final static/provenance",
+      "exitCode": 0,
+      "result": "typecheck; 76/76 immutable imports; JSON 8/8; YAML 1/1; workflow bash syntax; git diff; no project/tracked/QVAC GGUF/partial/part; historical aggregate 34a740958016b8fead9edbf16483dc41084b1619d891782756411d9ed962ca57"
     }
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T18:23:53Z",
+  "timestamp": "2026-08-24T18:46:21Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -1158,7 +1220,7 @@
   ],
   "resume_attempt": "shared-medpsy-healthcare-recovery-v1",
   "recovery_scope": "transparent import from exact Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f; MedPsy-1.7B Q4 only; QVAC product plus direct llama.cpp profiler over identical GGUF bytes; no model search; historical evidence immutable",
-  "blocked_reason": null,
+  "blocked_reason": "Local structured-danger/evidence-plane revision is complete and green, but real supported-platform QVAC calibration, an authorized independent sealed-holdout producer/content, named human clinical review, physical target-laptop evidence, real submitter/team identities, and a truthful signed model decision are absent; no new dispatch or publication is authorized.",
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -1190,9 +1252,11 @@
     "Corrected the screenshot-confirmed Task 4 visual-fidelity regression at 06865d2 by moving mandatory structured assessment behind native progressive disclosure while retaining the pinned compact English workflow.",
     "Implemented split product/raw v2 evidence planes at 856e5d9; independent review added exact calibration-evaluation-to-producer-manifest binding before holdout.",
     "Froze 27 fresh structured calibration cases and a 30-ID manifest-only sealed holdout at 145eb41; no failed-v1 expected outputs, inference, or unseen contents were reused or inspected; evaluator fails closed pending named human review.",
-    "Replaced stale Python profiler prompts with two bounded English healthcare prompts at e56f891; preserved exact MedPsy identity, false African-language claim, and unresolved submitter placeholders."
+    "Replaced stale Python profiler prompts with two bounded English healthcare prompts at e56f891; preserved exact MedPsy identity, false African-language claim, and unresolved submitter placeholders.",
+    "Prepared split evidence workflow at bcfb84e without dispatch: raw official llama.cpp is Ubuntu-only; QVAC product producer is supported-platform-only and records real telemetry.",
+    "Ran fresh full local reconciliation; recovered one stale active profiler-policy binding at 840af49; final suite passes 255/0/22 and all static/provenance/no-weight gates are green."
   ],
-  "what_is_needed": "Complete local Tasks 1-10 under the approved structured-danger and split-evidence revision; external publication, remote product evidence, named human review, physical target-laptop evidence, and model-decision signing remain separate unauthorized checkpoints.",
+  "what_is_needed": "Obtain real team/submitter identity values. Separately authorize and provide supported-platform QVAC product calibration prerequisites; appoint a named qualified human clinical reviewer; authorize an independent producer for unseen sealed holdouts; capture truthful physical target-laptop evidence. Only after all required product gates pass may a signed model decision authorize Phase 2 or claim-bearing downstream work. No workflow retry, push, publication, or model download is currently authorized.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",
@@ -1207,7 +1271,7 @@
     "planned_import_count": 76,
     "import_status": "complete",
     "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
-    "import_resume_hint": "Structured-danger revision Tasks 1-8 are complete. Resume at Task 9 local split evidence workflow; no dispatch/publication/network/model is authorized.",
+    "import_resume_hint": "Local structured-danger revision Tasks 1-10 are complete. Resume only at an explicitly authorized external checkpoint: supported-platform QVAC evidence, independent sealed holdouts, named clinical review, physical target evidence, real identity values, then signed decision.",
     "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,

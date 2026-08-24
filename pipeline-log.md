@@ -107,3 +107,6 @@
 2026-08-24T18:20:00Z | hackathon-build | START | structured-danger-revision-task-8 | Profiler metadata healthcare-scope correction started under TDD; no identity guessing or unsupported claims.
 2026-08-24T18:25:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-8 | Bounded English healthcare profiler metadata committed at e56f891; focused 14/14; identity placeholders remain explicit blockers.
 2026-08-24T18:25:00Z | hackathon-build | START | structured-danger-revision-task-9 | Split evidence-only workflow and producers started under TDD; local-only, with no dispatch, network, inference, or weights.
+2026-08-24T18:37:08Z | hackathon-build | COMPLETE | structured-danger-revision-task-9 | Split raw workflow and supported-platform QVAC producer committed at bcfb84e; focused 33/33 and all local static gates green; no external execution.
+2026-08-24T18:37:09Z | hackathon-build | START | structured-danger-revision-task-10 | Fresh full reconciliation started; external evidence remains unavailable and unauthorized.
+2026-08-24T18:44:50Z | hackathon-build | BLOCKED | structured-danger-evidence-plane-v2 | Local Tasks 1-10 green at 255 pass/0 fail/22 skip; external QVAC, holdout, human, physical, identity, and signed-decision gates remain absent.
