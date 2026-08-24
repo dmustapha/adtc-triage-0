@@ -55,3 +55,24 @@
 2026-08-24T03:05:38Z | build | BLOCKED | build | type=fundamental action=escalate
 2026-08-24T05:52:12Z | conductor | START | resume | Resuming from url_preverify
 2026-08-24T05:53:45Z | conductor | RECOVERY | build | Authorized shared-MedPsy healthcare revision; legal/provenance is first subgate; OLMo history preserved; no model search; Phase 2 still requires signed decision.
+2026-08-24T05:55:14Z | build | START | build | Dispatching build
+2026-08-24T05:58:35Z | hackathon-build | START | legal-provenance-recovery | Shared-MedPsy recovery resumed; exact Triage-0 provenance gate precedes all application import.
+2026-08-24T09:41:39Z | conductor | START | resume | Resuming from url_preverify
+2026-08-24T09:42:04Z | build | START | build | Dispatching build
+2026-08-24T09:44:00Z | hackathon-build | START | exact-baseline-import | Resuming Task 3 from pinned-object extraction; legal/provenance gate remains complete.
+2026-08-24T10:08:57Z | hackathon-build | BLOCKED | exact-baseline-import | Three dependency installs exhausted host disk; completion flags remain false and Task 4 was not entered.
+2026-08-24T10:10:24Z | build | BLOCKED | build | type=external action=retry
+2026-08-24T10:10:51Z | build | START | build | Dispatching build
+2026-08-24T10:10:51Z | hackathon-build | START | exact-baseline-import-external-retry-1 | Auditing disk capacity before any Task 3 install.
+2026-08-24T10:12:05Z | hackathon-build | BLOCKED | exact-baseline-import-external-retry-1 | Only 2,586,812 KiB free; no safe full install launched; completion flags remain false.
+2026-08-24T10:49:00Z | hackathon-build | START | exact-baseline-import-external-retry-2 | Final retry after authorized Anvil snapshot cleanup restored 57 GiB free.
+2026-08-24T11:06:52Z | hackathon-build | BLOCKED | exact-baseline-import-external-retry-2 | Sole full install failed with registry EIDLETIMEOUT; lock and dependencies remain incomplete; flags stay false.
+2026-08-24T10:14:06Z | build | BLOCKED | build | type=external action=retry
+2026-08-24T10:48:30Z | build | START | build | Dispatching build
+2026-08-24T11:08:37Z | hackathon-build | BLOCKED | exact-baseline-import-external-retry-2 | Independent gates confirm 25 loader failures, 11 missing direct dependencies, stale lock, and false completion flags.
+2026-08-24T12:06:12Z | hackathon-build | START | exact-baseline-import-authorized-install-retry | User authorized exactly one clean full npm install; registry ping passed and 54 GiB is free.
+2026-08-24T11:09:35Z | build | BLOCKED | build | type=external action=retry
+2026-08-24T12:03:50Z | conductor | START | resume | Resuming from url_preverify
+2026-08-24T12:03:51Z | hackathon-build | START | hackathon-build | Dispatching hackathon-build
+2026-08-24T12:05:49Z | build | START | build | Dispatching build
+2026-08-24T13:33:00Z | hackathon-build | COMPLETE | exact-baseline-import-authorized-install-retry | Task 3 verified: 76 imports, focused 9/9, full 155 pass/0 fail/24 skip, typecheck and all parity boundaries green.

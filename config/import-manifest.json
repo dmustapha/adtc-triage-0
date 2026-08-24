@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "kind": "pre-import-plan",
-  "applicationImported": false,
+  "kind": "completed-import",
+  "applicationImported": true,
   "preparedAt": "2026-08-24T00:00:00.000Z",
   "reviewedBy": "conductor-authorized automated provenance contract",
   "source": {
@@ -51,7 +51,8 @@
       "sourceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
     },
     {
       "sourcePath": "data/protocols/README.md",
@@ -60,7 +61,8 @@
       "sourceSha256": "3015554641ab746342cb2bcc9c08aa1f59909e01c11412c37399b4d8c3a55a42",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "3015554641ab746342cb2bcc9c08aa1f59909e01c11412c37399b4d8c3a55a42"
     },
     {
       "sourcePath": "data/rag/dose-tables.txt",
@@ -69,7 +71,8 @@
       "sourceSha256": "6a2d590e7ec2e2be1eea55633396c00d71c3032f2ead83f05b295cd77978c8fd",
       "originalCreatedAt": "2026-06-21T21:06:46+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "6a2d590e7ec2e2be1eea55633396c00d71c3032f2ead83f05b295cd77978c8fd"
     },
     {
       "sourcePath": "package-lock.json",
@@ -78,7 +81,12 @@
       "sourceSha256": "211a7da1ddddba9dd82d8aa667054254103ae52d24b9e2ada9aea7b4aefb00e0",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "5889a41e340377c7e7720bbcbebb60a234e92b17405eea837a6643e7e7857617",
+      "modification": {
+        "status": "modified",
+        "reason": "Reconciled one lockfile for the merged ADTC evidence and Triage-0 application dependency contract."
+      }
     },
     {
       "sourcePath": "package.json",
@@ -87,7 +95,12 @@
       "sourceSha256": "7e17c62f9a57f6fd450bac3b67ddf3990b7cdefc550f1a1a46a0818e10ca96c9",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "cb883498977ad45b981f76bc60226e5b795cb54f34381cd4fd261e1867d45c27",
+      "modification": {
+        "status": "modified",
+        "reason": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and test package contract."
+      }
     },
     {
       "sourcePath": "public/app.html",
@@ -96,7 +109,12 @@
       "sourceSha256": "9e9e07262d0d39ea9750af7ef36bd7a380d69740b034d75cf8873042b48c9ecc",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "b3a305515b261ab273e380c2667f82799022889d21027effc97cbff5a3e04d55",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed speech and multilingual controls so the imported UI exposes only the authorized English text workflow."
+      }
     },
     {
       "sourcePath": "public/apple-touch-icon.png",
@@ -105,7 +123,8 @@
       "sourceSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255"
     },
     {
       "sourcePath": "public/assets/css/app.css",
@@ -114,7 +133,8 @@
       "sourceSha256": "6d6fa0ef915a636065b10f7f560211c1158978815f9cb445ac7dfe6b7ee76fa8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "6d6fa0ef915a636065b10f7f560211c1158978815f9cb445ac7dfe6b7ee76fa8"
     },
     {
       "sourcePath": "public/assets/css/base.css",
@@ -123,7 +143,8 @@
       "sourceSha256": "c4622777ee144687d57644e1fc76bba386ef37e417646973a34c4c1f776e35ec",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c4622777ee144687d57644e1fc76bba386ef37e417646973a34c4c1f776e35ec"
     },
     {
       "sourcePath": "public/assets/css/fonts.css",
@@ -132,7 +153,8 @@
       "sourceSha256": "8abff9c97d4997a6d0e9a9c9f7401cdf22c01ce6f7e00fc05e0cb7d96554dc85",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "8abff9c97d4997a6d0e9a9c9f7401cdf22c01ce6f7e00fc05e0cb7d96554dc85"
     },
     {
       "sourcePath": "public/assets/css/landing.css",
@@ -141,7 +163,8 @@
       "sourceSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93"
     },
     {
       "sourcePath": "public/assets/css/tokens.css",
@@ -150,7 +173,8 @@
       "sourceSha256": "c3e7f7985c968f7aba8a8c240739ebf47d40ece09798cb4233ce11edb78268e2",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c3e7f7985c968f7aba8a8c240739ebf47d40ece09798cb4233ce11edb78268e2"
     },
     {
       "sourcePath": "public/assets/fonts/bricolagegrotesque-704ed999.woff2",
@@ -159,7 +183,8 @@
       "sourceSha256": "a22c997a894377f36d81c904163e0c05fbbcd32f0ca2e7beedb86b39be1296a1",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "a22c997a894377f36d81c904163e0c05fbbcd32f0ca2e7beedb86b39be1296a1"
     },
     {
       "sourcePath": "public/assets/fonts/bricolagegrotesque-a24a0e4a.woff2",
@@ -168,7 +193,8 @@
       "sourceSha256": "ea16948d4a91b77221f119ad27d4ac7a7581c98cf990712047f89a531a49ef28",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "ea16948d4a91b77221f119ad27d4ac7a7581c98cf990712047f89a531a49ef28"
     },
     {
       "sourcePath": "public/assets/fonts/bricolagegrotesque-b2c054fd.woff2",
@@ -177,7 +203,8 @@
       "sourceSha256": "4fd48b2c1ab27220e71f15f990550261b35245c3bdfd8d8025b4bdac0459ee2d",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "4fd48b2c1ab27220e71f15f990550261b35245c3bdfd8d8025b4bdac0459ee2d"
     },
     {
       "sourcePath": "public/assets/fonts/hankengrotesk-2f1d024a.woff2",
@@ -186,7 +213,8 @@
       "sourceSha256": "2f52020a90793104e4178b0ae3ccd30eea28cac27e0fea8fcf4f246151777f74",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "2f52020a90793104e4178b0ae3ccd30eea28cac27e0fea8fcf4f246151777f74"
     },
     {
       "sourcePath": "public/assets/fonts/hankengrotesk-5cebb0b5.woff2",
@@ -195,7 +223,8 @@
       "sourceSha256": "1f21c6eaa0000f3329cfcfac966b43d5bebf5aa610303e33294ac31bc6f4bb59",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "1f21c6eaa0000f3329cfcfac966b43d5bebf5aa610303e33294ac31bc6f4bb59"
     },
     {
       "sourcePath": "public/assets/fonts/hankengrotesk-8ad2d398.woff2",
@@ -204,7 +233,8 @@
       "sourceSha256": "a1376a563717f1efa2f5286ab23da2b61ae8dec827a77b97adfa01cad4ec4ee2",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "a1376a563717f1efa2f5286ab23da2b61ae8dec827a77b97adfa01cad4ec4ee2"
     },
     {
       "sourcePath": "public/assets/fonts/hankengrotesk-b0a9ff2a.woff2",
@@ -213,7 +243,8 @@
       "sourceSha256": "2f467719b2167cc4778b5780a2fb42fadf5203b29d0fb5f1482bbab32b1b7999",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "2f467719b2167cc4778b5780a2fb42fadf5203b29d0fb5f1482bbab32b1b7999"
     },
     {
       "sourcePath": "public/assets/img/apple-touch-icon.png",
@@ -222,7 +253,8 @@
       "sourceSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255"
     },
     {
       "sourcePath": "public/assets/img/favicon-32.png",
@@ -231,7 +263,8 @@
       "sourceSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f"
     },
     {
       "sourcePath": "public/assets/img/favicon.ico",
@@ -240,7 +273,8 @@
       "sourceSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e"
     },
     {
       "sourcePath": "public/assets/img/favicon.svg",
@@ -249,7 +283,8 @@
       "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
       "sourcePath": "public/assets/img/logo.svg",
@@ -258,7 +293,8 @@
       "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
       "sourcePath": "public/assets/js/net.js",
@@ -267,7 +303,8 @@
       "sourceSha256": "3ea27bcbd30dd85348cd0b9d296b5261fe11d7addef6675a7716b0e532cc49e0",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "3ea27bcbd30dd85348cd0b9d296b5261fe11d7addef6675a7716b0e532cc49e0"
     },
     {
       "sourcePath": "public/assets/js/triage.js",
@@ -276,7 +313,12 @@
       "sourceSha256": "9e87896b83e001173ba32448c34b27a58a7ff8a1d5f09aa92d864b42edafdca1",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "0bef5152dc1f5467de516e7752208fa9668878d3a376cf260a7958133c98db9e",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow."
+      }
     },
     {
       "sourcePath": "public/favicon-16.png",
@@ -285,7 +327,8 @@
       "sourceSha256": "0f899afd9f0fb17a329a7b9e8e3078dbd9177238b751d9b13500840bfd3b4111",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "0f899afd9f0fb17a329a7b9e8e3078dbd9177238b751d9b13500840bfd3b4111"
     },
     {
       "sourcePath": "public/favicon-32.png",
@@ -294,7 +337,8 @@
       "sourceSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f"
     },
     {
       "sourcePath": "public/favicon-48.png",
@@ -303,7 +347,8 @@
       "sourceSha256": "521cd1d988e4f4ee5b0d5e71ce37908075f4036f4920f36ef8a3331264c2a0cb",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "521cd1d988e4f4ee5b0d5e71ce37908075f4036f4920f36ef8a3331264c2a0cb"
     },
     {
       "sourcePath": "public/favicon.ico",
@@ -312,7 +357,8 @@
       "sourceSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e"
     },
     {
       "sourcePath": "public/favicon.svg",
@@ -321,7 +367,8 @@
       "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
       "sourcePath": "public/index.html",
@@ -330,7 +377,8 @@
       "sourceSha256": "dc91b946d5905417c1383c0178606b7b86bffc82ccbe73061b876c8b7e849faf",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "dc91b946d5905417c1383c0178606b7b86bffc82ccbe73061b876c8b7e849faf"
     },
     {
       "sourcePath": "public/logo.png",
@@ -339,7 +387,8 @@
       "sourceSha256": "bf8e70cedc19b6eba9457e470389e76185efff28be02b6f842f2dd86b772fb3e",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "bf8e70cedc19b6eba9457e470389e76185efff28be02b6f842f2dd86b772fb3e"
     },
     {
       "sourcePath": "public/logo.svg",
@@ -348,7 +397,8 @@
       "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
       "sourcePath": "scripts/audit-cases.ts",
@@ -357,7 +407,8 @@
       "sourceSha256": "1e1103531f46731aff8d9ee27fdbc1deb94706c4f3239276bda4ff8908585b49",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "1e1103531f46731aff8d9ee27fdbc1deb94706c4f3239276bda4ff8908585b49"
     },
     {
       "sourcePath": "scripts/clinical-audit.ts",
@@ -366,7 +417,8 @@
       "sourceSha256": "fa2e8080a32be48eecd35b0c81f65d98bb03730d1a7476ed15584c4b43940b58",
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "fa2e8080a32be48eecd35b0c81f65d98bb03730d1a7476ed15584c4b43940b58"
     },
     {
       "sourcePath": "scripts/ingest-protocols.ts",
@@ -375,7 +427,8 @@
       "sourceSha256": "a599cc690d51036b486b154ba32eb28657f791886450a029f2bbc08a674da1e8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "a599cc690d51036b486b154ba32eb28657f791886450a029f2bbc08a674da1e8"
     },
     {
       "sourcePath": "scripts/patch-sdk-zod.mjs",
@@ -384,7 +437,8 @@
       "sourceSha256": "c77e515a2ecaf81d65c5a6ab5eb23291e407bb7a9d75435483c1887ff9cc56da",
       "originalCreatedAt": "2026-07-12T21:31:17+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c77e515a2ecaf81d65c5a6ab5eb23291e407bb7a9d75435483c1887ff9cc56da"
     },
     {
       "sourcePath": "src/config.ts",
@@ -392,8 +446,9 @@
       "sourceGitObject": "5905660c5538c7f900e44b796dfc47a6e318170f",
       "sourceSha256": "dc12657a984d90c406e8e63ff8f7b55f45d21578143825ec28f533bba43baced",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "dc12657a984d90c406e8e63ff8f7b55f45d21578143825ec28f533bba43baced"
     },
     {
       "sourcePath": "src/qvac/egress-guard.ts",
@@ -402,7 +457,8 @@
       "sourceSha256": "0f9ca14c19055c397b362c52165e832b1802d118d3bf2a396616556afe7fe9fa",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "0f9ca14c19055c397b362c52165e832b1802d118d3bf2a396616556afe7fe9fa"
     },
     {
       "sourcePath": "src/qvac/engine.ts",
@@ -411,7 +467,12 @@
       "sourceSha256": "837791092604a40cc498a8c02dc46e0fb014797debda56f81c07116e9e1a435a",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "984f88e7809acb858a4fd4e049027b632e5a277b46d42fb9483e1690cdc588e2",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline."
+      }
     },
     {
       "sourcePath": "src/qvac/orchestrator.ts",
@@ -419,8 +480,9 @@
       "sourceGitObject": "458f0b073087387c096d1c0b9023f118ae84dc7a",
       "sourceSha256": "fc7d026c53c462a6593ef2a9d0401c843a348d6242cdf5ec076a13f7393bcce8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "fc7d026c53c462a6593ef2a9d0401c843a348d6242cdf5ec076a13f7393bcce8"
     },
     {
       "sourcePath": "src/qvac/perf-logger.ts",
@@ -429,7 +491,8 @@
       "sourceSha256": "10266512457b969eb5b43e330a9fae97f045d700ecc58e0ce440e7cf0eec00e8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "10266512457b969eb5b43e330a9fae97f045d700ecc58e0ce440e7cf0eec00e8"
     },
     {
       "sourcePath": "src/qvac/sdk.ts",
@@ -438,7 +501,8 @@
       "sourceSha256": "0937c1f9a8974a3f76e2c9e982c007ecceff918673ea418596b805aa4cc80356",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "0937c1f9a8974a3f76e2c9e982c007ecceff918673ea418596b805aa4cc80356"
     },
     {
       "sourcePath": "src/rag/ingest.ts",
@@ -447,7 +511,8 @@
       "sourceSha256": "3d64d38b6983c8c49c7d843adc348b463927750791cd46fe9b0262136e1adf1a",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "3d64d38b6983c8c49c7d843adc348b463927750791cd46fe9b0262136e1adf1a"
     },
     {
       "sourcePath": "src/rag/store.ts",
@@ -456,7 +521,8 @@
       "sourceSha256": "96d9d5adce596c2edbba8f166d41816acd27f8633c4a60a91e7a14d42ae77700",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "96d9d5adce596c2edbba8f166d41816acd27f8633c4a60a91e7a14d42ae77700"
     },
     {
       "sourcePath": "src/server.ts",
@@ -465,7 +531,12 @@
       "sourceSha256": "e8a3594de6098dffe73fab80753f015e091a9375e845fc43d6e87ee1309959df",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "3d1bab35f753741ab0ad56db44a469cd4e2bca473ba689e0d02e1e21d2530ccd",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed optional speech and translation routes, imports, and prewarming while preserving English text triage."
+      }
     },
     {
       "sourcePath": "src/triage/class-router.ts",
@@ -474,7 +545,8 @@
       "sourceSha256": "2b39340f981a539969d2e573561dd6a803cd4e5cca74bf8d4f8a250dd5028c0c",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "2b39340f981a539969d2e573561dd6a803cd4e5cca74bf8d4f8a250dd5028c0c"
     },
     {
       "sourcePath": "src/triage/protocol-table.ts",
@@ -483,7 +555,8 @@
       "sourceSha256": "bddeeb4245dc9af2f247e6a46a1a0b17ce6f514b0815862fd093149b345bc5f7",
       "originalCreatedAt": "2026-06-21T18:50:48+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "bddeeb4245dc9af2f247e6a46a1a0b17ce6f514b0815862fd093149b345bc5f7"
     },
     {
       "sourcePath": "src/triage/schema.ts",
@@ -492,7 +565,8 @@
       "sourceSha256": "cc030a671d0b27b26a5c32be68216dd428911de016926563d8da75358b36d3d4",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "cc030a671d0b27b26a5c32be68216dd428911de016926563d8da75358b36d3d4"
     },
     {
       "sourcePath": "src/triage/severity.ts",
@@ -501,7 +575,8 @@
       "sourceSha256": "de18a009ffc9cfd49be8ea2e36fa5c131111eb51c44069844649428920799da7",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "de18a009ffc9cfd49be8ea2e36fa5c131111eb51c44069844649428920799da7"
     },
     {
       "sourcePath": "src/triage/triage.ts",
@@ -510,7 +585,12 @@
       "sourceSha256": "abf3e081b48cb0bdde9da17052e7ab1f6603ed0fbe4b3f11e9fc638f027fd078",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "f3310b703dc963d50a38932492bf9e0ae86a17e0225a01e47f21211e8c583a24",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed translation dependencies so routing, grounding, and triage operate on English text only."
+      }
     },
     {
       "sourcePath": "tests/integration/citation-integrity.test.ts",
@@ -519,7 +599,8 @@
       "sourceSha256": "caa64beeab5e9c9a18673898444f9d2af945c5decf1f33c70ec75a280412e1da",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "caa64beeab5e9c9a18673898444f9d2af945c5decf1f33c70ec75a280412e1da"
     },
     {
       "sourcePath": "tests/integration/grounding.test.ts",
@@ -528,7 +609,8 @@
       "sourceSha256": "227d2822c64443b3c5ec1efc6dcdfa1be54550957dc1c8913eb56fc50b0eb066",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "227d2822c64443b3c5ec1efc6dcdfa1be54550957dc1c8913eb56fc50b0eb066"
     },
     {
       "sourcePath": "tests/integration/http-validation.test.ts",
@@ -537,7 +619,12 @@
       "sourceSha256": "7861d2a1b8bf34143b1b5e14dc80e9a2ea560f35d684fb52ab14a31081142123",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "d2c4ed4583176223f782a4094f0e127998ca094696279452a42e879a9696bfa0",
+      "modification": {
+        "status": "modified",
+        "reason": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered."
+      }
     },
     {
       "sourcePath": "tests/integration/injection.test.ts",
@@ -546,7 +633,8 @@
       "sourceSha256": "ceb9dec45faaaefe328a7701fe253a218a41429b73f33c1be1abde0509429b3f",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "ceb9dec45faaaefe328a7701fe253a218a41429b73f33c1be1abde0509429b3f"
     },
     {
       "sourcePath": "tests/integration/offline-egress.test.ts",
@@ -555,7 +643,8 @@
       "sourceSha256": "f318343ba94c2bf6afbfd293d7bc5e52c3b24982f3d0f7c268b21f06bdb10be5",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "f318343ba94c2bf6afbfd293d7bc5e52c3b24982f3d0f7c268b21f06bdb10be5"
     },
     {
       "sourcePath": "tests/integration/server.test.ts",
@@ -564,7 +653,12 @@
       "sourceSha256": "7e8bbdfed4b8e5fed7f8f8592f9329d6e4d1136129707ac30d8de98fa161b200",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "6113af9fe351ffb2cfd6400e2bd5948871d04cb971506ba716fa29a553070679",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed the TTS model prerequisite and characterized the excluded TTS route while retaining text-triage coverage."
+      }
     },
     {
       "sourcePath": "tests/integration/sse-contract.test.ts",
@@ -572,8 +666,9 @@
       "sourceGitObject": "67b0b95c63984bae2b9d4c98a2da7d9435f41fc0",
       "sourceSha256": "80615566207a929e3ea87601640e8a74d46d5fa382873d3f72143a5a86954568",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
-      "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "80615566207a929e3ea87601640e8a74d46d5fa382873d3f72143a5a86954568"
     },
     {
       "sourcePath": "tests/integration/triage.test.ts",
@@ -582,7 +677,12 @@
       "sourceSha256": "f52009e42402e747b784b65d686bd0a62fa37494cb32764cbad7334273d34fbb",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "b5079093ae2386e72ddce28754285b5a382a704c23160606d0fae79fa3857df1",
+      "modification": {
+        "status": "modified",
+        "reason": "Removed multilingual integration cases that require the excluded translation models."
+      }
     },
     {
       "sourcePath": "tests/quality/results-after-failure.json",
@@ -591,7 +691,8 @@
       "sourceSha256": "e48ada1e009dd3c7bdf759dbd7c76c42d443fd56e1b3f1954c37fe5b839fc52b",
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "e48ada1e009dd3c7bdf759dbd7c76c42d443fd56e1b3f1954c37fe5b839fc52b"
     },
     {
       "sourcePath": "tests/quality/results-after-textbook.json",
@@ -600,7 +701,8 @@
       "sourceSha256": "a7d7840c348ebf028c15e4d05b7d88be3ce76899151bd2358f1f70875ce4e4b4",
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "a7d7840c348ebf028c15e4d05b7d88be3ce76899151bd2358f1f70875ce4e4b4"
     },
     {
       "sourcePath": "tests/quality/results-baseline-failure.json",
@@ -609,7 +711,8 @@
       "sourceSha256": "e550ac0e9effb9179fb23016cbae335b5f71c9e5c2247b8f94719dc96d813575",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "e550ac0e9effb9179fb23016cbae335b5f71c9e5c2247b8f94719dc96d813575"
     },
     {
       "sourcePath": "tests/quality/results.json",
@@ -618,7 +721,8 @@
       "sourceSha256": "e82d5b241c8d0b0c3545313964ec94f0b514c88c8994180eba598cebf368486e",
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "e82d5b241c8d0b0c3545313964ec94f0b514c88c8994180eba598cebf368486e"
     },
     {
       "sourcePath": "tests/unit/class-router.test.ts",
@@ -627,7 +731,8 @@
       "sourceSha256": "92e17e01063d664da8d2c73424156e90af26923cf4c23e1ce887f73c4c18d3ef",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "92e17e01063d664da8d2c73424156e90af26923cf4c23e1ce887f73c4c18d3ef"
     },
     {
       "sourcePath": "tests/unit/config.test.ts",
@@ -636,7 +741,12 @@
       "sourceSha256": "c7ddc5c52b7ec0121c1e2bbd4f45b7fc6885d44cb53531ec2f68f847649bea72",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "c57aa292d952d9e5ac6ce1da6f76fff507754b11b1d9bace6f21ddbc12a0c294",
+      "modification": {
+        "status": "modified",
+        "reason": "Made the cold-workspace model-source assertion truthful because Task 3 excludes bundled model weights."
+      }
     },
     {
       "sourcePath": "tests/unit/egress-host.test.ts",
@@ -645,7 +755,8 @@
       "sourceSha256": "e7ccd8b5007344a484be7a5d0c1812ef55d2e111dc016d2786fcada7d6a9198b",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "e7ccd8b5007344a484be7a5d0c1812ef55d2e111dc016d2786fcada7d6a9198b"
     },
     {
       "sourcePath": "tests/unit/frontend.test.ts",
@@ -653,8 +764,9 @@
       "sourceGitObject": "bc313832afe39bca122dec4d005dc0ea56b37bef",
       "sourceSha256": "0141d566c16f45dc0720e01f63432e1475c43cca8c15eb29b2e8f6f0789687fe",
       "originalCreatedAt": "2026-06-25T07:09:42+01:00",
-      "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "0141d566c16f45dc0720e01f63432e1475c43cca8c15eb29b2e8f6f0789687fe"
     },
     {
       "sourcePath": "tests/unit/perf-csv.test.ts",
@@ -663,7 +775,8 @@
       "sourceSha256": "7fa3318110e18d14d98e1c4c4606b8378eca7d82167719e808f8b991acbad9ff",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "7fa3318110e18d14d98e1c4c4606b8378eca7d82167719e808f8b991acbad9ff"
     },
     {
       "sourcePath": "tests/unit/perf-logger.test.ts",
@@ -672,7 +785,8 @@
       "sourceSha256": "4ffd8fc84702726858fb456dc1d082c7f407c2a3461cec44cd08dcceff7366c5",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "4ffd8fc84702726858fb456dc1d082c7f407c2a3461cec44cd08dcceff7366c5"
     },
     {
       "sourcePath": "tests/unit/protocol-table.test.ts",
@@ -681,7 +795,8 @@
       "sourceSha256": "f07c9629a0c7f24db4ec36f49d9685ba58b032caf340b4b221f0fcdc3ada0dec",
       "originalCreatedAt": "2026-06-21T18:50:48+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "f07c9629a0c7f24db4ec36f49d9685ba58b032caf340b4b221f0fcdc3ada0dec"
     },
     {
       "sourcePath": "tests/unit/severity.test.ts",
@@ -690,7 +805,8 @@
       "sourceSha256": "8d088337f7d56cc661149d0579218da8eee5862dc25e3453b6ff9217c64e6f0f",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "8d088337f7d56cc661149d0579218da8eee5862dc25e3453b6ff9217c64e6f0f"
     },
     {
       "sourcePath": "tests/unit/store-save.test.ts",
@@ -699,7 +815,8 @@
       "sourceSha256": "8f551fa093afbac838e006ca6fb2c5a1e9b76ebb482217d9e6c7b170ab17111f",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "8f551fa093afbac838e006ca6fb2c5a1e9b76ebb482217d9e6c7b170ab17111f"
     },
     {
       "sourcePath": "tests/unit/store.test.ts",
@@ -708,7 +825,8 @@
       "sourceSha256": "c2608cc99f0e93c569802d491aa08c89ddc66940556bc3034fcde0009b673216",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "c2608cc99f0e93c569802d491aa08c89ddc66940556bc3034fcde0009b673216"
     },
     {
       "sourcePath": "tests/unit/text-quality.test.ts",
@@ -717,7 +835,8 @@
       "sourceSha256": "030fb890d22bb880acf310ab71bc5f184611b784e4513257fa867530cc94cd09",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
-      "purpose": "Exact pinned baseline component"
+      "purpose": "Exact pinned baseline component",
+      "destinationSha256": "030fb890d22bb880acf310ab71bc5f184611b784e4513257fa867530cc94cd09"
     },
     {
       "sourcePath": "tsconfig.json",
@@ -726,7 +845,12 @@
       "sourceSha256": "717ffcbb78c297f58835bf0b14142ba64e531153d132e9705bcf6855740fd3be",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
-      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "1584dc7f45183a503b58509ecc4f2bdca1b5c50aee1b9970179301cc4f0fb0d9",
+      "modification": {
+        "status": "modified",
+        "reason": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract."
+      }
     }
   ],
   "adtcNewFiles": [

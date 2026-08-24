@@ -283,3 +283,94 @@ STATIC_BOUNDARY_OK
 ### Gate result
 
 **PASS for exact-baseline import.** `applicationImported=false` remains true at this boundary. Source-rights, clinical, human, physical-hardware, QVAC Ubuntu, publication, and final model-decision gates remain open and cannot be inferred from this pass.
+
+## Shared-MedPsy Recovery Task 3 — Exact Baseline Import Blocked
+
+Task 3 resumed from the verified RED boundary. The immutable-object audit found all 76 approved destinations: 60 reused files byte-match the pinned source, 13 `modified-for-adtc` files still byte-match and remain pending adaptation, and only `package.json`, `package-lock.json`, and `tsconfig.json` differ as declared package/config changes. No mutable Triage-0 working-tree bytes were used.
+
+Draft package, TypeScript, manifest-type, schema, and verifier changes were prepared, but they are not accepted as complete. `config/import-manifest.json` and `PROVENANCE.json` intentionally retain `applicationImported=false`; no destination completion hashes were recorded and no Task 3 commit was created.
+
+### TDD and verification evidence
+
+```text
+Focused RED: node --import tsx --test tests/import-provenance.test.ts
+tests 8
+pass 7
+fail 1
+expected failure: application import must be recorded complete
+
+Independent immutable-object audit
+total 76; exact 73; changed 3; missing 0
+reused exact 60; modified-for-ADTC exact 13; modified-for-ADTC changed 3
+
+npm install attempts 1 and 2
+exit 1: TAR_ENTRY_ERROR ENOSPC
+
+npm install --no-audit --no-fund attempt 3
+repeated TAR_ENTRY_ERROR ENOSPC; stalled process terminated by implementation worker
+exit 143
+
+JSON_OK
+DIFF_CHECK_OK
+NO_TRACKED_WEIGHT_PARTIAL_OR_PRIVATE_KEY
+```
+
+The implementation worker accidentally launched overlapping installs during attempt 1 and later terminated the stalled third attempt despite an arriving wait instruction. These are recorded as `DEV-002 UNTESTED` and `DEV-003 UNTESTED`. The primary `DEV-001 UNTESTED` deviation is host disk exhaustion: dependency installation, lock reconciliation, typecheck, full tests, and completed-manifest verification were not run successfully.
+
+Only the partial untracked generated `node_modules` directory was removed after the block, restoring approximately 2.5 GiB free. No source, evidence, model, or historical path was deleted.
+
+### Gate result
+
+**BLOCKED at Task 3.** Free materially more host disk, then resume with one clean dependency install and the complete Task 3 GREEN sequence. Tasks 4 onward, fresh MedPsy evidence, human/physical gates, signing, and Phase 2 remain unopened.
+
+### External retry 1 — read-only capacity audit
+
+The conductor authorized one surgical environmental retry. No install was launched because the precondition failed:
+
+```text
+df -k /Users/MAC/adtc-2026
+available: 2,586,812 KiB (~2.47 GiB)
+
+/Users/MAC/adtc-2026/node_modules: absent
+/Users/MAC/.npm: 1,315,396 KiB (read-only observation; not cleared)
+package.json: 5 runtime + 6 development dependencies
+package-lock root: 0 runtime + 3 development dependencies (stale, unreconciled)
+```
+
+The previous clean attempt began with approximately 3.0 GiB free and still exhausted the filesystem while `node_modules` grew beyond 2 GiB and npm retained/extracted QVAC packages. Therefore 2.47 GiB is not materially adequate. A conservative minimum is 3.5 GiB free, with 4 GiB recommended for installation and verification headroom.
+
+No source, evidence, history, user file, model artifact, project artifact, global cache, Docker data, or unrelated path was deleted or changed during this retry. Task 3 remains blocked and pre-import.
+
+### External retry 2 — registry idle timeout
+
+The user-authorized Anvil snapshot cleanup restored 57 GiB free. Build launched exactly one clean full `npm install`; it was not duplicated or weakened. The install downloaded large QVAC transitive artifacts but exited 1:
+
+```text
+npm error code EIDLETIMEOUT
+npm error Idle timeout reached for host registry.npmjs.org:443
+```
+
+Approximately 50 GiB remained, proving disk capacity was no longer the failure. The install did not complete lifecycle/postinstall, did not reconcile `package-lock.json`, and left all 11 direct package dependencies unresolved.
+
+Final independent audit found `node_modules` absent rather than a usable partial tree; `npm ls --depth=0` reports all 11 direct dependencies missing with `ELSPROBLEMS`.
+
+Verification truthfully failed before application test bodies could execute:
+
+```text
+focused provenance: 1 loader test, 0 pass, 1 fail, 0 skip, 0 todo — tsx missing
+full npm test: 25 loader tests, 0 pass, 25 fail, 0 skip, 0 todo — tsx missing
+typecheck: exit 2 — TS2688 node types missing
+verify-import-manifest: exit 127 — tsx not found
+```
+
+Static boundaries still pass: all required JSON parses; immutable audit is 76 total, 73 exact, three declared changes, zero missing; Git-object/source-hash mismatches are zero; `git diff --check` is clean; no GGUF, partial model, or private key is tracked.
+
+`DEV-004 UNTESTED` records the external registry timeout. `applicationImported=false`, the lockfile remains stale, no completion hashes were written, no Task 3 commit exists, and Task 4 was not entered.
+
+### Authorized install retry — Task 3 complete
+
+The one newly authorized clean `npm install` completed successfully (320 packages added, 321 audited, zero vulnerabilities); no second install was launched. The immutable destination ledger now records 76 completed imports from commit `74424721bc75f564808eacce42d7f7f42676ae0f`: 64 reused byte-exact and 12 modified-for-ADTC with precise reasons and destination hashes, with zero pending or missing entries.
+
+The English text baseline removes only excluded speech and translation surfaces. TDD recorded the modality-exclusion characterization RED (1/1 failed before implementation) and GREEN (1/1 passed). Final verification is green: focused provenance 9/9; full suite 179 total, 155 passed, zero failed, 24 environment-dependent RAG/store skips, zero todo; strict TypeScript; 76-entry manifest verification; JSON parsing; immutable Git-object parity; dependency-tree validation; `git diff --check`; and no tracked GGUF, partial model, or private key.
+
+`applicationImported=true` is now truthful. Task 3 is complete. Task 4 may begin only with the exact frozen MedPsy artifact; weights must not be retained and Phase 2 remains blocked pending truthful fresh evidence and a signed decision.

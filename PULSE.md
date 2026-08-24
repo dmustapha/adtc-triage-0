@@ -347,12 +347,8 @@
 - Stop for explicit requirements revision or submission pivot. Do not search for another model or dispatch Phase 2/UI.
 ### build — 2026-08-24T03:01:33Z
 **Status:** BLOCKED
-**Done:** Frozen product-contract run `32684188985` failed 12-case calibration; untouched evaluation and downstream gates were not run.
-**Key Decision:** [USER] Preserve attempt 4; [SKILL] reject revision at 0/12 exact and 2/12 danger projection.
-**Blockers:** No signed model decision; Phase 2/UI and later skills remain forbidden.
-**For Next Skill:** Conductor must stop for explicit submission pivot or new requirements authority.
+*[Pruned — full section in .pre-prune.bak]*
 
----
 ### build — 2026-08-24T06:25:16Z
 **Status:** PARTIAL
 **Session(s):** 5, shared-MedPsy recovery
@@ -370,3 +366,77 @@
 
 #### For Next Skill
 - Import only the 76 manifest entries from Git object `74424721`; never copy the mutable source working tree.
+
+---
+### build — 2026-08-24T10:08:57Z
+**Status:** BLOCKED
+**Session(s):** 6, shared-MedPsy Task 3 resume
+
+#### Done
+- Verified 76/76 destinations: 73 exact pinned bytes, three declared package/config changes, zero missing.
+- Preserved `applicationImported=false`; no Task 3 commit or downstream model work occurred.
+- Removed only partial generated dependencies after the block; evidence and history remain intact.
+
+#### Key Decisions
+- [SKILL] Stop after three ENOSPC install attempts; unverified drafts cannot advance Task 3.
+
+#### Blockers for Downstream
+- Host disk cannot install the merged QVAC dependency graph; typecheck, full tests, lock parity, and manifest GREEN remain unrun.
+
+#### For Next Skill
+- Free materially more disk outside protected artifacts, then resume Task 3 from the existing RED and package/config drafts.
+
+---
+### build — 2026-08-24T10:12:05Z
+**Status:** BLOCKED
+**Session(s):** 7, external retry 1
+
+#### Done
+- Audited capacity read-only: 2,586,812 KiB free; project `node_modules` absent; npm cache 1,315,396 KiB.
+- Launched no install and deleted nothing; completion flags remain false.
+
+#### Key Decisions
+- [SKILL] Require at least 3.5 GiB free, 4 GiB recommended, before another full install.
+
+#### Blockers for Downstream
+- Current 2.47 GiB is below the capacity from which the prior clean install already failed.
+
+#### For Next Skill
+- Free safe capacity outside protected/unrelated artifacts, then resume Task 3 only.
+
+---
+### build — 2026-08-24T11:06:52Z
+**Status:** BLOCKED
+**Session(s):** 8, external retry 2 final budget
+
+#### Done
+- Restored-capacity retry launched one full install; it failed on registry `EIDLETIMEOUT`, not disk.
+- Preserved 76-entry parity and false completion flags; no Task 3 commit or Task 4 work occurred.
+
+#### Key Decisions
+- [SKILL] Treat incomplete install and loader-level failures as UNTESTED; do not promote static parity to GREEN.
+
+#### Blockers for Downstream
+- Registry timeout left 11 direct dependencies missing and the lock stale; all executable gates remain red.
+
+#### For Next Skill
+- Obtain conductor authority for a clean install after registry stability; rerun every Task 3 gate.
+
+---
+### build — 2026-08-24T13:33:00Z
+**Status:** COMPLETE
+**Session(s):** 9, authorized Task 3 install retry
+
+#### Done
+- Completed the sole authorized clean install and reconciled the 5-runtime/6-development dependency contract.
+- Verified all 76 pinned-object destinations: 64 reused exact, 12 modified-for-ADTC, zero pending or errors.
+- Passed focused 9/9, full 179 total/155 pass/0 fail/24 environment skips, typecheck, manifest, JSON, diff, and no-weight gates.
+
+#### Key Decisions
+- [SKILL] Set `applicationImported=true` only after every real pre-completion failure and parity gate cleared.
+
+#### Blockers for Downstream
+- Phase 2 remains blocked pending fresh MedPsy, truthful human/physical evidence, and a signed decision.
+
+#### For Next Skill
+- Begin Task 4 with only the frozen MedPsy revision/file/hash; never retain model weights.

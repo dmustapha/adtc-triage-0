@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 export const SOURCE_REPOSITORY = "https://github.com/dmustapha/triage-0";
@@ -42,12 +42,26 @@ export const PLANNED_SOURCE_PATHS = [
 
 const MODIFIED_FOR_ADTC = new Set<string>([
   "package-lock.json", "package.json", "public/app.html", "public/assets/js/triage.js",
-  "src/config.ts", "src/qvac/engine.ts", "src/qvac/orchestrator.ts", "src/server.ts",
+  "src/qvac/engine.ts", "src/server.ts",
   "src/triage/triage.ts", "tests/integration/http-validation.test.ts",
-  "tests/integration/server.test.ts", "tests/integration/sse-contract.test.ts",
-  "tests/integration/triage.test.ts", "tests/unit/config.test.ts", "tests/unit/frontend.test.ts",
+  "tests/integration/server.test.ts", "tests/integration/triage.test.ts", "tests/unit/config.test.ts",
   "tsconfig.json",
 ]);
+
+const MODIFICATION_REASONS: Record<string, string> = {
+  "package-lock.json": "Reconciled one lockfile for the merged ADTC evidence and Triage-0 application dependency contract.",
+  "package.json": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and test package contract.",
+  "public/app.html": "Removed speech and multilingual controls so the imported UI exposes only the authorized English text workflow.",
+  "public/assets/js/triage.js": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow.",
+  "src/qvac/engine.ts": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline.",
+  "src/server.ts": "Removed optional speech and translation routes, imports, and prewarming while preserving English text triage.",
+  "src/triage/triage.ts": "Removed translation dependencies so routing, grounding, and triage operate on English text only.",
+  "tests/integration/http-validation.test.ts": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered.",
+  "tests/integration/server.test.ts": "Removed the TTS model prerequisite and characterized the excluded TTS route while retaining text-triage coverage.",
+  "tests/integration/triage.test.ts": "Removed multilingual integration cases that require the excluded translation models.",
+  "tests/unit/config.test.ts": "Made the cold-workspace model-source assertion truthful because Task 3 excludes bundled model weights.",
+  "tsconfig.json": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract.",
+};
 
 export type ImportClassification = "reused" | "modified-for-adtc";
 
@@ -59,6 +73,8 @@ export interface ImportEntry {
   originalCreatedAt: string;
   classification: ImportClassification;
   purpose: string;
+  destinationSha256?: string;
+  modification?: { status: "pending-adaptation" | "modified"; reason: string };
 }
 
 export interface ImportManifest {
@@ -74,6 +90,30 @@ export interface ImportManifest {
   imports: ImportEntry[];
   adtcNewFiles: Array<{ path: string; classification: "adtc-new"; purpose: string }>;
   thirdPartyDependencies: Array<{ name: string; classification: "third-party"; basis: string; unresolvedRisk: string }>;
+}
+
+export interface CompletedImportManifest extends Omit<ImportManifest, "kind" | "applicationImported" | "imports"> {
+  kind: "completed-import";
+  applicationImported: true;
+  imports: ImportEntry[];
+}
+
+export type ImportManifestDocument = ImportManifest | CompletedImportManifest;
+
+export function completeImportManifest(repositoryPath = DEFAULT_SOURCE_REPOSITORY_PATH): CompletedImportManifest {
+  const manifest = buildImportManifest(repositoryPath);
+  const imports = manifest.imports.map((entry) => {
+    const destinationSha256 = createHash("sha256").update(readFileSync(entry.destinationPath)).digest("hex");
+    if (entry.classification === "reused") {
+      if (destinationSha256 !== entry.sourceSha256) throw new Error(`Reused destination differs from source: ${entry.destinationPath}`);
+      return { ...entry, destinationSha256 };
+    }
+    const reason = MODIFICATION_REASONS[entry.destinationPath];
+    if (!reason) throw new Error(`Missing modification reason: ${entry.destinationPath}`);
+    const status = destinationSha256 === entry.sourceSha256 ? "pending-adaptation" as const : "modified" as const;
+    return { ...entry, destinationSha256, modification: { status, reason } };
+  });
+  return { ...manifest, kind: "completed-import", applicationImported: true, imports };
 }
 
 function git(repositoryPath: string, args: string[]): Buffer {
@@ -145,7 +185,9 @@ export function buildImportManifest(repositoryPath = DEFAULT_SOURCE_REPOSITORY_P
 
 const invokedPath = process.argv[1];
 if (invokedPath && import.meta.url === pathToFileURL(invokedPath).href) {
-  const outputPath = process.argv[2] ?? "config/import-manifest.json";
-  writeFileSync(outputPath, `${JSON.stringify(buildImportManifest(), null, 2)}\n`);
-  process.stdout.write(`Wrote ${PLANNED_SOURCE_PATHS.length} planned imports to ${outputPath}\n`);
+  const completed = process.argv.includes("--complete");
+  const outputPath = process.argv.slice(2).find((arg) => !arg.startsWith("--")) ?? "config/import-manifest.json";
+  const manifest = completed ? completeImportManifest() : buildImportManifest();
+  writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  process.stdout.write(`Wrote ${PLANNED_SOURCE_PATHS.length} ${completed ? "completed" : "planned"} imports to ${outputPath}\n`);
 }

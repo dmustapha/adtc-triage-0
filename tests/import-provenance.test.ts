@@ -127,6 +127,44 @@ test("each planned hash is computed from the pinned Git blob", () => {
   }
 });
 
+test("English text baseline has no runtime dependency on excluded modalities", () => {
+  const runtimeFiles = [
+    "src/qvac/engine.ts",
+    "src/server.ts",
+    "src/triage/triage.ts",
+  ];
+
+  for (const path of runtimeFiles) {
+    const source = readFileSync(path, "utf8");
+    assert.doesNotMatch(source, /(?:audio|translation)\.js/, path);
+  }
+
+  const server = readFileSync("src/server.ts", "utf8");
+  assert.doesNotMatch(server, /app\.post\("\/(?:transcribe|tts)"/, "excluded routes must not be registered");
+});
+
+test("completed import ledger proves destination parity or records ADTC modification", () => {
+  const manifest = JSON.parse(readFileSync("config/import-manifest.json", "utf8"));
+
+  assert.equal(manifest.applicationImported, true, "application import must be recorded complete");
+  for (const entry of manifest.imports) {
+    const destinationBytes = readFileSync(entry.destinationPath);
+    const destinationSha256 = createHash("sha256").update(destinationBytes).digest("hex");
+
+    assert.equal(entry.destinationSha256, destinationSha256, entry.destinationPath);
+    if (entry.classification === "reused") {
+      assert.equal(destinationSha256, entry.sourceSha256, entry.destinationPath);
+      continue;
+    }
+
+    assert.ok(entry.modification?.reason, `${entry.destinationPath} requires a modification reason`);
+    assert.ok(
+      ["pending-adaptation", "modified"].includes(entry.modification?.status),
+      `${entry.destinationPath} requires a valid modification status`,
+    );
+  }
+});
+
 test("verifier rejects a path absent from the pinned source tree", () => {
   const manifest = buildImportManifest(TRIAGE_REPOSITORY);
   manifest.imports[0] = {
@@ -168,7 +206,8 @@ test("disclosures preserve Apache-2.0 notice, prior submission, and unresolved r
   const schema = JSON.parse(readFileSync("config/import-manifest.schema.json", "utf8"));
   const disclosure = readFileSync("PROVENANCE.md", "utf8");
 
-  assert.equal(provenance.applicationImported, false);
+  assert.equal(provenance.applicationImported, true);
+  assert.equal(provenance.status, "application-imported");
   assert.match(provenance.priorWorkDisclosure, /QVAC hackathon/i);
   assert.match(provenance.apacheNotice, /Apache License, Version 2\.0/);
   assert.match(disclosure, /QVAC hackathon/i);
@@ -186,7 +225,8 @@ test("disclosures preserve Apache-2.0 notice, prior submission, and unresolved r
   assert.equal(licenseDecision.assurances.organizerEligibilityCertainty, false);
   assert.match(licenseDecision.upstreamDataCaveats.genesisIAndII, /CC-BY-NC/i);
   assert.match(licenseDecision.modelCardUseWording, /research|educational/i);
-  assert.equal(schema.properties.applicationImported.const, false);
+  assert.deepEqual(schema.properties.kind.enum, ["pre-import-plan", "completed-import"]);
+  assert.equal(schema.properties.applicationImported.type, "boolean");
 });
 
 test("complete manifest verifies against the immutable source", () => {

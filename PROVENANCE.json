@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "status": "pre-import-planned",
-  "applicationImported": false,
+  "status": "application-imported",
+  "applicationImported": true,
   "fileLedger": "config/import-manifest.json",
   "fileLedgerSchema": "config/import-manifest.schema.json",
   "sourceRepository": "https://github.com/dmustapha/triage-0",

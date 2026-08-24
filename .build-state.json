@@ -1,11 +1,11 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "shared-medpsy-healthcare-recovery",
-  "currentStep": "3",
-  "currentSubStep": "exact-baseline-import-tdd",
-  "status": "in-progress",
+  "currentStep": "4",
+  "currentSubStep": "canonical-medpsy-parity-not-started",
+  "status": "in_progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -56,6 +56,30 @@
       "started_at": "2026-08-24T05:58:35Z",
       "completed_at": "2026-08-24T06:25:16Z",
       "evidence": "PASS: 76 planned imports verify against exact Git objects at 74424721; 42/42 full tests and strict TypeScript pass; applicationImported=false"
+    },
+    {
+      "phase": "exact-baseline-import",
+      "started_at": "2026-08-24T09:44:00Z",
+      "completed_at": "2026-08-24T10:06:00Z",
+      "evidence": "BLOCKED: 76/76 destinations present (73 exact, 3 declared package/config changes), but three npm install attempts exhausted disk with ENOSPC; completion flags remain false and GREEN verification was not run"
+    },
+    {
+      "phase": "exact-baseline-import-external-retry-1",
+      "started_at": "2026-08-24T10:10:51Z",
+      "completed_at": "2026-08-24T10:12:05Z",
+      "evidence": "BLOCKED: read-only capacity audit found 2,586,812 KiB free, no project node_modules, and 1,315,396 KiB npm cache; prior clean attempt failed after starting near 3.0 GiB free, so no safe full install was launched"
+    },
+    {
+      "phase": "exact-baseline-import-external-retry-2",
+      "started_at": "2026-08-24T10:49:00Z",
+      "completed_at": "2026-08-24T11:06:52Z",
+      "evidence": "BLOCKED: sole full npm install exited 1 with registry EIDLETIMEOUT while about 50 GiB remained; lock stayed stale, direct dependencies remained missing, and all completion flags stayed false"
+    },
+    {
+      "phase": "exact-baseline-import-authorized-install-retry",
+      "started_at": "2026-08-24T12:06:12Z",
+      "completed_at": "2026-08-24T13:33:00Z",
+      "evidence": "PASS: one authorized full npm install completed; 76/76 immutable Git-object imports verified (64 reused exact, 12 modified-for-ADTC); focused 9/9, full 179 total/155 pass/0 fail/24 skip, typecheck, manifest, JSON, diff, and no-weight gates pass"
     }
   ],
   "fileGroups": {
@@ -67,10 +91,16 @@
     "1.3-attempt-4-producer-freeze": {"files": ["tests/finalist-producers.test.ts", "config/model-finalists.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "config/replacement-lineage-sources.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json", "scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", ".github/workflows/olmo2-7b-recovery-evidence.yml", "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"], "written": true, "verified": true},
     "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true},
     "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json", "evidence/finalists/phase1-contract-v1/revision-status.json", "evidence/remote-run-32684188985/independent-calibration-review.json", "evidence/remote-run-32684188985/raw/calibration.jsonl", "evidence/remote-run-32684188985/calibration-evaluation.json"], "written": true, "verified": true},
-    "2-legal-provenance": {"files": ["PROVENANCE.md", "PROVENANCE.json", "config/import-manifest.schema.json", "config/import-manifest.json", "config/model-license-decision.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json"], "written": true, "verified": true}
+    "2-legal-provenance": {"files": ["PROVENANCE.md", "PROVENANCE.json", "config/import-manifest.schema.json", "config/import-manifest.json", "config/model-license-decision.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json"], "written": true, "verified": true},
+    "3-exact-baseline-import": {"files": ["PROVENANCE.json", "config/import-manifest.json", "config/import-manifest.schema.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json", "package-lock.json", "tsconfig.json", "src", "public", "data", "tests/unit", "tests/integration"], "written": true, "verified": true}
   },
-  "deviations": [],
-  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification", "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening"},
+  "deviations": [
+    {"step": "3", "id": "DEV-001", "description": "Dependency installation could not complete because the host filesystem exhausted free space", "reason": "The merged QVAC dependency graph plus npm extraction/cache exceeded available disk during three bounded attempts", "class": "UNTESTED", "impact": "Task 3 typecheck, full tests, lock reconciliation, and completion-ledger GREEN remain unverified"},
+    {"step": "3", "id": "DEV-002", "description": "Two overlapping npm install processes were launched during the first attempt", "reason": "Implementation-worker execution error", "class": "UNTESTED", "impact": "Increased disk pressure; no source, evidence, or model artifact was changed"},
+    {"step": "3", "id": "DEV-003", "description": "The stalled third npm install was terminated after repeated ENOSPC warnings", "reason": "Implementation-worker judgment error while disk free space approached exhaustion", "class": "UNTESTED", "impact": "Exit 143; no successful dependency install or downstream verification"}
+    ,{"step": "3", "id": "DEV-004", "description": "The sole final-retry dependency install exited with npm registry EIDLETIMEOUT", "reason": "registry.npmjs.org connection became idle while downloading large QVAC transitive artifacts", "class": "UNTESTED", "impact": "Dependency tree and lockfile remain incomplete; focused/full tests, typecheck, manifest GREEN, Task 3 commit, and Task 4 are blocked"}
+  ],
+  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification", "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening", "exact-baseline-import": "subagent implementation; orchestrator independently verified all final gates and owns the narrow commit"},
   "contractAddresses": {},
   "env": {},
   "devPort": 3000,
@@ -126,10 +156,30 @@
     ,{"command": "npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean after legal/provenance recovery"}
     ,{"command": "npm run verify-import-manifest", "exitCode": 0, "result": "76 planned imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
     ,{"command": "JSON/diff/no-weight boundary", "exitCode": 0, "result": "all new JSON parses; diff check clean; no tracked GGUF or partial file"}
+    ,{"command": "Task 3 focused provenance RED", "exitCode": 1, "result": "8 tests, 7 pass, 1 expected fail: application import completion remains false"}
+    ,{"command": "Task 3 independent pinned-object parity audit", "exitCode": 0, "result": "76 total; 73 exact; 3 declared package/config changes; 0 missing; 60 reused exact; 13 modified-for-ADTC pending adaptations exact"}
+    ,{"command": "npm install attempts 1-2", "exitCode": 1, "result": "TAR_ENTRY_ERROR ENOSPC during dependency extraction; no completed dependency tree"}
+    ,{"command": "npm install --no-audit --no-fund attempt 3", "exitCode": 143, "result": "repeated TAR_ENTRY_ERROR ENOSPC, then implementation worker terminated stalled process; no GREEN verification"}
+    ,{"command": "Task 3 JSON/diff/no-weight boundary", "exitCode": 0, "result": "JSON_OK; DIFF_CHECK_OK; no tracked GGUF, partial, or private release key"}
+    ,{"command": "External retry 1 read-only disk/dependency audit", "exitCode": 0, "result": "df: 2,586,812 KiB free; node_modules absent; npm cache 1,315,396 KiB; package has 5 runtime and 6 dev dependencies while current lock root is stale at 0 runtime and 3 dev dependencies"}
+    ,{"command": "External retry 2 npm install", "exitCode": 1, "result": "EIDLETIMEOUT: idle timeout for registry.npmjs.org:443; about 50 GiB free, so not ENOSPC; exactly one install launched"}
+    ,{"command": "External retry 2 focused provenance command", "exitCode": 1, "result": "1 loader-level test, 0 pass, 1 fail, 0 skipped, 0 todo; ERR_MODULE_NOT_FOUND for tsx"}
+    ,{"command": "External retry 2 npm test", "exitCode": 1, "result": "25 loader-level tests, 0 pass, 25 fail, 0 skipped, 0 todo; no test body executed because tsx was absent"}
+    ,{"command": "External retry 2 npm run typecheck", "exitCode": 2, "result": "TS2688: cannot find type definition file for node"}
+    ,{"command": "External retry 2 npm run verify-import-manifest", "exitCode": 127, "result": "tsx: command not found"}
+    ,{"command": "External retry 2 static boundaries", "exitCode": 0, "result": "all required JSON parses; 76 total/73 exact/3 changed/0 missing; git diff check clean; no tracked GGUF, partial, or private key"}
+    ,{"command": "External retry 2 npm ls --depth=0", "exitCode": 1, "result": "ELSPROBLEMS: all 11 direct runtime/development dependencies missing; node_modules absent at final independent audit"}
+    ,{"command": "authorized clean npm install", "exitCode": 0, "result": "320 packages added; 321 audited; 0 vulnerabilities; no second install launched"}
+    ,{"command": "Task 3 focused provenance GREEN", "exitCode": 0, "result": "9 tests, 9 pass, 0 fail, 0 skipped, 0 todo"}
+    ,{"command": "Task 3 npm test", "exitCode": 0, "result": "179 tests, 155 pass, 0 fail, 24 environment-dependent skips, 0 todo"}
+    ,{"command": "Task 3 npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean"}
+    ,{"command": "Task 3 npm run verify-import-manifest", "exitCode": 0, "result": "76 completed imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
+    ,{"command": "Task 3 independent immutable parity", "exitCode": 0, "result": "76 total; 64 reused exact; 12 modified-for-ADTC with precise reasons and destination hashes; 0 pending; 0 errors"}
+    ,{"command": "Task 3 JSON/diff/no-weight/no-partial boundaries", "exitCode": 0, "result": "required JSON parses; git diff check clean; no tracked GGUF, partial, or private key"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T06:25:16Z",
+  "timestamp": "2026-08-24T13:33:00Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -157,8 +207,14 @@
     "Ran authoritative GitHub Actions workflow 32669387576 and independently verified all 100 rows, exact command flags, artifact hashes, and absence of model weights.",
     "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work."
     ,"Formalized an isolated product-contract-v1 revision namespace: bounded extraction only, fenced untrusted input, strict validation, deterministic safety ownership, disjoint calibration, untouched 100-case evaluation, unresolved human/physical gates, and frozen attempt-4 hashes."
+    ,"Verified all 76 approved Task 3 destinations against immutable Git objects: 73 exact, 3 declared package/config changes, 0 missing."
+    ,"Tried three bounded dependency installs, including recoverable cache and partial generated node_modules cleanup; every install exhausted disk, and the final stalled process exited 143 after termination."
+    ,"Removed only the partial untracked generated node_modules tree after the blocked attempt, restoring approximately 2.5 GiB free; no source, evidence, model, or history path was deleted."
+    ,"External retry 1 performed read-only df/du and dependency-contract inspection only; node_modules was absent, no cache or unrelated path was removed, and no install was launched."
+    ,"After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining."
+    ,"Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute."
   ],
-  "what_is_needed": "Complete legal/provenance recovery before importing application files. Phase 2 still requires fresh MedPsy evidence, named human review, physical target-hardware proof, and a truthful signed model decision.",
+  "what_is_needed": "Begin approved Task 4 canonical MedPsy parity only. Use the frozen qvac/MedPsy-1.7B-GGUF revision and exact file/hash; do not retain weights or enter Phase 2 without a truthful signed decision.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",
@@ -171,7 +227,10 @@
     "evidence_namespace": "evidence/medpsy-shared-runtime-v1",
     "legal_provenance_status": "complete",
     "planned_import_count": 76,
-    "application_imported": false,
+    "import_status": "complete",
+    "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
+    "import_resume_hint": "Task 3 is complete and verified. Resume at Task 4 canonical MedPsy parity; preserve exact source provenance and no-weight boundaries.",
+    "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,
     "phase_2_authorized": false,
