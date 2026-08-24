@@ -20,7 +20,9 @@
     "generate-provenance": "tsx scripts/generate-provenance.ts",
     "sign-provenance": "tsx scripts/sign-provenance.ts",
     "aggregate-physical": "tsx scripts/aggregate-physical-release.ts",
-    "seed-demo": "tsx scripts/seed-demo.ts"
+    "seed-demo": "tsx scripts/seed-demo.ts",
+    "build-import-manifest": "tsx scripts/build-import-manifest.ts",
+    "verify-import-manifest": "tsx scripts/verify-import-manifest.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

@@ -243,3 +243,43 @@ An independent diagnostic removed only the terminal sentinel while preserving th
 The model invented present danger observations in routine, outside-scope, invalid, mimic, and injection calibration cases. This semantic failure is independent of the sentinel defect and rejects the product-contract revision. No untouched evaluation, two-person human review, physical target-laptop gate, signed model decision, model search, Phase 2, or UI work was performed.
 
 Raw calibration SHA-256 is `c61508ea75e3cdb0938740dc8dbcb642d1e302d97d6e386f9f6953b7dfc9c406`. Frozen evaluator SHA-256 is `953dc0f64e53fb924b10195cf3307f9d897ad132454643c78020b4a697141020`. Independent review is `evidence/remote-run-32684188985/independent-calibration-review.json`.
+
+## Shared-MedPsy Healthcare Recovery: Legal and Provenance Gate
+
+The user-authorized recovery supersedes the clean-build implementation instruction while preserving every prior result above. No application file or model weight was imported during this gate.
+
+The pre-import ledger now freezes 76 source objects from public Triage-0 commit `74424721bc75f564808eacce42d7f7f42676ae0f`. Each row records the Git object, SHA-256, creation timestamp, destination, classification, and purpose. The source `LICENSE` is mapped to `docs/licenses/TRIAGE-0-APACHE-2.0.txt` for import with the application.
+
+The model-license decision records the publisher-declared Apache-2.0 weight license, public anonymous artifact, research/educational wording, Genesis I/II CC-BY-NC caveat, incomplete exhaustive lineage, and the supervised early-PoC boundary. It does not claim legal certainty, organizer eligibility certainty, completed source-rights review, completed clinical review, or a signed model decision.
+
+### TDD and independent verification
+
+```text
+RED: node --import tsx --test tests/import-provenance.test.ts
+exit 1: ERR_MODULE_NOT_FOUND for scripts/build-import-manifest.js
+
+HARDENING RED: verifier rejects an incomplete planned import set
+exit 1: Missing expected exception
+
+GREEN: node --import tsx --test tests/import-provenance.test.ts
+tests 7
+pass 7
+fail 0
+
+npm run verify-import-manifest
+Verified 76 planned imports from 74424721bc75f564808eacce42d7f7f42676ae0f
+
+npm test
+tests 42
+pass 42
+fail 0
+
+npm run typecheck
+> tsc --noEmit
+
+STATIC_BOUNDARY_OK
+```
+
+### Gate result
+
+**PASS for exact-baseline import.** `applicationImported=false` remains true at this boundary. Source-rights, clinical, human, physical-hardware, QVAC Ubuntu, publication, and final model-decision gates remain open and cannot be inferred from this pass.

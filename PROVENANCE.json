@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "status": "pre-import-planned",
+  "applicationImported": false,
+  "fileLedger": "config/import-manifest.json",
+  "fileLedgerSchema": "config/import-manifest.schema.json",
+  "sourceRepository": "https://github.com/dmustapha/triage-0",
+  "sourceCommit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+  "sourceLicense": "Apache-2.0",
+  "apacheNotice": "Reused Triage-0 material remains subject to the Apache License, Version 2.0; retain its copyright, license, and NOTICE obligations.",
+  "priorWorkDisclosure": "Triage-0 previously appeared as a non-commercial proof of concept in the June 2026 QVAC hackathon. This ADTC submission transparently reuses only the files enumerated in the pinned ledger.",
+  "adtcWorkDisclosure": "ADTC work adds the official template contract, a single checksum-locked GGUF shared across disclosed runtimes, direct llama.cpp profiling, x86 evidence contracts, constrained-hardware optimization, reproducible packaging, and ADTC-specific evaluation.",
+  "reviews": {
+    "clinical": { "completed": false, "required": true },
+    "sourceRights": { "completed": false, "required": true },
+    "organizerEligibility": { "confirmed": false, "certaintyClaimed": false }
+  },
+  "modelLicenseDecision": "config/model-license-decision.json",
+  "claims": {
+    "builtEntirelyFromScratchForAdtc": false,
+    "legalCertainty": false,
+    "organizerEligibilityCertainty": false,
+    "validatedLanguage": "English",
+    "autonomousDiagnosis": false
+  }
+}

@@ -1,0 +1,806 @@
+{
+  "schemaVersion": 1,
+  "kind": "pre-import-plan",
+  "applicationImported": false,
+  "preparedAt": "2026-08-24T00:00:00.000Z",
+  "reviewedBy": "conductor-authorized automated provenance contract",
+  "source": {
+    "repository": "https://github.com/dmustapha/triage-0",
+    "localObjectStore": "/Users/MAC/triage-0",
+    "commit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+    "license": "Apache-2.0"
+  },
+  "scope": {
+    "included": [
+      "English text workflow",
+      "local RAG",
+      "deterministic clinical controls",
+      "localhost UI/assets",
+      "required tests and quality records",
+      "package, ingestion, and SDK patch inputs"
+    ],
+    "excluded": [
+      "speech-to-text",
+      "text-to-speech",
+      "translation",
+      "cloud deployment",
+      "demo/screenshots",
+      "mutable performance logs",
+      "model weights"
+    ]
+  },
+  "notices": {
+    "apache20": "Reused Triage-0 material remains subject to the Apache License, Version 2.0; retain its copyright, license, and NOTICE obligations.",
+    "priorHackathon": "Triage-0 previously appeared as a non-commercial proof of concept in the June 2026 QVAC hackathon."
+  },
+  "reviews": {
+    "sourceRights": {
+      "completed": false,
+      "required": true
+    },
+    "clinical": {
+      "completed": false,
+      "required": true
+    }
+  },
+  "imports": [
+    {
+      "sourcePath": "LICENSE",
+      "destinationPath": "docs/licenses/TRIAGE-0-APACHE-2.0.txt",
+      "sourceGitObject": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+      "sourceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "data/protocols/README.md",
+      "destinationPath": "data/protocols/README.md",
+      "sourceGitObject": "9b2c1ee0992b89e7950f963a7ff803542bf68562",
+      "sourceSha256": "3015554641ab746342cb2bcc9c08aa1f59909e01c11412c37399b4d8c3a55a42",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "data/rag/dose-tables.txt",
+      "destinationPath": "data/rag/dose-tables.txt",
+      "sourceGitObject": "059d4a8bc711debbc1675c27eb7c9ea1b474f0f3",
+      "sourceSha256": "6a2d590e7ec2e2be1eea55633396c00d71c3032f2ead83f05b295cd77978c8fd",
+      "originalCreatedAt": "2026-06-21T21:06:46+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "package-lock.json",
+      "destinationPath": "package-lock.json",
+      "sourceGitObject": "1657f86c50981da3979506fdd39e5404ab8135b9",
+      "sourceSha256": "211a7da1ddddba9dd82d8aa667054254103ae52d24b9e2ada9aea7b4aefb00e0",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "package.json",
+      "destinationPath": "package.json",
+      "sourceGitObject": "23a463a610a104a5958dbd942b892b4dbf2c1197",
+      "sourceSha256": "7e17c62f9a57f6fd450bac3b67ddf3990b7cdefc550f1a1a46a0818e10ca96c9",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "public/app.html",
+      "destinationPath": "public/app.html",
+      "sourceGitObject": "deab61457f09dc3d785dbe68f97dc6667fd2e8b1",
+      "sourceSha256": "9e9e07262d0d39ea9750af7ef36bd7a380d69740b034d75cf8873042b48c9ecc",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "public/apple-touch-icon.png",
+      "destinationPath": "public/apple-touch-icon.png",
+      "sourceGitObject": "a3d27c3819f630aea4ebc360ea3824cb58614557",
+      "sourceSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/css/app.css",
+      "destinationPath": "public/assets/css/app.css",
+      "sourceGitObject": "19c00b7ef3837c8e0f833167b4aff44469bdf786",
+      "sourceSha256": "6d6fa0ef915a636065b10f7f560211c1158978815f9cb445ac7dfe6b7ee76fa8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/css/base.css",
+      "destinationPath": "public/assets/css/base.css",
+      "sourceGitObject": "45ea96190273a667fa5b7385236a07a1605ea391",
+      "sourceSha256": "c4622777ee144687d57644e1fc76bba386ef37e417646973a34c4c1f776e35ec",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/css/fonts.css",
+      "destinationPath": "public/assets/css/fonts.css",
+      "sourceGitObject": "1fca882d4747a2eda8b54f88911d49b933c76679",
+      "sourceSha256": "8abff9c97d4997a6d0e9a9c9f7401cdf22c01ce6f7e00fc05e0cb7d96554dc85",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/css/landing.css",
+      "destinationPath": "public/assets/css/landing.css",
+      "sourceGitObject": "c07befc529471842aca638e3a68cfca5416230ce",
+      "sourceSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/css/tokens.css",
+      "destinationPath": "public/assets/css/tokens.css",
+      "sourceGitObject": "756c96fc2aaca8a8dd5cc2c5d58169212721129e",
+      "sourceSha256": "c3e7f7985c968f7aba8a8c240739ebf47d40ece09798cb4233ce11edb78268e2",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/bricolagegrotesque-704ed999.woff2",
+      "destinationPath": "public/assets/fonts/bricolagegrotesque-704ed999.woff2",
+      "sourceGitObject": "73967db90a38322bf1e6656b5d5c53115156ae45",
+      "sourceSha256": "a22c997a894377f36d81c904163e0c05fbbcd32f0ca2e7beedb86b39be1296a1",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/bricolagegrotesque-a24a0e4a.woff2",
+      "destinationPath": "public/assets/fonts/bricolagegrotesque-a24a0e4a.woff2",
+      "sourceGitObject": "6e6fa43982d2244101386150ae8ce54b9dfdae7c",
+      "sourceSha256": "ea16948d4a91b77221f119ad27d4ac7a7581c98cf990712047f89a531a49ef28",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/bricolagegrotesque-b2c054fd.woff2",
+      "destinationPath": "public/assets/fonts/bricolagegrotesque-b2c054fd.woff2",
+      "sourceGitObject": "86d4f45d11720f42d0ad039a5a4635d1b98b408f",
+      "sourceSha256": "4fd48b2c1ab27220e71f15f990550261b35245c3bdfd8d8025b4bdac0459ee2d",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/hankengrotesk-2f1d024a.woff2",
+      "destinationPath": "public/assets/fonts/hankengrotesk-2f1d024a.woff2",
+      "sourceGitObject": "2a836262678ff925e0e924450eac69e5cf207b62",
+      "sourceSha256": "2f52020a90793104e4178b0ae3ccd30eea28cac27e0fea8fcf4f246151777f74",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/hankengrotesk-5cebb0b5.woff2",
+      "destinationPath": "public/assets/fonts/hankengrotesk-5cebb0b5.woff2",
+      "sourceGitObject": "e71775f99dc5483d710cb0650a8d61188c16b968",
+      "sourceSha256": "1f21c6eaa0000f3329cfcfac966b43d5bebf5aa610303e33294ac31bc6f4bb59",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/hankengrotesk-8ad2d398.woff2",
+      "destinationPath": "public/assets/fonts/hankengrotesk-8ad2d398.woff2",
+      "sourceGitObject": "404fa659473ce2b290bebba07d2006c257293b01",
+      "sourceSha256": "a1376a563717f1efa2f5286ab23da2b61ae8dec827a77b97adfa01cad4ec4ee2",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/fonts/hankengrotesk-b0a9ff2a.woff2",
+      "destinationPath": "public/assets/fonts/hankengrotesk-b0a9ff2a.woff2",
+      "sourceGitObject": "21cdbd276f1e45ebf2364dd17cc021c21588ca6b",
+      "sourceSha256": "2f467719b2167cc4778b5780a2fb42fadf5203b29d0fb5f1482bbab32b1b7999",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/img/apple-touch-icon.png",
+      "destinationPath": "public/assets/img/apple-touch-icon.png",
+      "sourceGitObject": "a3d27c3819f630aea4ebc360ea3824cb58614557",
+      "sourceSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/img/favicon-32.png",
+      "destinationPath": "public/assets/img/favicon-32.png",
+      "sourceGitObject": "5738d72280e7169f1c9c97552b01ba3e5bba0447",
+      "sourceSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/img/favicon.ico",
+      "destinationPath": "public/assets/img/favicon.ico",
+      "sourceGitObject": "1c1111b232e5a29b22927f3e990e40a37745cbdb",
+      "sourceSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/img/favicon.svg",
+      "destinationPath": "public/assets/img/favicon.svg",
+      "sourceGitObject": "6ccce0804d102cd960bdea70753617b70dad0664",
+      "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/img/logo.svg",
+      "destinationPath": "public/assets/img/logo.svg",
+      "sourceGitObject": "6ccce0804d102cd960bdea70753617b70dad0664",
+      "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/js/net.js",
+      "destinationPath": "public/assets/js/net.js",
+      "sourceGitObject": "59f00a4122d2eb701270bf5ef374e73c48e2cec3",
+      "sourceSha256": "3ea27bcbd30dd85348cd0b9d296b5261fe11d7addef6675a7716b0e532cc49e0",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/assets/js/triage.js",
+      "destinationPath": "public/assets/js/triage.js",
+      "sourceGitObject": "d56cd16d96166c771ea56f7cb814c0dd8b5c8e63",
+      "sourceSha256": "9e87896b83e001173ba32448c34b27a58a7ff8a1d5f09aa92d864b42edafdca1",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "public/favicon-16.png",
+      "destinationPath": "public/favicon-16.png",
+      "sourceGitObject": "f8f4656bebcb04e5de290ec63817e740595b6fbb",
+      "sourceSha256": "0f899afd9f0fb17a329a7b9e8e3078dbd9177238b751d9b13500840bfd3b4111",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/favicon-32.png",
+      "destinationPath": "public/favicon-32.png",
+      "sourceGitObject": "5738d72280e7169f1c9c97552b01ba3e5bba0447",
+      "sourceSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/favicon-48.png",
+      "destinationPath": "public/favicon-48.png",
+      "sourceGitObject": "f88886262a170c516ec82ef16c2aca9faea274d6",
+      "sourceSha256": "521cd1d988e4f4ee5b0d5e71ce37908075f4036f4920f36ef8a3331264c2a0cb",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/favicon.ico",
+      "destinationPath": "public/favicon.ico",
+      "sourceGitObject": "1c1111b232e5a29b22927f3e990e40a37745cbdb",
+      "sourceSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/favicon.svg",
+      "destinationPath": "public/favicon.svg",
+      "sourceGitObject": "6ccce0804d102cd960bdea70753617b70dad0664",
+      "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/index.html",
+      "destinationPath": "public/index.html",
+      "sourceGitObject": "00ae6e548f1b9cae6b82e6cf5afba0324079ceff",
+      "sourceSha256": "dc91b946d5905417c1383c0178606b7b86bffc82ccbe73061b876c8b7e849faf",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/logo.png",
+      "destinationPath": "public/logo.png",
+      "sourceGitObject": "e9e178b52b497e39c44502543774732e7940cf8c",
+      "sourceSha256": "bf8e70cedc19b6eba9457e470389e76185efff28be02b6f842f2dd86b772fb3e",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "public/logo.svg",
+      "destinationPath": "public/logo.svg",
+      "sourceGitObject": "6ccce0804d102cd960bdea70753617b70dad0664",
+      "sourceSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8",
+      "originalCreatedAt": "2026-06-23T12:18:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "scripts/audit-cases.ts",
+      "destinationPath": "scripts/audit-cases.ts",
+      "sourceGitObject": "7b1c59f5745c80d9e260a94c8b0892a72742c0e2",
+      "sourceSha256": "1e1103531f46731aff8d9ee27fdbc1deb94706c4f3239276bda4ff8908585b49",
+      "originalCreatedAt": "2026-07-18T20:28:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "scripts/clinical-audit.ts",
+      "destinationPath": "scripts/clinical-audit.ts",
+      "sourceGitObject": "844b970a7efbbe0ddd52240cbaf7806b0e13cb30",
+      "sourceSha256": "fa2e8080a32be48eecd35b0c81f65d98bb03730d1a7476ed15584c4b43940b58",
+      "originalCreatedAt": "2026-07-14T06:52:44+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "scripts/ingest-protocols.ts",
+      "destinationPath": "scripts/ingest-protocols.ts",
+      "sourceGitObject": "fc6f71b31523b9c3eea71ca68a421414435a4804",
+      "sourceSha256": "a599cc690d51036b486b154ba32eb28657f791886450a029f2bbc08a674da1e8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "scripts/patch-sdk-zod.mjs",
+      "destinationPath": "scripts/patch-sdk-zod.mjs",
+      "sourceGitObject": "7a843cdfa5cd0f90f0e87bbd3a4e114186f45756",
+      "sourceSha256": "c77e515a2ecaf81d65c5a6ab5eb23291e407bb7a9d75435483c1887ff9cc56da",
+      "originalCreatedAt": "2026-07-12T21:31:17+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/config.ts",
+      "destinationPath": "src/config.ts",
+      "sourceGitObject": "5905660c5538c7f900e44b796dfc47a6e318170f",
+      "sourceSha256": "dc12657a984d90c406e8e63ff8f7b55f45d21578143825ec28f533bba43baced",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "src/qvac/egress-guard.ts",
+      "destinationPath": "src/qvac/egress-guard.ts",
+      "sourceGitObject": "0bf6d88571139c664e44083949ba9d1e341c8d97",
+      "sourceSha256": "0f9ca14c19055c397b362c52165e832b1802d118d3bf2a396616556afe7fe9fa",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/qvac/engine.ts",
+      "destinationPath": "src/qvac/engine.ts",
+      "sourceGitObject": "cf10091fb2c3e12bb2c121b5c9b2694cc12b5063",
+      "sourceSha256": "837791092604a40cc498a8c02dc46e0fb014797debda56f81c07116e9e1a435a",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "src/qvac/orchestrator.ts",
+      "destinationPath": "src/qvac/orchestrator.ts",
+      "sourceGitObject": "458f0b073087387c096d1c0b9023f118ae84dc7a",
+      "sourceSha256": "fc7d026c53c462a6593ef2a9d0401c843a348d6242cdf5ec076a13f7393bcce8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "src/qvac/perf-logger.ts",
+      "destinationPath": "src/qvac/perf-logger.ts",
+      "sourceGitObject": "87e26499ccd47dba5031b6f38b7fdc805ccdcd38",
+      "sourceSha256": "10266512457b969eb5b43e330a9fae97f045d700ecc58e0ce440e7cf0eec00e8",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/qvac/sdk.ts",
+      "destinationPath": "src/qvac/sdk.ts",
+      "sourceGitObject": "c076044370e462acb428e64f6974cba2da20cd94",
+      "sourceSha256": "0937c1f9a8974a3f76e2c9e982c007ecceff918673ea418596b805aa4cc80356",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/rag/ingest.ts",
+      "destinationPath": "src/rag/ingest.ts",
+      "sourceGitObject": "aabe2e44023efe1bf70fa2233b47d39b44573941",
+      "sourceSha256": "3d64d38b6983c8c49c7d843adc348b463927750791cd46fe9b0262136e1adf1a",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/rag/store.ts",
+      "destinationPath": "src/rag/store.ts",
+      "sourceGitObject": "743aed3b1b2f896719a2661a543defebf3b7a3fb",
+      "sourceSha256": "96d9d5adce596c2edbba8f166d41816acd27f8633c4a60a91e7a14d42ae77700",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/server.ts",
+      "destinationPath": "src/server.ts",
+      "sourceGitObject": "288f09acfbd69b286cf9bf9abfaa97fa43d1c91d",
+      "sourceSha256": "e8a3594de6098dffe73fab80753f015e091a9375e845fc43d6e87ee1309959df",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "src/triage/class-router.ts",
+      "destinationPath": "src/triage/class-router.ts",
+      "sourceGitObject": "967e21b4a4db7a4ea15145e7c74e099800926267",
+      "sourceSha256": "2b39340f981a539969d2e573561dd6a803cd4e5cca74bf8d4f8a250dd5028c0c",
+      "originalCreatedAt": "2026-07-18T20:28:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/triage/protocol-table.ts",
+      "destinationPath": "src/triage/protocol-table.ts",
+      "sourceGitObject": "ac7183300b9dd273e430196f15cf8ff4b800e5da",
+      "sourceSha256": "bddeeb4245dc9af2f247e6a46a1a0b17ce6f514b0815862fd093149b345bc5f7",
+      "originalCreatedAt": "2026-06-21T18:50:48+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/triage/schema.ts",
+      "destinationPath": "src/triage/schema.ts",
+      "sourceGitObject": "02d8614e59cd4ee7b7c417eb644426ba77ddb980",
+      "sourceSha256": "cc030a671d0b27b26a5c32be68216dd428911de016926563d8da75358b36d3d4",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/triage/severity.ts",
+      "destinationPath": "src/triage/severity.ts",
+      "sourceGitObject": "8c01c3158aa02fdba2490e77b5f557acdbc81f51",
+      "sourceSha256": "de18a009ffc9cfd49be8ea2e36fa5c131111eb51c44069844649428920799da7",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "src/triage/triage.ts",
+      "destinationPath": "src/triage/triage.ts",
+      "sourceGitObject": "8dbe40fa1da273736412787bde037d1b3183d27a",
+      "sourceSha256": "abf3e081b48cb0bdde9da17052e7ab1f6603ed0fbe4b3f11e9fc638f027fd078",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/integration/citation-integrity.test.ts",
+      "destinationPath": "tests/integration/citation-integrity.test.ts",
+      "sourceGitObject": "6dd3bd3220fadf6e98749eaf3502394950aecf71",
+      "sourceSha256": "caa64beeab5e9c9a18673898444f9d2af945c5decf1f33c70ec75a280412e1da",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/integration/grounding.test.ts",
+      "destinationPath": "tests/integration/grounding.test.ts",
+      "sourceGitObject": "36acc74a9f48fc6fdc4d12bf27a11bcf4ae43d96",
+      "sourceSha256": "227d2822c64443b3c5ec1efc6dcdfa1be54550957dc1c8913eb56fc50b0eb066",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/integration/http-validation.test.ts",
+      "destinationPath": "tests/integration/http-validation.test.ts",
+      "sourceGitObject": "174fad2ee7e0f6313c42ca0e19e4e51213f47067",
+      "sourceSha256": "7861d2a1b8bf34143b1b5e14dc80e9a2ea560f35d684fb52ab14a31081142123",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/integration/injection.test.ts",
+      "destinationPath": "tests/integration/injection.test.ts",
+      "sourceGitObject": "0d232bd90ba29d72e2515a11286f3699e987bbc4",
+      "sourceSha256": "ceb9dec45faaaefe328a7701fe253a218a41429b73f33c1be1abde0509429b3f",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/integration/offline-egress.test.ts",
+      "destinationPath": "tests/integration/offline-egress.test.ts",
+      "sourceGitObject": "d0e434b7eb6aaf83722b8b8e1a6c25a4b85e2b14",
+      "sourceSha256": "f318343ba94c2bf6afbfd293d7bc5e52c3b24982f3d0f7c268b21f06bdb10be5",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/integration/server.test.ts",
+      "destinationPath": "tests/integration/server.test.ts",
+      "sourceGitObject": "a5e0bb14ea2d09084bd4980d066b3408cecf2906",
+      "sourceSha256": "7e8bbdfed4b8e5fed7f8f8592f9329d6e4d1136129707ac30d8de98fa161b200",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/integration/sse-contract.test.ts",
+      "destinationPath": "tests/integration/sse-contract.test.ts",
+      "sourceGitObject": "67b0b95c63984bae2b9d4c98a2da7d9435f41fc0",
+      "sourceSha256": "80615566207a929e3ea87601640e8a74d46d5fa382873d3f72143a5a86954568",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/integration/triage.test.ts",
+      "destinationPath": "tests/integration/triage.test.ts",
+      "sourceGitObject": "3238d15a358b02a5e47e0838a37d2fc7ce6dc13e",
+      "sourceSha256": "f52009e42402e747b784b65d686bd0a62fa37494cb32764cbad7334273d34fbb",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/quality/results-after-failure.json",
+      "destinationPath": "tests/quality/results-after-failure.json",
+      "sourceGitObject": "79865cb6be516b50ec726cc0f2a65ce9aa15bfae",
+      "sourceSha256": "e48ada1e009dd3c7bdf759dbd7c76c42d443fd56e1b3f1954c37fe5b839fc52b",
+      "originalCreatedAt": "2026-07-14T06:52:44+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/quality/results-after-textbook.json",
+      "destinationPath": "tests/quality/results-after-textbook.json",
+      "sourceGitObject": "590c9e4d9600403219cb4687229c8c5880e1a0cf",
+      "sourceSha256": "a7d7840c348ebf028c15e4d05b7d88be3ce76899151bd2358f1f70875ce4e4b4",
+      "originalCreatedAt": "2026-07-14T06:52:44+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/quality/results-baseline-failure.json",
+      "destinationPath": "tests/quality/results-baseline-failure.json",
+      "sourceGitObject": "247f42c01fbcc9a76b5d4744b13458ff97f7eb55",
+      "sourceSha256": "e550ac0e9effb9179fb23016cbae335b5f71c9e5c2247b8f94719dc96d813575",
+      "originalCreatedAt": "2026-07-18T20:28:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/quality/results.json",
+      "destinationPath": "tests/quality/results.json",
+      "sourceGitObject": "24e0e9692e268b0ad12038dd69bacbbe7de333a2",
+      "sourceSha256": "e82d5b241c8d0b0c3545313964ec94f0b514c88c8994180eba598cebf368486e",
+      "originalCreatedAt": "2026-07-14T06:52:44+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/class-router.test.ts",
+      "destinationPath": "tests/unit/class-router.test.ts",
+      "sourceGitObject": "f779b0364039f6e92a69277f3cfc8707f440f792",
+      "sourceSha256": "92e17e01063d664da8d2c73424156e90af26923cf4c23e1ce887f73c4c18d3ef",
+      "originalCreatedAt": "2026-07-18T20:28:25+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/config.test.ts",
+      "destinationPath": "tests/unit/config.test.ts",
+      "sourceGitObject": "6bb870f58f4bb49d797f242d49895946e811e7e0",
+      "sourceSha256": "c7ddc5c52b7ec0121c1e2bbd4f45b7fc6885d44cb53531ec2f68f847649bea72",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/unit/egress-host.test.ts",
+      "destinationPath": "tests/unit/egress-host.test.ts",
+      "sourceGitObject": "6487f35286fbb805dd883f330b6fdb79d2f92dbe",
+      "sourceSha256": "e7ccd8b5007344a484be7a5d0c1812ef55d2e111dc016d2786fcada7d6a9198b",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/frontend.test.ts",
+      "destinationPath": "tests/unit/frontend.test.ts",
+      "sourceGitObject": "bc313832afe39bca122dec4d005dc0ea56b37bef",
+      "sourceSha256": "0141d566c16f45dc0720e01f63432e1475c43cca8c15eb29b2e8f6f0789687fe",
+      "originalCreatedAt": "2026-06-25T07:09:42+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    },
+    {
+      "sourcePath": "tests/unit/perf-csv.test.ts",
+      "destinationPath": "tests/unit/perf-csv.test.ts",
+      "sourceGitObject": "91ede7be7905aeedce50fe5661d52824eb506bfb",
+      "sourceSha256": "7fa3318110e18d14d98e1c4c4606b8378eca7d82167719e808f8b991acbad9ff",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/perf-logger.test.ts",
+      "destinationPath": "tests/unit/perf-logger.test.ts",
+      "sourceGitObject": "db16c0dfe684f8eb2570278393268fd559bf2baf",
+      "sourceSha256": "4ffd8fc84702726858fb456dc1d082c7f407c2a3461cec44cd08dcceff7366c5",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/protocol-table.test.ts",
+      "destinationPath": "tests/unit/protocol-table.test.ts",
+      "sourceGitObject": "7c35f5e2a37a86cd1d4361292fcd55f91cf7891c",
+      "sourceSha256": "f07c9629a0c7f24db4ec36f49d9685ba58b032caf340b4b221f0fcdc3ada0dec",
+      "originalCreatedAt": "2026-06-21T18:50:48+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/severity.test.ts",
+      "destinationPath": "tests/unit/severity.test.ts",
+      "sourceGitObject": "006559d5e2301d00a41684b87700a967808bd1ad",
+      "sourceSha256": "8d088337f7d56cc661149d0579218da8eee5862dc25e3453b6ff9217c64e6f0f",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/store-save.test.ts",
+      "destinationPath": "tests/unit/store-save.test.ts",
+      "sourceGitObject": "449a406ed4246ae39f6ae01136d61331c92ccdb0",
+      "sourceSha256": "8f551fa093afbac838e006ca6fb2c5a1e9b76ebb482217d9e6c7b170ab17111f",
+      "originalCreatedAt": "2026-06-21T05:15:06+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/store.test.ts",
+      "destinationPath": "tests/unit/store.test.ts",
+      "sourceGitObject": "cea3d8221496e9d8aca4228a3a63cef5973c257a",
+      "sourceSha256": "c2608cc99f0e93c569802d491aa08c89ddc66940556bc3034fcde0009b673216",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tests/unit/text-quality.test.ts",
+      "destinationPath": "tests/unit/text-quality.test.ts",
+      "sourceGitObject": "bb60227edcf2848408e8d1633594f71a3ab0b675",
+      "sourceSha256": "030fb890d22bb880acf310ab71bc5f184611b784e4513257fa867530cc94cd09",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "reused",
+      "purpose": "Exact pinned baseline component"
+    },
+    {
+      "sourcePath": "tsconfig.json",
+      "destinationPath": "tsconfig.json",
+      "sourceGitObject": "58f6007571953d7425c42fd25f009e70c06c2522",
+      "sourceSha256": "717ffcbb78c297f58835bf0b14142ba64e531153d132e9705bcf6855740fd3be",
+      "originalCreatedAt": "2026-06-20T22:46:36+01:00",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation"
+    }
+  ],
+  "adtcNewFiles": [
+    {
+      "path": "PROVENANCE.md",
+      "classification": "adtc-new",
+      "purpose": "Human-readable reuse and risk disclosure"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "classification": "adtc-new",
+      "purpose": "Machine-readable provenance registry"
+    },
+    {
+      "path": "config/import-manifest.schema.json",
+      "classification": "adtc-new",
+      "purpose": "Pre-import manifest contract"
+    },
+    {
+      "path": "config/import-manifest.json",
+      "classification": "adtc-new",
+      "purpose": "Frozen planned file ledger"
+    },
+    {
+      "path": "config/model-license-decision.json",
+      "classification": "adtc-new",
+      "purpose": "Disclosed-risk model license record"
+    },
+    {
+      "path": "scripts/build-import-manifest.ts",
+      "classification": "adtc-new",
+      "purpose": "Git-object manifest builder"
+    },
+    {
+      "path": "scripts/verify-import-manifest.ts",
+      "classification": "adtc-new",
+      "purpose": "Pinned-object verifier"
+    },
+    {
+      "path": "tests/import-provenance.test.ts",
+      "classification": "adtc-new",
+      "purpose": "Provenance regression contract"
+    }
+  ],
+  "thirdPartyDependencies": [
+    {
+      "name": "MedPsy-1.7B Q4_K_M GGUF",
+      "classification": "third-party",
+      "basis": "Publisher-declared Apache-2.0 weights with attribution; bytes are downloaded separately and are not retained in Git",
+      "unresolvedRisk": "Model-card wording and incomplete upstream training-data provenance require disclosed-risk review"
+    },
+    {
+      "name": "@qvac/sdk 0.13.3",
+      "classification": "third-party",
+      "basis": "Pinned product runtime dependency from the source lockfile",
+      "unresolvedRisk": "Ubuntu x86 product compatibility remains to be proven"
+    },
+    {
+      "name": "llama.cpp",
+      "classification": "third-party",
+      "basis": "Official direct profiler and raw-evidence runtime",
+      "unresolvedRisk": "Final physical target-hardware evidence remains mandatory"
+    },
+    {
+      "name": "WHO-derived local protocol material",
+      "classification": "third-party",
+      "basis": "Locally cited clinical grounding source",
+      "unresolvedRisk": "Source-rights and clinical adaptation reviews remain mandatory"
+    },
+    {
+      "name": "ADTC official profiler/template",
+      "classification": "third-party",
+      "basis": "Competition-provided scored path and repository template",
+      "unresolvedRisk": "Organizer eligibility is not guaranteed by this record"
+    }
+  ]
+}

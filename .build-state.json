@@ -1,18 +1,24 @@
 {
-  "project": "Triage-01",
-  "currentPhase": "phase-1-contract-sources-finalist-gate",
-  "currentStep": "1.3",
-  "currentSubStep": "requirements-revision-calibration-rejected",
-  "status": "blocked",
+  "project": "Triage-0 ADTC",
+  "currentPhase": "shared-medpsy-healthcare-recovery",
+  "currentStep": "3",
+  "currentSubStep": "exact-baseline-import-tdd",
+  "status": "in-progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
     "direct-runtime-and-deterministic-clinical-spine",
     "local-ui-lifecycle-and-no-egress-proof",
     "profiler-physical-evidence-and-early-checkpoint",
-    "provenance-report-inputs-and-release-freeze"
+    "provenance-report-inputs-and-release-freeze",
+    "legal-provenance-recovery",
+    "exact-baseline-import",
+    "canonical-medpsy-parity",
+    "fresh-medpsy-evidence",
+    "human-physical-decision-gate",
+    "submission-recovery"
   ],
   "phase_ledger": [
     {
@@ -44,6 +50,12 @@
       "started_at": "2026-08-24T02:16:27Z",
       "completed_at": "2026-08-24T03:01:33Z",
       "evidence": "BLOCKED: run 32684188985 fails exact 12-case frozen calibration; untouched evaluation, human review, physical gate, signing, and Phase 2 were not run"
+    },
+    {
+      "phase": "legal-provenance-recovery",
+      "started_at": "2026-08-24T05:58:35Z",
+      "completed_at": "2026-08-24T06:25:16Z",
+      "evidence": "PASS: 76 planned imports verify against exact Git objects at 74424721; 42/42 full tests and strict TypeScript pass; applicationImported=false"
     }
   ],
   "fileGroups": {
@@ -54,10 +66,11 @@
     "1.3-template-compliance-fix": {"files": ["scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", "tests/finalist-scripts.test.ts", "evidence/finalists/replacement/template-corrected-producer-manifest.json", "evidence/remote-run-32652354894/WITHDRAWN.json", "evidence/remote-run-32653499076/independent-raw-gate-review.json", "evidence/finalists/replacement/compliance-fix-status.json"], "written": true, "verified": true},
     "1.3-attempt-4-producer-freeze": {"files": ["tests/finalist-producers.test.ts", "config/model-finalists.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "config/replacement-lineage-sources.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json", "scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", ".github/workflows/olmo2-7b-recovery-evidence.yml", "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"], "written": true, "verified": true},
     "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true},
-    "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json", "evidence/finalists/phase1-contract-v1/revision-status.json", "evidence/remote-run-32684188985/independent-calibration-review.json", "evidence/remote-run-32684188985/raw/calibration.jsonl", "evidence/remote-run-32684188985/calibration-evaluation.json"], "written": true, "verified": true}
+    "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json", "evidence/finalists/phase1-contract-v1/revision-status.json", "evidence/remote-run-32684188985/independent-calibration-review.json", "evidence/remote-run-32684188985/raw/calibration.jsonl", "evidence/remote-run-32684188985/calibration-evaluation.json"], "written": true, "verified": true},
+    "2-legal-provenance": {"files": ["PROVENANCE.md", "PROVENANCE.json", "config/import-manifest.schema.json", "config/import-manifest.json", "config/model-license-decision.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json"], "written": true, "verified": true}
   },
   "deviations": [],
-  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification"},
+  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification", "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening"},
   "contractAddresses": {},
   "env": {},
   "devPort": 3000,
@@ -107,10 +120,16 @@
     ,{"command": "gh workflow run olmo2-7b-phase1-contract-v1-evidence.yml", "exitCode": 0, "result": "dispatched revised product-contract workflow run 32684188985 from exact frozen head 29e75309ec083fa415525b148c01e5ca01cf5234"}
     ,{"command": "GitHub Actions run 32684188985 frozen calibration", "exitCode": 2, "result": "12/12 unique calibration rows captured; frozen evaluator failed; untouched 100-case evaluation step skipped; model bytes removed; evidence-only artifact 9505304865 uploaded"}
     ,{"command": "independent calibration evidence review", "exitCode": 2, "result": "after diagnostic-only exact sentinel stripping: 12/12 bounded JSON, 0/12 exact calibration, 2/12 danger projection exact, 4/12 uncertainty, 2/12 mimic, 11/12 injection, 10/12 resource; candidate revision rejected"}
+    ,{"command": "legal/provenance TDD RED", "exitCode": 1, "result": "missing manifest modules failed first; hardening test then rejected an incomplete planned import set"}
+    ,{"command": "node --import tsx --test tests/import-provenance.test.ts", "exitCode": 0, "result": "7 pass, 0 fail; exact source objects, complete import set, disclosures, and fail-closed cases verified"}
+    ,{"command": "npm test", "exitCode": 0, "result": "42 pass, 0 fail after legal/provenance recovery"}
+    ,{"command": "npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean after legal/provenance recovery"}
+    ,{"command": "npm run verify-import-manifest", "exitCode": 0, "result": "76 planned imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
+    ,{"command": "JSON/diff/no-weight boundary", "exitCode": 0, "result": "all new JSON parses; diff check clean; no tracked GGUF or partial file"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T03:01:33Z",
+  "timestamp": "2026-08-24T06:25:16Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -119,9 +138,9 @@
   "failed_workflow_runs": [
     {"runId": "32669216111", "headSha": "34b2e51161ac8558c1bcc209a32e042058f69fb2", "stage": "pre-download harness", "modelBytesObserved": false, "behavioralOutputObserved": false, "rootCause": "job-wide CANDIDATE_ID leaked into historical default producer test"}
   ],
-  "resume_attempt": "requirements-revision-cycle-1-of-1",
-  "recovery_scope": "explicit Phase 1 product-contract evaluation revision for the already locked OLMo-2 7B candidate; no model search; preserve attempt-4 bare-prompt failure; remote evidence-only boundary",
-  "blocked_reason": "The one authorized product-contract revision fails its exact 12-case frozen calibration in run 32684188985. Untouched evaluation, human review, physical target-laptop proof, signing, and Phase 2 were correctly not run.",
+  "resume_attempt": "shared-medpsy-healthcare-recovery-v1",
+  "recovery_scope": "transparent import from exact Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f; MedPsy-1.7B Q4 only; QVAC product plus direct llama.cpp profiler over identical GGUF bytes; no model search; historical evidence immutable",
+  "blocked_reason": null,
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -139,5 +158,23 @@
     "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work."
     ,"Formalized an isolated product-contract-v1 revision namespace: bounded extraction only, fenced untrusted input, strict validation, deterministic safety ownership, disjoint calibration, untouched 100-case evaluation, unresolved human/physical gates, and frozen attempt-4 hashes."
   ],
-  "what_is_needed": "Explicit submission pivot or a new user-authorized requirements revision beyond cycle 1/1. Do not tune on untouched holdouts, search another model, or advance Phase 2 under current authority."
+  "what_is_needed": "Complete legal/provenance recovery before importing application files. Phase 2 still requires fresh MedPsy evidence, named human review, physical target-hardware proof, and a truthful signed model decision.",
+  "healthcare_recovery": {
+    "recovery_id": "shared-medpsy-healthcare-recovery-v1",
+    "source_repository": "https://github.com/dmustapha/triage-0",
+    "source_commit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+    "candidate_id": "medpsy-1.7b-q4",
+    "candidate_revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "candidate_file": "medpsy-1.7b-q4_k_m-imat.gguf",
+    "candidate_bytes": 1282439360,
+    "candidate_sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+    "evidence_namespace": "evidence/medpsy-shared-runtime-v1",
+    "legal_provenance_status": "complete",
+    "planned_import_count": 76,
+    "application_imported": false,
+    "model_search_allowed": false,
+    "model_decision_exists": false,
+    "phase_2_authorized": false,
+    "prior_olmo_blocked_reason": "The authorized OLMo product-contract revision failed exact frozen calibration in run 32684188985; the historical verdict remains preserved."
+  }
 }

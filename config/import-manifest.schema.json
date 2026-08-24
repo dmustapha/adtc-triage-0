@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dmustapha/adtc-2026/config/import-manifest.schema.json",
+  "title": "Triage-0 ADTC pre-import manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "applicationImported",
+    "preparedAt",
+    "reviewedBy",
+    "source",
+    "scope",
+    "notices",
+    "reviews",
+    "imports",
+    "adtcNewFiles",
+    "thirdPartyDependencies"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "pre-import-plan" },
+    "applicationImported": { "const": false },
+    "preparedAt": { "type": "string", "format": "date-time", "minLength": 1 },
+    "reviewedBy": { "type": "string", "minLength": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "localObjectStore", "commit", "license"],
+      "properties": {
+        "repository": { "const": "https://github.com/dmustapha/triage-0" },
+        "localObjectStore": { "type": "string", "minLength": 1 },
+        "commit": { "const": "74424721bc75f564808eacce42d7f7f42676ae0f" },
+        "license": { "const": "Apache-2.0" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["included", "excluded"],
+      "properties": {
+        "included": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "excluded": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "notices": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apache20", "priorHackathon"],
+      "properties": {
+        "apache20": { "type": "string", "minLength": 1 },
+        "priorHackathon": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reviews": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceRights", "clinical"],
+      "properties": {
+        "sourceRights": { "$ref": "#/$defs/pendingReview" },
+        "clinical": { "$ref": "#/$defs/pendingReview" }
+      }
+    },
+    "imports": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/import" }
+    },
+    "adtcNewFiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/adtcNew" }
+    },
+    "thirdPartyDependencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/thirdParty" }
+    }
+  },
+  "$defs": {
+    "pendingReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completed", "required"],
+      "properties": { "completed": { "const": false }, "required": { "const": true } }
+    },
+    "import": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePath", "destinationPath", "sourceGitObject", "sourceSha256", "originalCreatedAt", "classification", "purpose"],
+      "properties": {
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "destinationPath": { "type": "string", "minLength": 1 },
+        "sourceGitObject": { "type": "string", "pattern": "^[0-9a-f]{40,64}$" },
+        "sourceSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "originalCreatedAt": { "type": "string", "format": "date-time" },
+        "classification": { "enum": ["reused", "modified-for-adtc"] },
+        "purpose": { "type": "string", "minLength": 1 }
+      }
+    },
+    "adtcNew": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "classification", "purpose"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "classification": { "const": "adtc-new" },
+        "purpose": { "type": "string", "minLength": 1 }
+      }
+    },
+    "thirdParty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "classification", "basis", "unresolvedRisk"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "classification": { "const": "third-party" },
+        "basis": { "type": "string", "minLength": 1 },
+        "unresolvedRisk": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
