@@ -1,8 +1,8 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "structured-danger-evidence-plane-v2",
-  "currentStep": "revision-task-8",
-  "currentSubStep": "task-8-tdd-red",
+  "currentStep": "revision-task-9",
+  "currentSubStep": "task-9-tdd-red",
   "status": "in-progress",
   "autonomous_mode": true,
   "completedSteps": [
@@ -33,7 +33,8 @@
     "revision-task-4",
     "revision-task-5",
     "revision-task-6",
-    "revision-task-7"
+    "revision-task-7",
+    "revision-task-8"
   ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
@@ -150,7 +151,7 @@
       "phase": "structured-danger-evidence-plane-v2",
       "started_at": "2026-08-24T16:56:43Z",
       "completed_at": null,
-      "evidence": "IN PROGRESS: Tasks 1-7 committed through 145eb41; fresh 27-case provisional calibration and sealed manifest-only holdout verified; Task 8 profiler metadata started"
+      "evidence": "IN PROGRESS: Tasks 1-8 committed through e56f891; profiler metadata focused 14/14, English-only and placeholders explicit; Task 9 local workflow started"
     }
   ],
   "fileGroups": {
@@ -472,6 +473,16 @@
       "written": true,
       "verified": true,
       "commit": "145eb41"
+    },
+    "revision-task-8": {
+      "files": [
+        "metadata.json",
+        "tests/canonical-model.test.ts",
+        "tests/medpsy-raw-profiler-v2.test.ts"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "e56f891"
     }
   },
   "deviations": [
@@ -1120,11 +1131,16 @@
       "command": "Task 7 fresh calibration/sealed holdout structural gate",
       "exitCode": 0,
       "result": "18/18 focused; 27/27 unique/hash/coverage; 30 reserved holdout IDs; zero overlap; contents uncreated/uninspected; clinical review provisional; typecheck/import/JSON clean"
+    },
+    {
+      "command": "Task 8 profiler metadata focused/typecheck/JSON",
+      "exitCode": 0,
+      "result": "14 total; 14 pass; 0 fail/skip/todo; metadata JSON and typecheck clean; exact identity and English-only/no-African-language claims pinned; four identity placeholders remain"
     }
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T18:20:18Z",
+  "timestamp": "2026-08-24T18:23:53Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -1173,7 +1189,8 @@
     "Implemented and committed exact-one-JSON framing at 4aabd44 after 10 expected adversarial failures; prefixes, suffixes, multiple values, truncation, malformed JSON, and mutated terminal markers fail closed.",
     "Corrected the screenshot-confirmed Task 4 visual-fidelity regression at 06865d2 by moving mandatory structured assessment behind native progressive disclosure while retaining the pinned compact English workflow.",
     "Implemented split product/raw v2 evidence planes at 856e5d9; independent review added exact calibration-evaluation-to-producer-manifest binding before holdout.",
-    "Froze 27 fresh structured calibration cases and a 30-ID manifest-only sealed holdout at 145eb41; no failed-v1 expected outputs, inference, or unseen contents were reused or inspected; evaluator fails closed pending named human review."
+    "Froze 27 fresh structured calibration cases and a 30-ID manifest-only sealed holdout at 145eb41; no failed-v1 expected outputs, inference, or unseen contents were reused or inspected; evaluator fails closed pending named human review.",
+    "Replaced stale Python profiler prompts with two bounded English healthcare prompts at e56f891; preserved exact MedPsy identity, false African-language claim, and unresolved submitter placeholders."
   ],
   "what_is_needed": "Complete local Tasks 1-10 under the approved structured-danger and split-evidence revision; external publication, remote product evidence, named human review, physical target-laptop evidence, and model-decision signing remain separate unauthorized checkpoints.",
   "healthcare_recovery": {
@@ -1190,7 +1207,7 @@
     "planned_import_count": 76,
     "import_status": "complete",
     "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
-    "import_resume_hint": "Structured-danger revision Tasks 1-7 are complete. Resume at Task 8 profiler metadata; holdout content and human review remain truthful external blockers.",
+    "import_resume_hint": "Structured-danger revision Tasks 1-8 are complete. Resume at Task 9 local split evidence workflow; no dispatch/publication/network/model is authorized.",
     "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,

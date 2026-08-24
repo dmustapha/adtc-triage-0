@@ -105,3 +105,5 @@
 2026-08-24T18:10:00Z | hackathon-build | START | structured-danger-revision-task-7 | Fresh disjoint product calibration and sealed-holdout design started; no inference or holdout inspection.
 2026-08-24T18:20:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-7 | Fresh 27-case provisional calibration and sealed manifest-only holdout committed at 145eb41; focused 18/18; human review remains pending.
 2026-08-24T18:20:00Z | hackathon-build | START | structured-danger-revision-task-8 | Profiler metadata healthcare-scope correction started under TDD; no identity guessing or unsupported claims.
+2026-08-24T18:25:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-8 | Bounded English healthcare profiler metadata committed at e56f891; focused 14/14; identity placeholders remain explicit blockers.
+2026-08-24T18:25:00Z | hackathon-build | START | structured-danger-revision-task-9 | Split evidence-only workflow and producers started under TDD; local-only, with no dispatch, network, inference, or weights.
