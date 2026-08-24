@@ -1,11 +1,37 @@
 {
   "project": "Triage-0 ADTC",
-  "currentPhase": "shared-medpsy-healthcare-recovery",
-  "currentStep": "9",
-  "currentSubStep": "blocked-remote-medpsy-calibration-failed",
-  "status": "blocked",
+  "currentPhase": "structured-danger-evidence-plane-v2",
+  "currentStep": "revision-task-5",
+  "currentSubStep": "task-5-tdd-red",
+  "status": "in-progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import", "4-canonical-medpsy-parity", "5-shared-runtime-binding", "6-clinical-product-contract", "7-fresh-medpsy-evidence-local-build", "8-quality-reconciliation-local-only"],
+  "completedSteps": [
+    "1.1",
+    "1.2",
+    "1.3-attempt-4-candidate-freeze",
+    "1.3-attempt-4-lineage",
+    "1.3-attempt-4-producer-freeze",
+    "1.3-attempt-4-raw-gate",
+    "1.3-attempt-4-remote-evidence",
+    "1.3-machinery",
+    "1.3-product-contract-calibration",
+    "1.3-product-contract-revision-freeze",
+    "1.3-replacement-lineage",
+    "1.3-replacement-raw-gate-executed",
+    "1.3-replacement-shortlist",
+    "1.3-template-compliance-fix",
+    "2-legal-provenance",
+    "3-exact-baseline-import",
+    "4-canonical-medpsy-parity",
+    "5-shared-runtime-binding",
+    "6-clinical-product-contract",
+    "7-fresh-medpsy-evidence-local-build",
+    "8-quality-reconciliation-local-only",
+    "revision-task-1",
+    "revision-task-2",
+    "revision-task-3",
+    "revision-task-4"
+  ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -116,144 +142,925 @@
       "started_at": "2026-08-24T15:03:05Z",
       "completed_at": "2026-08-24T15:09:27Z",
       "evidence": "FAIL: exact GGUF verified and 12/12 calibration rows captured, but five frozen fatal gates failed; holdouts skipped; cleanup and evidence-only upload passed; sole dispatch budget spent"
+    },
+    {
+      "phase": "structured-danger-evidence-plane-v2",
+      "started_at": "2026-08-24T16:56:43Z",
+      "completed_at": null,
+      "evidence": "IN PROGRESS: Tasks 1-4 committed at ffbebe4, 8c6d923, ff6d829, 8367bd8; Task 4 full suite 207 pass/0 fail/22 skip; Task 5 exact-one-JSON framing started under TDD"
     }
   ],
   "fileGroups": {
-    "1.1": {"files": ["package.json", "tsconfig.json", ".gitignore", "src/types.ts", "src/release-evidence.ts", "config/model-finalists.json", "config/model-decision.schema.json", "config/runtime.json", "config/generation-policy.json", "DOMAIN-GUIDE.md"], "written": true, "verified": true},
-    "1.2": {"files": ["config/provenance.schema.json", "config/provenance-origins.schema.json", "config/provenance-origins.json", "config/organizer-approval-trust.json", "PROVENANCE.json", "config/clinical-sources.json", "scripts/attest-source.ts", "scripts/verify-sources.ts"], "written": true, "verified": true},
-    "1.3": {"files": ["scripts/create-release-key.ts", "scripts/extract-gguf-chat-template.ts", "scripts/build-finalist-bundle.ts", "scripts/run-finalist-gate.ts", "tests/finalist.test.ts", "config/finalist-corpus.json", "config/finalist-rubric.json", "scripts/freeze-finalist-inputs.ts", "scripts/run-lineage-gate.ts", "scripts/run-raw-finalist.ts", "scripts/summarize-finalist-status.ts", "tests/finalist-producers.test.ts", "evidence/finalists/producer-manifest.json", "evidence/finalists/status.json"], "written": true, "verified": true},
-    "1.3-replacement": {"files": ["config/replacement-lineage-sources.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/corrected-producer-manifest.json", "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json", "evidence/finalists/replacement/recovery-status.json", "evidence/remote-run-32652354894/independent-raw-gate-review.json", ".github/workflows/olmo-replacement-evidence.yml", "scripts/produce-replacement-ci-evidence.ts"], "written": true, "verified": true},
-    "1.3-template-compliance-fix": {"files": ["scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", "tests/finalist-scripts.test.ts", "evidence/finalists/replacement/template-corrected-producer-manifest.json", "evidence/remote-run-32652354894/WITHDRAWN.json", "evidence/remote-run-32653499076/independent-raw-gate-review.json", "evidence/finalists/replacement/compliance-fix-status.json"], "written": true, "verified": true},
-    "1.3-attempt-4-producer-freeze": {"files": ["tests/finalist-producers.test.ts", "config/model-finalists.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "config/replacement-lineage-sources.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json", "scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", ".github/workflows/olmo2-7b-recovery-evidence.yml", "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"], "written": true, "verified": true},
-    "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true},
-    "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json", "evidence/finalists/phase1-contract-v1/revision-status.json", "evidence/remote-run-32684188985/independent-calibration-review.json", "evidence/remote-run-32684188985/raw/calibration.jsonl", "evidence/remote-run-32684188985/calibration-evaluation.json"], "written": true, "verified": true},
-    "2-legal-provenance": {"files": ["PROVENANCE.md", "PROVENANCE.json", "config/import-manifest.schema.json", "config/import-manifest.json", "config/model-license-decision.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json"], "written": true, "verified": true},
-    "3-exact-baseline-import": {"files": ["PROVENANCE.json", "config/import-manifest.json", "config/import-manifest.schema.json", "scripts/build-import-manifest.ts", "scripts/verify-import-manifest.ts", "tests/import-provenance.test.ts", "package.json", "package-lock.json", "tsconfig.json", "src", "public", "data", "tests/unit", "tests/integration"], "written": true, "verified": true}
-    ,"4-canonical-medpsy-parity": {"files": ["metadata.json", "config/model-finalists.json", "config/canonical-model.json", "config/canonical-model.schema.json", "download_model.sh", "evidence/medpsy-shared-runtime-v1/model.sha256", "tests/canonical-model.test.ts", "tests/downloader.test.ts"], "written": true, "verified": true}
-    ,"5-shared-runtime-binding": {"files": ["src/model-contract.ts", "src/config.ts", "src/server.ts", "tests/model-parity.test.ts", "tests/unit/config.test.ts", "tests/integration/server.test.ts", "tests/finalist-producers.test.ts", "scripts/build-import-manifest.ts", "config/import-manifest.json"], "written": true, "verified": true}
-    ,"6-clinical-product-contract": {"files": ["config/product-generation-policy.json", "config/profiler-prompt-policy.json", "tests/product-contract.test.ts", "src/server.ts", "tests/integration/sse-contract.test.ts", "scripts/build-import-manifest.ts", "config/import-manifest.json"], "written": true, "verified": true}
-    ,"7-fresh-medpsy-evidence-local-build": {"files": [".github/workflows/medpsy-shared-runtime-evidence.yml", "scripts/medpsy-shared-runtime", "config/medpsy-shared-runtime", "tests/medpsy-evidence.test.ts", "evidence/medpsy-shared-runtime-v1/README.md"], "written": true, "verified": true}
-    ,"8-quality-reconciliation-local-only": {"files": ["evidence/medpsy-shared-runtime-v1/quality-reconciliation.md", "evidence/medpsy-shared-runtime-v1/baseline-test-summary.json"], "written": true, "verified": true}
+    "1.1": {
+      "files": [
+        "package.json",
+        "tsconfig.json",
+        ".gitignore",
+        "src/types.ts",
+        "src/release-evidence.ts",
+        "config/model-finalists.json",
+        "config/model-decision.schema.json",
+        "config/runtime.json",
+        "config/generation-policy.json",
+        "DOMAIN-GUIDE.md"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.2": {
+      "files": [
+        "config/provenance.schema.json",
+        "config/provenance-origins.schema.json",
+        "config/provenance-origins.json",
+        "config/organizer-approval-trust.json",
+        "PROVENANCE.json",
+        "config/clinical-sources.json",
+        "scripts/attest-source.ts",
+        "scripts/verify-sources.ts"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3": {
+      "files": [
+        "scripts/create-release-key.ts",
+        "scripts/extract-gguf-chat-template.ts",
+        "scripts/build-finalist-bundle.ts",
+        "scripts/run-finalist-gate.ts",
+        "tests/finalist.test.ts",
+        "config/finalist-corpus.json",
+        "config/finalist-rubric.json",
+        "scripts/freeze-finalist-inputs.ts",
+        "scripts/run-lineage-gate.ts",
+        "scripts/run-raw-finalist.ts",
+        "scripts/summarize-finalist-status.ts",
+        "tests/finalist-producers.test.ts",
+        "evidence/finalists/producer-manifest.json",
+        "evidence/finalists/status.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3-replacement": {
+      "files": [
+        "config/replacement-lineage-sources.json",
+        "evidence/finalists/replacement-shortlist.json",
+        "evidence/finalists/replacement/corrected-producer-manifest.json",
+        "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json",
+        "evidence/finalists/replacement/recovery-status.json",
+        "evidence/remote-run-32652354894/independent-raw-gate-review.json",
+        ".github/workflows/olmo-replacement-evidence.yml",
+        "scripts/produce-replacement-ci-evidence.ts"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3-template-compliance-fix": {
+      "files": [
+        "scripts/run-raw-finalist.ts",
+        "scripts/produce-replacement-ci-evidence.ts",
+        "tests/finalist-scripts.test.ts",
+        "evidence/finalists/replacement/template-corrected-producer-manifest.json",
+        "evidence/remote-run-32652354894/WITHDRAWN.json",
+        "evidence/remote-run-32653499076/independent-raw-gate-review.json",
+        "evidence/finalists/replacement/compliance-fix-status.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3-attempt-4-producer-freeze": {
+      "files": [
+        "tests/finalist-producers.test.ts",
+        "config/model-finalists.json",
+        "evidence/finalists/replacement-shortlist.json",
+        "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json",
+        "config/replacement-lineage-sources.json",
+        "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json",
+        "scripts/run-raw-finalist.ts",
+        "scripts/produce-replacement-ci-evidence.ts",
+        ".github/workflows/olmo2-7b-recovery-evidence.yml",
+        "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3-attempt-4-raw-gate": {
+      "files": [
+        "evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl",
+        "evidence/remote-run-32669387576/independent-raw-gate-review.json",
+        "evidence/finalists/replacement/recovery-status.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "1.3-product-contract-revision": {
+      "files": [
+        "config/phase1-contract-v1/calibration-corpus.json",
+        "config/phase1-contract-v1/evaluation-expectations.json",
+        "config/phase1-contract-v1/extraction.gbnf",
+        "config/phase1-contract-v1/extraction.schema.json",
+        "config/phase1-contract-v1/fatal-gates.json",
+        "config/phase1-contract-v1/llama-cli-source.json",
+        "config/phase1-contract-v1/system-prompt.txt",
+        "scripts/phase1-contract-v1/contract.ts",
+        "scripts/phase1-contract-v1/evaluate.ts",
+        "scripts/phase1-contract-v1/freeze-manifest.ts",
+        "scripts/phase1-contract-v1/run-raw-finalist.ts",
+        "tests/phase1-contract-v1.test.ts",
+        ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml",
+        "evidence/finalists/phase1-contract-v1/producer-manifest.json",
+        "evidence/finalists/phase1-contract-v1/revision-status.json",
+        "evidence/remote-run-32684188985/independent-calibration-review.json",
+        "evidence/remote-run-32684188985/raw/calibration.jsonl",
+        "evidence/remote-run-32684188985/calibration-evaluation.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "2-legal-provenance": {
+      "files": [
+        "PROVENANCE.md",
+        "PROVENANCE.json",
+        "config/import-manifest.schema.json",
+        "config/import-manifest.json",
+        "config/model-license-decision.json",
+        "scripts/build-import-manifest.ts",
+        "scripts/verify-import-manifest.ts",
+        "tests/import-provenance.test.ts",
+        "package.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "3-exact-baseline-import": {
+      "files": [
+        "PROVENANCE.json",
+        "config/import-manifest.json",
+        "config/import-manifest.schema.json",
+        "scripts/build-import-manifest.ts",
+        "scripts/verify-import-manifest.ts",
+        "tests/import-provenance.test.ts",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "src",
+        "public",
+        "data",
+        "tests/unit",
+        "tests/integration"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "4-canonical-medpsy-parity": {
+      "files": [
+        "metadata.json",
+        "config/model-finalists.json",
+        "config/canonical-model.json",
+        "config/canonical-model.schema.json",
+        "download_model.sh",
+        "evidence/medpsy-shared-runtime-v1/model.sha256",
+        "tests/canonical-model.test.ts",
+        "tests/downloader.test.ts"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "5-shared-runtime-binding": {
+      "files": [
+        "src/model-contract.ts",
+        "src/config.ts",
+        "src/server.ts",
+        "tests/model-parity.test.ts",
+        "tests/unit/config.test.ts",
+        "tests/integration/server.test.ts",
+        "tests/finalist-producers.test.ts",
+        "scripts/build-import-manifest.ts",
+        "config/import-manifest.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "6-clinical-product-contract": {
+      "files": [
+        "config/product-generation-policy.json",
+        "config/profiler-prompt-policy.json",
+        "tests/product-contract.test.ts",
+        "src/server.ts",
+        "tests/integration/sse-contract.test.ts",
+        "scripts/build-import-manifest.ts",
+        "config/import-manifest.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "7-fresh-medpsy-evidence-local-build": {
+      "files": [
+        ".github/workflows/medpsy-shared-runtime-evidence.yml",
+        "scripts/medpsy-shared-runtime",
+        "config/medpsy-shared-runtime",
+        "tests/medpsy-evidence.test.ts",
+        "evidence/medpsy-shared-runtime-v1/README.md"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "8-quality-reconciliation-local-only": {
+      "files": [
+        "evidence/medpsy-shared-runtime-v1/quality-reconciliation.md",
+        "evidence/medpsy-shared-runtime-v1/baseline-test-summary.json"
+      ],
+      "written": true,
+      "verified": true
+    },
+    "revision-task-1": {
+      "files": [
+        "config/structured-danger-v1/contract.json",
+        "tests/structured-danger-contract.test.ts",
+        "PRD.md",
+        "ARCHITECTURE.md",
+        "FEATURE-OBSERVABLES.md"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "ffbebe4"
+    },
+    "revision-task-2": {
+      "files": [
+        "src/triage/danger-observations.ts",
+        "tests/unit/danger-observations.test.ts",
+        "src/triage/schema.ts",
+        "src/triage/severity.ts",
+        "tests/unit/severity.test.ts"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "8c6d923"
+    },
+    "revision-task-3": {
+      "files": [
+        "src/server.ts",
+        "src/triage/triage.ts",
+        "tests/integration/http-validation.test.ts",
+        "tests/integration/sse-contract.test.ts",
+        "tests/integration/triage.test.ts",
+        "scripts/build-import-manifest.ts",
+        "config/import-manifest.json"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "ff6d829"
+    },
+    "revision-task-4": {
+      "files": [
+        "public/app.html",
+        "public/assets/js/triage.js",
+        "public/assets/css/app.css",
+        "tests/unit/frontend.test.ts",
+        "scripts/build-import-manifest.ts",
+        "config/import-manifest.json"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "8367bd8"
+    }
   },
   "deviations": [
-    {"step": "3", "id": "DEV-001", "description": "Dependency installation could not complete because the host filesystem exhausted free space", "reason": "The merged QVAC dependency graph plus npm extraction/cache exceeded available disk during three bounded attempts", "class": "UNTESTED", "impact": "Task 3 typecheck, full tests, lock reconciliation, and completion-ledger GREEN remain unverified"},
-    {"step": "3", "id": "DEV-002", "description": "Two overlapping npm install processes were launched during the first attempt", "reason": "Implementation-worker execution error", "class": "UNTESTED", "impact": "Increased disk pressure; no source, evidence, or model artifact was changed"},
-    {"step": "3", "id": "DEV-003", "description": "The stalled third npm install was terminated after repeated ENOSPC warnings", "reason": "Implementation-worker judgment error while disk free space approached exhaustion", "class": "UNTESTED", "impact": "Exit 143; no successful dependency install or downstream verification"}
-    ,{"step": "3", "id": "DEV-004", "description": "The sole final-retry dependency install exited with npm registry EIDLETIMEOUT", "reason": "registry.npmjs.org connection became idle while downloading large QVAC transitive artifacts", "class": "UNTESTED", "impact": "Dependency tree and lockfile remain incomplete; focused/full tests, typecheck, manifest GREEN, Task 3 commit, and Task 4 are blocked"}
-    ,{"step": "4", "id": "DEV-005", "description": "The initial downloader RED test invoked the imported legacy SmolLM2 network downloader instead of a stub", "reason": "Implementation-worker test isolation error", "class": "RECOVERED", "impact": "Exact test/curl processes were stopped immediately; temporary bytes were removed automatically; no project weight, publication, or commit occurred; all further downloader tests are network-stubbed"}
-    ,{"step": "8", "id": "DEV-006", "description": "POSTMORTEM.md append remains unstaged because the file was pre-existing untracked dirty content", "reason": "Preserve unrelated/user historical content and avoid committing an entire pre-existing untracked artifact", "class": "DOCUMENTED", "impact": "Task 8 evidence files contain the complete reconciliation; the exact append remains in the working tree but outside the narrow commit"}
+    {
+      "step": "3",
+      "id": "DEV-001",
+      "description": "Dependency installation could not complete because the host filesystem exhausted free space",
+      "reason": "The merged QVAC dependency graph plus npm extraction/cache exceeded available disk during three bounded attempts",
+      "class": "UNTESTED",
+      "impact": "Task 3 typecheck, full tests, lock reconciliation, and completion-ledger GREEN remain unverified"
+    },
+    {
+      "step": "3",
+      "id": "DEV-002",
+      "description": "Two overlapping npm install processes were launched during the first attempt",
+      "reason": "Implementation-worker execution error",
+      "class": "UNTESTED",
+      "impact": "Increased disk pressure; no source, evidence, or model artifact was changed"
+    },
+    {
+      "step": "3",
+      "id": "DEV-003",
+      "description": "The stalled third npm install was terminated after repeated ENOSPC warnings",
+      "reason": "Implementation-worker judgment error while disk free space approached exhaustion",
+      "class": "UNTESTED",
+      "impact": "Exit 143; no successful dependency install or downstream verification"
+    },
+    {
+      "step": "3",
+      "id": "DEV-004",
+      "description": "The sole final-retry dependency install exited with npm registry EIDLETIMEOUT",
+      "reason": "registry.npmjs.org connection became idle while downloading large QVAC transitive artifacts",
+      "class": "UNTESTED",
+      "impact": "Dependency tree and lockfile remain incomplete; focused/full tests, typecheck, manifest GREEN, Task 3 commit, and Task 4 are blocked"
+    },
+    {
+      "step": "4",
+      "id": "DEV-005",
+      "description": "The initial downloader RED test invoked the imported legacy SmolLM2 network downloader instead of a stub",
+      "reason": "Implementation-worker test isolation error",
+      "class": "RECOVERED",
+      "impact": "Exact test/curl processes were stopped immediately; temporary bytes were removed automatically; no project weight, publication, or commit occurred; all further downloader tests are network-stubbed"
+    },
+    {
+      "step": "8",
+      "id": "DEV-006",
+      "description": "POSTMORTEM.md append remains unstaged because the file was pre-existing untracked dirty content",
+      "reason": "Preserve unrelated/user historical content and avoid committing an entire pre-existing untracked artifact",
+      "class": "DOCUMENTED",
+      "impact": "Task 8 evidence files contain the complete reconciliation; the exact append remains in the working tree but outside the narrow commit"
+    },
+    {
+      "step": "revision-task-3",
+      "id": "DEV-007",
+      "description": "Initial invalid-request RED reached live QVAC and began an unintended gte-large download before interruption",
+      "reason": "The legacy server parses only caseText and entered triageContext before the new structured-request pre-runtime guard existed",
+      "class": "RECOVERED",
+      "impact": "77,922,304 incomplete bytes and exact run-created corestore/lock were isolated and removed; no complete cache, project artifact, source, evidence, history, or retained model byte remains; tests are blocked from rerun until pre-runtime parsing is implemented"
+    }
   ],
-  "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification", "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening", "exact-baseline-import": "subagent implementation; orchestrator independently verified all final gates and owns the narrow commit"},
+  "phaseExecutors": {
+    "phase-1": "subagent; orchestrator independent verification",
+    "legal-provenance-recovery": "subagent; orchestrator independent verification and license-preservation hardening",
+    "exact-baseline-import": "subagent implementation; orchestrator independently verified all final gates and owns the narrow commit",
+    "structured-danger-evidence-plane-v2-task-1": "subagent; orchestrator independent verification"
+  },
   "contractAddresses": {},
   "env": {},
   "devPort": 3000,
   "depsVerified": true,
   "verification_commands": [
-    {"command": "npm test", "exitCode": 0, "result": "17 pass, 0 fail"},
-    {"command": "npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean"},
-    {"command": "npm run verify-sources", "exitCode": 1, "result": "expected fail-closed: source review incomplete: WHO-IMCI-RESP-2022"},
-    {"command": "run-lineage-gate for both immutable model cards", "exitCode": 2, "result": "both rejected: insufficient itemized training lineage/rights evidence"},
-    {"command": "replacement producer focused tests", "exitCode": 0, "result": "6 pass, 0 fail"},
-    {"command": "remote npm test and npm run typecheck", "exitCode": 0, "result": "run 32648939418 passed before model download"},
-    {"command": "remote anonymous GGUF byte/hash verification", "exitCode": 0, "result": "935515296 bytes; sha256 abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6"},
-    {"command": "npm test", "exitCode": 0, "result": "corrected producer suite: 22 pass, 0 fail"},
-    {"command": "npm run typecheck", "exitCode": 0, "result": "corrected producer strict TypeScript clean"},
-    {"command": "workflow YAML parse", "exitCode": 0, "result": "corrected workflow YAML parses"},
-    {"command": "GitHub Actions run 32652354894", "exitCode": 0, "result": "100 raw cases captured; weights removed; evidence-only artifact uploaded"},
-    {"command": "independent raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs, exact command flags, raw sha256 e52cb4b7d5261fbbe19513e2c50e7992a3a5a89de0d1f1c65de2484c0c3d7494, no GGUF in artifact"},
-    {"command": "independent raw safety/format review", "exitCode": 2, "result": "candidate rejected on fatal danger, abstention, resource hallucination, prompt injection, structure, visible reasoning, truncation, and holdout gates"}
-    ,{"command": "focused producer template tests (RED)", "exitCode": 1, "result": "0 pass, 2 fail; live producer still contained -no-cnv"}
-    ,{"command": "focused producer template tests (GREEN)", "exitCode": 0, "result": "3 pass, 0 fail; --jinja --single-turn frozen"}
-    ,{"command": "npm test && npm run typecheck && workflow YAML parse", "exitCode": 0, "result": "22 pass, 0 fail; strict TypeScript clean; YAML parses"}
-    ,{"command": "GitHub Actions run 32653499076", "exitCode": 0, "result": "100 correctly templated raw cases captured; weights removed; evidence-only artifact uploaded"}
-    ,{"command": "independent corrected raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs; raw sha256 beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10; no GGUF; all commands use --jinja --single-turn"}
-    ,{"command": "independent corrected raw safety/format review", "exitCode": 2, "result": "candidate rejected: unsafe danger behavior, invented resources, injection compliance, 0/100 JSON, visible reasoning, and 84% truncation proxy"}
-    ,{"command": "attempt-4 TDD RED identity/lineage/producer tests", "exitCode": 1, "result": "expected missing 7B candidate, lineage, and workflow failures observed before implementation"}
-    ,{"command": "npm test", "exitCode": 0, "result": "attempt-4 producer suite: 26 pass, 0 fail"}
-    ,{"command": "npm run typecheck", "exitCode": 0, "result": "attempt-4 strict TypeScript clean"}
-    ,{"command": "workflow YAML parse", "exitCode": 0, "result": "olmo2-7b-recovery-evidence.yml parses: YAML_OK"}
-    ,{"command": "fresh OLMo-2 7B lineage producer", "exitCode": 0, "result": "verified 11 immutable primary lineage sources"}
-    ,{"command": "historical frozen-control hash assertions", "exitCode": 0, "result": "7 frozen corpus/rubric/policy and historical evidence artifacts match pre-attempt SHA-256 values"}
-    ,{"command": "git push submission main", "exitCode": 0, "result": "fast-forwarded public main to reviewed producer commit 34b2e51161ac8558c1bcc209a32e042058f69fb2"}
-    ,{"command": "gh workflow run olmo2-7b-recovery-evidence.yml", "exitCode": 0, "result": "dispatched run 32669216111 from reviewed head 34b2e51161ac8558c1bcc209a32e042058f69fb2"}
-    ,{"command": "GitHub Actions run 32669216111", "exitCode": 1, "result": "pre-download harness failed 25 pass, 1 fail because job-wide 7B CANDIDATE_ID contaminated a historical default 1B producer test; no model download or behavioral output"}
-    ,{"command": "neutral-environment regression RED", "exitCode": 1, "result": "focused workflow test rejected missing env -u CANDIDATE_ID guard"}
-    ,{"command": "neutral-environment regression GREEN and full verification", "exitCode": 0, "result": "focused tests pass; full suite 26 pass, 0 fail; typecheck clean; YAML_OK; producer manifest byte-matches regenerated plan"}
-    ,{"command": "GitHub Actions run 32669387576", "exitCode": 0, "result": "authoritative workflow completed from head 6b03b4f0a13fc0a9f911653e108119cc747faf15; exact model byte/hash checks passed; 100 raw rows captured; GGUF removed before evidence upload"}
-    ,{"command": "independent OLMo-2 7B raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs; 1,156,235 bytes; raw sha256 d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988; exact frozen commands; no GGUF or partial file"}
-    ,{"command": "independent OLMo-2 7B raw fatal-gate review", "exitCode": 2, "result": "rejected: danger safety, uncertainty/abstention, mimic, local resources, injection, 0/100 JSON, visible reasoning, 83% truncation proxy, and both holdouts fail"}
-    ,{"command": "product-contract-v1 independent-review RED", "exitCode": 1, "result": "5/5 focused tests failed correctly: aggregate model-owned danger, fence collisions, partial calibration pass, missing deterministic projector, and missing pinned llama CLI source identity"}
-    ,{"command": "npm test", "exitCode": 0, "result": "requirements-revision suite: 35 pass, 0 fail"}
-    ,{"command": "npm run typecheck", "exitCode": 0, "result": "requirements-revision strict TypeScript clean"}
-    ,{"command": "workflow YAML parse", "exitCode": 0, "result": "olmo2-7b-phase1-contract-v1-evidence.yml parses: YAML_OK"}
-    ,{"command": "independent manifest regeneration and cmp", "exitCode": 0, "result": "producer manifest byte parity; SHA-256 0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90"}
-    ,{"command": "pinned llama.cpp option-source verification", "exitCode": 0, "result": "common/arg.cpp at c8ade30036139e32108fee53d8b7164dbfda4bee hashes faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1 and defines --system-prompt-file plus --grammar-file"}
-    ,{"command": "historical and no-weight boundary assertions", "exitCode": 0, "result": "attempt-4 raw/review exact; prior evidence unchanged; 112/112 prompts fence-marker safe; no GGUF/partial; model decision absent; diff check clean"}
-    ,{"command": "git push submission main", "exitCode": 0, "result": "fast-forwarded public main to frozen revision commit 29e75309ec083fa415525b148c01e5ca01cf5234"}
-    ,{"command": "gh workflow run olmo2-7b-phase1-contract-v1-evidence.yml", "exitCode": 0, "result": "dispatched revised product-contract workflow run 32684188985 from exact frozen head 29e75309ec083fa415525b148c01e5ca01cf5234"}
-    ,{"command": "GitHub Actions run 32684188985 frozen calibration", "exitCode": 2, "result": "12/12 unique calibration rows captured; frozen evaluator failed; untouched 100-case evaluation step skipped; model bytes removed; evidence-only artifact 9505304865 uploaded"}
-    ,{"command": "independent calibration evidence review", "exitCode": 2, "result": "after diagnostic-only exact sentinel stripping: 12/12 bounded JSON, 0/12 exact calibration, 2/12 danger projection exact, 4/12 uncertainty, 2/12 mimic, 11/12 injection, 10/12 resource; candidate revision rejected"}
-    ,{"command": "legal/provenance TDD RED", "exitCode": 1, "result": "missing manifest modules failed first; hardening test then rejected an incomplete planned import set"}
-    ,{"command": "node --import tsx --test tests/import-provenance.test.ts", "exitCode": 0, "result": "7 pass, 0 fail; exact source objects, complete import set, disclosures, and fail-closed cases verified"}
-    ,{"command": "npm test", "exitCode": 0, "result": "42 pass, 0 fail after legal/provenance recovery"}
-    ,{"command": "npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean after legal/provenance recovery"}
-    ,{"command": "npm run verify-import-manifest", "exitCode": 0, "result": "76 planned imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
-    ,{"command": "JSON/diff/no-weight boundary", "exitCode": 0, "result": "all new JSON parses; diff check clean; no tracked GGUF or partial file"}
-    ,{"command": "Task 3 focused provenance RED", "exitCode": 1, "result": "8 tests, 7 pass, 1 expected fail: application import completion remains false"}
-    ,{"command": "Task 3 independent pinned-object parity audit", "exitCode": 0, "result": "76 total; 73 exact; 3 declared package/config changes; 0 missing; 60 reused exact; 13 modified-for-ADTC pending adaptations exact"}
-    ,{"command": "npm install attempts 1-2", "exitCode": 1, "result": "TAR_ENTRY_ERROR ENOSPC during dependency extraction; no completed dependency tree"}
-    ,{"command": "npm install --no-audit --no-fund attempt 3", "exitCode": 143, "result": "repeated TAR_ENTRY_ERROR ENOSPC, then implementation worker terminated stalled process; no GREEN verification"}
-    ,{"command": "Task 3 JSON/diff/no-weight boundary", "exitCode": 0, "result": "JSON_OK; DIFF_CHECK_OK; no tracked GGUF, partial, or private release key"}
-    ,{"command": "External retry 1 read-only disk/dependency audit", "exitCode": 0, "result": "df: 2,586,812 KiB free; node_modules absent; npm cache 1,315,396 KiB; package has 5 runtime and 6 dev dependencies while current lock root is stale at 0 runtime and 3 dev dependencies"}
-    ,{"command": "External retry 2 npm install", "exitCode": 1, "result": "EIDLETIMEOUT: idle timeout for registry.npmjs.org:443; about 50 GiB free, so not ENOSPC; exactly one install launched"}
-    ,{"command": "External retry 2 focused provenance command", "exitCode": 1, "result": "1 loader-level test, 0 pass, 1 fail, 0 skipped, 0 todo; ERR_MODULE_NOT_FOUND for tsx"}
-    ,{"command": "External retry 2 npm test", "exitCode": 1, "result": "25 loader-level tests, 0 pass, 25 fail, 0 skipped, 0 todo; no test body executed because tsx was absent"}
-    ,{"command": "External retry 2 npm run typecheck", "exitCode": 2, "result": "TS2688: cannot find type definition file for node"}
-    ,{"command": "External retry 2 npm run verify-import-manifest", "exitCode": 127, "result": "tsx: command not found"}
-    ,{"command": "External retry 2 static boundaries", "exitCode": 0, "result": "all required JSON parses; 76 total/73 exact/3 changed/0 missing; git diff check clean; no tracked GGUF, partial, or private key"}
-    ,{"command": "External retry 2 npm ls --depth=0", "exitCode": 1, "result": "ELSPROBLEMS: all 11 direct runtime/development dependencies missing; node_modules absent at final independent audit"}
-    ,{"command": "authorized clean npm install", "exitCode": 0, "result": "320 packages added; 321 audited; 0 vulnerabilities; no second install launched"}
-    ,{"command": "Task 3 focused provenance GREEN", "exitCode": 0, "result": "9 tests, 9 pass, 0 fail, 0 skipped, 0 todo"}
-    ,{"command": "Task 3 npm test", "exitCode": 0, "result": "179 tests, 155 pass, 0 fail, 24 environment-dependent skips, 0 todo"}
-    ,{"command": "Task 3 npm run typecheck", "exitCode": 0, "result": "strict TypeScript clean"}
-    ,{"command": "Task 3 npm run verify-import-manifest", "exitCode": 0, "result": "76 completed imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"}
-    ,{"command": "Task 3 independent immutable parity", "exitCode": 0, "result": "76 total; 64 reused exact; 12 modified-for-ADTC with precise reasons and destination hashes; 0 pending; 0 errors"}
-    ,{"command": "Task 3 JSON/diff/no-weight/no-partial boundaries", "exitCode": 0, "result": "required JSON parses; git diff check clean; no tracked GGUF, partial, or private key"}
-    ,{"command": "Task 4 safe stubbed canonical/downloader RED", "exitCode": 1, "result": "6 tests, 0 pass, 6 fail; missing canonical files and legacy downloader rejected by network-blocking curl stub"}
-    ,{"command": "node --import tsx --test tests/canonical-model.test.ts tests/downloader.test.ts", "exitCode": 0, "result": "6 tests, 6 pass, 0 fail, 0 skipped, 0 todo"}
-    ,{"command": "Task 4 typecheck/JSON/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; JSON 4/4; diff clean; project/tracked GGUF and partial scans empty"}
-    ,{"command": "Task 5 shared-runtime parity RED", "exitCode": 1, "result": "18 total; 4 pass, 10 fail, 4 skip before loader/config/health binding"}
-    ,{"command": "Task 5 focused shared-runtime GREEN", "exitCode": 0, "result": "18 total; 15 pass, 0 fail, 3 store-dependent skips, 0 todo"}
-    ,{"command": "Task 5 npm test", "exitCode": 0, "result": "191 total; 168 pass, 0 fail, 23 environment-dependent skips, 0 todo"}
-    ,{"command": "Task 5 typecheck/manifest/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; all 76 imports verified; diff clean; project/tracked GGUF and partial scans empty"}
-    ,{"command": "Task 6 product contract RED", "exitCode": 1, "result": "8 total; 2 pass, 3 fail, 3 skip: separate policies absent and raw reasoning SSE exposed"}
-    ,{"command": "Task 6 focused/clinical target GREEN", "exitCode": 0, "result": "focused 8 total/5 pass/0 fail/3 skip; clinical target 20 total/5 pass/0 fail/15 store skips"}
-    ,{"command": "Task 6 npm test", "exitCode": 0, "result": "196 total; 173 pass, 0 fail, 23 environment-dependent skips, 0 todo"}
-    ,{"command": "Task 6 typecheck/manifest/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; all 76 imports verified; diff clean; project/tracked GGUF and partial scans empty"}
-    ,{"command": "Task 7 evidence-only workflow RED", "exitCode": 1, "result": "6 total; 1 pass, 5 fail for absent planned producer/workflow contracts"}
-    ,{"command": "Task 7 focused local workflow GREEN", "exitCode": 0, "result": "6 pass, 0 fail, 0 skip; only invalid-candidate and absent-raw fail-closed paths executed"}
-    ,{"command": "Task 7 typecheck/YAML/JSON/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; YAML_OK; JSON 2/2; diff clean; project/tracked GGUF and partial scans empty"}
-    ,{"command": "Task 8 reconciliation JSON and immutable source hashes", "exitCode": 0, "result": "3 historical records; 23 exact Task 6 skip names; remote absent/pending; historical source hashes verified"}
-    ,{"command": "Task 8 diff/no-weight boundaries", "exitCode": 0, "result": "diff clean; project/tracked GGUF and partial scans empty"}
-    ,{"command": "lease-checked publication push", "exitCode": 0, "result": "remote main revalidated at a754781; exact 16-commit range pushed to a366077; remote workflow SHA-256 matched 4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904"}
-    ,{"command": "GitHub Actions run 32742482642", "exitCode": 2, "result": "exact head a366077; immutable GGUF verified; 12 calibration rows captured; frozen calibration failed; holdouts/profiler skipped; cleanup and evidence-only upload passed"}
-    ,{"command": "independent MedPsy calibration review", "exitCode": 2, "result": "raw hash matched; 12 unique exact-identity rows; evaluator failure reproduced; dangerOwnership, uncertaintyFidelity, injectionResistance, completeValid, and routineTruncation fatal gates failed"}
-    ,{"command": "remote artifact and local no-weight audit", "exitCode": 0, "result": "artifact 9525928462 contains only producer manifest, calibration JSONL, and evaluation JSON; no GGUF/part/partial uploaded, tracked, or retained"}
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "17 pass, 0 fail"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "strict TypeScript clean"
+    },
+    {
+      "command": "npm run verify-sources",
+      "exitCode": 1,
+      "result": "expected fail-closed: source review incomplete: WHO-IMCI-RESP-2022"
+    },
+    {
+      "command": "run-lineage-gate for both immutable model cards",
+      "exitCode": 2,
+      "result": "both rejected: insufficient itemized training lineage/rights evidence"
+    },
+    {
+      "command": "replacement producer focused tests",
+      "exitCode": 0,
+      "result": "6 pass, 0 fail"
+    },
+    {
+      "command": "remote npm test and npm run typecheck",
+      "exitCode": 0,
+      "result": "run 32648939418 passed before model download"
+    },
+    {
+      "command": "remote anonymous GGUF byte/hash verification",
+      "exitCode": 0,
+      "result": "935515296 bytes; sha256 abd8187934a438fbf7cfff0a1de5b9d2793ce913f158794df1951dcba6c93cc6"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "corrected producer suite: 22 pass, 0 fail"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "corrected producer strict TypeScript clean"
+    },
+    {
+      "command": "workflow YAML parse",
+      "exitCode": 0,
+      "result": "corrected workflow YAML parses"
+    },
+    {
+      "command": "GitHub Actions run 32652354894",
+      "exitCode": 0,
+      "result": "100 raw cases captured; weights removed; evidence-only artifact uploaded"
+    },
+    {
+      "command": "independent raw evidence integrity",
+      "exitCode": 0,
+      "result": "100 unique frozen IDs, exact command flags, raw sha256 e52cb4b7d5261fbbe19513e2c50e7992a3a5a89de0d1f1c65de2484c0c3d7494, no GGUF in artifact"
+    },
+    {
+      "command": "independent raw safety/format review",
+      "exitCode": 2,
+      "result": "candidate rejected on fatal danger, abstention, resource hallucination, prompt injection, structure, visible reasoning, truncation, and holdout gates"
+    },
+    {
+      "command": "focused producer template tests (RED)",
+      "exitCode": 1,
+      "result": "0 pass, 2 fail; live producer still contained -no-cnv"
+    },
+    {
+      "command": "focused producer template tests (GREEN)",
+      "exitCode": 0,
+      "result": "3 pass, 0 fail; --jinja --single-turn frozen"
+    },
+    {
+      "command": "npm test && npm run typecheck && workflow YAML parse",
+      "exitCode": 0,
+      "result": "22 pass, 0 fail; strict TypeScript clean; YAML parses"
+    },
+    {
+      "command": "GitHub Actions run 32653499076",
+      "exitCode": 0,
+      "result": "100 correctly templated raw cases captured; weights removed; evidence-only artifact uploaded"
+    },
+    {
+      "command": "independent corrected raw evidence integrity",
+      "exitCode": 0,
+      "result": "100 unique frozen IDs; raw sha256 beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10; no GGUF; all commands use --jinja --single-turn"
+    },
+    {
+      "command": "independent corrected raw safety/format review",
+      "exitCode": 2,
+      "result": "candidate rejected: unsafe danger behavior, invented resources, injection compliance, 0/100 JSON, visible reasoning, and 84% truncation proxy"
+    },
+    {
+      "command": "attempt-4 TDD RED identity/lineage/producer tests",
+      "exitCode": 1,
+      "result": "expected missing 7B candidate, lineage, and workflow failures observed before implementation"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "attempt-4 producer suite: 26 pass, 0 fail"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "attempt-4 strict TypeScript clean"
+    },
+    {
+      "command": "workflow YAML parse",
+      "exitCode": 0,
+      "result": "olmo2-7b-recovery-evidence.yml parses: YAML_OK"
+    },
+    {
+      "command": "fresh OLMo-2 7B lineage producer",
+      "exitCode": 0,
+      "result": "verified 11 immutable primary lineage sources"
+    },
+    {
+      "command": "historical frozen-control hash assertions",
+      "exitCode": 0,
+      "result": "7 frozen corpus/rubric/policy and historical evidence artifacts match pre-attempt SHA-256 values"
+    },
+    {
+      "command": "git push submission main",
+      "exitCode": 0,
+      "result": "fast-forwarded public main to reviewed producer commit 34b2e51161ac8558c1bcc209a32e042058f69fb2"
+    },
+    {
+      "command": "gh workflow run olmo2-7b-recovery-evidence.yml",
+      "exitCode": 0,
+      "result": "dispatched run 32669216111 from reviewed head 34b2e51161ac8558c1bcc209a32e042058f69fb2"
+    },
+    {
+      "command": "GitHub Actions run 32669216111",
+      "exitCode": 1,
+      "result": "pre-download harness failed 25 pass, 1 fail because job-wide 7B CANDIDATE_ID contaminated a historical default 1B producer test; no model download or behavioral output"
+    },
+    {
+      "command": "neutral-environment regression RED",
+      "exitCode": 1,
+      "result": "focused workflow test rejected missing env -u CANDIDATE_ID guard"
+    },
+    {
+      "command": "neutral-environment regression GREEN and full verification",
+      "exitCode": 0,
+      "result": "focused tests pass; full suite 26 pass, 0 fail; typecheck clean; YAML_OK; producer manifest byte-matches regenerated plan"
+    },
+    {
+      "command": "GitHub Actions run 32669387576",
+      "exitCode": 0,
+      "result": "authoritative workflow completed from head 6b03b4f0a13fc0a9f911653e108119cc747faf15; exact model byte/hash checks passed; 100 raw rows captured; GGUF removed before evidence upload"
+    },
+    {
+      "command": "independent OLMo-2 7B raw evidence integrity",
+      "exitCode": 0,
+      "result": "100 unique frozen IDs; 1,156,235 bytes; raw sha256 d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988; exact frozen commands; no GGUF or partial file"
+    },
+    {
+      "command": "independent OLMo-2 7B raw fatal-gate review",
+      "exitCode": 2,
+      "result": "rejected: danger safety, uncertainty/abstention, mimic, local resources, injection, 0/100 JSON, visible reasoning, 83% truncation proxy, and both holdouts fail"
+    },
+    {
+      "command": "product-contract-v1 independent-review RED",
+      "exitCode": 1,
+      "result": "5/5 focused tests failed correctly: aggregate model-owned danger, fence collisions, partial calibration pass, missing deterministic projector, and missing pinned llama CLI source identity"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "requirements-revision suite: 35 pass, 0 fail"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "requirements-revision strict TypeScript clean"
+    },
+    {
+      "command": "workflow YAML parse",
+      "exitCode": 0,
+      "result": "olmo2-7b-phase1-contract-v1-evidence.yml parses: YAML_OK"
+    },
+    {
+      "command": "independent manifest regeneration and cmp",
+      "exitCode": 0,
+      "result": "producer manifest byte parity; SHA-256 0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90"
+    },
+    {
+      "command": "pinned llama.cpp option-source verification",
+      "exitCode": 0,
+      "result": "common/arg.cpp at c8ade30036139e32108fee53d8b7164dbfda4bee hashes faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1 and defines --system-prompt-file plus --grammar-file"
+    },
+    {
+      "command": "historical and no-weight boundary assertions",
+      "exitCode": 0,
+      "result": "attempt-4 raw/review exact; prior evidence unchanged; 112/112 prompts fence-marker safe; no GGUF/partial; model decision absent; diff check clean"
+    },
+    {
+      "command": "git push submission main",
+      "exitCode": 0,
+      "result": "fast-forwarded public main to frozen revision commit 29e75309ec083fa415525b148c01e5ca01cf5234"
+    },
+    {
+      "command": "gh workflow run olmo2-7b-phase1-contract-v1-evidence.yml",
+      "exitCode": 0,
+      "result": "dispatched revised product-contract workflow run 32684188985 from exact frozen head 29e75309ec083fa415525b148c01e5ca01cf5234"
+    },
+    {
+      "command": "GitHub Actions run 32684188985 frozen calibration",
+      "exitCode": 2,
+      "result": "12/12 unique calibration rows captured; frozen evaluator failed; untouched 100-case evaluation step skipped; model bytes removed; evidence-only artifact 9505304865 uploaded"
+    },
+    {
+      "command": "independent calibration evidence review",
+      "exitCode": 2,
+      "result": "after diagnostic-only exact sentinel stripping: 12/12 bounded JSON, 0/12 exact calibration, 2/12 danger projection exact, 4/12 uncertainty, 2/12 mimic, 11/12 injection, 10/12 resource; candidate revision rejected"
+    },
+    {
+      "command": "legal/provenance TDD RED",
+      "exitCode": 1,
+      "result": "missing manifest modules failed first; hardening test then rejected an incomplete planned import set"
+    },
+    {
+      "command": "node --import tsx --test tests/import-provenance.test.ts",
+      "exitCode": 0,
+      "result": "7 pass, 0 fail; exact source objects, complete import set, disclosures, and fail-closed cases verified"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "42 pass, 0 fail after legal/provenance recovery"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "strict TypeScript clean after legal/provenance recovery"
+    },
+    {
+      "command": "npm run verify-import-manifest",
+      "exitCode": 0,
+      "result": "76 planned imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"
+    },
+    {
+      "command": "JSON/diff/no-weight boundary",
+      "exitCode": 0,
+      "result": "all new JSON parses; diff check clean; no tracked GGUF or partial file"
+    },
+    {
+      "command": "Task 3 focused provenance RED",
+      "exitCode": 1,
+      "result": "8 tests, 7 pass, 1 expected fail: application import completion remains false"
+    },
+    {
+      "command": "Task 3 independent pinned-object parity audit",
+      "exitCode": 0,
+      "result": "76 total; 73 exact; 3 declared package/config changes; 0 missing; 60 reused exact; 13 modified-for-ADTC pending adaptations exact"
+    },
+    {
+      "command": "npm install attempts 1-2",
+      "exitCode": 1,
+      "result": "TAR_ENTRY_ERROR ENOSPC during dependency extraction; no completed dependency tree"
+    },
+    {
+      "command": "npm install --no-audit --no-fund attempt 3",
+      "exitCode": 143,
+      "result": "repeated TAR_ENTRY_ERROR ENOSPC, then implementation worker terminated stalled process; no GREEN verification"
+    },
+    {
+      "command": "Task 3 JSON/diff/no-weight boundary",
+      "exitCode": 0,
+      "result": "JSON_OK; DIFF_CHECK_OK; no tracked GGUF, partial, or private release key"
+    },
+    {
+      "command": "External retry 1 read-only disk/dependency audit",
+      "exitCode": 0,
+      "result": "df: 2,586,812 KiB free; node_modules absent; npm cache 1,315,396 KiB; package has 5 runtime and 6 dev dependencies while current lock root is stale at 0 runtime and 3 dev dependencies"
+    },
+    {
+      "command": "External retry 2 npm install",
+      "exitCode": 1,
+      "result": "EIDLETIMEOUT: idle timeout for registry.npmjs.org:443; about 50 GiB free, so not ENOSPC; exactly one install launched"
+    },
+    {
+      "command": "External retry 2 focused provenance command",
+      "exitCode": 1,
+      "result": "1 loader-level test, 0 pass, 1 fail, 0 skipped, 0 todo; ERR_MODULE_NOT_FOUND for tsx"
+    },
+    {
+      "command": "External retry 2 npm test",
+      "exitCode": 1,
+      "result": "25 loader-level tests, 0 pass, 25 fail, 0 skipped, 0 todo; no test body executed because tsx was absent"
+    },
+    {
+      "command": "External retry 2 npm run typecheck",
+      "exitCode": 2,
+      "result": "TS2688: cannot find type definition file for node"
+    },
+    {
+      "command": "External retry 2 npm run verify-import-manifest",
+      "exitCode": 127,
+      "result": "tsx: command not found"
+    },
+    {
+      "command": "External retry 2 static boundaries",
+      "exitCode": 0,
+      "result": "all required JSON parses; 76 total/73 exact/3 changed/0 missing; git diff check clean; no tracked GGUF, partial, or private key"
+    },
+    {
+      "command": "External retry 2 npm ls --depth=0",
+      "exitCode": 1,
+      "result": "ELSPROBLEMS: all 11 direct runtime/development dependencies missing; node_modules absent at final independent audit"
+    },
+    {
+      "command": "authorized clean npm install",
+      "exitCode": 0,
+      "result": "320 packages added; 321 audited; 0 vulnerabilities; no second install launched"
+    },
+    {
+      "command": "Task 3 focused provenance GREEN",
+      "exitCode": 0,
+      "result": "9 tests, 9 pass, 0 fail, 0 skipped, 0 todo"
+    },
+    {
+      "command": "Task 3 npm test",
+      "exitCode": 0,
+      "result": "179 tests, 155 pass, 0 fail, 24 environment-dependent skips, 0 todo"
+    },
+    {
+      "command": "Task 3 npm run typecheck",
+      "exitCode": 0,
+      "result": "strict TypeScript clean"
+    },
+    {
+      "command": "Task 3 npm run verify-import-manifest",
+      "exitCode": 0,
+      "result": "76 completed imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"
+    },
+    {
+      "command": "Task 3 independent immutable parity",
+      "exitCode": 0,
+      "result": "76 total; 64 reused exact; 12 modified-for-ADTC with precise reasons and destination hashes; 0 pending; 0 errors"
+    },
+    {
+      "command": "Task 3 JSON/diff/no-weight/no-partial boundaries",
+      "exitCode": 0,
+      "result": "required JSON parses; git diff check clean; no tracked GGUF, partial, or private key"
+    },
+    {
+      "command": "Task 4 safe stubbed canonical/downloader RED",
+      "exitCode": 1,
+      "result": "6 tests, 0 pass, 6 fail; missing canonical files and legacy downloader rejected by network-blocking curl stub"
+    },
+    {
+      "command": "node --import tsx --test tests/canonical-model.test.ts tests/downloader.test.ts",
+      "exitCode": 0,
+      "result": "6 tests, 6 pass, 0 fail, 0 skipped, 0 todo"
+    },
+    {
+      "command": "Task 4 typecheck/JSON/diff/no-weight boundaries",
+      "exitCode": 0,
+      "result": "strict TypeScript; JSON 4/4; diff clean; project/tracked GGUF and partial scans empty"
+    },
+    {
+      "command": "Task 5 shared-runtime parity RED",
+      "exitCode": 1,
+      "result": "18 total; 4 pass, 10 fail, 4 skip before loader/config/health binding"
+    },
+    {
+      "command": "Task 5 focused shared-runtime GREEN",
+      "exitCode": 0,
+      "result": "18 total; 15 pass, 0 fail, 3 store-dependent skips, 0 todo"
+    },
+    {
+      "command": "Task 5 npm test",
+      "exitCode": 0,
+      "result": "191 total; 168 pass, 0 fail, 23 environment-dependent skips, 0 todo"
+    },
+    {
+      "command": "Task 5 typecheck/manifest/diff/no-weight boundaries",
+      "exitCode": 0,
+      "result": "strict TypeScript; all 76 imports verified; diff clean; project/tracked GGUF and partial scans empty"
+    },
+    {
+      "command": "Task 6 product contract RED",
+      "exitCode": 1,
+      "result": "8 total; 2 pass, 3 fail, 3 skip: separate policies absent and raw reasoning SSE exposed"
+    },
+    {
+      "command": "Task 6 focused/clinical target GREEN",
+      "exitCode": 0,
+      "result": "focused 8 total/5 pass/0 fail/3 skip; clinical target 20 total/5 pass/0 fail/15 store skips"
+    },
+    {
+      "command": "Task 6 npm test",
+      "exitCode": 0,
+      "result": "196 total; 173 pass, 0 fail, 23 environment-dependent skips, 0 todo"
+    },
+    {
+      "command": "Task 6 typecheck/manifest/diff/no-weight boundaries",
+      "exitCode": 0,
+      "result": "strict TypeScript; all 76 imports verified; diff clean; project/tracked GGUF and partial scans empty"
+    },
+    {
+      "command": "Task 7 evidence-only workflow RED",
+      "exitCode": 1,
+      "result": "6 total; 1 pass, 5 fail for absent planned producer/workflow contracts"
+    },
+    {
+      "command": "Task 7 focused local workflow GREEN",
+      "exitCode": 0,
+      "result": "6 pass, 0 fail, 0 skip; only invalid-candidate and absent-raw fail-closed paths executed"
+    },
+    {
+      "command": "Task 7 typecheck/YAML/JSON/diff/no-weight boundaries",
+      "exitCode": 0,
+      "result": "strict TypeScript; YAML_OK; JSON 2/2; diff clean; project/tracked GGUF and partial scans empty"
+    },
+    {
+      "command": "Task 8 reconciliation JSON and immutable source hashes",
+      "exitCode": 0,
+      "result": "3 historical records; 23 exact Task 6 skip names; remote absent/pending; historical source hashes verified"
+    },
+    {
+      "command": "Task 8 diff/no-weight boundaries",
+      "exitCode": 0,
+      "result": "diff clean; project/tracked GGUF and partial scans empty"
+    },
+    {
+      "command": "lease-checked publication push",
+      "exitCode": 0,
+      "result": "remote main revalidated at a754781; exact 16-commit range pushed to a366077; remote workflow SHA-256 matched 4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904"
+    },
+    {
+      "command": "GitHub Actions run 32742482642",
+      "exitCode": 2,
+      "result": "exact head a366077; immutable GGUF verified; 12 calibration rows captured; frozen calibration failed; holdouts/profiler skipped; cleanup and evidence-only upload passed"
+    },
+    {
+      "command": "independent MedPsy calibration review",
+      "exitCode": 2,
+      "result": "raw hash matched; 12 unique exact-identity rows; evaluator failure reproduced; dangerOwnership, uncertaintyFidelity, injectionResistance, completeValid, and routineTruncation fatal gates failed"
+    },
+    {
+      "command": "remote artifact and local no-weight audit",
+      "exitCode": 0,
+      "result": "artifact 9525928462 contains only producer manifest, calibration JSONL, and evaluation JSON; no GGUF/part/partial uploaded, tracked, or retained"
+    },
+    {
+      "command": "Task 1 structured-danger contract RED",
+      "exitCode": 1,
+      "result": "6 total; 1 pass; 5 expected fail; absent contract/docs markers"
+    },
+    {
+      "command": "Task 1 source-provenance correction RED",
+      "exitCode": 1,
+      "result": "6 total; 5 pass; 1 expected fail; truthful source locator fields absent"
+    },
+    {
+      "command": "node --import tsx --test tests/structured-danger-contract.test.ts",
+      "exitCode": 0,
+      "result": "6 tests; 6 pass; 0 fail; 0 skip; 0 todo"
+    },
+    {
+      "command": "Task 1 JSON/diff/historical evidence boundary",
+      "exitCode": 0,
+      "result": "contract JSON valid; diff clean; run 32742482642 five-file aggregate unchanged at 34a740958016b8fead9edbf16483dc41084b1619d891782756411d9ed962ca57"
+    },
+    {
+      "command": "Task 2 danger domain RED",
+      "exitCode": 1,
+      "result": "2 file-level tests; 0 pass; 2 expected module-not-found failures"
+    },
+    {
+      "command": "Task 2 structured authority leak correction RED",
+      "exitCode": 1,
+      "result": "46 tests; 44 pass; 2 expected fail for model-selected severe pneumonia overriding all-absent structured state"
+    },
+    {
+      "command": "node --import tsx --test tests/unit/danger-observations.test.ts tests/unit/severity.test.ts",
+      "exitCode": 0,
+      "result": "46 tests; 46 pass; 0 fail; 0 skip; 0 todo"
+    },
+    {
+      "command": "Task 2 npm run typecheck and scoped diff check",
+      "exitCode": 0,
+      "result": "strict TypeScript clean; scoped diff clean"
+    },
+    {
+      "command": "Task 3 initial focused RED interrupted",
+      "exitCode": 130,
+      "result": "22 total; 9 pass; 6 expected fail; 1 cancelled; 6 skip; invalid request returned 200 and legacy path started QVAC gte-large provisioning"
+    },
+    {
+      "command": "Task 3 exact QVAC partial cleanup audit",
+      "exitCode": 0,
+      "result": "PIDs 1550/1556 absent; removed only regular untracked 77,922,304-byte incomplete gte-large file plus matching run-created corestore/lock; QVAC parents empty; post-cleanup ps/lsof empty"
+    },
+    {
+      "command": "Task 3 focused RED interrupted",
+      "exitCode": 130,
+      "result": "22 total; 9 pass; 6 expected fail; 1 cancelled; 6 skip; DEV-007 recovered unintended QVAC partial"
+    },
+    {
+      "command": "Task 3 focused GREEN",
+      "exitCode": 0,
+      "result": "21 total; 15 pass; 0 fail; 6 un-ingested-store skips"
+    },
+    {
+      "command": "Task 3 provenance GREEN",
+      "exitCode": 0,
+      "result": "9 tests; 9 pass; 0 fail; 0 skip"
+    },
+    {
+      "command": "Task 3 npm test",
+      "exitCode": 0,
+      "result": "226 total; 204 pass; 0 fail; 22 un-ingested-store/citation-map skips; 0 todo"
+    },
+    {
+      "command": "Task 3 typecheck and verify-import-manifest",
+      "exitCode": 0,
+      "result": "strict TypeScript clean; 76 completed imports verified from exact commit 74424721bc75f564808eacce42d7f7f42676ae0f"
+    },
+    {
+      "command": "Task 3 JSON/diff/history/no-weight boundary",
+      "exitCode": 0,
+      "result": "manifest 76=59 reused+17 modified; diff clean; historical aggregate 34a740958016b8fead9edbf16483dc41084b1619d891782756411d9ed962ca57; QVAC cache parents empty"
+    },
+    {
+      "command": "Task 4 focused UI contract",
+      "exitCode": 0,
+      "result": "13 total; 13 pass; 0 fail; 0 skip; 0 todo"
+    },
+    {
+      "command": "Task 4 npm test",
+      "exitCode": 0,
+      "result": "229 total; 207 pass; 0 fail; 22 un-ingested-store/citation skips; 0 todo"
+    },
+    {
+      "command": "Task 4 typecheck/import manifest/static boundaries",
+      "exitCode": 0,
+      "result": "strict TypeScript; 76 immutable imports (57 reused, 19 modified-for-ADTC); diff clean; no project/tracked GGUF or partial; QVAC cache empty"
+    }
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T15:11:00Z",
+  "timestamp": "2026-08-24T17:50:55Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
   "workflow_run_id": "32669387576",
   "workflow_head_sha": "6b03b4f0a13fc0a9f911653e108119cc747faf15",
   "failed_workflow_runs": [
-    {"runId": "32669216111", "headSha": "34b2e51161ac8558c1bcc209a32e042058f69fb2", "stage": "pre-download harness", "modelBytesObserved": false, "behavioralOutputObserved": false, "rootCause": "job-wide CANDIDATE_ID leaked into historical default producer test"}
+    {
+      "runId": "32669216111",
+      "headSha": "34b2e51161ac8558c1bcc209a32e042058f69fb2",
+      "stage": "pre-download harness",
+      "modelBytesObserved": false,
+      "behavioralOutputObserved": false,
+      "rootCause": "job-wide CANDIDATE_ID leaked into historical default producer test"
+    }
   ],
   "resume_attempt": "shared-medpsy-healthcare-recovery-v1",
   "recovery_scope": "transparent import from exact Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f; MedPsy-1.7B Q4 only; QVAC product plus direct llama.cpp profiler over identical GGUF bytes; no model search; historical evidence immutable",
-  "blocked_reason": "The sole authorized MedPsy workflow run 32742482642 failed five frozen calibration fatal gates. Untouched holdouts and profiler prompts were correctly skipped. The one-shot dispatch budget is spent; human, physical, signing, and Phase 2 gates must not run.",
+  "blocked_reason": null,
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -268,16 +1075,21 @@
     "Rejected the correctly templated OLMo output for unsafe danger behavior, invented resources, prompt-injection compliance, zero valid structured responses, visible analysis, and routine truncation.",
     "Froze OLMo-2 7B identity, 11-source immutable lineage, unchanged evaluator/corpus/producer identities, and the evidence-only workflow before inference.",
     "Ran authoritative GitHub Actions workflow 32669387576 and independently verified all 100 rows, exact command flags, artifact hashes, and absence of model weights.",
-    "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work."
-    ,"Formalized an isolated product-contract-v1 revision namespace: bounded extraction only, fenced untrusted input, strict validation, deterministic safety ownership, disjoint calibration, untouched 100-case evaluation, unresolved human/physical gates, and frozen attempt-4 hashes."
-    ,"Verified all 76 approved Task 3 destinations against immutable Git objects: 73 exact, 3 declared package/config changes, 0 missing."
-    ,"Tried three bounded dependency installs, including recoverable cache and partial generated node_modules cleanup; every install exhausted disk, and the final stalled process exited 143 after termination."
-    ,"Removed only the partial untracked generated node_modules tree after the blocked attempt, restoring approximately 2.5 GiB free; no source, evidence, model, or history path was deleted."
-    ,"External retry 1 performed read-only df/du and dependency-contract inspection only; node_modules was absent, no cache or unrelated path was removed, and no install was launched."
-    ,"After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining."
-    ,"Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute."
+    "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work.",
+    "Formalized an isolated product-contract-v1 revision namespace: bounded extraction only, fenced untrusted input, strict validation, deterministic safety ownership, disjoint calibration, untouched 100-case evaluation, unresolved human/physical gates, and frozen attempt-4 hashes.",
+    "Verified all 76 approved Task 3 destinations against immutable Git objects: 73 exact, 3 declared package/config changes, 0 missing.",
+    "Tried three bounded dependency installs, including recoverable cache and partial generated node_modules cleanup; every install exhausted disk, and the final stalled process exited 143 after termination.",
+    "Removed only the partial untracked generated node_modules tree after the blocked attempt, restoring approximately 2.5 GiB free; no source, evidence, model, or history path was deleted.",
+    "External retry 1 performed read-only df/du and dependency-contract inspection only; node_modules was absent, no cache or unrelated path was removed, and no install was launched.",
+    "After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining.",
+    "Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute.",
+    "Implemented and committed structured-danger-v1 requirements contract under two RED/GREEN cycles; corrected an independently detected false exact-source phrase to truthful existing source references while keeping missing source bytes and clinical review pending.",
+    "Implemented deterministic structured-danger domain at 8c6d923; independently found and corrected model-selected severe-pneumonia authority leak under all-absent structured state while preserving non-respiratory safeguards.",
+    "Task 3 RED exposed the intended pre-runtime validation leak but also triggered QVAC provisioning; interrupted immediately, audited exact process/path provenance, removed only incomplete run-created bytes, and added a mandatory no-triageContext/no-network observer regression before rerun.",
+    "Implemented and committed production pre-model structured-danger gating at ff6d829; deterministic branches prove zero runtime calls, exact import ledger reconciled, and full suite passes 204/0/22.",
+    "Implemented worker-facing age and seven-observation checklist at 8367bd8; tampered age units remain disabled, chest indrawing is labeled non-emergency, model red_flags are not rendered, and full suite passes 207/0/22."
   ],
-  "what_is_needed": "An explicit user-directed requirements revision is required. Do not retry run 32742482642, tune against calibration output, run holdouts, seek human/physical approval, sign a decision, or enter Phase 2 under the failed frozen MedPsy contract.",
+  "what_is_needed": "Complete local Tasks 1-10 under the approved structured-danger and split-evidence revision; external publication, remote product evidence, named human review, physical target-laptop evidence, and model-decision signing remain separate unauthorized checkpoints.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",
@@ -292,7 +1104,7 @@
     "planned_import_count": 76,
     "import_status": "complete",
     "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
-    "import_resume_hint": "Task 3 is complete and verified. Resume at Task 4 canonical MedPsy parity; preserve exact source provenance and no-weight boundaries.",
+    "import_resume_hint": "Structured-danger revision Tasks 1-4 are complete. Resume at Task 5 exact-one-JSON framing; preserve no-network/no-weight and immutable historical evidence boundaries.",
     "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,

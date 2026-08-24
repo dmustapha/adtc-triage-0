@@ -92,3 +92,9 @@
 2026-08-24T15:01:24Z | build | START | build | Dispatching build
 2026-08-24T15:03:05Z | hackathon-build | START | remote-medpsy-evidence | Authorized exact push landed at a366077; sole workflow dispatch run 32742482642 queued from matching head.
 2026-08-24T15:09:27Z | hackathon-build | BLOCKED | remote-medpsy-evidence | Run 32742482642 failed five frozen calibration fatal gates; holdouts skipped; cleanup/upload passed; no weights retained; no retry authorized.
+2026-08-24T15:14:16Z | build | BLOCKED | build | type=fundamental action=escalate
+2026-08-24T16:50:21Z | conductor | START | resume | Resuming from url_preverify
+2026-08-24T16:50:33Z | build | START | build | Dispatching build
+2026-08-24T16:56:43Z | hackathon-build | START | structured-danger-evidence-plane-v2 | Resuming the approved requirements revision at Task 1 under TDD; local-only, with no publication, workflow dispatch, model download, or weight retention.
+2026-08-24T17:50:13Z | hackathon-build | COMPLETE | structured-danger-revision-task-4 | Worker checklist committed at 8367bd8; focused 13/13 and full 207 pass/0 fail/22 skip; model-free deterministic emergency smoke passed.
+2026-08-24T17:50:13Z | hackathon-build | START | structured-danger-revision-task-5 | Exact-one-JSON framing adapter started under TDD; local-only and no model bytes.
