@@ -1,0 +1,46 @@
+{
+  "p0_features": [
+    {
+      "command": "node --import tsx --test tests/structured-danger-contract.test.ts tests/debug-local-e2e.test.ts tests/debug-inference-queue.test.ts",
+      "exit_code": 0,
+      "sentinel": "real QVAC path, resident model, or ingested store absent",
+      "observed": "8 tests passed. Structured danger, truthful empty-state health, deterministic emergency SSE, and queue ownership executed. The health response still had residentModels=[] and this command did not execute QVAC product inference."
+    },
+    {
+      "command": "test -f model/medpsy-1.7b-q4_k_m-imat.gguf",
+      "exit_code": 1,
+      "sentinel": "canonical GGUF absent",
+      "observed": "The exact 1,282,439,360-byte canonical GGUF is absent from the local project and no download was authorized."
+    },
+    {
+      "command": "test -f evidence/model-decision.json",
+      "exit_code": 1,
+      "sentinel": "signed model decision absent",
+      "observed": "No signed model decision exists and Phase 2 remains unauthorized."
+    },
+    {
+      "command": "npm run verify-sources",
+      "exit_code": 1,
+      "sentinel": "source review incomplete",
+      "observed": "The command failed closed with source review incomplete: WHO-IMCI-RESP-2022."
+    },
+    {
+      "command": "test -f submission.json",
+      "exit_code": 1,
+      "sentinel": "official profiler result absent",
+      "observed": "submission.json is absent. No current full profiler run is available for claim-bearing scoring."
+    },
+    {
+      "command": "test -x scripts/verify-offline.sh",
+      "exit_code": 1,
+      "sentinel": "full no-egress proof absent",
+      "observed": "The planned full offline proof script is absent. The executed deterministic emergency path is not a browser-to-QVAC-to-source no-egress proof."
+    },
+    {
+      "command": "test -f demo/final.mp4",
+      "exit_code": 1,
+      "sentinel": "final video absent",
+      "observed": "No final video exists. Publication and final video production are outside the current authorization."
+    }
+  ]
+}

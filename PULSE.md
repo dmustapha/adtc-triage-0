@@ -653,3 +653,24 @@
 
 #### For Next Skill
 - Verify Milestone must score deterministic proof separately from skipped QVAC/raw/clinical/physical gates and must not promote run 32742482642.
+
+---
+### verify_milestone — 2026-08-24T20:05:00Z
+**Status:** COMPLETE
+**Session(s):** 1
+
+#### Done
+- Audited all 12 P0 observables; 3 shipped, 6 partial, 3 missing.
+- Re-ran deterministic demo, parser, parity, queue, typecheck, URLs, and source gate.
+- Blind P0 re-derivation agreed FAIL with the lead token.
+
+#### Key Decisions
+- [SKILL] [D-V1] HOLD claim-bearing advancement at 25% completion and 60 observable score.
+- [USER] Local-only downstream hardening remains authorized with all removed claims absent.
+
+#### Blockers for Downstream
+- Real QVAC/store, source review, profiler, physical Ubuntu, identities, signing, and submission evidence remain absent.
+- Diagnosis-first medicines, doses, and management-plan behavior remains outside the PRD claim.
+
+#### For Next Skill
+- Design Forge may assess the verified local UI only; do not infer resident-model, offline-inference, clinical, physical, or submission proof.

@@ -1,0 +1,227 @@
+{
+  "status": "complete",
+  "mode": "milestone",
+  "autonomous_mode": true,
+  "runDate": "2026-08-24T20:04:41Z",
+  "winnerReadiness": 0,
+  "maxScore": 100,
+  "overallStatus": "HOLD",
+  "recommendation": "HOLD claim-bearing advancement. Continue only the separately authorized local hardening phases with all removed claims kept absent.",
+  "blocked_reason": null,
+  "claimScope": "Local deterministic and artifact verification only. Real QVAC product inference, sealed holdouts, named clinical review, physical Ubuntu evidence, signed model decision, Phase 2, and submission readiness remain unavailable.",
+  "killZones": {
+    "kz1_demo_reliability": "N/A",
+    "kz2_submission_completeness": "TRIGGERED",
+    "kz3_contract_wrong_network": "N/A",
+    "kz4_sponsor_integration": "CLEAR_CONDITIONAL",
+    "kz4_condition": "ADTC contract files exist, but real QVAC, profiler, physical, and signed-decision proof is absent.",
+    "kz5_eligibility_compliance": "MANUAL_CHECK_REQUIRED",
+    "kz5_reason": "Transparent prior-work provenance exists, but final organizer eligibility and real submitter identities are unresolved."
+  },
+  "facets": {
+    "f1_demo_reliability": { "score": 0, "max": 25, "notes": "Milestone mode does not score preflight facets. Deterministic emergency flow passed; controlling QVAC flow was unavailable." },
+    "f2_submission_completeness": { "score": 0, "max": 20, "notes": "REPORT.md is a template, submission.json and final video are absent, and identity placeholders remain." },
+    "f3_sponsor_integration": { "score": 0, "max": 20, "notes": "Generic sponsor scoring is inapplicable; ADTC contract depth is conditional." },
+    "f4_technical_correctness": { "score": 0, "max": 15, "notes": "Fresh focused tests and typecheck passed under claim-limited scope." },
+    "f5_narrative_quality": { "score": 0, "max": 10, "notes": "Not scored in milestone mode." },
+    "f6_eligibility_compliance": { "score": 0, "max": 5, "notes": "Manual organizer and identity confirmation remain." },
+    "f7_code_quality": { "score": 0, "max": 3, "notes": "Not scored in milestone mode." },
+    "f8_presentation_assets": { "score": 0, "max": 2, "notes": "Final video is absent by current authorization." }
+  },
+  "sponsors": {
+    "ADTC official evaluation contract": {
+      "status": "conditional",
+      "notes": "Template, metadata, downloader, exact model identity, split runtime contracts, and deterministic controls exist. Real model, profiler, physical, clinical review, and signing proof do not."
+    }
+  },
+  "blockers": [
+    "Canonical GGUF is absent locally and no model download is authorized.",
+    "Real supported-platform QVAC product calibration and ingested store are absent.",
+    "Named clinical/source review is incomplete.",
+    "submission.json, physical Ubuntu evidence, and a signed model decision are absent.",
+    "REPORT.md remains a template and final video plus submitter identities are absent.",
+    "Diagnosis-first classifications, medicines, doses, and management-plan rendering exceed the controlling PRD claim."
+  ],
+  "triage_order": [
+    "Keep diagnosis, medicine, dose, and management-plan claims removed.",
+    "Obtain separately authorized real QVAC and source-review evidence.",
+    "Produce official profiler and physical Ubuntu evidence.",
+    "Create a truthful signed model decision only after all gates pass.",
+    "Replace the template report and stage final identity and media fields."
+  ],
+  "milestones": [
+    {
+      "phase": "post-build-claim-limited",
+      "completion": 25,
+      "drift": "major",
+      "demo_path": "blocked",
+      "kz_warnings": [
+        "KZ-1: deterministic emergency path passes, but the controlling all-absent QVAC path cannot run.",
+        "KZ-2: required report, profiler JSON, video, identities, and final staging are absent.",
+        "KZ-4: ADTC integration is contract-deep only on local deterministic surfaces; real runtime evidence is absent.",
+        "KZ-5: prior-work disclosure exists, but organizer eligibility remains manual."
+      ],
+      "kz_triggered": ["KZ-2"],
+      "decision": "HOLD",
+      "timestamp": "2026-08-24T20:04:41Z"
+    }
+  ],
+  "buildVerification": {
+    "contractAddresses": {},
+    "deviationCount": 9,
+    "knownRiskCount": 0
+  },
+  "debugIntegration": {
+    "confidenceScore": 77,
+    "unresolvedCount": 2,
+    "testCoverage": 0,
+    "testCoverageNote": "Coverage instrumentation is absent; final Debug evidence was 264 pass, 0 fail, 22 exact skips."
+  },
+  "contractAddresses": {},
+  "phaseCompletion": {
+    "plannedClaims": 12,
+    "shippedClaims": 3,
+    "partialClaims": 6,
+    "missingClaims": 3,
+    "completionPercent": 25
+  },
+  "prdFeatureDelta": [
+    { "featureId": "FTR-001", "status": "PARTIAL", "evidence": "Fixture downloader tests pass; exact local GGUF and live provisioning proof are absent." },
+    { "featureId": "FTR-002", "status": "MISSING", "evidence": "evidence/model-decision.json is absent and Phase 2 is unauthorized." },
+    { "featureId": "FTR-003", "status": "PARTIAL", "evidence": "Split runtime identity contracts pass; neither real runtime plane executed in this milestone." },
+    { "featureId": "FTR-004", "status": "SHIPPED", "evidence": "Structured age and seven tri-state observation contract passed fresh." },
+    { "featureId": "FTR-005", "status": "SHIPPED", "evidence": "Fresh malformed, oversized, exact-one-JSON, and fail-closed tests passed." },
+    { "featureId": "FTR-006", "status": "SHIPPED", "evidence": "Fresh deterministic emergency precedence and chest-indrawing boundary passed." },
+    { "featureId": "FTR-007", "status": "PARTIAL", "evidence": "Deterministic emergency citation binds, but npm run verify-sources fails on incomplete named review." },
+    { "featureId": "FTR-008", "status": "PARTIAL", "evidence": "Local deterministic SSE works; full no-egress browser-to-QVAC proof is absent." },
+    { "featureId": "FTR-009", "status": "PARTIAL", "evidence": "Queue timeout ownership passed; real model cancel/recovery remains unavailable." },
+    { "featureId": "FTR-010", "status": "PARTIAL", "evidence": "Static exact-hash parity passes; real QVAC and profiler execution are absent." },
+    { "featureId": "FTR-011", "status": "MISSING", "evidence": "scripts/early-checkpoint.sh and submission.json are absent; report remains a template." },
+    { "featureId": "FTR-012", "status": "MISSING", "evidence": "demo/final.mp4 is absent and publication is unauthorized." }
+  ],
+  "architectureComponents": {
+    "planned": 9,
+    "found": 9,
+    "missing": [],
+    "incomplete": [
+      "Finalist Gate has no passing signed decision.",
+      "Evidence and Release Pipeline lacks current profiler, physical, no-egress, report, and video artifacts.",
+      "Source Catalog lacks complete named review.",
+      "Runtime product plane lacks real QVAC/model/store execution."
+    ]
+  },
+  "confirmedUrls": {
+    "checked": 5,
+    "reachable": 5,
+    "unreachable": [],
+    "warnings": [
+      "Public repository remains at a366077 while local HEAD is 7193cfb; no push is authorized.",
+      "Public REPORT.md is reachable but still the coding_assistants template.",
+      "The stored 4B finalist URL is reachable but is stale and not part of the immutable current MedPsy-1.7B identity.",
+      "No video URL exists."
+    ]
+  },
+  "demoPath": {
+    "status": "blocked",
+    "steps": [
+      { "step": "Open local UI and inspect supported scope", "status": "WORKS", "evidence": "Fresh /app check and Wire screenshot." },
+      { "step": "Inspect runtime and offline evidence", "status": "PARTIAL", "evidence": "Health is truthful with residentModels=[] and egress unarmed; this is not offline-inference proof." },
+      { "step": "Run structured emergency observation", "status": "WORKS", "evidence": "Fresh deterministic emergency SSE completed with zero QVAC boundaries." },
+      { "step": "Run supported all-absent case through QVAC product", "status": "BROKEN", "evidence": "Canonical GGUF and ingested store are absent." },
+      { "step": "Show official profiler and physical evidence", "status": "BROKEN", "evidence": "submission.json and physical Ubuntu bundle are absent." }
+    ]
+  },
+  "downstream_items": {
+    "open": 9,
+    "done": 4,
+    "partial": 1,
+    "unactioned_completed_phase": ["DI-S2: early valid submission-survival checkpoint remains open after Build"],
+    "grouped_open": {
+      "stress_test": ["DI-B1", "DI-B2"],
+      "deploy": ["DI-W1"],
+      "verify_preflight": ["DI-I2", "DI-T3", "DI-S3"],
+      "build": ["DI-S2"]
+    }
+  },
+  "winningPatternChecks": {
+    "wp1_landing": { "status": "PASS", "detail": "Local first visit contains scope, setup state, and usable input without a login wall." },
+    "wp2_testRatio": { "status": "PASS", "ratio": 0.8163, "detail": "40 test files / 49 TypeScript or JavaScript source files." },
+    "wp3_multiTrack": { "status": "WARN", "realTracks": 1, "claimedTracks": 1, "detail": "One healthcare track is deliberate; no unsupported multi-track claim." },
+    "wp4_submissionDir": { "status": "SKIPPED", "detail": "Milestone mode." },
+    "wp5_readmeStory": { "status": "SKIPPED", "detail": "Milestone mode." }
+  },
+  "observable_score": 60,
+  "observable_grade": "DEGRADED",
+  "observable_results": [
+    { "feature_id": "FTR-001", "feature": "Canonical provisioning", "status": "SKIP", "sentinel_hit": "Exact download prohibited by current authorization." },
+    { "feature_id": "FTR-002", "feature": "Signed finalist gate", "status": "FAIL", "sentinel_hit": "Signed model decision absent." },
+    { "feature_id": "FTR-003", "feature": "Split runtimes and exact GGUF identity", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-004", "feature": "Structured pediatric intake", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-005", "feature": "Fail-closed parsing", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-006", "feature": "Structured danger precedence", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-007", "feature": "Reviewed source binding", "status": "FAIL", "sentinel_hit": "source review incomplete: WHO-IMCI-RESP-2022" },
+    { "feature_id": "FTR-008", "feature": "Full offline workflow", "status": "SKIP", "sentinel_hit": "GGUF/store absent and no model acquisition authorized." },
+    { "feature_id": "FTR-009", "feature": "Queue and recovery", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-010", "feature": "Evidence-plane parity", "status": "PASS", "sentinel_hit": null },
+    { "feature_id": "FTR-011", "feature": "Submission-survival checkpoint", "status": "FAIL", "sentinel_hit": "early-checkpoint script and submission.json absent." },
+    { "feature_id": "FTR-012", "feature": "120-second final video", "status": "FAIL", "sentinel_hit": "demo/final.mp4 absent." }
+  ],
+  "fallback_active_features": [
+    "FTR-002 signed finalist gate",
+    "FTR-007 reviewed source binding",
+    "FTR-011 submission-survival checkpoint",
+    "FTR-012 final video"
+  ],
+  "post_build_critique": {
+    "elevations_implemented": 0,
+    "elevations_partial": ["E-1", "E-2", "E-3"],
+    "elevations_missing": ["E-4 physical 8 GB evidence bundle", "E-5 submission-first proof cut"],
+    "p0_built_and_tested": 0,
+    "p0_built_untested": 1,
+    "p0_not_built": 6,
+    "p0_total": 7,
+    "p0_score": 0,
+    "decision": "DO-NOT-SUBMIT",
+    "thesis_gate": "skipped-no-winner-brief",
+    "thesis_note": "WINNER-BRIEF.md and a canonical Thesis block are absent. The current PRD thesis is coherent, but the required THESIS-1..5 re-gate cannot be claimed."
+  },
+  "blind_cross_review": {
+    "artifact": "VERIFY-OBSERVABLE-EVIDENCE.json",
+    "artifact_sha256": "d87b49f10cf2c1ec422eec1dc59c8bff4493f26f5a6385d7d8e2b2f66b726b4f",
+    "lead_token": "FAIL",
+    "independent_token": "FAIL",
+    "reviewer": "independent parent Codex agent",
+    "network_calls": 0,
+    "reconciled": true
+  },
+  "rawModelScorecard": {
+    "formula": "0.50*S_acc + 0.30*S_perf + 0.20*S_eff - P_thermal",
+    "accuracy": "UNAVAILABLE",
+    "throughput": "UNAVAILABLE for current official claim",
+    "peakRss": "UNAVAILABLE for current official claim",
+    "thermalPenalty": "UNAVAILABLE",
+    "total": "NOT COMPUTABLE",
+    "notes": "Historical Apple and failed-run evidence is not promoted to current physical or passing profiler proof."
+  },
+  "uiObservations": {
+    "connectivityBadge": "PASS: Browser online/offline now describes browser reachability and remains separate from server no-egress proof.",
+    "preRunOnDeviceCopy": "PASS: pre-run copy no longer says This ran on the device; empty residentModels and setup-needed state remain visible.",
+    "claimBoundary": "FAIL FOR CLAIM-BEARING USE: diagnosis-first classifications, medicines, doses, and management-plan rendering remain in the imported product path beyond the PRD."
+  },
+  "context_percentage": 0,
+  "errors": [],
+  "phase_ledger": [
+    { "phase": "setup", "started_at": "2026-08-24T19:59:34Z", "completed_at": "2026-08-24T20:00:30Z", "evidence": "Conductor prerequisites Debug complete and Wire complete_with_blockers; claim-limited authorization confirmed." },
+    { "phase": "phase_objectives", "started_at": "2026-08-24T20:00:30Z", "completed_at": "2026-08-24T20:01:00Z", "evidence": "12 P0 observable claims extracted; 3 shipped, 6 partial, 3 missing; 25% complete." },
+    { "phase": "architectural_drift", "started_at": "2026-08-24T20:01:00Z", "completed_at": "2026-08-24T20:01:20Z", "evidence": "Major claim-level drift: QVAC product retained, but no real runtime evidence and diagnosis-first output exceeds the narrow PRD." },
+    { "phase": "prd_feature_delta", "started_at": "2026-08-24T20:01:20Z", "completed_at": "2026-08-24T20:02:00Z", "evidence": "VERIFY-REPORT.md classifies all 12 claims; 9/12 are partial or missing, requiring HOLD." },
+    { "phase": "architecture_component_check", "started_at": "2026-08-24T20:02:00Z", "completed_at": "2026-08-24T20:02:20Z", "evidence": "9/9 planned components have meaningful equivalents; four remain functionally incomplete." },
+    { "phase": "confirmed_urls_validation", "started_at": "2026-08-24T20:02:20Z", "completed_at": "2026-08-24T20:02:40Z", "evidence": "Five stored URLs returned HTTP 200; remote main remains a366077 and report content is stale." },
+    { "phase": "demo_path_check", "started_at": "2026-08-24T20:02:40Z", "completed_at": "2026-08-24T20:03:10Z", "evidence": "Fresh deterministic emergency SSE passed; controlling all-absent QVAC and profiler steps are unavailable." },
+    { "phase": "kill_zone_warnings", "started_at": "2026-08-24T20:03:10Z", "completed_at": "2026-08-24T20:03:25Z", "evidence": "KZ-1/2/4/5 warnings recorded; KZ-2 is active for claim-bearing submission readiness." },
+    { "phase": "proceed_decision", "started_at": "2026-08-24T20:03:25Z", "completed_at": "2026-08-24T20:03:35Z", "evidence": "HOLD under <80% completion, major drift, blocked controlling demo path, and completed-phase DI-S2 slip." },
+    { "phase": "feature_observables", "started_at": "2026-08-24T20:03:35Z", "completed_at": "2026-08-24T20:04:10Z", "evidence": "12 observables: 6 pass, 4 fail, 2 authorized skips; score 60 DEGRADED." },
+    { "phase": "critique_alignment", "started_at": "2026-08-24T20:04:10Z", "completed_at": "2026-08-24T20:04:41Z", "evidence": "Raw P0 artifact d87b49f10cf2; lead FAIL equals independent no-network reviewer FAIL; thesis re-gate skipped because WINNER-BRIEF is absent." },
+    { "phase": "report", "started_at": "2026-08-24T20:04:41Z", "completed_at": "2026-08-24T20:05:00Z", "evidence": "VERIFY-REPORT.md, .verify-state.json, raw evidence, PULSE, and exact claim-limited HOLD recorded." }
+  ]
+}
