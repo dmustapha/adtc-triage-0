@@ -73,6 +73,7 @@
 | DI-S3 | scope-handoff | verify_preflight | P0 | Close every item in the ADTC-specific Definition of Done | Clean clone, offline app, parity, safety, provenance, physical evidence, and submitted Devpost entry pass | open |
 | DI-B1 | build | stress_test | P1 | Clarify the header `Online` badge so it cannot imply internet connectivity | Offline/localhost semantics are explicit and screenshot-tested | open |
 | DI-B2 | build | stress_test | P1 | Hide or qualify pre-run `This ran on the device` copy until inference evidence exists | Pre-run, deterministic-only, and real-inference states make no premature execution claim | open |
+| DI-W1 | wire | deploy | P1 | Replace the placeholder root REPORT with an evidence-bound healthcare report | Correct domain and identity placeholders remain explicit; no missing QVAC, physical, clinical, signing, or submission proof is promoted | open |
 
 ## Skill Sections
 
@@ -632,3 +633,23 @@
 
 #### For Next Skill
 - Wire the local deterministic and artifact paths; preserve removed claims and exact model/store blocks.
+
+---
+### wire — 2026-08-24T19:52:31Z
+**Status:** COMPLETE
+**Session(s):** 1
+
+#### Done
+- Mapped 11 components and 13 connections; 7 pass, 1 partial, 5 exact skips.
+- Proved live deterministic emergency SSE, health, static UI, parity, and 76-import provenance.
+- Captured honest first-visit Chrome evidence and stopped the owned localhost process.
+
+#### Key Decisions
+- [SKILL] [D-W1] Status is WIRED-WITH-DEGRADATION: every locally applicable critical edge passed, while unavailable model/store/profiler edges received no credit.
+
+#### Blockers for Downstream
+- Real QVAC/store/profiler and claim-bearing evidence remain unavailable; diagnosis-first medicine/plan rendering remains outside the PRD claim.
+- `REPORT.md` remains a placeholder and is owner-routed to Deploy as DI-W1.
+
+#### For Next Skill
+- Verify Milestone must score deterministic proof separately from skipped QVAC/raw/clinical/physical gates and must not promote run 32742482642.

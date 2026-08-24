@@ -1,0 +1,450 @@
+{
+  "status": "WIRED-WITH-DEGRADATION",
+  "working_dir": "/Users/MAC/adtc-2026",
+  "autonomous_mode": true,
+  "project_type": "full-stack",
+  "context_percentage": 0,
+  "timestamp": "2026-08-24T19:52:31Z",
+  "claimScope": "Local deterministic and artifact integration only; unavailable QVAC, GGUF, RAG, profiler, clinical, physical, signing, and submission claims remain removed.",
+  "topology": {
+    "components": [
+      {
+        "name": "browser-ui",
+        "type": "frontend",
+        "entryPoint": "public/app.html"
+      },
+      {
+        "name": "localhost-api",
+        "type": "backend",
+        "entryPoint": "src/server.ts"
+      },
+      {
+        "name": "structured-danger-policy",
+        "type": "domain-service",
+        "entryPoint": "src/triage/danger-observations.ts"
+      },
+      {
+        "name": "protocol-binder",
+        "type": "domain-service",
+        "entryPoint": "src/triage/protocol-table.ts"
+      },
+      {
+        "name": "qvac-orchestrator",
+        "type": "local-sdk-service",
+        "entryPoint": "src/qvac/orchestrator.ts"
+      },
+      {
+        "name": "rag-store",
+        "type": "local-data-service",
+        "entryPoint": "src/rag/store.ts"
+      },
+      {
+        "name": "canonical-model-contract",
+        "type": "local-artifact",
+        "entryPoint": "config/canonical-model.json"
+      },
+      {
+        "name": "model-provisioner",
+        "type": "setup-script",
+        "entryPoint": "download_model.sh"
+      },
+      {
+        "name": "raw-profiler-plane",
+        "type": "evidence-producer",
+        "entryPoint": "scripts/medpsy-raw-profiler-v2/run-raw.ts"
+      },
+      {
+        "name": "import-provenance",
+        "type": "evidence-ledger",
+        "entryPoint": "config/import-manifest.json"
+      },
+      {
+        "name": "submission-report-plane",
+        "type": "evidence-consumer",
+        "entryPoint": "REPORT.md"
+      }
+    ],
+    "connections": [
+      {
+        "id": "ui-to-static-server",
+        "from": "browser-ui",
+        "to": "localhost-api",
+        "type": "api-call",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "ui-to-health",
+        "from": "browser-ui",
+        "to": "localhost-api",
+        "type": "api-call",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "ui-to-deterministic-sse",
+        "from": "browser-ui",
+        "to": "localhost-api",
+        "type": "api-call",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "api-to-danger-policy",
+        "from": "localhost-api",
+        "to": "structured-danger-policy",
+        "type": "in-process",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "danger-policy-to-protocol",
+        "from": "structured-danger-policy",
+        "to": "protocol-binder",
+        "type": "in-process",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "metadata-to-model-contract",
+        "from": "canonical-model-contract",
+        "to": "localhost-api",
+        "type": "file-read",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "provisioner-to-gguf",
+        "from": "model-provisioner",
+        "to": "canonical-model-contract",
+        "type": "file-read",
+        "credentialEnvVar": null,
+        "status": "SKIPPED",
+        "priority": "standard"
+      },
+      {
+        "id": "qvac-to-canonical-gguf",
+        "from": "qvac-orchestrator",
+        "to": "canonical-model-contract",
+        "type": "sdk",
+        "credentialEnvVar": null,
+        "status": "SKIPPED",
+        "priority": "standard"
+      },
+      {
+        "id": "qvac-to-rag-store",
+        "from": "qvac-orchestrator",
+        "to": "rag-store",
+        "type": "sdk",
+        "credentialEnvVar": null,
+        "status": "SKIPPED",
+        "priority": "standard"
+      },
+      {
+        "id": "all-absent-to-qvac",
+        "from": "localhost-api",
+        "to": "qvac-orchestrator",
+        "type": "sdk",
+        "credentialEnvVar": null,
+        "status": "SKIPPED",
+        "priority": "standard"
+      },
+      {
+        "id": "gguf-to-raw-profiler",
+        "from": "canonical-model-contract",
+        "to": "raw-profiler-plane",
+        "type": "process-start",
+        "credentialEnvVar": null,
+        "status": "SKIPPED",
+        "priority": "standard"
+      },
+      {
+        "id": "provenance-to-runtime",
+        "from": "import-provenance",
+        "to": "localhost-api",
+        "type": "file-read",
+        "credentialEnvVar": null,
+        "status": "PASS",
+        "priority": "critical"
+      },
+      {
+        "id": "evidence-to-report",
+        "from": "raw-profiler-plane",
+        "to": "submission-report-plane",
+        "type": "file-read",
+        "credentialEnvVar": null,
+        "status": "PARTIAL",
+        "priority": "standard"
+      }
+    ],
+    "totalComponents": 11,
+    "totalConnections": 13
+  },
+  "credentials": {
+    "total": 0,
+    "resolved": 0,
+    "unresolved": 0,
+    "mockFlagsActive": 0,
+    "unresolvedList": [],
+    "mockFlags": [],
+    "notes": [
+      "No project .env or .env.local; downloader sends no auth header; optional unused HF_TOKEN was not resolved."
+    ]
+  },
+  "fix_attempts": [],
+  "integrationResults": {
+    "total": 13,
+    "passed": 7,
+    "partial": 1,
+    "failed": 0,
+    "skipped": 5,
+    "results": [
+      {
+        "connectionId": "ui-to-static-server",
+        "result": "PASS",
+        "elapsed_ms": 61,
+        "error": null,
+        "notes": "GET /app 200; 10,295 bytes; patient input; no login/empty wall; Chrome evidence captured."
+      },
+      {
+        "connectionId": "ui-to-health",
+        "result": "PASS",
+        "elapsed_ms": 61,
+        "error": null,
+        "notes": "GET /health 200; exact identity; residentModels=[], chunks=0, ragLive=null, egress unarmed."
+      },
+      {
+        "connectionId": "ui-to-deterministic-sse",
+        "result": "PASS",
+        "elapsed_ms": 61,
+        "error": null,
+        "notes": "POST /triage emitted stage,citation,card,done with EMERGENCY and deterministic retrieval."
+      },
+      {
+        "connectionId": "api-to-danger-policy",
+        "result": "PASS",
+        "elapsed_ms": 61,
+        "error": null,
+        "notes": "Known emergency completed with zero observed QVAC/router/RAG/model boundaries."
+      },
+      {
+        "connectionId": "danger-policy-to-protocol",
+        "result": "PASS",
+        "elapsed_ms": 61,
+        "error": null,
+        "notes": "Fixed IMCI citation preceded emergency card."
+      },
+      {
+        "connectionId": "metadata-to-model-contract",
+        "result": "PASS",
+        "elapsed_ms": 6052,
+        "error": null,
+        "notes": "27/27 focused identity, parity, contract, security, UI, and fixture-downloader tests passed."
+      },
+      {
+        "connectionId": "provisioner-to-gguf",
+        "result": "SKIPPED",
+        "elapsed_ms": 0,
+        "error": "canonical GGUF absent and download unauthorized",
+        "notes": "Fixture tests are not promoted to live artifact proof."
+      },
+      {
+        "connectionId": "qvac-to-canonical-gguf",
+        "result": "SKIPPED",
+        "elapsed_ms": 0,
+        "error": "canonical GGUF absent",
+        "notes": "No QVAC model load or cache acquisition attempted."
+      },
+      {
+        "connectionId": "qvac-to-rag-store",
+        "result": "SKIPPED",
+        "elapsed_ms": 0,
+        "error": "citation map and ingested store absent",
+        "notes": "Health reports chunks=0 and ragLive=null."
+      },
+      {
+        "connectionId": "all-absent-to-qvac",
+        "result": "SKIPPED",
+        "elapsed_ms": 0,
+        "error": "canonical GGUF and ingested store absent",
+        "notes": "No mock or deterministic substitute was credited as QVAC evidence."
+      },
+      {
+        "connectionId": "gguf-to-raw-profiler",
+        "result": "SKIPPED",
+        "elapsed_ms": 0,
+        "error": "canonical GGUF absent and external execution unauthorized",
+        "notes": "Failed run 32742482642 remains unchanged historical evidence."
+      },
+      {
+        "connectionId": "provenance-to-runtime",
+        "result": "PASS",
+        "elapsed_ms": 25394,
+        "error": null,
+        "notes": "9/9 provenance tests and 76/76 import verification passed."
+      },
+      {
+        "connectionId": "evidence-to-report",
+        "result": "PARTIAL",
+        "elapsed_ms": 0,
+        "error": null,
+        "notes": "REPORT.md remains a template placeholder and cannot carry current claims."
+      }
+    ]
+  },
+  "demoFlowTest": {
+    "status": "PASS",
+    "endpoint": "/triage",
+    "method": "POST",
+    "responseShapeValid": true,
+    "notes": "Advisory deterministic emergency flow only; not QVAC, grounding, profiler, or clinical-validation proof."
+  },
+  "seedScript": {
+    "exists": false,
+    "ran": false,
+    "status": "SKIPPED"
+  },
+  "landingPage": {
+    "hasContent": true,
+    "screenshot": "output/playwright/wire-landing-claim-limited.png",
+    "sha256": "db1ec906a30fc48134976dcb0c86e1dd30e4fa17832a7e1e6e5332a26fd20232",
+    "warnings": [
+      "Setup-needed empty-store state is visible; browser reachability remains separate from egress proof."
+    ]
+  },
+  "blockers": [
+    {
+      "type": "missing-prerequisite",
+      "connection": "qvac-to-canonical-gguf",
+      "detail": "Canonical 1,282,439,360-byte GGUF is absent and acquisition is unauthorized.",
+      "recovery_hint": "Use only separately authorized exact bytes and supported-platform evidence."
+    },
+    {
+      "type": "missing-prerequisite",
+      "connection": "qvac-to-rag-store",
+      "detail": "QVAC store/citation map is absent; grounded product inference is unavailable.",
+      "recovery_hint": "Ingest only during an explicitly authorized evidence run."
+    },
+    {
+      "type": "claim-boundary",
+      "connection": "all-absent-to-qvac",
+      "detail": "Diagnosis-first classifications, medicines, dose bands, and management-plan rendering exceed the controlling PRD claim boundary.",
+      "recovery_hint": "Keep claim-bearing use removed until revised and independently clinically reviewed."
+    },
+    {
+      "type": "artifact-incomplete",
+      "connection": "evidence-to-report",
+      "detail": "REPORT.md contains template placeholders and a coding_assistants domain.",
+      "recovery_hint": "Deploy/package must replace it without promoting missing proof."
+    }
+  ],
+  "sentinel_hits": [],
+  "auth_gaps": [],
+  "authorizationBoundary": "Loopback-only single-user product; production loopback binding and CSP assertions passed.",
+  "privacy_audit": {
+    "status": "SKIPPED",
+    "reason": "No FHE, ZK, encrypted mapping, or contract architecture."
+  },
+  "cross_account_test": "SKIPPED-no-multi-user-data-model",
+  "async_operations": [],
+  "processesStarted": [
+    {
+      "pid": 15292,
+      "purpose": "bounded localhost screenshot",
+      "startedAt": "2026-08-24T19:43:40Z",
+      "stoppedAt": "2026-08-24T19:49:10Z",
+      "verifiedStopped": true
+    }
+  ],
+  "verification": {
+    "focusedTests": "36 total, 36 pass, 0 fail, 0 skip",
+    "typecheck": "PASS",
+    "importManifest": "76/76 PASS",
+    "json": "8/8 PASS",
+    "diffCheck": "PASS",
+    "canonicalGguf": "ABSENT",
+    "citationMap": "ABSENT",
+    "submissionJson": "ABSENT",
+    "ownedListenersAfterCleanup": 0
+  },
+  "phase": {
+    "discovery": "complete",
+    "credentials": "complete",
+    "dependencies": "complete",
+    "integration": "complete",
+    "fix_retest": "complete",
+    "demoFlow": "complete",
+    "privacy_audit": "skipped",
+    "isolation_test": "skipped",
+    "async_latency": "skipped",
+    "report": "complete"
+  },
+  "phase_ledger": [
+    {
+      "phase": "discovery",
+      "started_at": "2026-08-24T19:36:13Z",
+      "completed_at": "2026-08-24T19:39:30Z",
+      "evidence": "11 current components and 13 actual connections mapped"
+    },
+    {
+      "phase": "credentials",
+      "started_at": "2026-08-24T19:39:30Z",
+      "completed_at": "2026-08-24T19:41:15Z",
+      "evidence": "0 required credentials; no project env, downloader auth, or mock flag"
+    },
+    {
+      "phase": "dependencies",
+      "started_at": "2026-08-24T19:41:15Z",
+      "completed_at": "2026-08-24T19:43:10Z",
+      "evidence": "Contracts ordered before HTTP/SSE and prerequisite skips"
+    },
+    {
+      "phase": "integration",
+      "started_at": "2026-08-24T19:43:10Z",
+      "completed_at": "2026-08-24T19:50:30Z",
+      "evidence": "13 connections: 7 pass, 1 partial, 0 fail, 5 exact skips; server stopped"
+    },
+    {
+      "phase": "fix_retest",
+      "started_at": "2026-08-24T19:50:30Z",
+      "completed_at": "2026-08-24T19:50:31Z",
+      "evidence": "No newly proven local wiring/code defect required a fix"
+    },
+    {
+      "phase": "demoFlow",
+      "started_at": "2026-08-24T19:43:10Z",
+      "completed_at": "2026-08-24T19:49:10Z",
+      "evidence": "PASS deterministic emergency SSE and Chrome screenshot db1ec906a30f; not QVAC proof"
+    },
+    {
+      "phase": "privacy_audit",
+      "started_at": "2026-08-24T19:50:31Z",
+      "completed_at": "2026-08-24T19:50:32Z",
+      "evidence": "SKIPPED: no FHE/ZK/encrypted contract"
+    },
+    {
+      "phase": "isolation_test",
+      "started_at": "2026-08-24T19:50:32Z",
+      "completed_at": "2026-08-24T19:50:33Z",
+      "evidence": "SKIPPED: no multi-user data model"
+    },
+    {
+      "phase": "async_latency",
+      "started_at": "2026-08-24T19:50:33Z",
+      "completed_at": "2026-08-24T19:50:34Z",
+      "evidence": "SKIPPED: no external async completion pattern"
+    },
+    {
+      "phase": "report",
+      "started_at": "2026-08-24T19:50:34Z",
+      "completed_at": "2026-08-24T19:52:31Z",
+      "evidence": "WIRE-REPORT.md, state, blockers, and screenshot recorded"
+    }
+  ]
+}
