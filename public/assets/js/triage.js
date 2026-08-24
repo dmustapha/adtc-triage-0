@@ -162,7 +162,8 @@
           (eg.strict ? " &middot; egress blocked (strict)" : "") + "</span>"
         );
       }
-      if (h.medpsy) {
+      var residents = Array.isArray(h.residentModels) ? h.residentModels : [];
+      if (h.medpsy && residents.indexOf("medpsy") !== -1) {
         chips.push('<span class="od-chip">' + ICON.chip + "MedPsy " + esc(String(h.medpsy).toUpperCase()) + " &middot; runs on this Mac</span>");
       }
       if (chips.length) { proof.innerHTML = chips.join(""); proof.hidden = false; }

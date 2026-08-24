@@ -11,7 +11,7 @@
     if (el.dataset.egress === "1") return;
     var off = !navigator.onLine;
     var txt = el.querySelector(".badge-txt") || el; // update the label, keep the pip dot
-    txt.textContent = off ? "Offline" : "Online";
+    txt.textContent = off ? "Browser offline" : "Browser online";
     el.classList.toggle("is-offline", off);
     el.classList.toggle("is-online", !off);
   }

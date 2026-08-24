@@ -26,7 +26,7 @@
           <span class="tag" style="display:block">offline clinical guidance</span>
         </span>
       </a>
-      <span id="net" class="badge is-offline"><span class="pip pip--ring"></span><span class="badge-txt">Offline</span></span>
+      <span id="net" class="badge"><span class="pip pip--ring"></span><span class="badge-txt">Network status</span></span>
     </header>
 
     <main class="app-main">
@@ -105,7 +105,7 @@
       <!-- live performance -->
       <section aria-label="Live performance">
         <div class="panel">
-          <p class="perf-lead"><b>This ran on the device.</b> No network was used.</p>
+          <p class="perf-lead"><b>Run an assessment</b> to populate local runtime evidence. Network policy and model residency are reported below.</p>
           <!-- On-device proof, fed by /health: the egress guard's real armed/strict/violations count and
                the resident model. Honest by construction — the server blocks egress and reports it here. -->
           <div id="odProof" class="od-proof" hidden></div>
