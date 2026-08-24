@@ -61,6 +61,10 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   });
   return Promise.race([p, timeout]).finally(() => clearTimeout(timer)) as Promise<T>;
 }
+
+export function withInferenceDeadline<T>(fn: () => Promise<T>, ms: number, label: string): Promise<T> {
+  return withTimeout(withInferenceLock(fn), ms, label);
+}
 const TRIAGE_TIMEOUT_MS = 300_000; // 5 min — 4B model on CPU needs headroom
 
 /** Log the real error server-side (stderr only) and return a fixed, friendly message — never leak an
@@ -232,7 +236,7 @@ app.post("/triage", async (req: Request, res: Response) => {
     // Serialize the whole inference sequence: the engine is single-job, so two concurrent /triage
     // requests must queue, not interleave (else one gets "Cannot set new job"). The stream stays open
     // and silent while waiting its turn, then runs normally.
-    await withInferenceLock(() => withTimeout((async () => {
+    await withInferenceDeadline(async () => {
     observeTriageExecution("qvac-context");
     const ctx = await triageContext();
 
@@ -315,7 +319,7 @@ app.post("/triage", async (req: Request, res: Response) => {
     send("plan", { plan });
     send("done", { ok: true });
     endStream();
-    })(), TRIAGE_TIMEOUT_MS, "triage"));
+    }, TRIAGE_TIMEOUT_MS, "triage");
   } catch (err) {
     process.stderr.write(`[triage-0] triage error :: ${(err as Error)?.stack ?? String(err)}\n`);
     send("error", { error: "Triage could not complete on-device. Please retry, or escalate to a clinician." });
