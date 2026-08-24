@@ -96,10 +96,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "cb883498977ad45b981f76bc60226e5b795cb54f34381cd4fd261e1867d45c27",
+      "destinationSha256": "0bd1aa5b0837e4bd653f33579d41aff6fc51ad2f5922750d5577d3c1eaa2bc46",
       "modification": {
         "status": "modified",
-        "reason": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and test package contract."
+        "reason": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and corrected integration-test package contract."
       }
     },
     {
@@ -110,10 +110,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "c6bb88f803be1d7be65958d981a07683df7a90f22fc6c454a41b56c7e068141a",
+      "destinationSha256": "9cdbf5f8c4119123feaf122dd34cbd98e3d6942fa38bc99025d82b979b21fff9",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded speech and multilingual controls while preserving the pinned compact patient-entry hierarchy; added the required structured patient-age and seven-sign checklist through native progressive disclosure immediately before guidance."
+        "reason": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow."
       }
     },
     {
@@ -137,7 +137,7 @@
       "destinationSha256": "f5529dee9ab7070c4b269613940266933b3299ca0142aeac7405c7c5f6bfcd0b",
       "modification": {
         "status": "modified",
-        "reason": "Added compact responsive progressive-disclosure styling, native-control focus, age input, completion status, and structured summary while preserving the pinned visual hierarchy."
+        "reason": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system."
       }
     },
     {
@@ -306,9 +306,13 @@
       "sourceGitObject": "59f00a4122d2eb701270bf5ef374e73c48e2cec3",
       "sourceSha256": "3ea27bcbd30dd85348cd0b9d296b5261fe11d7addef6675a7716b0e532cc49e0",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "3ea27bcbd30dd85348cd0b9d296b5261fe11d7addef6675a7716b0e532cc49e0"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "764b4ab925308cdde53999b63f3b2a90e66ea9aff31e002e902404169c7f00b3",
+      "modification": {
+        "status": "modified",
+        "reason": "Distinguished browser network reachability from server-enforced on-device egress proof so UI badges cannot imply cloud inference or completed offline evidence."
+      }
     },
     {
       "sourcePath": "public/assets/js/triage.js",
@@ -318,10 +322,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "d316fe2b7c687f640e66b43882991d21f1e64cc84cbd54d414917f1c3ccc44c6",
+      "destinationSha256": "fa2c975ec1994703b930d248412da122c5771b884a7fdcb43a2abf2d98e9e290",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, suppressed model-authored red-flag display, and kept compact disclosure status concise."
+        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display."
       }
     },
     {
@@ -540,7 +544,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "ec116019ea9eb7814ad32a8fc5c2cde6cabd12996f26890cd67a5ceaebc9d0cf",
+      "destinationSha256": "bf7559eb34f42b52a3c0074eb1f3bb5db734e189df2e6e9a620cff31d93b65bf",
       "modification": {
         "status": "modified",
         "reason": "Preserved English text triage while parsing structured age and danger observations before QVAC context, semantic routing, retrieval, or MedPsy; deterministic emergency, assessment-required, and age-scoped chest-indrawing branches now short-circuit before runtime work."
@@ -789,7 +793,7 @@
       "destinationSha256": "bbb370491d85e4e8232bce3056a5b10bbf404613366fbef007504d448d526ccd",
       "modification": {
         "status": "modified",
-        "reason": "Added DOM, progressive-disclosure fidelity, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and structured-summary regressions for the checklist."
+        "reason": "Added DOM, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and recorded-summary regressions for the structured checklist."
       }
     },
     {

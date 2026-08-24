@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts tests/unit/*.test.ts tests/integration/*.test.ts",
     "test:unit": "node --import tsx --test tests/unit/*.test.ts",
-    "test:e2e": "TRIAGE01_E2E=1 node --import tsx --test tests/server.test.ts",
+    "test:e2e": "TRIAGE01_E2E=1 node --import tsx --test tests/integration/server.test.ts",
     "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
     "ingest": "tsx scripts/ingest-protocols.ts",
