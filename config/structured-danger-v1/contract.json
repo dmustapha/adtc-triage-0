@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "revision": "structured-danger-v1",
+  "status": "requirements-frozen-implementation-pending",
+  "patientAge": {
+    "required": true,
+    "units": [
+      "months",
+      "years"
+    ],
+    "value": {
+      "finite": true,
+      "minimumInclusive": 0
+    },
+    "normalization": "convert to months without inferring age from caseText",
+    "supportedRespiratoryBandMonths": {
+      "minimumInclusive": 2,
+      "maximumExclusive": 60
+    },
+    "source": {
+      "sourceId": "WHO-IMCI-RESP-2022",
+      "document": "WHO Integrated Management of Childhood Illness Chart Booklet (2014)",
+      "url": "https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf",
+      "locator": "Cough or difficult breathing; general danger signs",
+      "publicationMetadataPath": "data/protocols/README.md",
+      "boundaryEvidencePath": "data/rag/dose-tables.txt",
+      "boundaryEvidenceExactFragments": [
+        "2 months up to 12 months",
+        "12 months up to 3 years",
+        "3 years up to 5 years"
+      ],
+      "sourceBytesPresent": false,
+      "clinicalReviewStatus": "pending",
+      "baselineCommit": "74424721bc75f564808eacce42d7f7f42676ae0f"
+    }
+  },
+  "dangerObservations": {
+    "keys": [
+      "cannotDrinkOrBreastfeed",
+      "vomitsEverything",
+      "convulsions",
+      "lethargicOrUnconscious",
+      "chestIndrawing",
+      "stridorWhenCalm",
+      "lowOxygenOrCentralCyanosis"
+    ],
+    "emergencyCapableKeys": [
+      "cannotDrinkOrBreastfeed",
+      "vomitsEverything",
+      "convulsions",
+      "lethargicOrUnconscious",
+      "stridorWhenCalm",
+      "lowOxygenOrCentralCyanosis"
+    ],
+    "nonEmergencyClassificationKeys": [
+      "chestIndrawing"
+    ],
+    "requestValues": [
+      "PRESENT",
+      "ABSENT",
+      "NOT_ASSESSED"
+    ],
+    "internalValues": [
+      "PRESENT",
+      "ABSENT",
+      "NOT_ASSESSED",
+      "CONFLICT"
+    ],
+    "missingFieldNormalizesTo": "NOT_ASSESSED",
+    "missingObjectNormalizesTo": "NOT_ASSESSED",
+    "requestAllowsConflict": false,
+    "visibleCompatibilityField": "card.red_flags",
+    "visibleFieldSource": "structured observations only"
+  },
+  "preModelPrecedence": [
+    {
+      "id": "known-emergency-present",
+      "when": "any emergencyCapableKey is PRESENT",
+      "outcome": "DETERMINISTIC_EMERGENCY",
+      "beforeMissingAgeOrFields": true,
+      "modelInvoked": false,
+      "semanticRoutingInvoked": false
+    },
+    {
+      "id": "assessment-incomplete-or-outside-scope",
+      "when": "no emergencyCapableKey is PRESENT",
+      "failClosedOn": [
+        "MISSING_AGE",
+        "UNSUPPORTED_AGE",
+        "NOT_ASSESSED",
+        "CONFLICT"
+      ],
+      "outcome": "ASSESSMENT_REQUIRED",
+      "modelInvoked": false,
+      "semanticRoutingInvoked": false
+    },
+    {
+      "id": "isolated-chest-indrawing-supported-age",
+      "when": "all emergencyCapableKeys are ABSENT and chestIndrawing is PRESENT",
+      "ageBandMonths": {
+        "minimumInclusive": 2,
+        "maximumExclusive": 60
+      },
+      "outcome": "NON_EMERGENCY_PNEUMONIA",
+      "chestIndrawingAloneIsEmergency": false,
+      "modelInvoked": false,
+      "semanticRoutingInvoked": false
+    },
+    {
+      "id": "supported-all-absent-qvac",
+      "when": "supported age and all seven observations are ABSENT",
+      "runtime": "QVAC SDK 0.13.3",
+      "requiresAllSevenAbsent": true,
+      "modelInvoked": true,
+      "requiredProductPath": [
+        "semantic routing",
+        "local RAG",
+        "two-pass MedPsy generation",
+        "schema validation",
+        "bounded retry",
+        "deterministic reconciliation",
+        "source-bound plan assembly"
+      ]
+    }
+  ],
+  "model": {
+    "candidateId": "medpsy-1.7b-q4",
+    "repository": "qvac/MedPsy-1.7B-GGUF",
+    "revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "filename": "medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "evidencePlanes": {
+    "product": {
+      "name": "medpsy-product-v2",
+      "runtime": "QVAC SDK 0.13.3",
+      "requiredPath": "actual QVAC two-pass, local RAG, retry, deterministic policy, citation, and no-egress path"
+    },
+    "rawProfiler": {
+      "name": "medpsy-raw-profiler-v2",
+      "runtime": "pinned official llama.cpp",
+      "purpose": "exact GGUF compatibility, raw framing, participant prompts, and profiler measurements",
+      "provesProductSafety": false
+    },
+    "historical": {
+      "name": "medpsy-shared-runtime-v1",
+      "runId": 32742482642,
+      "immutable": true
+    }
+  },
+  "releaseBlockers": {
+    "submitterIdentityPlaceholders": true,
+    "signedModelDecisionPresent": false,
+    "namedHumanClinicalReviewPresent": false,
+    "physicalTargetLaptopEvidencePresent": false,
+    "phase2Allowed": false
+  }
+}
