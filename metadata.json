@@ -12,16 +12,16 @@
   "cross_disciplinary_pairing": {
     "discipline": "education",
     "load_bearing": true,
-    "description": "Brief description of how your model serves a real-world domain."
+    "description": "Community health education is load-bearing: the English-only offline prototype helps supervised workers record a structured pediatric respiratory assessment, while deterministic policy—not model output—owns escalation."
   },
   "test_prompts": [
     {
       "prompt_id": "tp_001",
-      "prompt": "Write a Python function that reads a CSV file and returns the column with the highest mean value."
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings."
     },
     {
       "prompt_id": "tp_002",
-      "prompt": "Explain the difference between a list and a tuple in Python, and give one example where each is the better choice."
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted classification. State that recorded danger observations and deterministic policy—not model output—control escalation. Do not diagnose or prescribe."
     }
   ],
   "model": {

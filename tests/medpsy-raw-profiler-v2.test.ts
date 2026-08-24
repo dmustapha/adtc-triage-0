@@ -12,6 +12,22 @@ const sha256 = (value: string | Buffer) => createHash("sha256").update(value).di
 const run = (script: string, args: string[]) =>
   spawnSync(process.execPath, ["--import", tsx, resolve(root, script), ...args], { cwd: root, encoding: "utf8" });
 
+const EXPECTED_TEST_PROMPTS = [
+  {
+    prompt_id: "tp_001",
+    prompt:
+      "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+  },
+  {
+    prompt_id: "tp_002",
+    prompt:
+      "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted classification. State that recorded danger observations and deterministic policy—not model output—control escalation. Do not diagnose or prescribe.",
+  },
+] as const;
+
+const EXPECTED_PAIRING_DESCRIPTION =
+  "Community health education is load-bearing: the English-only offline prototype helps supervised workers record a structured pediatric respiratory assessment, while deterministic policy—not model output—owns escalation.";
+
 function rawFixture(overrides: Record<string, unknown> = {}) {
   const rawStdout = '  {"classification":"routine"}  [end of text]\n';
   const normalizedPayload = '{"classification":"routine"}';
@@ -51,6 +67,17 @@ test("raw contract has a distinct namespace, tier, runtime, and exact model iden
   assert.equal(contract.runtime.revision, "c8ade30036139e32108fee53d8b7164dbfda4bee");
   assert.equal(contract.candidate.sha256, "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880");
   assert.deepEqual(contract.thresholds, { dualHashRequiredRate: 1, exactOneJsonRequiredRate: 1, maximumWeightArtifacts: 0 });
+});
+
+test("metadata freezes two bounded healthcare prompts for the raw profiler", async () => {
+  const metadata = JSON.parse(await readFile("metadata.json", "utf8"));
+  assert.deepEqual(metadata.test_prompts, EXPECTED_TEST_PROMPTS);
+  assert.equal(metadata.cross_disciplinary_pairing.description, EXPECTED_PAIRING_DESCRIPTION);
+
+  const promptText = metadata.test_prompts.map(({ prompt }: { prompt: string }) => prompt).join("\n");
+  assert.doesNotMatch(promptText, /\bPython\b|\bCSV\b|\blist\b|\btuple\b/i);
+  assert.match(promptText, /pediatric respiratory/i);
+  assert.match(promptText, /supervised community health worker/i);
 });
 
 test("raw contract requires original and normalized payload hashes without product claims", async () => {
