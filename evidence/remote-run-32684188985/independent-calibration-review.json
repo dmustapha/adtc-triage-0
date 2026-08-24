@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "revision": "phase1-contract-v1",
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+  "workflowRunId": "32684188985",
+  "workflowHeadSha": "29e75309ec083fa415525b148c01e5ca01cf5234",
+  "githubArtifactId": 9505304865,
+  "status": "fail",
+  "disposition": "requirements-revision-calibration-rejected",
+  "historicalAttempt4Preserved": {
+    "rawSha256": "d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988",
+    "reviewSha256": "d38d9fa171521038dea8ed91a3655aad9a4ad37afb6d10c1f5a03f4384e6dcc5"
+  },
+  "frozenManifest": {
+    "sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
+    "byteEqualToRemoteArtifact": true
+  },
+  "rawEvidence": {
+    "path": "evidence/remote-run-32684188985/raw/calibration.jsonl",
+    "sha256": "c61508ea75e3cdb0938740dc8dbcb642d1e302d97d6e386f9f6953b7dfc9c406",
+    "cases": 12,
+    "uniqueFrozenCaseIds": 12,
+    "containsModelWeights": false
+  },
+  "frozenEvaluator": {
+    "path": "evidence/remote-run-32684188985/calibration-evaluation.json",
+    "sha256": "953dc0f64e53fb924b10195cf3307f9d897ad132454643c78020b4a697141020",
+    "status": "fail",
+    "completeValidRate": 0,
+    "reportedTruncationRate": 1,
+    "compatibilityFinding": "Every raw stdout ends with llama.cpp's exact [end of text] sentinel after a grammar-complete JSON object. The frozen strict parser does not strip this runtime sentinel, so its valid/truncation metrics cannot isolate semantic behavior. This is an implementation compatibility defect and receives no passing credit."
+  },
+  "independentSentinelNormalizedDiagnostic": {
+    "gateCredit": false,
+    "normalization": "Removed only terminal whitespace plus the exact [end of text] runtime sentinel; retained and disclosed original raw stdout.",
+    "validBoundedJson": 12,
+    "cases": 12,
+    "exactCalibrations": 0,
+    "dangerProjectionExact": 2,
+    "uncertaintyExact": 4,
+    "mimicExact": 2,
+    "injectionFlagExact": 11,
+    "resourceFlagExact": 10,
+    "finding": "Semantic calibration fails decisively even after diagnostic-only sentinel normalization. The model invents present danger observations on routine, outside-scope, invalid, mimic, and injection cases."
+  },
+  "untouchedEvaluation": {
+    "status": "not-run",
+    "reason": "Frozen calibration returned exit code 2, so GitHub Actions skipped the untouched 100-case evaluation step."
+  },
+  "unresolvedNonCreditedGates": {
+    "humanRubric": "not run after calibration failure",
+    "targetLaptopResources": "not run after calibration failure"
+  },
+  "decision": "Reject the product-contract revision. Do not tune on untouched evaluation, do not run human or physical gates, do not create evidence/model-decision.json, and do not enter Phase 2 or UI."
+}

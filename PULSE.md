@@ -27,6 +27,7 @@
 | AF-B3 | build | [USER] Prior OLMo behavioral verdict | run 32652354894 rejected OLMo -> verdict withdrawn because `-no-cnv` bypassed the embedded GGUF template |
 | AF-B4 | build | [TEST] Corrected OLMo raw gate | invalid untemplated evidence -> run 32653499076 uses `--jinja --single-turn`, preserves all frozen inputs, and still fails multiple fatal gates |
 | AF-B5 | build | [USER] Final recovery candidate | zero selected models -> lock `allenai/OLMo-2-1124-7B-Instruct-GGUF` Q4_K_M as the single authorized fourth-attempt candidate under the unchanged Phase 1 gate |
+| AF-B6 | conductor | [USER] Pipeline continuation target | stopped after attempt 4 -> resume Build through an explicit product-contract requirements revision and continue through Demo Rehearsal only if every FSM gate passes |
 
 ## Decisions Log
 | # | Skill | Decision | Why | Affects |
@@ -51,6 +52,7 @@
 | 18 | build | [USER] Reopen finalist model choice after both MedPsy candidates failed lineage | No sufficient new MedPsy evidence was supplied; replacement candidates may be evaluated only under the unchanged content-addressed raw gate | build, debug, package, verify_preflight |
 | 19 | build | [USER] Correct the OLMo producer with pinned llama.cpp `--jinja --single-turn -p` | `-no-cnv` disables conversation/template application, so the prior behavioral verdict was invalid and could not be reused | build, debug, package, verify_preflight |
 | 20 | build | [USER] Lock OLMo-2-1124-7B-Instruct Q4_K_M as the final recovery candidate | It is the only screened option combining an official anonymous GGUF, complete public training chain, pinned `olmo2` runtime compatibility, and materially greater capacity than the rejected 1B model | conductor, build, debug, package, verify_preflight |
+| 21 | conductor | [USER] Continue the conductor through Demo Rehearsal | Preserve the failed bare-prompt evidence, revise Phase 1 to test the same OLMo-2 7B under the actual constrained product contract, and advance only after a signed passing model decision | build, debug, wire, verify_milestone, design_forge, stress_test, deploy, livetest, interrogate, demo_rehearsal |
 
 ## Downstream Items
 <!-- Owner-routed, non-blocking deferred work. Every skill reads on entry, actions rows it owns. See PULSE-PROTOCOL § Downstream Items. -->
@@ -340,3 +342,9 @@
 
 #### For Next Skill
 - Stop for explicit requirements revision or submission pivot. Do not search for another model or dispatch Phase 2/UI.
+### build — 2026-08-24T03:01:33Z
+**Status:** BLOCKED
+**Done:** Frozen product-contract run `32684188985` failed 12-case calibration; untouched evaluation and downstream gates were not run.
+**Key Decision:** [USER] Preserve attempt 4; [SKILL] reject revision at 0/12 exact and 2/12 danger projection.
+**Blockers:** No signed model decision; Phase 2/UI and later skills remain forbidden.
+**For Next Skill:** Conductor must stop for explicit submission pivot or new requirements authority.

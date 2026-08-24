@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "revision": "phase1-contract-v1",
+  "freezeRule": "all identities and producers frozen before revised inference",
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+  "llamaRevision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  "runtimeArgs": [
+    "-t",
+    "4",
+    "-ngl",
+    "0",
+    "-c",
+    "2048",
+    "-n",
+    "128",
+    "--temp",
+    "0",
+    "--jinja",
+    "--single-turn"
+  ],
+  "llamaCliSource": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "revision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+    "path": "common/arg.cpp",
+    "sha256": "faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1",
+    "supportedFlags": [
+      "--system-prompt-file",
+      "--grammar-file"
+    ]
+  },
+  "calibration": {
+    "cases": 12,
+    "idsSha256": "0aab5c57c5f7d06950da0a1ba630f4987c37b5f3b7c2ffd76b6835da1ed9520b"
+  },
+  "evaluation": {
+    "pediatricCases": 50,
+    "generalMedicalCases": 50,
+    "idsSha256": "c7919e11e0fae68dc5deba4a79b02da26e83c7398c6e5c76027bf2db47322686"
+  },
+  "historicalAttempt4": {
+    "rawSha256": "d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988",
+    "reviewSha256": "d38d9fa171521038dea8ed91a3655aad9a4ad37afb6d10c1f5a03f4384e6dcc5",
+    "disposition": "authoritative-bare-prompt-failure-preserved"
+  },
+  "inputHashes": {
+    "corpus": "6fd2a1351bf2bcb9ef7927aacf55ecf0aff65f7505d82243a00ece83df4a5f50",
+    "rubric": "6d89cf637fb2a7e61553eef943c402e6e245e4ae8ad6c77c93e48d9df872eb00",
+    "candidate": "baa9149b9fc2884a04b6d179371b0c81b07c13efa59d62aec8edc66e64d799a6",
+    "lineage": "897c1847171ed3aa12ec35fe0741f6bdd050e832460ec72cc28ce266d06371f1",
+    "systemPrompt": "68b10d0406ff5433e3e8c6874b384c8950462a03d30a625329d1045da3a6470b",
+    "extractionSchema": "364181eaaaf6a0cdcc871a08995e5fbc4b62b0926d67670c35071f76b768aace",
+    "grammar": "657d9b33289a374a2d610fc37534268bf9ee9e49201b5cd97555529985b4c305",
+    "calibration": "713e9ae319d51fe3a6b5cc3af56df57b75648c642c8af5548bc25351648880fa",
+    "expectations": "d45e8f092c8e59f033db84d34a69e91c15b7d23032e4c779bf6ee4956bcd2774",
+    "fatalGates": "f707fae6ef4e220c1c155fc14f150d8b9eda6319610de1105d0bfb6c71104cb4",
+    "llamaCliSource": "1f4460375ffc41578068c97a1a6d5918c25a22b1f0b9dea017055d4e1be5e648",
+    "contract": "a09fbfaaa59df0979733d3c656c5765316cd7bdaa1d3bd89212cb1012d49f41a",
+    "rawProducer": "ff7439cabf8a76e192be4defda64d7af48282aca8d1e76f87b3030666f3ca62f",
+    "evaluator": "6aa92dafaf311bd0493ffd322dff92275d867b6e6404721725f842c164473b72",
+    "manifestProducer": "1eb589d10505b5ae211b70a1442ec9adf91788e8966c4416f93cde7f2313fa5e",
+    "workflow": "c3a9bd00c99b7c1b0ced419957298e9e742eb4ed7a1dd5bf06914c30604643e4",
+    "attempt4Raw": "d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988",
+    "attempt4Review": "d38d9fa171521038dea8ed91a3655aad9a4ad37afb6d10c1f5a03f4384e6dcc5"
+  },
+  "producers": {
+    "calibration": [
+      "node",
+      "--import",
+      "tsx",
+      "scripts/phase1-contract-v1/run-raw-finalist.ts",
+      "olmo-2-1124-7b-instruct-q4-k-m",
+      "evidence/finalists/phase1-contract-v1/training-lineage.json",
+      "config/phase1-contract-v1/calibration-corpus.json",
+      "evidence/finalists/phase1-contract-v1/raw/calibration.jsonl"
+    ],
+    "evaluation": [
+      "node",
+      "--import",
+      "tsx",
+      "scripts/phase1-contract-v1/run-raw-finalist.ts",
+      "olmo-2-1124-7b-instruct-q4-k-m",
+      "evidence/finalists/phase1-contract-v1/training-lineage.json",
+      "config/finalist-corpus.json",
+      "evidence/finalists/phase1-contract-v1/raw/evaluation.jsonl"
+    ]
+  },
+  "unresolved": [
+    "humanRubric",
+    "targetLaptopResources"
+  ]
+}

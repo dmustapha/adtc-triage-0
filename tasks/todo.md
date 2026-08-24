@@ -92,9 +92,9 @@
     - [x] Preserve attempt-4 bare-prompt evidence and hashes unchanged.
     - [x] Build from scratch a compact fenced, grammar-constrained extraction contract under TDD.
     - [x] Freeze revised evaluator, prompt/schema, calibration separation, producer, corpus, and evidence identities before inference.
-    - [ ] Run the revised evidence-only workflow remotely; never retain or upload weights.
-    - [ ] Run human and target-laptop gates only after a complete revised behavioral pass.
-    - [ ] Sign `evidence/model-decision.json` only if every revised gate passes.
+    - [x] Run the revised evidence-only workflow remotely; run `32684188985` retained no weights and failed frozen calibration.
+    - [x] Run human and target-laptop gates only after a complete revised behavioral pass — correctly not run after calibration failure.
+    - [x] Sign `evidence/model-decision.json` only if every revised gate passes — no decision created; Phase 2 remains blocked.
 - [ ] Resume the conductor through Demo Rehearsal under the user-authorized requirements revision.
   - [x] Save the authorization and recover the stale conductor lock safely.
   - [x] Pass the conductor resume gate, FSM gate, and Build pre-dispatch gate.

@@ -222,3 +222,24 @@ DIFF_CHECK_OK
 ```
 
 The frozen producer manifest hashes to `0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90`. Pinned llama.cpp `common/arg.cpp` at revision `c8ade30036139e32108fee53d8b7164dbfda4bee` hashes to `faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1` and defines both `--system-prompt-file` and `--grammar-file`. No inference has run under the revised contract yet.
+
+Frozen revision commit `29e75309ec083fa415525b148c01e5ca01cf5234` was fast-forwarded to `submission/main`. GitHub Actions run `32684188985` was dispatched from that exact public head at `2026-08-24T02:46:53Z`.
+
+### Frozen calibration result
+
+Run `32684188985` passed the local harness, 11-source immutable lineage, pinned llama.cpp build, and exact 4,472,020,256-byte/SHA model verification. It captured all 12 unique frozen calibration cases, then exited 2 at calibration. GitHub correctly skipped the untouched 100-case evaluation, removed the GGUF, and uploaded evidence-only artifact `9505304865`.
+
+The frozen evaluator records failure. It also exposed a compatibility defect: every grammar-complete JSON object is followed by llama.cpp's exact `[end of text]` runtime sentinel, which the strict parser did not strip. This makes its reported 0% validity and 100% truncation unsuitable for isolating semantic behavior; those two metrics receive no positive or negative reinterpretation beyond the frozen failure itself.
+
+An independent diagnostic removed only the terminal sentinel while preserving the disclosed original bytes. That yielded 12/12 syntactically valid bounded JSON objects but still failed decisively:
+
+- exact calibration: 0/12;
+- deterministic danger projection: 2/12 correct;
+- uncertainty: 4/12 correct;
+- mimic: 2/12 correct;
+- injection flag: 11/12 correct;
+- resource-mention flag: 10/12 correct.
+
+The model invented present danger observations in routine, outside-scope, invalid, mimic, and injection calibration cases. This semantic failure is independent of the sentinel defect and rejects the product-contract revision. No untouched evaluation, two-person human review, physical target-laptop gate, signed model decision, model search, Phase 2, or UI work was performed.
+
+Raw calibration SHA-256 is `c61508ea75e3cdb0938740dc8dbcb642d1e302d97d6e386f9f6953b7dfc9c406`. Frozen evaluator SHA-256 is `953dc0f64e53fb924b10195cf3307f9d897ad132454643c78020b4a697141020`. Independent review is `evidence/remote-run-32684188985/independent-calibration-review.json`.

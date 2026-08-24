@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "revision": "phase1-contract-v1",
+  "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+  "selectedCandidateId": null,
+  "workflowRunId": "32684188985",
+  "workflowHeadSha": "29e75309ec083fa415525b148c01e5ca01cf5234",
+  "workflowConclusion": "failure",
+  "failedStage": "frozen-calibration",
+  "calibrationRawSha256": "c61508ea75e3cdb0938740dc8dbcb642d1e302d97d6e386f9f6953b7dfc9c406",
+  "independentReviewPath": "evidence/remote-run-32684188985/independent-calibration-review.json",
+  "untouchedEvaluationRun": false,
+  "humanReviewRun": false,
+  "targetLaptopGateRun": false,
+  "modelDecisionCreated": false,
+  "phase2Authorized": false,
+  "reason": "The exact 12-case frozen calibration fails the revised product contract. Diagnostic-only runtime-sentinel normalization yields 0/12 exact calibrations and 2/12 correct deterministic danger projections."
+}
