@@ -82,6 +82,55 @@
     });
   }
 
+  var DANGER_SIGNS = [
+    ["cannotDrinkOrBreastfeed", "Cannot drink or breastfeed"],
+    ["vomitsEverything", "Vomits everything"],
+    ["convulsions", "Convulsions"],
+    ["lethargicOrUnconscious", "Lethargic or unconscious"],
+    ["chestIndrawing", "Chest indrawing"],
+    ["stridorWhenCalm", "Stridor when calm"],
+    ["lowOxygenOrCentralCyanosis", "Low oxygen or central cyanosis"],
+  ];
+
+  function selectedDangerValue(key) {
+    var selected = document.querySelector('input[name="danger-' + key + '"]:checked');
+    return selected ? selected.value : "NOT_ASSESSED";
+  }
+
+  function readStructuredDanger() {
+    var observations = {};
+    DANGER_SIGNS.forEach(function (sign) { observations[sign[0]] = selectedDangerValue(sign[0]); });
+    return {
+      patientAge: { value: Number($("patientAgeValue").value), unit: $("patientAgeUnit").value },
+      dangerObservations: observations,
+    };
+  }
+
+  function hasSupportedAge(age) {
+    if (age.unit !== "months" && age.unit !== "years") return false;
+    var months = age.unit === "years" ? age.value * 12 : age.value;
+    return Number.isFinite(months) && months >= 2 && months < 60;
+  }
+
+  function updateDangerChecklist() {
+    var structured = readStructuredDanger();
+    var values = structured.dangerObservations;
+    var assessed = DANGER_SIGNS.filter(function (sign) { return values[sign[0]] !== "NOT_ASSESSED"; }).length;
+    var ready = assessed === DANGER_SIGNS.length && hasSupportedAge(structured.patientAge);
+    var status = assessed + " of " + DANGER_SIGNS.length + " signs assessed.";
+    if (ready) status += " Ready for guidance.";
+    else status += " Enter an age from 2 months to under 5 years and assess every sign.";
+    if ($("dangerStatus")) $("dangerStatus").textContent = status;
+    if ($("dangerSummary")) {
+      $("dangerSummary").textContent = "Recorded checklist: " + DANGER_SIGNS.map(function (sign) {
+        var value = values[sign[0]].toLowerCase().replace("_", " ");
+        return sign[1] + ": " + value.charAt(0).toUpperCase() + value.slice(1);
+      }).join("; ") + ".";
+    }
+    if ($("assess") && !assessCtl) $("assess").disabled = !ready;
+    return ready;
+  }
+
   // ---- guidelines loaded count (for the live readout) + empty-store setup banner (H-7) ----
   fetch("/health").then(function (r) { return r.json(); }).then(function (h) {
     if ($("hChunks")) $("hChunks").textContent = h.chunks != null ? h.chunks : "·";
@@ -211,7 +260,6 @@
     $("card").classList.remove("hidden");
     var sev = card.severity;
     var ico = (sev === "ROUTINE" || sev === "SELF_CARE") ? ICON.check : ICON.alert;
-    var flags = (card.red_flags || []).map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("");
     // Clinical order: Severity (how urgent) -> Classification (what it is) -> Why -> Action -> Management.
     // The WHO classification is shown as "Classification" (not "Diagnosis"): IMCI/mhGAP produce a
     // protocol classification, and the tool is decision-SUPPORT, not a diagnoser (see the disclaimer).
@@ -242,7 +290,6 @@
       dx +
       (sev !== "UNKNOWN" && card.reasoning ? '<div class="why">' + esc(card.reasoning) + "</div>" : "") +
       '<div class="action">' + (sev === "UNKNOWN" ? t("abstain_msg") : esc(card.action)) + "</div>" +
-      (flags ? '<ul class="flags">' + flags + "</ul>" : "") +
       (sev !== "UNKNOWN" ? '<div id="planWrap" class="plan-pending" role="status" aria-live="polite">' + t("plan_pending") + "</div>" : "") +
       "";
     lastCard = card;
@@ -456,6 +503,8 @@
   async function runAssess() {
     var caseText = $("case").value.trim();
     if (!caseText) { $("status").textContent = "Describe or record a case first."; $("case").focus(); return; }
+    if (!updateDangerChecklist()) { $("status").textContent = "Complete the supported patient age and all seven signs first."; return; }
+    var structuredDanger = readStructuredDanger();
     // Re-entrancy guard: a run is already in flight (assessCtl set). The keyboard path (Ctrl/Cmd+Enter)
     // bypasses the button, so without this a second run would overwrite assessCtl + the shared timer
     // interval (stopping the live one) and start a second /triage the single-job engine only queues.
@@ -487,7 +536,7 @@
       var r = await fetch("/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caseText: caseText }),
+        body: JSON.stringify({ caseText: caseText, patientAge: structuredDanger.patientAge, dangerObservations: structuredDanger.dangerObservations }),
         signal: assessCtl.signal
       });
       // Guard before reading the stream: a non-2xx or bodyless response has no readable stream.
@@ -536,6 +585,11 @@
     }
   }
   if ($("assess")) $("assess").onclick = runAssess;
+  if ($("dangerChecklist")) {
+    $("dangerChecklist").addEventListener("change", updateDangerChecklist);
+    $("patientAgeValue").addEventListener("input", updateDangerChecklist);
+    updateDangerChecklist();
+  }
   // Ctrl/Cmd+Enter from the case box submits, the way a clinician expects.
   if ($("case")) $("case").addEventListener("keydown", function (e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runAssess(); }
@@ -560,6 +614,8 @@
       runAssess: runAssess,
       startReasonTimer: startReasonTimer,
       stopReasonTimer: stopReasonTimer,
+      readStructuredDanger: readStructuredDanger,
+      updateDangerChecklist: updateDangerChecklist,
     };
   }
 })();

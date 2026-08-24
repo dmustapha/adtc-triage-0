@@ -110,10 +110,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "b3a305515b261ab273e380c2667f82799022889d21027effc97cbff5a3e04d55",
+      "destinationSha256": "56d41cb4e68a81b858172eac50b6d925756a4db587fc8dc55ecc3796e4d1a5ad",
       "modification": {
         "status": "modified",
-        "reason": "Removed speech and multilingual controls so the imported UI exposes only the authorized English text workflow."
+        "reason": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow."
       }
     },
     {
@@ -132,9 +132,13 @@
       "sourceGitObject": "19c00b7ef3837c8e0f833167b4aff44469bdf786",
       "sourceSha256": "6d6fa0ef915a636065b10f7f560211c1158978815f9cb445ac7dfe6b7ee76fa8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "6d6fa0ef915a636065b10f7f560211c1158978815f9cb445ac7dfe6b7ee76fa8"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "03c1c5843dfecac2aaf90ececaadecd0f9279513131bddc4d333f2b956d94c94",
+      "modification": {
+        "status": "modified",
+        "reason": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system."
+      }
     },
     {
       "sourcePath": "public/assets/css/base.css",
@@ -314,10 +318,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "0bef5152dc1f5467de516e7752208fa9668878d3a376cf260a7958133c98db9e",
+      "destinationSha256": "5ffa1082ab4922b2a8dbf8f71f980e9550e3b9ade35c48c7d96aa8d222410bf8",
       "modification": {
         "status": "modified",
-        "reason": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow."
+        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display."
       }
     },
     {
@@ -780,9 +784,13 @@
       "sourceGitObject": "bc313832afe39bca122dec4d005dc0ea56b37bef",
       "sourceSha256": "0141d566c16f45dc0720e01f63432e1475c43cca8c15eb29b2e8f6f0789687fe",
       "originalCreatedAt": "2026-06-25T07:09:42+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "0141d566c16f45dc0720e01f63432e1475c43cca8c15eb29b2e8f6f0789687fe"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "e96ecc9150fe6fecca7465f1457432d85ded7d1ce3842f2a4747f3d5c1664445",
+      "modification": {
+        "status": "modified",
+        "reason": "Added DOM, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and recorded-summary regressions for the structured checklist."
+      }
     },
     {
       "sourcePath": "tests/unit/perf-csv.test.ts",

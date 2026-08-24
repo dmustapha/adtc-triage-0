@@ -8,14 +8,28 @@ import assert from "node:assert/strict";
 // @ts-expect-error - jsdom ships no bundled types; tests/ is outside the build-gate tsconfig anyway.
 import { JSDOM } from "jsdom";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 
 // Element IDs the app wiring + renderers touch (planWrap is created INSIDE #card by renderCard).
 const IDS = [
   "seeds", "rec", "status", "citationBox", "reasoning", "reasoningWrap", "reasonLabel", "reasonTimer",
   "card", "err", "result", "hTtft", "hTps", "hDev", "hChunks", "net", "assess",
 ];
+const DANGER_KEYS = [
+  "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
+  "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
+] as const;
 // `#case` is a <textarea> (runAssess reads `.value`); the rest are plain divs.
-const body = `<textarea id="case"></textarea>` + IDS.map((id) => `<div id="${id}"></div>`).join("");
+const dangerControls = DANGER_KEYS.map((key) =>
+  `<fieldset data-danger-key="${key}">` +
+  ["PRESENT", "ABSENT", "NOT_ASSESSED"].map((value) =>
+    `<label><input type="radio" name="danger-${key}" value="${value}"${value === "NOT_ASSESSED" ? " checked" : ""}>${value}</label>`,
+  ).join("") + "</fieldset>",
+).join("");
+const body = `<textarea id="case"></textarea>` +
+  `<input id="patientAgeValue" type="number"><select id="patientAgeUnit"><option value="months">Months</option><option value="years">Years</option></select>` +
+  `<div id="dangerStatus"></div><div id="dangerSummary"></div>${dangerControls}` +
+  IDS.map((id) => `<div id="${id}"></div>`).join("");
 const dom = new JSDOM(`<!DOCTYPE html><body>${body}</body>`, { url: "http://localhost:3010/app" });
 const g = globalThis as Record<string, unknown>;
 g.window = dom.window;
@@ -36,8 +50,67 @@ const fe = require("../../public/assets/js/triage.js") as {
   runAssess: () => Promise<void>;
   startReasonTimer: () => void;
   stopReasonTimer: () => void;
+  readStructuredDanger: () => Record<string, unknown>;
+  updateDangerChecklist: () => boolean;
 };
 const card = () => dom.window.document.getElementById("card")!.innerHTML;
+
+test("structured checklist markup is accessible, clinically labelled, and has no CONFLICT choice", () => {
+  const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
+  const page = new JSDOM(html).window.document;
+  assert.equal(page.querySelector("#dangerChecklist legend")?.textContent?.trim(), "Danger and breathing signs checklist");
+  assert.equal(page.querySelectorAll("#dangerChecklist fieldset[data-danger-key]").length, 7);
+  for (const fieldset of page.querySelectorAll("#dangerChecklist fieldset[data-danger-key]")) {
+    assert.equal(fieldset.querySelectorAll('input[type="radio"]').length, 3);
+    assert.equal(fieldset.querySelector('input[value="NOT_ASSESSED"]')?.hasAttribute("checked"), true);
+  }
+  assert.ok(page.querySelector('label[for="patientAgeValue"]'));
+  assert.ok(page.querySelector('label[for="patientAgeUnit"]'));
+  assert.ok(page.querySelector("#dangerStatus[role=status]"));
+  assert.equal(page.querySelectorAll('input[value="CONFLICT"]').length, 0);
+  assert.match(page.querySelector('[data-danger-key="chestIndrawing"] legend')?.textContent || "", /breathing classification sign/i);
+  assert.doesNotMatch(page.querySelector('[data-danger-key="chestIndrawing"] legend')?.textContent || "", /general danger sign/i);
+  assert.match(html, /Cannot drink or breastfeed/);
+  assert.match(html, /Vomits everything/);
+  assert.match(html, /Lethargic or unconscious/);
+  assert.match(html, /Stridor when calm/);
+  assert.match(html, /Low oxygen or central cyanosis/);
+});
+
+test("structured checklist serializes exact values and enables submission only when complete and age-supported", () => {
+  const assess = el("assess") as HTMLButtonElement;
+  (el("patientAgeValue") as HTMLInputElement).value = "18";
+  (el("patientAgeUnit") as HTMLSelectElement).value = "months";
+  assert.equal(fe.updateDangerChecklist(), false);
+  assert.equal(assess.disabled, true);
+  assert.match(el("dangerStatus").textContent || "", /0 of 7 signs assessed/i);
+
+  DANGER_KEYS.forEach((key, index) => {
+    const value = index === 4 ? "PRESENT" : "ABSENT";
+    (doc.querySelector(`input[name="danger-${key}"][value="${value}"]`) as HTMLInputElement).checked = true;
+  });
+  assert.equal(fe.updateDangerChecklist(), true);
+  assert.equal(assess.disabled, false);
+  assert.match(el("dangerStatus").textContent || "", /7 of 7 signs assessed/i);
+  assert.match(el("dangerSummary").textContent || "", /Chest indrawing: Present/);
+
+  assert.deepEqual(fe.readStructuredDanger(), {
+    patientAge: { value: 18, unit: "months" },
+    dangerObservations: {
+      cannotDrinkOrBreastfeed: "ABSENT", vomitsEverything: "ABSENT", convulsions: "ABSENT",
+      lethargicOrUnconscious: "ABSENT", chestIndrawing: "PRESENT", stridorWhenCalm: "ABSENT",
+      lowOxygenOrCentralCyanosis: "ABSENT",
+    },
+  });
+
+  (el("patientAgeValue") as HTMLInputElement).value = "60";
+  assert.equal(fe.updateDangerChecklist(), false, "60 months is outside the supported age band");
+  assert.equal(assess.disabled, true);
+
+  (el("patientAgeValue") as HTMLInputElement).value = "18";
+  (el("patientAgeUnit") as HTMLSelectElement).value = "fortnights";
+  assert.equal(fe.updateDangerChecklist(), false, "an unsupported age unit cannot enable submission");
+});
 
 test("esc escapes HTML metacharacters", () => {
   assert.equal(fe.esc('<a>&"x'), "&lt;a&gt;&amp;&quot;x");
@@ -66,6 +139,11 @@ test("renderCard on UNKNOWN hides the classification and the plan slot", () => {
   const h = card();
   assert.ok(!/Classification/.test(h), "no classification label on abstain");
   assert.ok(!/id="planWrap"/.test(h), "no plan slot on abstain");
+});
+
+test("renderCard never exposes model-authored red flags", () => {
+  fe.renderCard({ severity: "URGENT", action: "Treat now", red_flags: ["MODEL GENERATED FLAG"] }, "PNEUMONIA");
+  assert.doesNotMatch(card(), /MODEL GENERATED FLAG/);
 });
 
 test("renderPlan lays out medicines (dose table), supportive, return-now, follow-up detail", () => {
@@ -131,10 +209,12 @@ test("H-1: reason timer counts whole seconds up and clears on stop", () => {
 
 test("H-2: Stop aborts the in-flight assessment, restores the button, and is re-entrancy-guarded", async () => {
   let fetchCalls = 0;
+  let requestBody = "";
   // Abort-aware fetch stub: parks until the AbortController fires, then rejects with an AbortError
   // (mirrors what the browser fetch does on signal.abort()).
-  g.fetch = (_url: string, opts: { signal: AbortSignal }) => {
+  g.fetch = (_url: string, opts: { signal: AbortSignal; body: string }) => {
     fetchCalls++;
+    requestBody = opts.body;
     return new Promise((_resolve, reject) => {
       opts.signal.addEventListener("abort", () => {
         const e = new Error("aborted");
@@ -144,6 +224,12 @@ test("H-2: Stop aborts the in-flight assessment, restores the button, and is re-
     });
   };
   (el("case") as unknown as { value: string }).value = "child with a cough and fast breathing, alert";
+  (el("patientAgeValue") as HTMLInputElement).value = "18";
+  (el("patientAgeUnit") as HTMLSelectElement).value = "months";
+  DANGER_KEYS.forEach((key) => {
+    (doc.querySelector(`input[name="danger-${key}"][value="ABSENT"]`) as HTMLInputElement).checked = true;
+  });
+  fe.updateDangerChecklist();
   const assess = el("assess");
   const origLabel = assess.innerHTML;
 
@@ -151,6 +237,11 @@ test("H-2: Stop aborts the in-flight assessment, restores the button, and is re-
   await Promise.resolve();           // let runAssess reach the fetch await
   await fe.runAssess();              // second call must be guarded out while the first is in flight
   assert.equal(fetchCalls, 1, "re-entrancy guard blocks the second run");
+  assert.deepEqual(JSON.parse(requestBody), {
+    caseText: "child with a cough and fast breathing, alert",
+    patientAge: { value: 18, unit: "months" },
+    dangerObservations: Object.fromEntries(DANGER_KEYS.map((key) => [key, "ABSENT"])),
+  });
   assert.match(assess.innerHTML, /Stop/, "button is in Stop mode during the run");
   assert.match(assess.className, /is-stopping/, "neutral Stop styling applied");
 

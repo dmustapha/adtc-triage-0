@@ -40,12 +40,40 @@
         <div class="panel">
           <p class="hint">Type the age and what you see.</p>
           <textarea id="case" aria-label="Patient case" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
+          <fieldset id="dangerChecklist" class="danger-checklist">
+            <legend>Danger and breathing signs checklist</legend>
+            <p class="danger-help">Record each observed sign before requesting guidance.</p>
+            <div class="age-fields">
+              <div>
+                <label for="patientAgeValue">Patient age</label>
+                <input id="patientAgeValue" type="number" min="0" step="any" inputmode="decimal" autocomplete="off" />
+              </div>
+              <div>
+                <label for="patientAgeUnit">Age unit</label>
+                <select id="patientAgeUnit">
+                  <option value="months">Months</option>
+                  <option value="years">Years</option>
+                </select>
+              </div>
+            </div>
+            <div class="danger-signs">
+              <fieldset data-danger-key="cannotDrinkOrBreastfeed"><legend>Cannot drink or breastfeed</legend><div class="tri-state"><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="PRESENT" />Present</label><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="ABSENT" />Absent</label><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="vomitsEverything"><legend>Vomits everything</legend><div class="tri-state"><label><input type="radio" name="danger-vomitsEverything" value="PRESENT" />Present</label><label><input type="radio" name="danger-vomitsEverything" value="ABSENT" />Absent</label><label><input type="radio" name="danger-vomitsEverything" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="convulsions"><legend>Convulsions</legend><div class="tri-state"><label><input type="radio" name="danger-convulsions" value="PRESENT" />Present</label><label><input type="radio" name="danger-convulsions" value="ABSENT" />Absent</label><label><input type="radio" name="danger-convulsions" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="lethargicOrUnconscious"><legend>Lethargic or unconscious</legend><div class="tri-state"><label><input type="radio" name="danger-lethargicOrUnconscious" value="PRESENT" />Present</label><label><input type="radio" name="danger-lethargicOrUnconscious" value="ABSENT" />Absent</label><label><input type="radio" name="danger-lethargicOrUnconscious" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="chestIndrawing"><legend>Chest indrawing <span>breathing classification sign, not an emergency sign by itself</span></legend><div class="tri-state"><label><input type="radio" name="danger-chestIndrawing" value="PRESENT" />Present</label><label><input type="radio" name="danger-chestIndrawing" value="ABSENT" />Absent</label><label><input type="radio" name="danger-chestIndrawing" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="stridorWhenCalm"><legend>Stridor when calm</legend><div class="tri-state"><label><input type="radio" name="danger-stridorWhenCalm" value="PRESENT" />Present</label><label><input type="radio" name="danger-stridorWhenCalm" value="ABSENT" />Absent</label><label><input type="radio" name="danger-stridorWhenCalm" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+              <fieldset data-danger-key="lowOxygenOrCentralCyanosis"><legend>Low oxygen or central cyanosis</legend><div class="tri-state"><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="PRESENT" />Present</label><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="ABSENT" />Absent</label><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+            </div>
+            <p id="dangerStatus" class="danger-status" role="status">0 of 7 signs assessed.</p>
+            <p id="dangerSummary" class="danger-summary" aria-live="polite"></p>
+          </fieldset>
           <p class="multiling">English text workflow.</p>
           <div class="seeds" id="seeds" aria-label="Fill an example case">
             <button class="seed" type="button" data-fill="18 month old, watery diarrhoea for 2 days, sunken eyes, restless and irritable, drinks eagerly when offered water.">English example</button>
           </div>
           <div class="actions">
-            <button class="btn btn--primary" id="assess" type="button">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+            <button class="btn btn--primary" id="assess" type="button" disabled aria-describedby="dangerStatus">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             <span id="status" class="status" role="status"></span>
           </div>
         </div>
