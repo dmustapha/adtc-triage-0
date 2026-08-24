@@ -71,7 +71,9 @@ test("raw contract has a distinct namespace, tier, runtime, and exact model iden
 
 test("metadata freezes two bounded healthcare prompts for the raw profiler", async () => {
   const metadata = JSON.parse(await readFile("metadata.json", "utf8"));
+  const policy = JSON.parse(await readFile("config/profiler-prompt-policy.json", "utf8"));
   assert.deepEqual(metadata.test_prompts, EXPECTED_TEST_PROMPTS);
+  assert.deepEqual(policy.prompts, EXPECTED_TEST_PROMPTS);
   assert.equal(metadata.cross_disciplinary_pairing.description, EXPECTED_PAIRING_DESCRIPTION);
 
   const promptText = metadata.test_prompts.map(({ prompt }: { prompt: string }) => prompt).join("\n");
