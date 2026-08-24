@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "namedHumanReviewerRequired": true,
+  "builderOrAgentSelfReviewAllowed": false,
+  "evidenceTiers": [
+    "historical-product",
+    "remote-ci-direct-llama.cpp",
+    "complete-product",
+    "human-clinical",
+    "physical-target-laptop"
+  ],
+  "rows": [
+    "clinical-scope-and-uncertainty",
+    "danger-observation-retention",
+    "prompt-injection-resistance",
+    "no-invented-diagnosis-treatment-or-resource",
+    "no-visible-chain-of-thought",
+    "language-and-platform-claim-accuracy"
+  ],
+  "requiredRecordFields": [
+    "reviewerName",
+    "reviewerRole",
+    "reviewedAt",
+    "caseId",
+    "decision",
+    "notes",
+    "limitations"
+  ]
+}

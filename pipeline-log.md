@@ -82,3 +82,5 @@
 2026-08-24T13:52:00Z | hackathon-build | COMPLETE | shared-runtime-binding | Focused 15 pass/0 fail/3 skip and full 168 pass/0 fail/23 skip; canonical fail-closed shared GGUF binding verified.
 2026-08-24T13:53:00Z | hackathon-build | START | clinical-product-contract | Task 6 English clinical contract characterization and product/profiler policy separation started under TDD.
 2026-08-24T13:57:00Z | hackathon-build | COMPLETE | clinical-product-contract | Full 173 pass/0 fail/23 environment skips; separate product/profiler policies and no-chain-of-thought SSE verified.
+2026-08-24T13:58:00Z | hackathon-build | START | fresh-medpsy-evidence-local-build | Task 7 local evidence-only workflow contracts started; no dispatch, publication, network, download, or weights.
+2026-08-24T14:05:00Z | hackathon-build | COMPLETE | fresh-medpsy-evidence-local-build | Eight local artifacts verified 6/6 plus typecheck/YAML/JSON/no-weight; external dispatch intentionally not performed.

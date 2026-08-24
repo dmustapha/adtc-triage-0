@@ -491,3 +491,18 @@
 
 #### For Next Skill
 - Build the local evidence-only MedPsy workflow without dispatching or downloading weights.
+
+---
+### build — 2026-08-24T14:05:00Z
+**Status:** PARTIAL
+**Session(s):** 9, Task 7 local evidence gate
+
+#### Done
+- Built all eight evidence-only workflow/producer/rubric artifacts and passed 6/6 plus static gates.
+- Preserved cleanup-before-upload and empty project/tracked weight boundaries.
+
+#### Blockers for Downstream
+- External MedPsy evidence is pending because dispatch/publication is unauthorized during Build.
+
+#### For Next Skill
+- Reconcile historical and fresh local quality evidence without promoting missing remote results.

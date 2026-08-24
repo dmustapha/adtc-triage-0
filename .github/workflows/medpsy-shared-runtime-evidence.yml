@@ -1,0 +1,93 @@
+name: MedPsy shared-runtime evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: medpsy-shared-runtime-v1
+  cancel-in-progress: false
+
+jobs:
+  evidence-only-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      CANDIDATE_ID: medpsy-1.7b-q4
+      MODEL_FILENAME: medpsy-1.7b-q4_k_m-imat.gguf
+      MODEL_URL: https://huggingface.co/qvac/MedPsy-1.7B-GGUF/resolve/fd4cecc90c2de8dce4b112795456a54be9c59363/medpsy-1.7b-q4_k_m-imat.gguf
+      MODEL_BYTES: "1282439360"
+      MODEL_SHA256: 41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880
+      LLAMA_REVISION: c8ade30036139e32108fee53d8b7164dbfda4bee
+      CHAT_TEMPLATE_ARGS: "--jinja --single-turn"
+      EVIDENCE_TIER: remote-ci-direct-llama.cpp
+      EVIDENCE_HOST: github-actions-ubuntu-24.04
+      RUN_DIR: evidence/medpsy-shared-runtime-v1/remote-run
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+
+      - name: Install and verify frozen local harness
+        run: |
+          npm ci
+          node --import tsx --test tests/medpsy-evidence.test.ts
+          npm run typecheck
+          mkdir -p "$RUN_DIR"
+          node --import tsx scripts/medpsy-shared-runtime/freeze-manifest.ts "$RUN_DIR/producer-manifest.json"
+
+      - name: Build pinned CPU-only llama.cpp
+        run: |
+          git init "$RUNNER_TEMP/llama.cpp"
+          git -C "$RUNNER_TEMP/llama.cpp" remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C "$RUNNER_TEMP/llama.cpp" fetch --depth 1 origin "$LLAMA_REVISION"
+          git -C "$RUNNER_TEMP/llama.cpp" checkout --detach FETCH_HEAD
+          cmake -S "$RUNNER_TEMP/llama.cpp" -B "$RUNNER_TEMP/llama.cpp/build" -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/llama.cpp/build" --config Release --target llama-cli --parallel 2
+          echo "$RUNNER_TEMP/llama.cpp/build/bin" >> "$GITHUB_PATH"
+
+      - name: Download and verify immutable GGUF
+        run: |
+          mkdir -p model
+          curl --fail --location --retry 8 --retry-all-errors --retry-delay 10 --connect-timeout 30 --max-time 10800 --continue-at - --output "model/$MODEL_FILENAME.partial" "$MODEL_URL"
+          test "$(stat -c %s "model/$MODEL_FILENAME.partial")" = "$MODEL_BYTES"
+          echo "$MODEL_SHA256  model/$MODEL_FILENAME.partial" | sha256sum --check --strict
+          mv "model/$MODEL_FILENAME.partial" "model/$MODEL_FILENAME"
+
+      - name: Run frozen calibration
+        run: |
+          mkdir -p "$RUN_DIR/raw"
+          node --import tsx scripts/medpsy-shared-runtime/run-raw.ts "$CANDIDATE_ID" config/phase1-contract-v1/calibration-corpus.json "$RUN_DIR/raw/calibration.jsonl"
+          node --import tsx scripts/medpsy-shared-runtime/evaluate.ts "$RUN_DIR/raw/calibration.jsonl" "$RUN_DIR/calibration-evaluation.json"
+
+      - name: Prove producers unchanged after calibration
+        run: git diff --exit-code -- scripts/medpsy-shared-runtime config/medpsy-shared-runtime config/finalist-corpus.json config/phase1-contract-v1 .github/workflows/medpsy-shared-runtime-evidence.yml
+
+      - name: Run untouched holdouts and public profiler prompts
+        run: |
+          node --import tsx scripts/medpsy-shared-runtime/run-raw.ts "$CANDIDATE_ID" config/finalist-corpus.json "$RUN_DIR/raw/evaluation.jsonl"
+          node --import tsx scripts/medpsy-shared-runtime/evaluate.ts "$RUN_DIR/raw/evaluation.jsonl" "$RUN_DIR/evaluation.json"
+          node --import tsx scripts/medpsy-shared-runtime/run-raw.ts "$CANDIDATE_ID" metadata.json "$RUN_DIR/raw/profiler.jsonl"
+          find "$RUN_DIR" -type f -print0 | sort -z | xargs -0 sha256sum > "$RUN_DIR/hashes.sha256"
+
+      - name: Remove model bytes and partials before upload
+        if: always()
+        run: rm -f "model/$MODEL_FILENAME" "model/$MODEL_FILENAME.partial" model/*.gguf model/*.partial model/*.part
+
+      - name: Upload MedPsy evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: medpsy-shared-runtime-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            evidence/medpsy-shared-runtime-v1/remote-run/
+            !evidence/medpsy-shared-runtime-v1/**/*.gguf
+            !evidence/medpsy-shared-runtime-v1/**/*.partial
+            !evidence/medpsy-shared-runtime-v1/**/*.part

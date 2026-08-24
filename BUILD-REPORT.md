@@ -388,3 +388,7 @@ One model-contract loader now fails closed on absent or wrong-hash canonical byt
 ### Task 6 — clinical product contract
 
 The imported English clinical spine remains locally grounded, fenced, two-pass, schema-constrained, deterministically reconciled, citation-bound, abstaining, and fail-closed. Product generation policy now documents the QVAC orchestration separately from the two public direct-llama.cpp profiler prompts. Raw reasoning SSE is suppressed while first-token telemetry remains. Full verification passes 173 with zero failures and 23 explicitly environment-dependent store/citation skips; the historical generation policy remains byte-frozen.
+
+### Task 7 — local evidence-only MedPsy gate
+
+Eight planned local artifacts freeze the exact candidate, pinned llama.cpp revision, disjoint calibration/holdouts, embedded-template flags, raw retention, host/tier labels, human rubric, and cleanup-before-upload contract. Focused tests pass 6/6; TypeScript, YAML, JSON, diff, and empty model-byte scans pass. Only fail-closed invalid-candidate and absent-raw paths ran locally. No workflow dispatch, publication, network access, download, inference, or model weight occurred; external evidence remains pending by policy.

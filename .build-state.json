@@ -1,11 +1,11 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "shared-medpsy-healthcare-recovery",
-  "currentStep": "7",
-  "currentSubStep": "fresh-medpsy-evidence-local-build-not-started",
+  "currentStep": "8",
+  "currentSubStep": "quality-reconciliation-local-only-not-started",
   "status": "in_progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import", "4-canonical-medpsy-parity", "5-shared-runtime-binding", "6-clinical-product-contract"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import", "4-canonical-medpsy-parity", "5-shared-runtime-binding", "6-clinical-product-contract", "7-fresh-medpsy-evidence-local-build"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -98,6 +98,12 @@
       "started_at": "2026-08-24T13:53:00Z",
       "completed_at": "2026-08-24T13:57:00Z",
       "evidence": "PASS: English local clinical behavior frozen; product QVAC policy separated from two public direct-llama.cpp profiler prompts; raw reasoning SSE suppressed; full 173 pass/0 fail/23 skip"
+    },
+    {
+      "phase": "fresh-medpsy-evidence-local-build",
+      "started_at": "2026-08-24T13:58:00Z",
+      "completed_at": "2026-08-24T14:05:00Z",
+      "evidence": "PASS LOCAL CONTRACT: eight planned evidence-only artifacts; focused 6/6, typecheck, YAML, JSON, diff, and no-weight gates pass. External dispatch/publication intentionally not performed during Build."
     }
   ],
   "fileGroups": {
@@ -114,6 +120,7 @@
     ,"4-canonical-medpsy-parity": {"files": ["metadata.json", "config/model-finalists.json", "config/canonical-model.json", "config/canonical-model.schema.json", "download_model.sh", "evidence/medpsy-shared-runtime-v1/model.sha256", "tests/canonical-model.test.ts", "tests/downloader.test.ts"], "written": true, "verified": true}
     ,"5-shared-runtime-binding": {"files": ["src/model-contract.ts", "src/config.ts", "src/server.ts", "tests/model-parity.test.ts", "tests/unit/config.test.ts", "tests/integration/server.test.ts", "tests/finalist-producers.test.ts", "scripts/build-import-manifest.ts", "config/import-manifest.json"], "written": true, "verified": true}
     ,"6-clinical-product-contract": {"files": ["config/product-generation-policy.json", "config/profiler-prompt-policy.json", "tests/product-contract.test.ts", "src/server.ts", "tests/integration/sse-contract.test.ts", "scripts/build-import-manifest.ts", "config/import-manifest.json"], "written": true, "verified": true}
+    ,"7-fresh-medpsy-evidence-local-build": {"files": [".github/workflows/medpsy-shared-runtime-evidence.yml", "scripts/medpsy-shared-runtime", "config/medpsy-shared-runtime", "tests/medpsy-evidence.test.ts", "evidence/medpsy-shared-runtime-v1/README.md"], "written": true, "verified": true}
   },
   "deviations": [
     {"step": "3", "id": "DEV-001", "description": "Dependency installation could not complete because the host filesystem exhausted free space", "reason": "The merged QVAC dependency graph plus npm extraction/cache exceeded available disk during three bounded attempts", "class": "UNTESTED", "impact": "Task 3 typecheck, full tests, lock reconciliation, and completion-ledger GREEN remain unverified"},
@@ -209,10 +216,13 @@
     ,{"command": "Task 6 focused/clinical target GREEN", "exitCode": 0, "result": "focused 8 total/5 pass/0 fail/3 skip; clinical target 20 total/5 pass/0 fail/15 store skips"}
     ,{"command": "Task 6 npm test", "exitCode": 0, "result": "196 total; 173 pass, 0 fail, 23 environment-dependent skips, 0 todo"}
     ,{"command": "Task 6 typecheck/manifest/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; all 76 imports verified; diff clean; project/tracked GGUF and partial scans empty"}
+    ,{"command": "Task 7 evidence-only workflow RED", "exitCode": 1, "result": "6 total; 1 pass, 5 fail for absent planned producer/workflow contracts"}
+    ,{"command": "Task 7 focused local workflow GREEN", "exitCode": 0, "result": "6 pass, 0 fail, 0 skip; only invalid-candidate and absent-raw fail-closed paths executed"}
+    ,{"command": "Task 7 typecheck/YAML/JSON/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; YAML_OK; JSON 2/2; diff clean; project/tracked GGUF and partial scans empty"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T13:57:00Z",
+  "timestamp": "2026-08-24T14:05:00Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -247,7 +257,7 @@
     ,"After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining."
     ,"Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute."
   ],
-  "what_is_needed": "Build Task 7 local evidence-only MedPsy workflow and manifests without publication or model download. External workflow dispatch remains unauthorized during Build.",
+  "what_is_needed": "Perform Task 8 local quality reconciliation while marking remote MedPsy evidence pending. Do not dispatch or publish during Build; human/physical/signing gates remain closed.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",
