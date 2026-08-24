@@ -28,6 +28,8 @@
 | AF-B4 | build | [TEST] Corrected OLMo raw gate | invalid untemplated evidence -> run 32653499076 uses `--jinja --single-turn`, preserves all frozen inputs, and still fails multiple fatal gates |
 | AF-B5 | build | [USER] Final recovery candidate | zero selected models -> lock `allenai/OLMo-2-1124-7B-Instruct-GGUF` Q4_K_M as the single authorized fourth-attempt candidate under the unchanged Phase 1 gate |
 | AF-B6 | conductor | [USER] Pipeline continuation target | stopped after attempt 4 -> resume Build through an explicit product-contract requirements revision and continue through Demo Rehearsal only if every FSM gate passes |
+| AF-R1 | conductor | [USER] Healthcare recovery authority | failed OLMo clean-build contract -> transparent Triage-0 reuse from commit `74424721` with MedPsy-1.7B Q4 as the sole shared-GGUF candidate |
+| AF-R2 | conductor | [USER] Runtime ownership correction | direct llama.cpp-only product -> QVAC product plus direct llama.cpp profiler over identical MedPsy bytes and checksum |
 
 ## Decisions Log
 | # | Skill | Decision | Why | Affects |
@@ -53,6 +55,7 @@
 | 19 | build | [USER] Correct the OLMo producer with pinned llama.cpp `--jinja --single-turn -p` | `-no-cnv` disables conversation/template application, so the prior behavioral verdict was invalid and could not be reused | build, debug, package, verify_preflight |
 | 20 | build | [USER] Lock OLMo-2-1124-7B-Instruct Q4_K_M as the final recovery candidate | It is the only screened option combining an official anonymous GGUF, complete public training chain, pinned `olmo2` runtime compatibility, and materially greater capacity than the rejected 1B model | conductor, build, debug, package, verify_preflight |
 | 21 | conductor | [USER] Continue the conductor through Demo Rehearsal | Preserve the failed bare-prompt evidence, revise Phase 1 to test the same OLMo-2 7B under the actual constrained product contract, and advance only after a signed passing model decision | build, debug, wire, verify_milestone, design_forge, stress_test, deploy, livetest, interrogate, demo_rehearsal |
+| 22 | conductor | [USER] Retain healthcare through the shared-MedPsy Triage-0 recovery | The existing product and exact model are already proven together; the former MedPsy stop was pre-inference and the clean-build migration discarded the working orchestration | build, debug, wire, verify_milestone, stress_test, deploy, livetest, interrogate, demo_rehearsal, demo, package, verify_preflight |
 
 ## Downstream Items
 <!-- Owner-routed, non-blocking deferred work. Every skill reads on entry, actions rows it owns. See PULSE-PROTOCOL § Downstream Items. -->
@@ -64,7 +67,7 @@
 | DI-T1 | candidate-fit-audit | build | P0 | Create template-derived ADTC root with one canonical GGUF and optional QVAC app | Required root artifacts validate; model remains runnable if app directory is removed | open |
 | DI-T2 | candidate-fit-audit | debug | P0 | Resolve fresh-clone model-path contract failure and distinguish required-asset skips | Full test summary has no unexplained failures; offline default and docs agree | open |
 | DI-T3 | candidate-fit-audit | verify_preflight | P0 | Run pinned profiler on target-class Ubuntu x86 | Fresh-clone hash, TPS, RSS, thermals, and submission JSON recorded | open |
-| DI-T4 | candidate-fit-audit | build | P0 | Resolve the prior-work boundary without delaying the clean ADTC build | If approval exists, save and disclose it; otherwise prove no Triage-0 implementation artifacts were imported | open |
+| DI-T4 | candidate-fit-audit | build | P0 | Resolve the prior-work boundary through transparent reuse | Freeze commit `74424721`, enumerate imported files and hashes, preserve notices, and disclose the prior QVAC submission | open |
 | DI-S1 | scope-handoff | forge | P0 | Freeze the narrow clinical taxonomy, exact claim, resource budgets, and feature observables | PRD and architecture encode real P0 behavior and cuttable QVAC adapters | done |
 | DI-S2 | scope-handoff | build | P0 | Reach an early valid Devpost submission-survival checkpoint before P1 work | Required repository, report, prompts, profiler values, video plan, and saved draft are present | open |
 | DI-S3 | scope-handoff | verify_preflight | P0 | Close every item in the ADTC-specific Definition of Done | Clean clone, offline app, parity, safety, provenance, physical evidence, and submitted Devpost entry pass | open |

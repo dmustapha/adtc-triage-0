@@ -51,3 +51,7 @@
 2026-08-23T22:52:25Z | build | BLOCKED | build | type=fundamental action=escalate
 2026-08-24T02:11:48Z | conductor | START | resume | Resuming from url_preverify
 2026-08-24T02:12:53Z | build | START | build | Dispatching build
+2026-08-24T03:05:34Z | build | COMPLETE | build | gate=pass
+2026-08-24T03:05:38Z | build | BLOCKED | build | type=fundamental action=escalate
+2026-08-24T05:52:12Z | conductor | START | resume | Resuming from url_preverify
+2026-08-24T05:53:45Z | conductor | RECOVERY | build | Authorized shared-MedPsy healthcare revision; legal/provenance is first subgate; OLMo history preserved; no model search; Phase 2 still requires signed decision.

@@ -1,7 +1,7 @@
 {
   "version": "2.0",
   "created_at": "2026-08-22T06:08:35Z",
-  "updated_at": "2026-08-23T18:46:00Z",
+  "updated_at": "2026-08-24T03:05:56Z",
   "working_dir": "/Users/MAC/adtc-2026",
   "hackathon": {
     "name": "Africa Deep Tech Challenge 2026",
@@ -67,7 +67,7 @@
     "copilot_pat_available": false
   },
   "pipeline": {
-    "project_name": "Triage-01",
+    "project_name": "Triage-0 ADTC",
     "current_phase": "build",
     "phases": {
       "intel": {
@@ -97,9 +97,10 @@
         "completed_at": "2026-08-23T13:55:01Z"
       },
       "build": {
-        "status": "blocked",
-        "dispatched_at": "2026-08-23T16:56:00Z",
-        "completed_at": "2026-08-23T17:12:30Z"
+        "status": "running",
+        "dispatched_at": "2026-08-24T05:53:45Z",
+        "completed_at": null,
+        "note": "User-authorized shared-MedPsy healthcare recovery; legal/provenance subgate precedes import and implementation"
       },
       "debug": {
         "status": "pending",
@@ -239,32 +240,31 @@
   "buildState": {
     "status": "blocked",
     "currentPhase": "phase-1-contract-sources-finalist-gate",
-    "currentStep": "1.3-replacement-template-corrected-raw-gate-blocked",
+    "currentStep": "1.3-product-contract-calibration-rejected",
     "selectedCandidateId": null,
     "contractAddresses": {},
     "deviationCount": 0,
     "untestedDeviationCount": 0,
     "knownRiskCount": 2,
-    "blockedReason": "The correctly templated OLMo Q4 raw run fails multiple unchanged fatal gates; MedPsy candidates remain rejected on lineage. No canonical GGUF can be selected.",
-    "recoveryAuthorization": "User explicitly authorized a fourth and final conductor-owned Build Phase 1 recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M; dispatch begins only in the new chat",
-    "producerCorrection": "Run 32652354894 withdrawn; run 32653499076 used --jinja --single-turn and is authoritative",
-    "rawArtifactSha256": "beee8770fcc40f7bade398cae36baed099413c339a0e46b01c0b5f92f019bf10",
-    "whatIsNeeded": "In the new chat, resume the conductor and execute user-authorized Build attempt 4 for the locked OLMo-2 7B Q4_K_M candidate under the unchanged Phase 1 gate.",
-    "approvedRecoveryCandidate": {
-      "candidateId": "olmo-2-1124-7b-instruct-q4-k-m",
-      "repository": "allenai/OLMo-2-1124-7B-Instruct-GGUF",
-      "revision": "410e0069f64869e4b1d17d8de04810b881fd824b",
-      "filename": "olmo-2-1124-7B-instruct-Q4_K_M.gguf",
-      "bytes": 4472020256,
-      "sha256": "e08112e5f84aab7c05fa6e713c58e5214cd5d8e32ed773ff3354b006eed41b95",
-      "quantization": "Q4_K_M",
-      "license": "Apache-2.0",
-      "immutableUrl": "https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct-GGUF/resolve/410e0069f64869e4b1d17d8de04810b881fd824b/olmo-2-1124-7B-instruct-Q4_K_M.gguf?download=true"
-    },
-    "nextAttempt": 4,
-    "nextAttemptAuthorized": true,
-    "recoveryDesignPath": "docs/plans/2026-08-23-olmo2-7b-final-recovery-design.md",
-    "recoveryPlanPath": "docs/plans/2026-08-23-olmo2-7b-final-recovery-plan.md"
+    "blockedReason": "The single authorized product-contract revision failed its exact frozen 12-case calibration in workflow 32684188985. Sentinel-normalized diagnostics produced 12/12 bounded JSON but 0/12 exact calibrations and only 2/12 correct deterministic danger projections.",
+    "whatIsNeeded": "Explicit submission pivot or a newly authorized requirements revision beyond exhausted cycle 1/1. No further prompt tuning, model search, untouched evaluation, human/physical gate, model signing, Phase 2, or UI is authorized.",
+    "recoveryAuthorization": "Product-contract requirements revision cycle 1/1 executed and exhausted",
+    "approvedRecoveryCandidateId": "olmo-2-1124-7b-instruct-q4-k-m",
+    "modelSearchAllowed": false,
+    "requirementsRevisionWorkflowRunId": "32684188985",
+    "requirementsRevisionArtifactId": "9505304865",
+    "requirementsRevisionProducerHeadSha": "29e75309ec083fa415525b148c01e5ca01cf5234",
+    "requirementsRevisionEvidenceCommit": "a754781bae10785ed5975ca878680840a230b556",
+    "requirementsRevisionManifestSha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
+    "requirementsRevisionRawSha256": "c61508ea75e3cdb0938740dc8dbcb642d1e302d97d6e386f9f6953b7dfc9c406",
+    "requirementsRevisionEvaluatorSha256": "953dc0f64e53fb924b10195cf3307f9d897ad132454643c78020b4a697141020",
+    "lineageSha256": "bd2e2cabc5e2ba728cc0c31d8641e141ff821f605239fd091cdec8e0a4c2d835",
+    "untouchedEvaluationRun": false,
+    "humanReviewRun": false,
+    "physicalGateRun": false,
+    "modelDecisionExists": false,
+    "phase2Authorized": false,
+    "weightsRetained": false
   },
   "debugState": null,
   "wireState": null,
@@ -335,21 +335,29 @@
   "dispatch_context": {
     "mode": "resume",
     "target_skill": "hackathon-build",
-    "attempt": 3,
-    "max_attempts": 4,
+    "attempt": 1,
+    "max_attempts": 1,
     "working_dir": "/Users/MAC/adtc-2026",
     "gap_list": [
-      "Resume only Build Phase 1 through the conductor for user-authorized attempt 4",
-      "Evaluate only locked OLMo-2-1124-7B-Instruct Q4_K_M identity under the unchanged 100-case gate",
-      "Do not enter Phase 2/UI unless every raw, human, and target-laptop gate passes and evidence/model-decision.json is signed",
-      "If the candidate fails, stop and return for an explicit requirement revision or submission pivot"
+      "Run legal/provenance recovery before importing Triage-0 files",
+      "Freeze exact source commit 74424721bc75f564808eacce42d7f7f42676ae0f and file-level manifest",
+      "Restore MedPsy-1.7B Q4_K_M as the only candidate; no model search",
+      "Replace unpublished itemized-lineage kill gate with truthful license and caveat disclosure",
+      "Require same-GGUF QVAC product and direct llama.cpp profiler parity",
+      "Preserve all historical OLMo and clinical evidence",
+      "Keep Phase 2 blocked until a truthful signed model decision exists"
     ],
     "cascade_diagnosis": null,
     "deploy_targets": [],
     "deploy_env_vars": {},
-    "next_attempt": 4,
+    "next_attempt": "shared-medpsy-healthcare-recovery-v1",
     "user_authorized_retry_override": true,
-    "approved_candidate_id": "olmo-2-1124-7b-instruct-q4-k-m"
+    "approved_candidate_id": "medpsy-1.7b-q4",
+    "requirements_revision": true,
+    "continuation_target": "demo_rehearsal",
+    "recovery_design": "docs/plans/2026-08-24-healthcare-retention-shared-medpsy-design.md",
+    "recovery_plan": "docs/plans/2026-08-24-shared-medpsy-healthcare-retention-implementation.md",
+    "blocker_review": "docs/reviews/2026-08-24-shared-medpsy-document-and-blocker-review.md"
   },
   "continuation_manifest": {
     "continuation_count": 0,
@@ -359,7 +367,21 @@
     "spawned_at": null
   },
   "retry_ledger": {
-    "build": {}
+    "build": {
+      "fundamental": {
+        "attempts": 1,
+        "budget_remaining": 0,
+        "action": "escalate",
+        "recorded_at": "2026-08-24T03:05:56Z"
+      },
+      "healthcare_recovery": {
+        "recovery_id": "shared-medpsy-healthcare-recovery-v1",
+        "authorized_at": "2026-08-24T05:53:45Z",
+        "attempts": 0,
+        "budget_remaining": 1,
+        "scope": "shared MedPsy plus transparent Triage-0 reuse only"
+      }
+    }
   },
   "checkpoints_answered": {
     "manifest": true,
@@ -379,9 +401,9 @@
   "checkpoint_details": {
     "idea_selection": {
       "answered": true,
-      "choice": "Triage-0 clinical thesis with Approach C",
-      "modifications": "New ADTC-native clean implementation named Triage-01; preserve explicit provenance distinction from Triage-0",
-      "project_name": "Triage-01"
+      "choice": "Triage-0 healthcare product with shared MedPsy runtime",
+      "modifications": "Transparent reuse from commit 74424721; QVAC product and direct llama.cpp profiler share exact MedPsy GGUF; no model search",
+      "project_name": "Triage-0 ADTC"
     },
     "post_forge_credentials": {
       "answered": true,
@@ -389,5 +411,51 @@
       "skipped": [],
       "note": "No credentials required: public GitHub, anonymous GGUF, direct localhost llama.cpp, no cloud inference; user explicitly required credential-free deployment."
     }
+  },
+  "requirements_revision": {
+    "authorized": true,
+    "authorized_at": "2026-08-24T02:13:30Z",
+    "source_prompt": "continu with condu tour till demo rehearsal",
+    "classification": "Phase 1 product-contract evaluation revision, not a fifth model-recovery attempt",
+    "model_search_allowed": false,
+    "preserve_attempt_4_evidence": true,
+    "same_candidate_only": "olmo-2-1124-7b-instruct-q4-k-m",
+    "phase_2_gate": "signed passing evidence/model-decision.json required",
+    "target_phase": "demo_rehearsal",
+    "status": "blocked",
+    "completed_at": "2026-08-24T03:05:56Z",
+    "workflow_run_id": "32684188985",
+    "artifact_id": "9505304865",
+    "evidence_commit": "a754781bae10785ed5975ca878680840a230b556",
+    "calibration_result": {
+      "exact": "0/12",
+      "bounded_json_after_sentinel_diagnostic": "12/12",
+      "deterministic_danger_projection": "2/12",
+      "untouched_evaluation_run": false
+    }
+  },
+  "healthcare_recovery": {
+    "recovery_id": "shared-medpsy-healthcare-recovery-v1",
+    "status": "running",
+    "authorized": true,
+    "authorized_at": "2026-08-24T05:53:45Z",
+    "source_prompt": "lets do these rn then",
+    "classification": "user-authorized healthcare-retention requirements revision and transparent prior-work reuse; not a model search",
+    "project_name": "Triage-0 ADTC",
+    "source_repository": "https://github.com/dmustapha/triage-0",
+    "source_commit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+    "candidate_id": "medpsy-1.7b-q4",
+    "candidate_revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "candidate_file": "medpsy-1.7b-q4_k_m-imat.gguf",
+    "candidate_bytes": 1282439360,
+    "candidate_sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+    "model_search_allowed": false,
+    "first_subgate": "legal-provenance",
+    "evidence_namespace": "evidence/medpsy-shared-runtime-v1",
+    "preserve_historical_evidence": true,
+    "phase_2_gate": "truthful signed evidence/model-decision.json required",
+    "human_review_required": true,
+    "physical_target_required": true,
+    "weights_may_be_retained": false
   }
 }
