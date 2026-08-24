@@ -5,7 +5,7 @@
 //
 // Routes:
 //   GET  /health        — liveness + resident models + chunk count + resident mode
-//   POST /triage        — SSE: citation (early) -> reasoning deltas -> card+perf   (E-5 cinematic)
+//   POST /triage        — SSE: citation (early) -> first-token telemetry -> card+perf
 //   GET  /perf-log      — { rows }   |   GET /perf-log.csv — raw CSV
 import express, { type Request, type Response, type NextFunction } from "express";
 import { readFileSync, existsSync } from "node:fs";
@@ -148,8 +148,8 @@ if (process.env.TRIAGE0_DEBUG_ROUTE) {
 }
 
 // ── POST /triage (Server-Sent Events) ───────────────────────────────────────────────
-// E-5: emit the matched WHO citation FIRST (sub-2s, from retrieval), then stream reasoning deltas,
-// then the final card + perf. The whole wow lands early; the reasoning wait is visible, not dead air.
+// E-5: emit the matched WHO citation FIRST (sub-2s, from retrieval), then first-token telemetry and the
+// final card. Raw model reasoning remains internal; only the brief validated card justification is visible.
 app.post("/triage", async (req: Request, res: Response) => {
   const caseText = String(req.body?.caseText ?? "").trim();
   if (!caseText) return res.status(400).json({ error: "caseText is required." });
@@ -238,8 +238,7 @@ app.post("/triage", async (req: Request, res: Response) => {
       retrieval,
     });
 
-    // Stream reasoning tokens as the model thinks (strip <think> tags client-side is unnecessary —
-    // the deltas already include them; we surface a "reasoning…" affordance in the UI).
+    // Observe the first internal delta for honest TTFT telemetry, but never expose raw reasoning tokens.
     send("stage", { key: "reason", label: "Reasoning on-device", detail: "MedPsy 1.7B · GPU" });
     const reasonStart = Date.now();
     let firstDeltaSent = false;
@@ -251,7 +250,7 @@ app.post("/triage", async (req: Request, res: Response) => {
           firstDeltaSent = true;
           send("first_token", { ttftMs: Date.now() - reasonStart });
         }
-        send("reasoning", { delta: chunk });
+        void chunk;
       },
     });
 

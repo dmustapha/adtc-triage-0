@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "profiler-prompt",
+  "modelContract": "config/canonical-model.json",
+  "runtime": "llama.cpp",
+  "promptSource": "metadata.json#test_prompts",
+  "reusesProductOrchestration": false,
+  "prompts": [
+    {
+      "prompt_id": "tp_001",
+      "prompt": "Write a Python function that reads a CSV file and returns the column with the highest mean value."
+    },
+    {
+      "prompt_id": "tp_002",
+      "prompt": "Explain the difference between a list and a tuple in Python, and give one example where each is the better choice."
+    }
+  ]
+}

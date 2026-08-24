@@ -1,7 +1,7 @@
 // File: tests/integration/sse-contract.test.ts
 // MODEL-GATED. Pins the /triage SSE WIRE CONTRACT — the exact event order and per-event payload schema
 // the frontend (triage.js handleEvent) depends on. server.test.ts proves the hero loop end-to-end; this
-// proves the contract is STABLE: citation arrives before reasoning before card before plan before done,
+// proves the contract is STABLE: citation arrives before first-token telemetry, card, plan, and done,
 // every event carries its documented fields, and the abstain path emits exactly [abstain, done] with an
 // UNKNOWN card and no citation/card/plan.
 //
@@ -64,7 +64,7 @@ const triage = (caseText: string) =>
     body: JSON.stringify({ caseText }),
   });
 
-test("grounded /triage: full event ORDER citation<first_token<reasoning<card<plan<done", { skip, timeout: 300_000 }, async () => {
+test("grounded /triage: full event ORDER citation<first_token<card<plan<done without chain-of-thought", { skip, timeout: 300_000 }, async () => {
   const r = await triage("2-year-old, cough 3 days, chest indrawing, breathing 52 a minute, alert and drinking, no danger signs.");
   assert.match(r.headers.get("content-type") || "", /text\/event-stream/);
   const events = await readSse(r);
@@ -73,11 +73,10 @@ test("grounded /triage: full event ORDER citation<first_token<reasoning<card<pla
   const idx = (k: string) => kinds.indexOf(k);
   assert.ok(idx("citation") >= 0, "emits a citation");
   assert.ok(idx("first_token") > idx("citation"), "first_token after citation");
-  assert.ok(idx("reasoning") > idx("first_token"), "first reasoning delta after first_token");
-  assert.ok(idx("card") > idx("reasoning"), "card after reasoning");
+  assert.ok(idx("card") > idx("first_token"), "card after first-token telemetry");
   assert.ok(idx("plan") > idx("card"), "plan after card (progressive enhancement, Task #22)");
   assert.equal(kinds[kinds.length - 1], "done", "done is the terminal event");
-  assert.ok(kinds.filter((k) => k === "reasoning").length >= 1, "at least one reasoning delta streamed");
+  assert.ok(!kinds.includes("reasoning"), "model chain-of-thought is never exposed");
   assert.ok(!kinds.includes("error"), "a grounded case never emits an error event");
 
   // Representation: additive on-device pipeline readout. Each `stage` marks a REAL step; they are

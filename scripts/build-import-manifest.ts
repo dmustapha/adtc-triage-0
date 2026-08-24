@@ -44,7 +44,8 @@ const MODIFIED_FOR_ADTC = new Set<string>([
   "package-lock.json", "package.json", "public/app.html", "public/assets/js/triage.js",
   "src/config.ts", "src/qvac/engine.ts", "src/server.ts",
   "src/triage/triage.ts", "tests/integration/http-validation.test.ts",
-  "tests/integration/server.test.ts", "tests/integration/triage.test.ts", "tests/unit/config.test.ts",
+  "tests/integration/server.test.ts", "tests/integration/sse-contract.test.ts",
+  "tests/integration/triage.test.ts", "tests/unit/config.test.ts",
   "tsconfig.json",
 ]);
 
@@ -55,10 +56,11 @@ const MODIFICATION_REASONS: Record<string, string> = {
   "public/assets/js/triage.js": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow.",
   "src/config.ts": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection.",
   "src/qvac/engine.ts": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline.",
-  "src/server.ts": "Preserved English text triage while adding fail-closed canonical model startup and distinct shared-runtime health identity.",
+  "src/server.ts": "Preserved English text triage, added fail-closed shared-model identity, and withheld raw reasoning deltas while retaining first-token telemetry.",
   "src/triage/triage.ts": "Removed translation dependencies so routing, grounding, and triage operate on English text only.",
   "tests/integration/http-validation.test.ts": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered.",
   "tests/integration/server.test.ts": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities.",
+  "tests/integration/sse-contract.test.ts": "Updated the English text SSE contract to prohibit visible chain-of-thought while preserving citation, telemetry, card, plan, and terminal event order.",
   "tests/integration/triage.test.ts": "Removed multilingual integration cases that require the excluded translation models.",
   "tests/unit/config.test.ts": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection.",
   "tsconfig.json": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract.",

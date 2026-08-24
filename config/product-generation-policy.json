@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "product-generation",
+  "modelContract": "config/canonical-model.json",
+  "runtime": {
+    "name": "QVAC SDK",
+    "version": "0.13.3"
+  },
+  "languageScope": [
+    "en"
+  ],
+  "context": {
+    "mode": "local-rag",
+    "untrustedInputFences": [
+      "CASE",
+      "PROTOCOL"
+    ],
+    "sourceBoundCitations": true
+  },
+  "passes": [
+    {
+      "name": "reason",
+      "temperature": 0,
+      "outputExposure": "internal-only"
+    },
+    {
+      "name": "extract",
+      "temperature": 0,
+      "constraint": "json-schema-to-GBNF",
+      "validation": "TriageExtractSchema.safeParse",
+      "maxAttempts": 3
+    }
+  ],
+  "deterministicOwners": [
+    "classification-reconciliation",
+    "severity",
+    "red-flags",
+    "protocol-citations",
+    "management-plan"
+  ],
+  "failureModes": [
+    "abstain",
+    "fail-closed-error"
+  ],
+  "visibleOutput": {
+    "chainOfThought": false,
+    "briefValidatedJustification": true
+  }
+}

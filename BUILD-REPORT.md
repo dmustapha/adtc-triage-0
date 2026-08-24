@@ -384,3 +384,7 @@ The canonical contract now freezes `medpsy-1.7b-q4` at revision `fd4cecc90c2de8d
 ### Task 5 — shared GGUF runtime binding
 
 One model-contract loader now fails closed on absent or wrong-hash canonical bytes. Product configuration and `/health` use the canonical MedPsy identity while distinguishing QVAC SDK 0.13.3 product execution from official llama.cpp profiling over the same file. Focused verification passes 15 with three store-dependent skips; the full suite passes 168 with zero failures and 23 environment-dependent skips. The historical OLMo test correction changes assertion scope only—MedPsy's explicitly superseded active path is excluded while all OLMo evidence and verdict bytes remain untouched; corrected test SHA-256 is `0f1d1c4540d9226ac6442ae57c7fa382f4bd5bdf623b89db85b4cb8098754e64`.
+
+### Task 6 — clinical product contract
+
+The imported English clinical spine remains locally grounded, fenced, two-pass, schema-constrained, deterministically reconciled, citation-bound, abstaining, and fail-closed. Product generation policy now documents the QVAC orchestration separately from the two public direct-llama.cpp profiler prompts. Raw reasoning SSE is suppressed while first-token telemetry remains. Full verification passes 173 with zero failures and 23 explicitly environment-dependent store/citation skips; the historical generation policy remains byte-frozen.

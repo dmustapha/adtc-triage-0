@@ -536,10 +536,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "b85bec60379baa6ab32405e00b3c79f5eb9bfe274e222a34a5cf3ba61e9e1b0b",
+      "destinationSha256": "2603ac0a1120163e4d3757f10883a0dd408f4e1aaf08943e7e2ad837665bceed",
       "modification": {
         "status": "modified",
-        "reason": "Preserved English text triage while adding fail-closed canonical model startup and distinct shared-runtime health identity."
+        "reason": "Preserved English text triage, added fail-closed shared-model identity, and withheld raw reasoning deltas while retaining first-token telemetry."
       }
     },
     {
@@ -670,9 +670,13 @@
       "sourceGitObject": "67b0b95c63984bae2b9d4c98a2da7d9435f41fc0",
       "sourceSha256": "80615566207a929e3ea87601640e8a74d46d5fa382873d3f72143a5a86954568",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "80615566207a929e3ea87601640e8a74d46d5fa382873d3f72143a5a86954568"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "b0411695ac082578ea26438e90e8badbf17559ce6db2f5f2f5470c0aa87f22ba",
+      "modification": {
+        "status": "modified",
+        "reason": "Updated the English text SSE contract to prohibit visible chain-of-thought while preserving citation, telemetry, card, plan, and terminal event order."
+      }
     },
     {
       "sourcePath": "tests/integration/triage.test.ts",

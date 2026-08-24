@@ -476,3 +476,18 @@
 
 #### For Next Skill
 - Freeze the English clinical product contract and separate product versus profiler policies.
+
+---
+### build — 2026-08-24T13:57:00Z
+**Status:** PARTIAL
+**Session(s):** 9, Task 6 clinical contract
+
+#### Done
+- Froze the imported English clinical behavior and separated QVAC product policy from direct llama.cpp profiler prompts.
+- Suppressed raw reasoning SSE; passed full 173/0/23 plus typecheck, manifest, diff, and no-weight gates.
+
+#### Blockers for Downstream
+- Fresh evidence, human/physical review, and signed decision remain unresolved; Phase 2 is closed.
+
+#### For Next Skill
+- Build the local evidence-only MedPsy workflow without dispatching or downloading weights.
