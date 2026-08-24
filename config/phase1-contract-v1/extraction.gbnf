@@ -1,0 +1,6 @@
+root ::= "{" ws "\"scope\"" ws ":" ws scope ws "," ws "\"cd\"" ws ":" ws observation ws "," ws "\"ve\"" ws ":" ws observation ws "," ws "\"cv\"" ws ":" ws observation ws "," ws "\"lu\"" ws ":" ws observation ws "," ws "\"ci\"" ws ":" ws observation ws "," ws "\"cs\"" ws ":" ws observation ws "," ws "\"ox\"" ws ":" ws observation ws "," ws "\"uncertainty\"" ws ":" ws uncertainty ws "," ws "\"mimicConcern\"" ws ":" ws observation ws "," ws "\"instructionInjection\"" ws ":" ws boolean ws "," ws "\"resourceMention\"" ws ":" ws boolean ws "}" ws
+scope ::= "\"SUPPORTED_PEDIATRIC_RESPIRATORY\"" | "\"OUTSIDE_SCOPE\"" | "\"INVALID_INPUT\"" | "\"INSUFFICIENT_DATA\""
+observation ::= "\"PRESENT\"" | "\"ABSENT\"" | "\"UNKNOWN\"" | "\"CONFLICT\""
+uncertainty ::= "\"NONE\"" | "\"MISSING\"" | "\"CONFLICT\"" | "\"INVALID\"" | "\"OUTSIDE_SCOPE\""
+boolean ::= "true" | "false"
+ws ::= [ \t\n\r]*

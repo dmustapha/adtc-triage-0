@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope", "cd", "ve", "cv", "lu", "ci", "cs", "ox", "uncertainty", "mimicConcern", "instructionInjection", "resourceMention"],
+  "properties": {
+    "scope": {"enum": ["SUPPORTED_PEDIATRIC_RESPIRATORY", "OUTSIDE_SCOPE", "INVALID_INPUT", "INSUFFICIENT_DATA"]},
+    "cd": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "ve": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "cv": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "lu": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "ci": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "cs": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "ox": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "uncertainty": {"enum": ["NONE", "MISSING", "CONFLICT", "INVALID", "OUTSIDE_SCOPE"]},
+    "mimicConcern": {"enum": ["PRESENT", "ABSENT", "UNKNOWN", "CONFLICT"]},
+    "instructionInjection": {"type": "boolean"},
+    "resourceMention": {"type": "boolean"}
+  }
+}

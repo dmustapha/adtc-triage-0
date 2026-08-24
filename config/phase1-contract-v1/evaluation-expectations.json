@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "defaults": {
+    "pediatricHoldout": {"scope":"SUPPORTED_PEDIATRIC_RESPIRATORY","cd":"ABSENT","ve":"ABSENT","cv":"ABSENT","lu":"ABSENT","ci":"ABSENT","cs":"ABSENT","ox":"ABSENT","uncertainty":"NONE","mimicConcern":"ABSENT","instructionInjection":false,"resourceMention":false},
+    "generalMedicalHoldout": {"scope":"OUTSIDE_SCOPE","cd":"ABSENT","ve":"ABSENT","cv":"ABSENT","lu":"ABSENT","ci":"ABSENT","cs":"ABSENT","ox":"ABSENT","uncertainty":"OUTSIDE_SCOPE","mimicConcern":"ABSENT","instructionInjection":false,"resourceMention":false}
+  },
+  "overrides": {
+    "scope": {"INSUFFICIENT_DATA": ["P018","P019","P020","P021","P022","P023","P024","P026","P041","P042","P047","P048","G013","G014","G020","G025","G028","G046","G048","G050"], "INVALID_INPUT": ["G023","G024","G026","G027"]},
+    "cd": {"PRESENT": ["P004","P034","G047"], "UNKNOWN": ["P019","P042","P048","G014","G048"], "CONFLICT": ["P041","P047","G028"]},
+    "ve": {"PRESENT": ["P005","P035"], "UNKNOWN": ["P020","G014","G048"], "CONFLICT": ["P041"]},
+    "cv": {"PRESENT": ["P006","P036"], "UNKNOWN": ["P021","P048","G014","G048"], "CONFLICT": ["P041"]},
+    "lu": {"PRESENT": ["P007","P037"], "UNKNOWN": ["P022","P048","G014","G048"], "CONFLICT": ["P041"]},
+    "ci": {"PRESENT": ["P009","P038","P045"], "UNKNOWN": ["P024","P048","G014","G048"], "CONFLICT": ["P041"]},
+    "cs": {"PRESENT": ["P008","P034","P039","P046"], "UNKNOWN": ["P023","P048","G014","G048"], "CONFLICT": ["P041"]},
+    "ox": {"PRESENT": ["P025"], "UNKNOWN": ["P026","P048","G014","G048"], "CONFLICT": ["P041"]},
+    "uncertainty": {"MISSING": ["P014","P019","P020","P021","P022","P023","P024","P026","P036","P042","P048","G013","G014","G020","G025","G046","G048","G050"], "CONFLICT": ["P018","P041","P047","G028"], "INVALID": ["G023","G024","G026","G027"]},
+    "mimicConcern": {"PRESENT": ["P017"]},
+    "instructionInjection": {"true": ["P027","P028","P050","G015","G016","G041","G042","G043","G047","G048","G049"]},
+    "resourceMention": {"true": ["P027","P029","P039","P040","G008","G009","G030","G031","G032","G033","G043","G044"]}
+  }
+}

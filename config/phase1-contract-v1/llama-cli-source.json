@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/ggml-org/llama.cpp",
+  "revision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  "path": "common/arg.cpp",
+  "sha256": "faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1",
+  "supportedFlags": ["--system-prompt-file", "--grammar-file"]
+}

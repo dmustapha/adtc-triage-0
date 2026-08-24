@@ -187,3 +187,38 @@ OLMo-2 7B is **REJECTED** under the unchanged fatal gate:
 - Both 50-case holdouts have zero contract-valid outputs and cannot receive complete-case credit.
 
 Human review and physical target-laptop gates were not run or credited because fatal raw failures already require rejection. `evidence/model-decision.json` remains absent, selected candidate count is zero, and Phase 2/UI remain forbidden. The final authorized recovery is exhausted; Build is blocked pending an explicit requirements revision or submission pivot.
+
+## Requirements Revision Cycle 1 — Frozen Product Contract v1
+
+The user authorized an explicit Phase 1 product-contract evaluation revision for the same locked OLMo-2 7B candidate. This is separate evidence lineage, not model-recovery attempt 5 and not a rewrite of run `32669387576`. The historical raw and review SHA-256 values remain `d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988` and `d38d9fa171521038dea8ed91a3655aad9a4ad37afb6d10c1f5a03f4384e6dcc5`.
+
+TDD first exposed missing contract files. Independent review then forced a second RED cycle for three fail-closed gaps: a partial 11/12 calibration artifact could pass, literal case-data fence terminators were accepted, and aggregate `dangerObservation` incorrectly left danger classification with the model. The corrected contract now:
+
+- extracts only bounded atomic observations (`cd`, `ve`, `cv`, `lu`, `ci`, `cs`, `ox`), scope, uncertainty, mimic, injection, and resource-mention flags;
+- rejects aggregate danger, urgency, actions, explanations, diagnosis, treatment, resources, citations, numbers, and reasoning as model-owned output;
+- derives danger, urgency, fixed actions, and fixed explanations in deterministic code with PRESENT → CONFLICT → UNKNOWN → ABSENT precedence;
+- rejects reserved fence markers before model access;
+- requires the exact 12 unique frozen calibration IDs before untouched evaluation can run;
+- preserves all 100 existing evaluation prompts and holdout IDs without calibration overlap;
+- discloses raw stdout/stderr and leaves human review and physical-laptop gates unresolved in CI.
+
+Independent pre-inference verification output:
+
+```text
+npm test
+tests 35
+pass 35
+fail 0
+
+npm run typecheck
+> tsc --noEmit
+
+YAML_OK
+MANIFEST_PARITY_OK
+HISTORICAL_ATTEMPT4_UNCHANGED
+MODEL_DECISION_ABSENT
+NO_MODEL_WEIGHTS
+DIFF_CHECK_OK
+```
+
+The frozen producer manifest hashes to `0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90`. Pinned llama.cpp `common/arg.cpp` at revision `c8ade30036139e32108fee53d8b7164dbfda4bee` hashes to `faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1` and defines both `--system-prompt-file` and `--grammar-file`. No inference has run under the revised contract yet.

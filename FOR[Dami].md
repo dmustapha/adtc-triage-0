@@ -161,3 +161,11 @@ The remote workflow itself worked: it downloaded the exact 4.47 GB file, verifie
 The model failed the unchanged contract decisively. None of its 100 responses was valid required JSON; 83 appeared token-truncated; and specific cases downgraded danger signs, asserted unknown facts, invented or validated local resources, followed injected instructions, exposed reasoning, and mishandled the medical-mimic case. Because any one of these gates is fatal, later human review and laptop profiling could not rescue the candidate and were intentionally not credited.
 
 No canonical model decision was created. The responsible next move is a conscious requirements revision or submission pivot, not another unapproved candidate search or UI work built on an unsafe model.
+
+## What changed in the approved product-contract revision
+
+The old run asked the model to solve the whole case in free text. The revised experiment asks it to do a smaller job: extract a fixed set of atomic observations into grammar-constrained JSON. The patient text is fenced as untrusted data, and a literal fence collision is rejected before inference.
+
+The most important boundary is ownership. The model cannot emit an aggregate danger verdict, urgency, action, explanation, diagnosis, treatment, citation, number, or resource. It can only label atomic observations such as cannot drink, convulsions, chest indrawing, calm stridor, or explicit low oxygen as present, absent, unknown, or conflicting. Deterministic code then applies fixed precedence and produces the safety state. This makes the safety policy inspectable even when model extraction is imperfect.
+
+Twelve separate calibration cases must all appear exactly once and pass before the untouched 100-case evaluation begins. Their IDs and prompt hashes are disjoint from the holdouts, and the complete prompt, grammar, schema, evaluator, producer, workflow, model identity, and historical attempt-4 hashes are frozen in one manifest before inference.

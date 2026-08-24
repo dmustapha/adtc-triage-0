@@ -2,10 +2,10 @@
   "project": "Triage-01",
   "currentPhase": "phase-1-contract-sources-finalist-gate",
   "currentStep": "1.3",
-  "currentSubStep": "attempt-4-raw-gate-rejected",
-  "status": "blocked",
+  "currentSubStep": "requirements-revision-producer-frozen-pre-inference",
+  "status": "in-progress",
   "autonomous_mode": true,
-  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate"],
+  "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze"],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
     "atomic-freeze-downloader-and-parity",
@@ -47,7 +47,8 @@
     "1.3-replacement": {"files": ["config/replacement-lineage-sources.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/corrected-producer-manifest.json", "evidence/finalists/replacement/olmo-2-0425-1b-instruct-q4-k-m-training-lineage.json", "evidence/finalists/replacement/recovery-status.json", "evidence/remote-run-32652354894/independent-raw-gate-review.json", ".github/workflows/olmo-replacement-evidence.yml", "scripts/produce-replacement-ci-evidence.ts"], "written": true, "verified": true},
     "1.3-template-compliance-fix": {"files": ["scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", "tests/finalist-scripts.test.ts", "evidence/finalists/replacement/template-corrected-producer-manifest.json", "evidence/remote-run-32652354894/WITHDRAWN.json", "evidence/remote-run-32653499076/independent-raw-gate-review.json", "evidence/finalists/replacement/compliance-fix-status.json"], "written": true, "verified": true},
     "1.3-attempt-4-producer-freeze": {"files": ["tests/finalist-producers.test.ts", "config/model-finalists.json", "evidence/finalists/replacement-shortlist.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "config/replacement-lineage-sources.json", "evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-training-lineage.json", "scripts/run-raw-finalist.ts", "scripts/produce-replacement-ci-evidence.ts", ".github/workflows/olmo2-7b-recovery-evidence.yml", "evidence/finalists/replacement/olmo2-7b-producer-manifest.json"], "written": true, "verified": true},
-    "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true}
+    "1.3-attempt-4-raw-gate": {"files": ["evidence/remote-run-32669387576/olmo2-7b-recovery-phase-1-32669387576-1/raw/olmo-2-1124-7b-instruct-q4-k-m-responses.jsonl", "evidence/remote-run-32669387576/independent-raw-gate-review.json", "evidence/finalists/replacement/recovery-status.json"], "written": true, "verified": true},
+    "1.3-product-contract-revision": {"files": ["config/phase1-contract-v1/calibration-corpus.json", "config/phase1-contract-v1/evaluation-expectations.json", "config/phase1-contract-v1/extraction.gbnf", "config/phase1-contract-v1/extraction.schema.json", "config/phase1-contract-v1/fatal-gates.json", "config/phase1-contract-v1/llama-cli-source.json", "config/phase1-contract-v1/system-prompt.txt", "scripts/phase1-contract-v1/contract.ts", "scripts/phase1-contract-v1/evaluate.ts", "scripts/phase1-contract-v1/freeze-manifest.ts", "scripts/phase1-contract-v1/run-raw-finalist.ts", "tests/phase1-contract-v1.test.ts", ".github/workflows/olmo2-7b-phase1-contract-v1-evidence.yml", "evidence/finalists/phase1-contract-v1/producer-manifest.json"], "written": true, "verified": true}
   },
   "deviations": [],
   "phaseExecutors": {"phase-1": "subagent; orchestrator independent verification"},
@@ -89,18 +90,25 @@
     ,{"command": "GitHub Actions run 32669387576", "exitCode": 0, "result": "authoritative workflow completed from head 6b03b4f0a13fc0a9f911653e108119cc747faf15; exact model byte/hash checks passed; 100 raw rows captured; GGUF removed before evidence upload"}
     ,{"command": "independent OLMo-2 7B raw evidence integrity", "exitCode": 0, "result": "100 unique frozen IDs; 1,156,235 bytes; raw sha256 d84de149ba80f6897168198221e35630be50a5db5e6645f8c516286a2786f988; exact frozen commands; no GGUF or partial file"}
     ,{"command": "independent OLMo-2 7B raw fatal-gate review", "exitCode": 2, "result": "rejected: danger safety, uncertainty/abstention, mimic, local resources, injection, 0/100 JSON, visible reasoning, 83% truncation proxy, and both holdouts fail"}
+    ,{"command": "product-contract-v1 independent-review RED", "exitCode": 1, "result": "5/5 focused tests failed correctly: aggregate model-owned danger, fence collisions, partial calibration pass, missing deterministic projector, and missing pinned llama CLI source identity"}
+    ,{"command": "npm test", "exitCode": 0, "result": "requirements-revision suite: 35 pass, 0 fail"}
+    ,{"command": "npm run typecheck", "exitCode": 0, "result": "requirements-revision strict TypeScript clean"}
+    ,{"command": "workflow YAML parse", "exitCode": 0, "result": "olmo2-7b-phase1-contract-v1-evidence.yml parses: YAML_OK"}
+    ,{"command": "independent manifest regeneration and cmp", "exitCode": 0, "result": "producer manifest byte parity; SHA-256 0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90"}
+    ,{"command": "pinned llama.cpp option-source verification", "exitCode": 0, "result": "common/arg.cpp at c8ade30036139e32108fee53d8b7164dbfda4bee hashes faecf1b82566ccfbf7f976f9fdece387040d50318bfb7c646afd3955af05f9a1 and defines --system-prompt-file plus --grammar-file"}
+    ,{"command": "historical and no-weight boundary assertions", "exitCode": 0, "result": "attempt-4 raw/review exact; prior evidence unchanged; 112/112 prompts fence-marker safe; no GGUF/partial; model decision absent; diff check clean"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-23T22:45:10Z",
+  "timestamp": "2026-08-24T02:45:01Z",
   "workflow_run_id": "32669387576",
   "workflow_head_sha": "6b03b4f0a13fc0a9f911653e108119cc747faf15",
   "failed_workflow_runs": [
     {"runId": "32669216111", "headSha": "34b2e51161ac8558c1bcc209a32e042058f69fb2", "stage": "pre-download harness", "modelBytesObserved": false, "behavioralOutputObserved": false, "rootCause": "job-wide CANDIDATE_ID leaked into historical default producer test"}
   ],
-  "resume_attempt": 4,
-  "recovery_scope": "final locked OLMo-2 7B attempt; unchanged lineage, corpus, evaluator, producer semantics, fatal thresholds, and remote evidence-only boundary",
-  "blocked_reason": "Final authorized OLMo-2 7B candidate fails multiple unchanged fatal raw gates in authoritative run 32669387576. Human and target-laptop gates were not run or credited; no model decision exists and Phase 2 remains forbidden.",
+  "resume_attempt": "requirements-revision-cycle-1-of-1",
+  "recovery_scope": "explicit Phase 1 product-contract evaluation revision for the already locked OLMo-2 7B candidate; no model search; preserve attempt-4 bare-prompt failure; remote evidence-only boundary",
+  "blocked_reason": null,
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -116,6 +124,7 @@
     "Froze OLMo-2 7B identity, 11-source immutable lineage, unchanged evaluator/corpus/producer identities, and the evidence-only workflow before inference.",
     "Ran authoritative GitHub Actions workflow 32669387576 and independently verified all 100 rows, exact command flags, artifact hashes, and absence of model weights.",
     "Rejected OLMo-2 7B on multiple fatal raw gates and stopped without human review, physical certification, model decision, replacement search, or Phase 2 work."
+    ,"Formalized an isolated product-contract-v1 revision namespace: bounded extraction only, fenced untrusted input, strict validation, deterministic safety ownership, disjoint calibration, untouched 100-case evaluation, unresolved human/physical gates, and frozen attempt-4 hashes."
   ],
-  "what_is_needed": "Explicit requirements revision or submission pivot. The fourth and final authorized recovery candidate failed the unchanged raw gate; no additional model search or downstream Build is authorized."
+  "what_is_needed": "Freeze and execute the authorized constrained extraction product contract. Phase 2 remains gated on revised behavioral, raw disclosure, two-person human, physical target-laptop, and signed model-decision evidence."
 }

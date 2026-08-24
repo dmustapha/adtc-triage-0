@@ -760,3 +760,50 @@
 > do you have the exact fix locked in? lets get this blocker solved and actually continue phase 1. lets continue in a new chat. lock in your recommendation. use /handoff
 
 **Action:** Recorded explicit approval of OLMo-2-1124-7B-Instruct Q4_K_M as the single final recovery candidate, locked its exact immutable identity and fourth-attempt gate design, created a conductor-owned implementation plan, updated PULSE/task/lesson/state handoffs, and saved a comprehensive `/handoff` snapshot without dispatching Build in the current chat.
+
+### Prompt 43
+> where is the prompt. no need to use /handoff. you should have enough info already
+
+**Action:** Stopped the full `/handoff` workflow, preserved only the required minimal context snapshot, and prepared the exact copy-paste new-chat resume prompt.
+
+### Prompt 44
+> continue
+
+**Action:** Completed the minimal snapshot and delivered the locked new-chat prompt without dispatching Build in the current chat.
+
+### Prompt 45
+> Resume Triage-01 in /Users/MAC/adtc-2026 through the hackathon conductor.
+>
+> The user explicitly authorizes Build attempt 4, the fourth and final Phase 1 model-recovery attempt. Do not run Hackathon Build directly. Use only the locked OLMo-2-1124-7B-Instruct Q4_K_M candidate and the existing remote evidence-only GitHub Actions path. Preserve the frozen 100-case gate and all fatal thresholds. Do not enter Phase 2 or UI before a signed passing model decision exists. If the candidate fails, stop without another model search.
+
+**Action:** Resumed through the conductor, atomically recorded attempt 4, refreshed continuity metadata, and dispatched the existing Build orchestrator. The authoritative 100-case run completed evidence-only, but OLMo-2 7B failed multiple unchanged fatal raw gates, so Build stopped fail-closed with no model decision, human/physical credit, Phase 2 work, or further model search.
+
+### Prompt 46
+> why is it blocked. what happened
+
+**Action:** Saved the required context snapshot and explained that Build is blocked because the final candidate failed multiple unchanged fatal raw behavioral gates, not because the workflow or download failed.
+
+### Prompt 47
+> what can we do. improve the prompting to the model? what do you think our next step should be
+
+**Action:** Saved the decision context and began a design-level comparison of prompt-contract revision, constrained decoding, app-layer controls, and submission pivot options without changing the frozen gate or restarting Build.
+
+### Prompt 48
+> i think you can even compare what you have in mind with the prompt engineering of the original triage-0 project
+
+**Action:** Added a direct audit of the original Triage-0 prompt pipeline to the recovery design, preserving the no-code-reuse provenance boundary and comparing its system prompts, extraction contract, safety controls, and evidence against Triage-01's failed bare-prompt runner.
+
+### Prompt 49
+> /'
+
+**Action:** Treated the input as incomplete or accidental, saved the active prompt-contract decision context, and made no pipeline or repository-state changes beyond documentation.
+
+### Prompt 50
+> where are we
+
+**Action:** Refreshed the status snapshot and reported the precise conductor, Build, evidence, blocking, root-cause, and pending-decision state.
+
+### Prompt 51
+> continu with condu tour till demo rehearsal
+
+**Action:** Interpreted this as authorization to resume the hackathon conductor and continue through Demo Rehearsal, subject to all existing FSM gates and resolution of the missing signed model decision; no individual pipeline skill was invoked directly.

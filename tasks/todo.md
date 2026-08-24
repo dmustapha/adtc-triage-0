@@ -5,8 +5,8 @@
 - [x] Read the ADTC brief, PULSE, controlling override, conductor beacon/state, Build state, and locked OLMo-2 7B recovery artifacts.
 - [x] Pass the conductor resume, FSM, and Build pre-dispatch gates.
 - [x] Atomically record attempt 4 and refresh the beacon plus phase-ownership snapshot.
-- [ ] Dispatch the existing Build orchestrator through the conductor with the locked candidate and unchanged 100-case gate.
-- [ ] Accept only a fully signed passing model decision; otherwise stop fail-closed without another search.
+- [x] Dispatch the existing Build orchestrator through the conductor with the locked candidate and unchanged 100-case gate.
+- [x] Accept only a fully signed passing model decision; otherwise stop fail-closed without another search (stopped: OLMo-2 7B failed fatal raw gates).
 
 ## Build attempt 3 — Phase 1 producer compliance fix
 
@@ -81,13 +81,27 @@
   - [x] Run the fixed raw-artifact-backed finalist truth gate before UI breadth — both finalists rejected on insufficient training-lineage evidence.
   - [x] Select exactly one passing canonical GGUF or stop honestly if neither passes — stopped with zero candidates selected.
   - [x] Reopen model choice and evaluate replacement candidates under the unchanged Phase 1 truth gate — OLMo was the sole lineage-cleared candidate and failed the corrected templated raw gate.
-  - [ ] Run the user-authorized fourth and final recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M under the unchanged Phase 1 gate.
+  - [x] Run the user-authorized fourth and final recovery attempt with locked OLMo-2-1124-7B-Instruct Q4_K_M under the unchanged Phase 1 gate (rejected; no model selected).
     - [x] Freeze exact candidate identity and historical-candidate invariants under TDD.
     - [x] Prove the immutable public Base → SFT → DPO → RLVR lineage chain.
     - [x] Freeze and verify the 7B evidence-only producer before inference.
     - [x] Run and retrieve the exact GitHub Actions evidence workflow — authoritative run `32669387576`, 100 rows, no weights returned.
     - [x] Apply unchanged fatal gates; candidate rejected, so human/physical gates were not run and no decision was signed.
   - [ ] Execute the remaining frozen `PLAN.md` tasks with TDD and clean-build provenance.
+  - [ ] Execute the user-authorized Phase 1 product-contract requirements revision for locked OLMo-2 7B.
+    - [x] Preserve attempt-4 bare-prompt evidence and hashes unchanged.
+    - [x] Build from scratch a compact fenced, grammar-constrained extraction contract under TDD.
+    - [x] Freeze revised evaluator, prompt/schema, calibration separation, producer, corpus, and evidence identities before inference.
+    - [ ] Run the revised evidence-only workflow remotely; never retain or upload weights.
+    - [ ] Run human and target-laptop gates only after a complete revised behavioral pass.
+    - [ ] Sign `evidence/model-decision.json` only if every revised gate passes.
+- [ ] Resume the conductor through Demo Rehearsal under the user-authorized requirements revision.
+  - [x] Save the authorization and recover the stale conductor lock safely.
+  - [x] Pass the conductor resume gate, FSM gate, and Build pre-dispatch gate.
+  - [ ] Re-dispatch Build to formalize and test the compact constrained product prompt contract against the same OLMo-2 7B.
+  - [ ] Require a signed passing model decision before Phase 2.
+  - [ ] Continue sequentially through Debug, Wire, Verify Milestone, Design Forge or justified skip, Stress Test, Deploy, Livetest, Interrogate, and Demo Rehearsal.
+  - [ ] Stop at Demo Rehearsal or earlier if any mandatory FSM gate blocks.
 - [ ] Build, debug, wire, profile, and verify on constrained hardware.
 - [ ] Complete design, stress testing, deployment, live testing, and interrogation.
 - [ ] Produce the 2-minute demo, package the Devpost submission, and run preflight.
