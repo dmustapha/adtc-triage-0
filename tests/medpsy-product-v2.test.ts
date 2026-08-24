@@ -52,6 +52,12 @@ async function productFixture(overrides: Record<string, unknown> = {}) {
       citationsValidated: true,
       noEgress: true,
       outputValid: true,
+      labelReviewStatus: "reviewed",
+      clinicalReview: {
+        reviewerName: "Test Fixture Reviewer",
+        reviewerRole: "test-only fixture",
+        reviewedAt: "2026-08-24T00:00:00Z",
+      },
     }],
     artifacts: ["producer-manifest.json", "raw/product-calibration.jsonl", "calibration-evaluation.json"],
     ...overrides,
@@ -197,4 +203,106 @@ test("product manifest freezes commands, schemas, source hashes, and is determin
   assert.ok(Object.values(manifest.schemas).every((value) => typeof value === "object"));
   assert.ok(Object.values(manifest.sourceHashes).every((value) => /^[a-f0-9]{64}$/.test(String(value))));
   assert.equal(manifest.noWeightArtifacts, true);
+});
+
+const canonicalHash = (value: unknown) => sha256(JSON.stringify(value));
+
+test("v2 calibration corpus has unique revision IDs and immutable case commitments", async () => {
+  const corpus = JSON.parse(await readFile("config/medpsy-product-v2/calibration-corpus.json", "utf8"));
+  const ids = corpus.cases.map((item: any) => item.id);
+  assert.equal(corpus.namespace, "medpsy-product-v2");
+  assert.equal(corpus.split, "development-calibration");
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(ids.length >= 27);
+  assert.ok(ids.every((id: string) => /^MPCAL2-\d{3}$/.test(id)));
+  for (const item of corpus.cases) {
+    const { caseSha256, ...committed } = item;
+    assert.match(caseSha256, /^[a-f0-9]{64}$/);
+    assert.equal(caseSha256, canonicalHash(committed));
+  }
+});
+
+test("every calibration case is source-backed and clinically provisional", async () => {
+  const corpus = JSON.parse(await readFile("config/medpsy-product-v2/calibration-corpus.json", "utf8"));
+  const sources = JSON.parse(await readFile("config/clinical-sources.json", "utf8"));
+  const byId = new Map(sources.map((source: any) => [source.id, source]));
+  assert.equal(corpus.clinicalLabelStatus, "provisional-pending-named-human-review");
+  for (const item of corpus.cases) {
+    assert.equal(item.labelReviewStatus, corpus.clinicalLabelStatus);
+    assert.ok(item.citations.length > 0);
+    for (const citation of item.citations) {
+      const source: any = byId.get(citation.sourceId);
+      assert.ok(source, `${item.id}: registered source ${citation.sourceId}`);
+      assert.equal(citation.sourceSha256, source.sha256);
+      assert.equal(citation.derivedContentSha256, source.derivedContentSha256);
+      assert.equal(citation.locator, source.locator);
+    }
+  }
+});
+
+test("calibration coverage matrix is complete and the failed v1 expected-output contract is not reused", async () => {
+  const corpus = JSON.parse(await readFile("config/medpsy-product-v2/calibration-corpus.json", "utf8"));
+  const historical = JSON.parse(await readFile("config/phase1-contract-v1/calibration-corpus.json", "utf8"));
+  const covered = new Set(corpus.cases.flatMap((item: any) => item.coverage));
+  assert.deepEqual([...covered].sort(), [...corpus.requiredCoverage].sort());
+  const historicalPrompts = new Set(historical.cases.map((item: any) => item.prompt));
+  for (const item of corpus.cases) {
+    assert.ok(!historicalPrompts.has(item.request.caseText), `${item.id}: fresh case text`);
+    assert.ok(!Object.keys(item.expected).some((key) => ["scope", "cd", "ve", "cv", "lu", "ci", "cs", "ox"].includes(key)));
+  }
+});
+
+test("sealed holdout manifest contains no case contents and has reproducible design hashes", async () => {
+  const manifest = JSON.parse(await readFile("config/medpsy-product-v2/holdout-manifest.json", "utf8"));
+  assert.equal(manifest.status, "awaiting-authorized-independent-producer");
+  assert.equal(manifest.contentsInspected, false);
+  assert.equal(manifest.caseContentSha256, null);
+  assert.equal(manifest.corpusArtifactPath, null);
+  assert.ok(!("cases" in manifest));
+  assert.equal(manifest.reservedIdsSha256, canonicalHash(manifest.reservedCaseIds));
+  const { manifestCoreSha256, ...core } = manifest;
+  assert.equal(manifestCoreSha256, canonicalHash(core));
+});
+
+test("calibration and sealed holdout identifiers are disjoint", async () => {
+  const corpus = JSON.parse(await readFile("config/medpsy-product-v2/calibration-corpus.json", "utf8"));
+  const holdout = JSON.parse(await readFile("config/medpsy-product-v2/holdout-manifest.json", "utf8"));
+  const calibrationIds = new Set(corpus.cases.map((item: any) => item.id));
+  assert.equal(holdout.reservedCaseIds.filter((id: string) => calibrationIds.has(id)).length, 0);
+});
+
+test("review rubric names the pending human gate and provisional rows fail closed", async () => {
+  const contract = JSON.parse(await readFile("config/medpsy-product-v2/contract.json", "utf8"));
+  const rubricBytes = await readFile("config/medpsy-product-v2/review-rubric.json");
+  const rubric = JSON.parse(rubricBytes.toString("utf8"));
+  assert.equal(rubric.reviewGate.status, "provisional-pending-named-human-review");
+  assert.equal(rubric.reviewGate.reviewerName, null);
+  assert.equal(rubric.reviewGate.builderOrAgentSelfReviewAllowed, false);
+  assert.ok(rubric.requiredRecordFields.includes("reviewerName"));
+  assert.ok(contract.schemas.row.required.includes("labelReviewStatus"));
+  assert.ok(contract.schemas.row.required.includes("clinicalReview"));
+  const fixture = await productFixture();
+  fixture.rows[0].labelReviewStatus = "provisional-pending-named-human-review";
+  fixture.rows[0].clinicalReview = null as any;
+  const { result, outputPath } = await evaluate(fixture);
+  assert.equal(result.status, 2, result.stderr);
+  const output = JSON.parse(await readFile(outputPath, "utf8"));
+  assert.equal(output.gates.namedHumanClinicalReview.status, "fail");
+
+  const missingIdentity = await productFixture();
+  missingIdentity.rows[0].clinicalReview = null as any;
+  const missing = await evaluate(missingIdentity);
+  assert.equal(missing.result.status, 2, missing.result.stderr);
+  const missingOutput = JSON.parse(await readFile(missing.outputPath, "utf8"));
+  assert.equal(missingOutput.gates.namedHumanClinicalReview.status, "fail");
+});
+
+test("product manifest binds the corpus, sealed holdout design, and review rubric hashes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "medpsy-product-task7-manifest-"));
+  const output = join(directory, "manifest.json");
+  assert.equal(run("scripts/medpsy-product-v2/freeze-manifest.ts", [output]).status, 0);
+  const manifest = JSON.parse(await readFile(output, "utf8"));
+  for (const key of ["calibrationCorpus", "holdoutManifest", "reviewRubric", "corpusMethod"]) {
+    assert.match(manifest.sourceHashes[key], /^[a-f0-9]{64}$/);
+  }
 });

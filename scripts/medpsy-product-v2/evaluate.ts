@@ -47,6 +47,13 @@ const pathFailures = rows.filter((row: any) => !productPathValid(row)).length;
 const citationFailures = rows.filter((row: any) => row.citationsValidated !== true).length;
 const egressViolations = rows.filter((row: any) => row.noEgress !== true).length;
 const modelInvokedCases = rows.filter((row: any) => row.modelInvoked === true).length;
+function namedReviewValid(row: any): boolean {
+  const review = row.clinicalReview;
+  return row.labelReviewStatus === "reviewed" && typeof review?.reviewerName === "string" && review.reviewerName.trim().length > 0 &&
+    typeof review?.reviewerRole === "string" && review.reviewerRole.trim().length > 0 &&
+    typeof review?.reviewedAt === "string" && Number.isFinite(Date.parse(review.reviewedAt));
+}
+const provisionalLabelRows = rows.filter((row: any) => !namedReviewValid(row)).length;
 const calibrationPrerequisiteValid = await calibrationReady();
 
 const gates = {
@@ -58,6 +65,7 @@ const gates = {
   noEgress: gate(egressViolations <= fatal.thresholds.maximumEgressViolations, { violations: egressViolations }),
   artifactNoWeights: gate(artifacts.every((path: string) => !forbiddenSuffixes.some((suffix: string) => path.toLowerCase().endsWith(suffix))), { artifacts }),
   calibrationBeforeHoldout: gate(calibrationPrerequisiteValid, { stage: input.stage ?? null, evaluationPath: input.prerequisites?.calibrationEvaluationPath ?? null }),
+  namedHumanClinicalReview: gate(rows.length > 0 && provisionalLabelRows === 0, { rows: rows.length, provisionalOrMissing: provisionalLabelRows }),
 };
 const status = Object.values(gates).every((item) => item.status === "pass") ? "pass" : "fail";
 const evidence = {

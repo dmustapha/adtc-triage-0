@@ -11,6 +11,10 @@ const paths = {
   productPolicy: "config/product-generation-policy.json",
   contract: "config/medpsy-product-v2/contract.json",
   fatalGates: "config/medpsy-product-v2/fatal-gates.json",
+  calibrationCorpus: "config/medpsy-product-v2/calibration-corpus.json",
+  holdoutManifest: "config/medpsy-product-v2/holdout-manifest.json",
+  reviewRubric: "config/medpsy-product-v2/review-rubric.json",
+  corpusMethod: "docs/evidence/medpsy-product-v2-corpus-method.md",
   evaluator: "scripts/medpsy-product-v2/evaluate.ts",
   manifestProducer: "scripts/medpsy-product-v2/freeze-manifest.ts"
 } as const;

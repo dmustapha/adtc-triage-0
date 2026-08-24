@@ -49,7 +49,7 @@
       "required": ["schemaVersion", "namespace", "evidenceTier", "manifestSha256", "stage", "producerKind", "candidate", "runtime", "rows", "artifacts"]
     },
     "row": {
-      "required": ["caseId", "evidenceKind", "modelInvoked", "stages", "citationsValidated", "noEgress", "outputValid"]
+      "required": ["caseId", "evidenceKind", "modelInvoked", "stages", "citationsValidated", "noEgress", "outputValid", "labelReviewStatus", "clinicalReview"]
     },
     "evaluation": {
       "required": ["schemaVersion", "namespace", "evidenceTier", "stage", "status", "gates", "unresolved"]
