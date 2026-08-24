@@ -351,3 +351,22 @@
 **Key Decision:** [USER] Preserve attempt 4; [SKILL] reject revision at 0/12 exact and 2/12 danger projection.
 **Blockers:** No signed model decision; Phase 2/UI and later skills remain forbidden.
 **For Next Skill:** Conductor must stop for explicit submission pivot or new requirements authority.
+
+---
+### build — 2026-08-24T06:25:16Z
+**Status:** PARTIAL
+**Session(s):** 5, shared-MedPsy recovery
+
+#### Done
+- Closed the legal/provenance pre-import gate with 76 exact pinned source objects.
+- Recorded prior QVAC-hackathon reuse and MedPsy license/data caveats without claiming certainty.
+- Verified 7 focused and 42 full tests, strict TypeScript, and no tracked model weights.
+
+#### Deviations
+- [USER] Shared-MedPsy recovery supersedes the earlier clean-build and OLMo product instructions; historical evidence remains unchanged.
+
+#### Blockers for Downstream
+- Phase 2 remains blocked pending fresh MedPsy, human clinical, physical Ubuntu, and signed-decision evidence.
+
+#### For Next Skill
+- Import only the 76 manifest entries from Git object `74424721`; never copy the mutable source working tree.
