@@ -110,10 +110,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "56d41cb4e68a81b858172eac50b6d925756a4db587fc8dc55ecc3796e4d1a5ad",
+      "destinationSha256": "c6bb88f803be1d7be65958d981a07683df7a90f22fc6c454a41b56c7e068141a",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow."
+        "reason": "Removed excluded speech and multilingual controls while preserving the pinned compact patient-entry hierarchy; added the required structured patient-age and seven-sign checklist through native progressive disclosure immediately before guidance."
       }
     },
     {
@@ -134,10 +134,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "03c1c5843dfecac2aaf90ececaadecd0f9279513131bddc4d333f2b956d94c94",
+      "destinationSha256": "f5529dee9ab7070c4b269613940266933b3299ca0142aeac7405c7c5f6bfcd0b",
       "modification": {
         "status": "modified",
-        "reason": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system."
+        "reason": "Added compact responsive progressive-disclosure styling, native-control focus, age input, completion status, and structured summary while preserving the pinned visual hierarchy."
       }
     },
     {
@@ -318,10 +318,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "5ffa1082ab4922b2a8dbf8f71f980e9550e3b9ade35c48c7d96aa8d222410bf8",
+      "destinationSha256": "d316fe2b7c687f640e66b43882991d21f1e64cc84cbd54d414917f1c3ccc44c6",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display."
+        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, suppressed model-authored red-flag display, and kept compact disclosure status concise."
       }
     },
     {
@@ -786,10 +786,10 @@
       "originalCreatedAt": "2026-06-25T07:09:42+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "e96ecc9150fe6fecca7465f1457432d85ded7d1ce3842f2a4747f3d5c1664445",
+      "destinationSha256": "bbb370491d85e4e8232bce3056a5b10bbf404613366fbef007504d448d526ccd",
       "modification": {
         "status": "modified",
-        "reason": "Added DOM, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and recorded-summary regressions for the structured checklist."
+        "reason": "Added DOM, progressive-disclosure fidelity, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and structured-summary regressions for the checklist."
       }
     },
     {

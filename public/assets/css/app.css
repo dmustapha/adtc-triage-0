@@ -31,15 +31,23 @@ textarea#case{
 textarea#case::placeholder{ color:var(--dim); }
 textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border-color:transparent; }
 
-/* Structured observations stay compact and use native radios for keyboard/screen-reader behavior. */
-.danger-checklist{ margin:18px 0 0; padding:0; border:0; }
+/* Required observations sit behind native disclosure so the pinned patient-panel rhythm stays intact. */
+.assessment-disclosure{ margin:14px 0 2px; background:#0b0e0f; border:1px solid var(--line-2); border-radius:var(--r); }
+.assessment-disclosure>summary{ min-height:46px; padding:10px 13px; display:flex; align-items:center; gap:10px;
+  color:var(--ink); cursor:pointer; list-style:none; font-size:13.5px; font-weight:600; }
+.assessment-disclosure>summary::-webkit-details-marker{ display:none; }
+.assessment-disclosure>summary::after{ content:"+"; width:22px; height:22px; flex:none; display:grid; place-items:center;
+  color:var(--accent); background:var(--accent-wash); border:1px solid var(--accent-line); border-radius:var(--r-pill); }
+.assessment-disclosure[open]>summary{ border-bottom:1px solid var(--line); }
+.assessment-disclosure[open]>summary::after{ content:"−"; }
+.danger-checklist{ margin:0; padding:14px; border:0; }
 .danger-checklist>legend{ font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ink); }
 .danger-help{ margin:3px 0 13px; font-size:13px; color:var(--dim); }
 .age-fields{ display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:12px; }
 .age-fields label{ display:block; margin-bottom:5px; font-size:12.5px; font-weight:600; color:var(--mut); }
 .age-fields input,.age-fields select{ width:100%; min-height:44px; padding:8px 11px; font:inherit; color:var(--ink);
   background:#0b0e0f; border:1px solid var(--line-2); border-radius:var(--r); }
-.danger-signs{ display:grid; gap:8px; }
+.danger-signs{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 .danger-signs fieldset{ min-width:0; margin:0; padding:10px 11px; border:1px solid var(--line); border-radius:var(--r); }
 .danger-signs legend{ padding:0 4px; font-size:13px; font-weight:600; color:var(--ink); }
 .danger-signs legend span{ display:block; font-size:11.5px; font-weight:400; color:var(--dim); }
@@ -49,7 +57,7 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .tri-state input{ position:absolute; width:1px; height:1px; margin:-1px; clip:rect(0 0 0 0); overflow:hidden; }
 .tri-state label:has(input:checked){ color:var(--accent); border-color:var(--accent-line); background:var(--accent-wash); }
 .tri-state label:has(input:focus-visible){ outline:2px solid var(--accent); outline-offset:2px; }
-.danger-status{ margin:11px 0 0; font-size:13px; color:var(--mut); }
+.danger-status{ margin-left:auto; font-size:11.5px; line-height:1.3; text-align:right; color:var(--mut); font-weight:400; }
 .danger-summary{ margin:5px 0 0; font-size:12px; line-height:1.45; color:var(--dim); }
 
 .actions{ display:flex; gap:11px; align-items:center; flex-wrap:wrap; margin-top:16px; }
@@ -205,6 +213,8 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
   .actions .btn--primary{ flex:1; }
   .reason{ max-height:150px; }
   .age-fields{ grid-template-columns:1fr; }
-  .tri-state{ grid-template-columns:1fr; }
+  .danger-signs{ grid-template-columns:1fr; }
   .tri-state label{ min-height:44px; }
+  .assessment-disclosure>summary{ align-items:flex-start; flex-wrap:wrap; }
+  .danger-status{ order:3; width:100%; margin-left:0; text-align:left; }
 }

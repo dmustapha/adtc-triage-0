@@ -77,13 +77,37 @@ test("structured checklist markup is accessible, clinically labelled, and has no
   assert.match(html, /Low oxygen or central cyanosis/);
 });
 
+test("structured assessment preserves the pinned compact patient-panel rhythm", () => {
+  const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../public/assets/css/app.css", import.meta.url), "utf8");
+  const page = new JSDOM(html).window.document;
+  const disclosure = page.querySelector("details#dangerDisclosure");
+  const patientPanel = page.querySelector("#case")?.closest(".panel");
+
+  assert.ok(disclosure, "required observations use native progressive disclosure");
+  assert.equal(disclosure?.hasAttribute("open"), false, "assessment is compact on first view");
+  assert.ok(disclosure?.querySelector("summary #dangerStatus[role=status]"));
+  assert.equal(disclosure?.querySelector("#dangerChecklist")?.tagName, "FIELDSET");
+  assert.equal(disclosure?.parentElement, patientPanel);
+  assert.ok(
+    (page.querySelector("#seeds")?.compareDocumentPosition(disclosure!) || 0) & 4,
+    "the original text/example rhythm remains ahead of structured observations",
+  );
+  assert.ok(
+    (disclosure?.compareDocumentPosition(page.querySelector(".actions")!) || 0) & 4,
+    "the required assessment sits immediately before the guidance action",
+  );
+  assert.match(css, /\.assessment-disclosure\s*>\s*summary/);
+  assert.doesNotMatch(css, /\.danger-checklist\s*\{[^}]*margin:\s*18px 0 0/s);
+});
+
 test("structured checklist serializes exact values and enables submission only when complete and age-supported", () => {
   const assess = el("assess") as HTMLButtonElement;
   (el("patientAgeValue") as HTMLInputElement).value = "18";
   (el("patientAgeUnit") as HTMLSelectElement).value = "months";
   assert.equal(fe.updateDangerChecklist(), false);
   assert.equal(assess.disabled, true);
-  assert.match(el("dangerStatus").textContent || "", /0 of 7 signs assessed/i);
+  assert.equal(el("dangerStatus").textContent, "0 of 7 signs assessed.");
 
   DANGER_KEYS.forEach((key, index) => {
     const value = index === 4 ? "PRESENT" : "ABSENT";
@@ -91,7 +115,7 @@ test("structured checklist serializes exact values and enables submission only w
   });
   assert.equal(fe.updateDangerChecklist(), true);
   assert.equal(assess.disabled, false);
-  assert.match(el("dangerStatus").textContent || "", /7 of 7 signs assessed/i);
+  assert.equal(el("dangerStatus").textContent, "7 of 7 signs assessed. Ready for guidance.");
   assert.match(el("dangerSummary").textContent || "", /Chest indrawing: Present/);
 
   assert.deepEqual(fe.readStructuredDanger(), {
@@ -106,6 +130,7 @@ test("structured checklist serializes exact values and enables submission only w
   (el("patientAgeValue") as HTMLInputElement).value = "60";
   assert.equal(fe.updateDangerChecklist(), false, "60 months is outside the supported age band");
   assert.equal(assess.disabled, true);
+  assert.equal(el("dangerStatus").textContent, "7 of 7 signs assessed. Age required (2 months to under 5 years).");
 
   (el("patientAgeValue") as HTMLInputElement).value = "18";
   (el("patientAgeUnit") as HTMLSelectElement).value = "fortnights";

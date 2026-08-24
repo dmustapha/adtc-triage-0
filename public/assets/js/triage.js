@@ -116,10 +116,11 @@
     var structured = readStructuredDanger();
     var values = structured.dangerObservations;
     var assessed = DANGER_SIGNS.filter(function (sign) { return values[sign[0]] !== "NOT_ASSESSED"; }).length;
-    var ready = assessed === DANGER_SIGNS.length && hasSupportedAge(structured.patientAge);
+    var ageReady = hasSupportedAge(structured.patientAge);
+    var ready = assessed === DANGER_SIGNS.length && ageReady;
     var status = assessed + " of " + DANGER_SIGNS.length + " signs assessed.";
     if (ready) status += " Ready for guidance.";
-    else status += " Enter an age from 2 months to under 5 years and assess every sign.";
+    else if (!ageReady) status += " Age required (2 months to under 5 years).";
     if ($("dangerStatus")) $("dangerStatus").textContent = status;
     if ($("dangerSummary")) {
       $("dangerSummary").textContent = "Recorded checklist: " + DANGER_SIGNS.map(function (sign) {
