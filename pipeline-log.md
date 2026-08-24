@@ -103,3 +103,5 @@
 2026-08-24T18:08:00Z | hackathon-build | COMPLETE | structured-danger-task-4-fidelity | Screenshot-backed compact hierarchy correction committed at 06865d2; focused 14/14, typecheck, provenance, and model-free Chrome evidence green.
 2026-08-24T18:10:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-6 | Split evidence planes committed at 856e5d9; focused 19/19 after manifest-binding RED/GREEN; historical evidence unchanged.
 2026-08-24T18:10:00Z | hackathon-build | START | structured-danger-revision-task-7 | Fresh disjoint product calibration and sealed-holdout design started; no inference or holdout inspection.
+2026-08-24T18:20:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-7 | Fresh 27-case provisional calibration and sealed manifest-only holdout committed at 145eb41; focused 18/18; human review remains pending.
+2026-08-24T18:20:00Z | hackathon-build | START | structured-danger-revision-task-8 | Profiler metadata healthcare-scope correction started under TDD; no identity guessing or unsupported claims.
