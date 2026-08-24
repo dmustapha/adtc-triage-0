@@ -65,7 +65,7 @@
 | DI-I2 | intel | verify_preflight | P1 | Run three cold-boot profiler passes on borrowed target-class Ubuntu 22.04 laptop | CPU SKU, governor, ambient, hashes, TPS, RSS, accuracy, and thermals recorded | open |
 | DI-I3 | intel | package | P1 | Recheck registered Devpost form and unresolved team-ID field | Form fields and hosting constraints are captured; team-ID semantics still require final confirmation | partial |
 | DI-T1 | candidate-fit-audit | build | P0 | Create template-derived ADTC root with one canonical GGUF and optional QVAC app | Required root artifacts validate; model remains runnable if app directory is removed | done |
-| DI-T2 | candidate-fit-audit | debug | P0 | Resolve fresh-clone model-path contract failure and distinguish required-asset skips | Full test summary has no unexplained failures; offline default and docs agree | open |
+| DI-T2 | candidate-fit-audit | debug | P0 | Resolve fresh-clone model-path contract failure and distinguish required-asset skips | Full test summary has no unexplained failures; offline default and docs agree | done |
 | DI-T3 | candidate-fit-audit | verify_preflight | P0 | Run pinned profiler on target-class Ubuntu x86 | Fresh-clone hash, TPS, RSS, thermals, and submission JSON recorded | open |
 | DI-T4 | candidate-fit-audit | build | P0 | Resolve the prior-work boundary through transparent reuse | Freeze commit `74424721`, enumerate imported files and hashes, preserve notices, and disclose the prior QVAC submission | done |
 | DI-S1 | scope-handoff | forge | P0 | Freeze the narrow clinical taxonomy, exact claim, resource budgets, and feature observables | PRD and architecture encode real P0 behavior and cuttable QVAC adapters | done |
@@ -598,3 +598,37 @@
 
 #### For Next Skill
 - Debug the claim-limited local build first; do not promote missing clinical, physical, identity, or signing evidence.
+
+---
+### debug — 2026-08-24T19:23:01Z
+**Status:** COMPLETE
+**Session(s):** 1
+
+#### Done
+- Ran full eight-phase local gate; final suite is 264 pass, 0 fail, 22 exact skips.
+- Fixed localhost exposure, timeout queue ownership, stale E2E path, and premature UI claims.
+- Verified 76 imports, JSON/YAML, history, provenance, secrets, and empty weight/cache boundaries.
+
+#### Additions (not in PRD/Architecture)
+- [SKILL] [NEW] Added five Debug regression files for security, queue, E2E, scope, and claim truthfulness.
+
+#### Deviations
+- [USER] Model/store-dependent checks remained unavailable under the no-download/no-external-mutation scope.
+
+#### Verified Facts
+- [VF-D1] Final local suite: 286 total, 264 pass, 0 fail, 22 exact prerequisite skips.
+- [VF-D2] Run 32742482642 evidence remains immutable; published head a366077 remains in ancestry.
+- [VF-D3] Production binds to 127.0.0.1 and timed-out work retains the single inference queue.
+
+#### Assumptions
+- None.
+
+#### Blockers for Downstream
+- Claim-bearing use remains blocked by absent QVAC/store evidence and diagnosis-first management rendering beyond the PRD.
+- Named review, physical Ubuntu proof, identities, signed model decision, and submission readiness remain absent.
+
+#### Key Decisions
+- [SKILL] [D-D1] Proceed at confidence 77 only under claim-limited scope; do not promote skipped real-model evidence.
+
+#### For Next Skill
+- Wire the local deterministic and artifact paths; preserve removed claims and exact model/store blocks.
