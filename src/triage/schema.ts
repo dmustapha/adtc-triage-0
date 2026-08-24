@@ -7,9 +7,36 @@
 // authored. This keeps the two things the model is bad at (severity bucketing, citing) out of its hands.
 import { z } from "zod";
 import { CLASSIFICATION_ENUM } from "./protocol-table.js";
+import { DANGER_OBSERVATION_KEYS } from "./danger-observations.js";
 
 export const SEVERITIES = ["EMERGENCY", "URGENT", "ROUTINE", "SELF_CARE", "UNKNOWN"] as const;
 export type Severity = (typeof SEVERITIES)[number];
+
+export const PatientAgeSchema = z.object({
+  value: z.number().finite().nonnegative(),
+  unit: z.enum(["months", "years"]),
+}).strict();
+
+const DangerObservationRequestValueSchema = z.enum(["PRESENT", "ABSENT", "NOT_ASSESSED"]);
+const dangerObservationShape = {
+  cannotDrinkOrBreastfeed: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  vomitsEverything: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  convulsions: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  lethargicOrUnconscious: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  chestIndrawing: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  stridorWhenCalm: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+  lowOxygenOrCentralCyanosis: DangerObservationRequestValueSchema.default("NOT_ASSESSED"),
+};
+
+const DEFAULT_DANGER_OBSERVATIONS = Object.fromEntries(
+  DANGER_OBSERVATION_KEYS.map((key) => [key, "NOT_ASSESSED"]),
+) as Record<(typeof DANGER_OBSERVATION_KEYS)[number], "NOT_ASSESSED">;
+
+export const DangerObservationsRequestSchema = z.object(dangerObservationShape).strict().default(DEFAULT_DANGER_OBSERVATIONS);
+export const StructuredDangerRequestSchema = z.object({
+  patientAge: PatientAgeSchema.optional(),
+  dangerObservations: DangerObservationsRequestSchema,
+}).strict();
 
 /** A citation injected from a real retrieved chunk (never model-authored). Used by every plan line. */
 export const PlanCitationSchema = z.object({

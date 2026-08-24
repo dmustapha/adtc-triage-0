@@ -4,6 +4,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { classifyToSeverity, hasEmergencySign, finalizeSeverity, finalizeSeverityV2 } from "../../src/triage/severity.js";
+import { DANGER_OBSERVATION_KEYS, evaluateDangerPolicy, type DangerObservationKey } from "../../src/triage/danger-observations.js";
+
+const STRUCTURED_ABSENT = Object.fromEntries(DANGER_OBSERVATION_KEYS.map((key) => [key, "ABSENT"])) as Record<DangerObservationKey, "ABSENT">;
 
 test("severe / danger-sign / refer-urgently -> EMERGENCY", () => {
   assert.equal(classifyToSeverity("SEVERE PNEUMONIA OR VERY SEVERE DISEASE", "give first dose of antibiotic, refer URGENTLY to hospital"), "EMERGENCY");
@@ -391,4 +394,51 @@ test("finalizeSeverityV2: danger sign in caseText AND redFlags — handled once"
     finalizeSeverityV2("PNEUMONIA", "give oral amoxicillin", "chest indrawing, child is floppy", ["floppy", "lethargic"]),
     "EMERGENCY",
   );
+});
+
+test("authoritative structured state prevents free text and model red_flags from controlling the seven atoms", () => {
+  const structured = evaluateDangerPolicy({ value: 9, unit: "months" }, STRUCTURED_ABSENT);
+  assert.equal(
+    finalizeSeverityV2("PNEUMONIA", "give oral amoxicillin", "unable to drink and convulsing", ["calm stridor"], structured),
+    "URGENT",
+  );
+});
+
+test("authoritative all-absent state prevents a model-selected severe pneumonia class from creating emergency", () => {
+  const structured = evaluateDangerPolicy({ value: 9, unit: "months" }, STRUCTURED_ABSENT);
+  assert.equal(
+    finalizeSeverityV2(
+      "SEVERE PNEUMONIA OR VERY SEVERE DISEASE",
+      "give first dose, refer urgently",
+      "unable to drink with calm stridor and chest indrawing",
+      ["convulsions", "central cyanosis"],
+      structured,
+    ),
+    "URGENT",
+  );
+});
+
+test("legacy severity entry point honors authoritative all-absent respiratory state", () => {
+  const structured = evaluateDangerPolicy({ value: 9, unit: "months" }, STRUCTURED_ABSENT);
+  assert.equal(
+    finalizeSeverity("SEVERE PNEUMONIA", "refer urgently", "unable to drink with calm stridor", ["convulsions"], structured),
+    "URGENT",
+  );
+});
+
+test("authoritative structured emergency and chest-indrawing decisions override model prose", () => {
+  const emergency = evaluateDangerPolicy(undefined, { cannotDrinkOrBreastfeed: "PRESENT" });
+  assert.equal(finalizeSeverityV2("COUGH OR COLD", "home care", "well child", [], emergency), "EMERGENCY");
+
+  const chest = evaluateDangerPolicy(
+    { value: 9, unit: "months" },
+    { ...STRUCTURED_ABSENT, chestIndrawing: "PRESENT" },
+  );
+  assert.equal(finalizeSeverityV2("SEVERE PNEUMONIA OR VERY SEVERE DISEASE", "refer", "unable to drink", ["convulsions"], chest), "URGENT");
+});
+
+test("authoritative structured state preserves non-respiratory and self-harm safeguards", () => {
+  const structured = evaluateDangerPolicy({ value: 24, unit: "months" }, STRUCTURED_ABSENT);
+  assert.equal(finalizeSeverityV2("DEPRESSION", "follow up", "says life is not worth living", [], structured), "EMERGENCY");
+  assert.equal(finalizeSeverityV2("SEVERE DEHYDRATION", "Plan C, refer urgently", "skin pinch very slow", [], structured), "EMERGENCY");
 });

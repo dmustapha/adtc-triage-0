@@ -8,6 +8,7 @@
 // a severe/Pink classification requires a general danger sign or stridor; chest indrawing or fast
 // breathing alone is the home-treatment band).
 import type { Severity } from "./schema.js";
+import type { DangerDecision } from "./danger-observations.js";
 import { lookupProtocol } from "./protocol-table.js";
 
 // "Pink": wording that means severe disease / urgent referral / a pre-referral first dose.
@@ -53,6 +54,9 @@ export function classifyToSeverity(classification: string, action: string): Seve
 const DANGER_RE =
   /(unable to (?:drink|feed|breastfeed|wake|rouse)|not (?:been )?able to (?:drink|feed|breastfeed|wake)|cannot (?:drink|feed|wake)|can'?t (?:drink|feed|wake|keep)|won'?t (?:drink|feed|breastfeed|wake)|not (?:drinking|feeding|breastfeeding|waking|responding)|refus(?:es|ing) (?:to )?(?:drink|feed)|vomit(?:s|ing)? everything|convuls\w*|seizure|fits|lethargic|lethargy|drowsy|floppy|limp|unconscious|unrousable|unresponsive|very sleepy|won'?t wake|not waking|stridor|grunting|gasping|apno?ea|stopped breathing|not breathing|blue (?:lips|skin|tinge)|cyanos\w*|central cyanosis|severe respiratory distress|severe chest indrawing|coma|comatose|suicid\w*|self-?harm|harm (?:them|him|her)self|kill (?:them|him|her)self|not worth living|isn'?t worth living|wants? to die|better off dead|ending (?:it|his life|her life|their life)|take (?:his|her|their) own life|bleeding heavily|severe dehydration|very (?:sick|weak|ill)|oedema of both feet|swelling of both feet|both feet (?:are )?swollen|swollen feet|bilateral (?:pitting )?o?edema|pitting o?edema)/gi;
 
+const NON_STRUCTURED_DANGER_RE =
+  /(suicid\w*|self-?harm|harm (?:them|him|her)self|kill (?:them|him|her)self|not worth living|isn'?t worth living|wants? to die|better off dead|ending (?:it|his life|her life|their life)|take (?:his|her|their) own life|bleeding heavily|severe dehydration|very (?:sick|weak|ill)|oedema of both feet|swelling of both feet|both feet (?:are )?swollen|swollen feet|bilateral (?:pitting )?o?edema|pitting o?edema)/gi;
+
 // Pneumonia-sign presentation: chest indrawing / fast breathing / an explicit breaths-per-minute count.
 // The danger-sign gate ONLY downgrades when one of these IS present (a pure pneumonia presentation),
 // so a case with no pneumonia signs keeps the model's band rather than being silently downgraded.
@@ -63,8 +67,15 @@ const PNEUMONIA_SIGN_RE = /(chest indrawing|fast breathing|breathing (?:at )?\d+
  * Negation-aware: "no stridor" / "denies vomiting" / "without convulsions" do NOT count.
  */
 export function hasEmergencySign(caseText: string, redFlags: string[] = []): boolean {
-  const hay = `${caseText} ${redFlags.join(" ")}`.toLowerCase();
-  for (const m of hay.matchAll(DANGER_RE)) {
+  return hasNonNegatedMatch(`${caseText} ${redFlags.join(" ")}`.toLowerCase(), DANGER_RE);
+}
+
+function hasNonStructuredEmergencySign(caseText: string, redFlags: string[]): boolean {
+  return hasNonNegatedMatch(`${caseText} ${redFlags.join(" ")}`.toLowerCase(), NON_STRUCTURED_DANGER_RE);
+}
+
+function hasNonNegatedMatch(hay: string, pattern: RegExp): boolean {
+  for (const m of hay.matchAll(pattern)) {
     const idx = m.index ?? 0;
     // Scope negation to the CURRENT clause: scan back only to the previous clause boundary
     // (comma, semicolon, or a polarity-flipping conjunction). A fixed char window was too short for
@@ -99,7 +110,10 @@ export function finalizeSeverity(
   action: string,
   caseText: string,
   redFlags: string[] = [],
+  structured?: DangerDecision,
 ): Severity {
+  const authoritative = structuredSeverity(structured);
+  if (authoritative) return authoritative;
   const band = classifyToSeverity(classification, action);
   // Scoped danger-sign INVARIANT: only downgrade an EMERGENCY when the case is a PURE pneumonia-sign
   // presentation (chest indrawing / fast breathing) AND no emergency sign is present. This neutralises
@@ -108,14 +122,18 @@ export function finalizeSeverity(
   // EMERGENCY. A non-pneumonia case the model flags EMERGENCY is left as EMERGENCY (safe over-call).
   if (band === "EMERGENCY") {
     const hay = `${caseText} ${redFlags.join(" ")}`;
-    if (!hasEmergencySign(caseText, redFlags) && PNEUMONIA_SIGN_RE.test(hay)) return "URGENT";
+    const emergency = structured ? hasNonStructuredEmergencySign(caseText, redFlags) : hasEmergencySign(caseText, redFlags);
+    if (emergency) return "EMERGENCY";
+    if (structured && /\bSEVERE PNEUMONIA\b/i.test(classification)) return "URGENT";
+    if (!structured && PNEUMONIA_SIGN_RE.test(hay)) return "URGENT";
     return "EMERGENCY";
   }
   // ESCALATE: a non-emergency band with a genuine general danger sign present is EMERGENCY (WHO: a danger
   // sign means urgent referral). This mirrors finalizeSeverityV2 for the UNENCODED-class path (malnutrition
   // and the mhGAP fallbacks), so complicated SAM with bilateral pitting oedema is not under-triaged as
   // URGENT. Negation-aware via hasEmergencySign; over-triage is the safe direction for a triage tool.
-  if (hasEmergencySign(caseText, redFlags)) return "EMERGENCY";
+  const emergency = structured ? hasNonStructuredEmergencySign(caseText, redFlags) : hasEmergencySign(caseText, redFlags);
+  if (emergency) return "EMERGENCY";
   return band;
 }
 
@@ -133,16 +151,25 @@ export function finalizeSeverityV2(
   action: string,
   caseText: string,
   redFlags: string[] = [],
+  structured?: DangerDecision,
 ): Severity {
+  const authoritative = structuredSeverity(structured);
+  if (authoritative) return authoritative;
   const entry = lookupProtocol(classification);
   const base = entry ? entry.severity : classifyToSeverity(classification, action);
   // Escalate: a true general danger sign outranks any classification band.
-  if (hasEmergencySign(caseText, redFlags)) return "EMERGENCY";
+  const emergency = structured ? hasNonStructuredEmergencySign(caseText, redFlags) : hasEmergencySign(caseText, redFlags);
+  if (emergency) return "EMERGENCY";
   // Downgrade: an EMERGENCY justified ONLY by a pneumonia sign (no danger sign) is the home-treatment band —
   // but ONLY for a class that HAS a home-treatment sibling (`entry.downgradeTo`, set on SEVERE PNEUMONIA OR
   // VERY SEVERE DISEASE alone). This gates the downgrade on the SAME signal the plan-routing uses
   // (triage.ts), so severity can never desync from the plan, and a stray pneumonia-sign token can never
   // under-triage another frozen Pink class (VERY SEVERE FEBRILE DISEASE, SEVERE DEHYDRATION, etc.). C-1.
-  if (base === "EMERGENCY" && entry?.downgradeTo && PNEUMONIA_SIGN_RE.test(`${caseText} ${redFlags.join(" ")}`)) return "URGENT";
+  if (base === "EMERGENCY" && entry?.downgradeTo && (Boolean(structured) || PNEUMONIA_SIGN_RE.test(`${caseText} ${redFlags.join(" ")}`))) return "URGENT";
   return base;
+}
+
+function structuredSeverity(decision?: DangerDecision): Severity | undefined {
+  if (!decision || decision.route === "QVAC") return undefined;
+  return decision.severity;
 }
