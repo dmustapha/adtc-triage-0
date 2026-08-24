@@ -506,3 +506,22 @@
 
 #### For Next Skill
 - Reconcile historical and fresh local quality evidence without promoting missing remote results.
+
+---
+### build — 2026-08-24T14:12:00Z
+**Status:** BLOCKED
+**Session(s):** 9, Task 8 reconciliation / Task 9 gate
+
+#### Done
+- Reconciled three historical records with fresh Task 6/7 local evidence and named all 23 environment skips.
+- Marked remote MedPsy evidence absent/pending; retained empty project/tracked weight boundaries.
+
+#### Deviations
+- [DOCUMENTED] Append-only POSTMORTEM correction remains unstaged because the full file was pre-existing untracked dirty content.
+
+#### Blockers for Downstream
+- Mandatory remote MedPsy behavioral/profiler evidence, named human clinical review, and physical Ubuntu target evidence are absent.
+- No truthful signed model decision exists; Phase 2 and submission-facing recovery remain forbidden.
+
+#### For Next Skill
+- Obtain explicit publication authority, run the evidence-only workflow, then obtain truthful human and target-hardware evidence before signing.

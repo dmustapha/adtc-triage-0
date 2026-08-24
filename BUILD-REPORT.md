@@ -392,3 +392,9 @@ The imported English clinical spine remains locally grounded, fenced, two-pass, 
 ### Task 7 — local evidence-only MedPsy gate
 
 Eight planned local artifacts freeze the exact candidate, pinned llama.cpp revision, disjoint calibration/holdouts, embedded-template flags, raw retention, host/tier labels, human rubric, and cleanup-before-upload contract. Focused tests pass 6/6; TypeScript, YAML, JSON, diff, and empty model-byte scans pass. Only fail-closed invalid-candidate and absent-raw paths ran locally. No workflow dispatch, publication, network access, download, inference, or model weight occurred; external evidence remains pending by policy.
+
+### Task 8 reconciliation and Task 9 gate
+
+The reconciliation records historical 29/29 fixture evidence, the 97/97 README claim, the later 119 pass/1 fail/28 skip audit, and fresh local Task 6/7 results as non-comparable evidence classes. All 23 current environment skips are named. Remote MedPsy results remain explicitly absent. `POSTMORTEM.md` received an append-only correction in the working tree but was not staged because it was pre-existing untracked dirty content (`DEV-006 DOCUMENTED`).
+
+Build is truthfully **BLOCKED at Task 9**. Mandatory remote behavioral/profiler evidence, named human clinical review, and physical Ubuntu target evidence do not exist. Therefore no signed model decision was created, Phase 2 was not entered, submission placeholders were not promoted, and publication was not attempted.

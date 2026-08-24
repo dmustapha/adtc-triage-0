@@ -84,3 +84,6 @@
 2026-08-24T13:57:00Z | hackathon-build | COMPLETE | clinical-product-contract | Full 173 pass/0 fail/23 environment skips; separate product/profiler policies and no-chain-of-thought SSE verified.
 2026-08-24T13:58:00Z | hackathon-build | START | fresh-medpsy-evidence-local-build | Task 7 local evidence-only workflow contracts started; no dispatch, publication, network, download, or weights.
 2026-08-24T14:05:00Z | hackathon-build | COMPLETE | fresh-medpsy-evidence-local-build | Eight local artifacts verified 6/6 plus typecheck/YAML/JSON/no-weight; external dispatch intentionally not performed.
+2026-08-24T14:06:00Z | hackathon-build | START | quality-reconciliation-local-only | Task 8 historical/fresh local quality reconciliation; remote evidence remains explicitly pending.
+2026-08-24T14:12:00Z | hackathon-build | COMPLETE | quality-reconciliation-local-only | Historical and fresh local evidence reconciled without promotion; remote result remains absent.
+2026-08-24T14:12:00Z | hackathon-build | BLOCKED | human-physical-decision-gate | Remote MedPsy, named human clinical, and physical Ubuntu evidence absent; no signed decision or Phase 2.

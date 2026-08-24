@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-24",
+  "status": "local-reconciliation-complete-remote-evidence-pending",
+  "historicalEvidence": [
+    {
+      "label": "Triage-0 development quality fixture",
+      "sourceCommit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+      "sourcePath": "tests/quality/results-after-textbook.json",
+      "sourceSha256": "a7d7840c348ebf028c15e4d05b7d88be3ce76899151bd2358f1f70875ce4e4b4",
+      "artifactTimestamp": "2026-07-19T16:06:06.751Z",
+      "counts": {
+        "total": 29,
+        "passed": 29,
+        "failed": 0,
+        "errors": 0,
+        "skipped": "not-reported"
+      },
+      "evidenceClass": "historical-development-regression"
+    },
+    {
+      "label": "Triage-0 README snapshot claim",
+      "sourceCommit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+      "sourcePath": "README.md:144",
+      "sourceSha256": "0d2ffe86d4a40425f1659736bc188feefb1176595f798500524a0fb4c551e4ef",
+      "claim": "97/97 passing",
+      "counts": {
+        "total": 97,
+        "passed": 97,
+        "failed": "not-reported",
+        "skipped": "not-reported"
+      },
+      "evidenceClass": "historical-documentation-claim"
+    },
+    {
+      "label": "Later public fresh-clone audit",
+      "auditedCommit": "74424721bc75f564808eacce42d7f7f42676ae0f",
+      "sourcePath": "research/TRIAGE-0-ADTC-FIT-AUDIT.md:326",
+      "sourceSha256": "2b5db88073c5c774b76d1cd344a8e25aa435e22a320e7f0c05769b801416fc6e",
+      "command": "npm test",
+      "counts": {
+        "total": 148,
+        "passed": 119,
+        "failed": 1,
+        "skipped": 28
+      },
+      "failure": "Fresh-clone config test required a local default model path while the pinned source config defaulted to a remote Hugging Face URL.",
+      "environmentNotes": "npm ci completed, typecheck passed, and the production audit reported zero known vulnerabilities; detailed Node, OS, and dependency resolution were not recorded in the cited audit.",
+      "evidenceClass": "historical-fresh-clone-audit"
+    }
+  ],
+  "nonComparability": [
+    "The 29-case artifact is a development quality fixture, not the Node test-runner suite.",
+    "The 97/97 value is a README claim without a machine-readable runner artifact in this record.",
+    "The 148-test fresh-clone audit used the pinned public source before ADTC import and adaptation.",
+    "Current runs use the merged ADTC dependency lock, altered test inventory, English-only scope, and canonical local-model contract.",
+    "Platform, Node version, dependency resolution, generated RAG fixtures, and cached model assets differ or were not fully recorded across runs.",
+    "Skipped tests are not passing evidence and are reported separately."
+  ],
+  "currentEnvironment": {
+    "os": "macOS 26.0.1 build 25A362",
+    "architecture": "arm64",
+    "node": "v24.10.0",
+    "workingDirectory": "/Users/MAC/adtc-2026",
+    "evidenceTier": "local-development-static-and-model-free",
+    "modelBytesPresent": false,
+    "ragStoreIngested": false
+  },
+  "task6LocalRuns": {
+    "resultingCommit": "5ee2766961660b31ce9516723b7ff800e652e781",
+    "resultingTree": "2f5c59a926e0f499a2d7e2282072fdc3574aa9fd",
+    "runs": [
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/product-contract.test.ts tests/integration/sse-contract.test.ts",
+        "counts": { "total": 8, "passed": 5, "failed": 0, "skipped": 3, "todo": 0 }
+      },
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/product-contract.test.ts tests/integration/grounding.test.ts tests/integration/injection.test.ts tests/integration/citation-integrity.test.ts tests/integration/triage.test.ts",
+        "counts": { "total": 20, "passed": 5, "failed": 0, "skipped": 15, "todo": 0 }
+      },
+      {
+        "command": "npm test",
+        "counts": { "total": 196, "passed": 173, "failed": 0, "skipped": 23, "todo": 0 }
+      },
+      {
+        "command": "npm run typecheck",
+        "exitCode": 0
+      },
+      {
+        "command": "npm run verify-import-manifest",
+        "exitCode": 0,
+        "result": "Verified 76 completed imports from 74424721bc75f564808eacce42d7f7f42676ae0f"
+      }
+    ],
+    "environmentDependentSkipNames": [
+      "plan integrity (IMCI): every prose line is verbatim-grounded at its cited page — pneumonia (IMCI)",
+      "plan integrity (IMCI): every prose line is verbatim-grounded at its cited page — danger-sign (IMCI severe)",
+      "plan integrity (mhGAP fence): adult depression cites no IMCI and surfaces no paediatric text",
+      "grounding+ pneumonia: chest indrawing -> PNEUMONIA (home amoxicillin), NOT severe",
+      "grounding+ general danger signs",
+      "grounding+ dehydration",
+      "grounding+ depression (mhGAP)",
+      "grounding correctness: chest-indrawing retrieves the 2014 PNEUMONIA+amoxicillin disposition",
+      "grounding- off-domain queries do NOT cross the threshold (no false grounding)",
+      "E-1a: a poisoned CASE cannot force EMERGENCY",
+      "E-1b: a poisoned PROTOCOL chunk cannot force a dangerous downgrade",
+      "a full triage makes ZERO outbound network connections (warm cache)",
+      "POST /triage streams citation-first then a grounded, non-EMERGENCY card for pneumonia",
+      "POST /triage rejects an oversized case with a friendly 400 (no embedder overflow)",
+      "POST /tts is absent from the English text baseline",
+      "grounded /triage: full event ORDER citation<first_token<card<plan<done without chain-of-thought",
+      "grounded /triage: per-event payload SCHEMA (citation / first_token / card / plan)",
+      "abstain /triage: [stage(detect), abstain, done], card.severity UNKNOWN, lang set, no citation/card/plan",
+      "HERO: chest-indrawing pneumonia is NOT EMERGENCY (2014 home-treatment disposition)",
+      "danger-sign case IS EMERGENCY (and the plan carries referral)",
+      "mhGAP adult depression: a cited, multi-component plan from the mhGAP corpus",
+      "off-domain case ABSTAINS (UNKNOWN, no invented citation)",
+      "dose-safety gate: every protocol-table line is verbatim-grounded (RAG corpus or clean dose source)"
+    ],
+    "skipReason": "The local citation map and RAG store were not ingested; model/store-dependent tests self-skipped.",
+    "contentHashes": {
+      "tests/product-contract.test.ts": "79b91e251122a65986020655cc65b0770faece9198f3f49d4aa29f83354f0de3",
+      "config/product-generation-policy.json": "ba206590a38ef6f7c89e6abb500befa59769a02ec1843d5efdc799f3435168e2",
+      "config/profiler-prompt-policy.json": "30350eae31418c39c476e6868464eb41d31aac1b006152efdcea5aef2bd69d35"
+    }
+  },
+  "task7LocalRuns": {
+    "resultingCommit": "f5532fc9f3b1b28209df2b2ca92edc341079e9b2",
+    "resultingTree": "d98d233667c475c929f0eb23a7d7552fec51e315",
+    "runs": [
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/medpsy-evidence.test.ts",
+        "counts": { "total": 6, "passed": 6, "failed": 0, "skipped": 0, "todo": 0 }
+      },
+      {
+        "command": "npm run typecheck",
+        "exitCode": 0
+      },
+      {
+        "command": "ruby -e 'require \"yaml\"; YAML.load_file(\".github/workflows/medpsy-shared-runtime-evidence.yml\"); puts \"YAML_OK\"'",
+        "exitCode": 0,
+        "result": "YAML_OK"
+      }
+    ],
+    "contentHashes": {
+      "tests/medpsy-evidence.test.ts": "f0d6236a04fe88f209ae062734501f5e953d738543b7a13e07015153cb4538d5",
+      ".github/workflows/medpsy-shared-runtime-evidence.yml": "4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904"
+    },
+    "scope": "Local producer/static verification only; the valid raw runner and workflow were not invoked."
+  },
+  "remoteEvidence": {
+    "status": "absent-pending-approved-publication-gate",
+    "workflowDispatched": false,
+    "runId": null,
+    "artifactPaths": [],
+    "result": null,
+    "limitations": "No MedPsy behavioral, profiler, target-hardware, or human-review result is claimed by this local reconciliation."
+  }
+}
