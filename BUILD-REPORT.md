@@ -380,3 +380,7 @@ Task 4 deviation `DEV-005 RECOVERED`: the initial RED test accidentally invoked 
 ### Task 4 — canonical MedPsy artifact
 
 The canonical contract now freezes `medpsy-1.7b-q4` at revision `fd4cecc90c2de8dce4b112795456a54be9c59363`, file `medpsy-1.7b-q4_k_m-imat.gguf`, 1,282,439,360 bytes, SHA-256 `41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880`, English scope, official llama.cpp runtime, and QVAC SDK 0.13.3 product runtime over the same bytes. The credential-free downloader uses a partial path, validates size/hash, and atomically renames only verified bytes. Stubbed focused tests pass 6/6, TypeScript is clean, and project/tracked model scans are empty.
+
+### Task 5 — shared GGUF runtime binding
+
+One model-contract loader now fails closed on absent or wrong-hash canonical bytes. Product configuration and `/health` use the canonical MedPsy identity while distinguishing QVAC SDK 0.13.3 product execution from official llama.cpp profiling over the same file. Focused verification passes 15 with three store-dependent skips; the full suite passes 168 with zero failures and 23 environment-dependent skips. The historical OLMo test correction changes assertion scope only—MedPsy's explicitly superseded active path is excluded while all OLMo evidence and verdict bytes remain untouched; corrected test SHA-256 is `0f1d1c4540d9226ac6442ae57c7fa382f4bd5bdf623b89db85b4cb8098754e64`.

@@ -446,9 +446,13 @@
       "sourceGitObject": "5905660c5538c7f900e44b796dfc47a6e318170f",
       "sourceSha256": "dc12657a984d90c406e8e63ff8f7b55f45d21578143825ec28f533bba43baced",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "dc12657a984d90c406e8e63ff8f7b55f45d21578143825ec28f533bba43baced"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationSha256": "ad45c87baebc27e42790b441b28cc3fd15d1d10731aee395179d3716b10e7245",
+      "modification": {
+        "status": "modified",
+        "reason": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection."
+      }
     },
     {
       "sourcePath": "src/qvac/egress-guard.ts",
@@ -532,10 +536,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "3d1bab35f753741ab0ad56db44a469cd4e2bca473ba689e0d02e1e21d2530ccd",
+      "destinationSha256": "b85bec60379baa6ab32405e00b3c79f5eb9bfe274e222a34a5cf3ba61e9e1b0b",
       "modification": {
         "status": "modified",
-        "reason": "Removed optional speech and translation routes, imports, and prewarming while preserving English text triage."
+        "reason": "Preserved English text triage while adding fail-closed canonical model startup and distinct shared-runtime health identity."
       }
     },
     {
@@ -654,10 +658,10 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "6113af9fe351ffb2cfd6400e2bd5948871d04cb971506ba716fa29a553070679",
+      "destinationSha256": "6cb7b3d84f4d1b188eeb729fa13653b618e71f2c5b8973365068ac6b4aa9478d",
       "modification": {
         "status": "modified",
-        "reason": "Removed the TTS model prerequisite and characterized the excluded TTS route while retaining text-triage coverage."
+        "reason": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities."
       }
     },
     {
@@ -742,10 +746,10 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "c57aa292d952d9e5ac6ce1da6f76fff507754b11b1d9bace6f21ddbc12a0c294",
+      "destinationSha256": "74ad9bb31b404379aa261616948a014fe12dd0ea9a1ae59b03b588cbca789420",
       "modification": {
         "status": "modified",
-        "reason": "Made the cold-workspace model-source assertion truthful because Task 3 excludes bundled model weights."
+        "reason": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection."
       }
     },
     {

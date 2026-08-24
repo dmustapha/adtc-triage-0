@@ -1,7 +1,7 @@
 // File: tests/unit/config.test.ts
 // MODEL-FREE config gate. config.ts reads process.env at module-evaluation time, so we set env vars and
 // dynamic-import a FRESH module instance (a unique ?v= query busts the ESM module cache) to observe how
-// each override resolves. Proves: MODEL_ID selects the 4B HF URL vs the local 1.7B .gguf; PORT,
+// each override resolves. Proves: MODEL_ID cannot select an alternate medical model; PORT,
 // RAG_THRESHOLD, RESIDENT_MODE parse; and the model registry carries every role the orchestrator needs.
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
@@ -24,32 +24,19 @@ async function freshConfig() {
   return import(`../../src/config.js?v=${v++}`);
 }
 
-test("MODEL_ID=4b -> medpsySpec().modelSrc is the 4B Hugging Face GGUF URL", async () => {
+test("MODEL_ID cannot select an alternate medical model", async () => {
   process.env.MODEL_ID = "4b";
-  const { config, medpsySpec } = await freshConfig();
-  assert.equal(config.modelId, "4b");
-  const spec = medpsySpec();
-  assert.match(spec.modelSrc, /^https:\/\/huggingface\.co\//, "4B resolves to the remote HF URL");
-  assert.match(spec.modelSrc, /MedPsy-4B-GGUF.*4b-q4_k_m/i);
-  assert.equal(spec.modelType, "llm");
-  assert.equal(spec.role, "medpsy");
+  const { config, registry } = await freshConfig();
+  assert.equal(config.modelId, "medpsy-1.7b-q4");
+  assert.match(registry.medpsy.modelSrc, /model\/medpsy-1\.7b-q4_k_m-imat\.gguf$/);
+  assert.doesNotMatch(registry.medpsy.modelSrc, /^https?:\/\//);
 });
 
-test("MODEL_ID uppercase is lowercased (4B -> 4b)", async () => {
-  process.env.MODEL_ID = "4B";
-  const { config, medpsySpec } = await freshConfig();
-  assert.equal(config.modelId, "4b");
-  assert.match(medpsySpec().modelSrc, /huggingface\.co/);
-});
-
-test("default (no MODEL_ID) -> disclosed 1.7b artifact without bundling model weights", async () => {
+test("medpsySpec fails closed while canonical model bytes are absent", async () => {
   delete process.env.MODEL_ID;
   const { config, medpsySpec } = await freshConfig();
-  assert.equal(config.modelId, "1.7b");
-  const src = medpsySpec().modelSrc;
-  assert.match(src, /medpsy-1\.7b-q4_k_m-imat\.gguf$/, "default identifies the 1.7B gguf");
-  assert.match(src, /^https?:\/\//, "Task 3 excludes model weights, so a cold workspace uses the disclosed URL");
-  assert.equal(medpsySpec().ctxSize, 3072);
+  assert.equal(config.modelId, "medpsy-1.7b-q4");
+  assert.throws(() => medpsySpec(), /missing canonical model/i);
 });
 
 test("RAG_THRESHOLD parses as a number; default is 0.685", async () => {
@@ -98,6 +85,7 @@ test("registry carries every role the orchestrator loads (stt/tts/embeddings/med
   assert.equal(registry.embeddings.modelType, "embeddings");
   assert.equal(registry.embeddings.modelSrc, "GTE_LARGE_FP16", "default embedder token");
   assert.equal(registry.medpsy.role, "medpsy");
+  assert.match(registry.medpsy.modelSrc, /model\/medpsy-1\.7b-q4_k_m-imat\.gguf$/);
 });
 
 test("EMBED_SRC overrides the embeddings model token", async () => {

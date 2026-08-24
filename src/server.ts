@@ -17,6 +17,9 @@ import { routeCase, ensureClassPrototypes } from "./triage/class-router.js";
 import { readPerfRows, perfCsvPath } from "./qvac/perf-logger.js";
 import { chunkCount, citationMapHealthy } from "./rag/store.js";
 import { guard } from "./qvac/egress-guard.js";
+import { loadModelContract, readModelIdentity } from "./model-contract.js";
+
+const modelIdentity = readModelIdentity();
 
 /** Max characters accepted for a triage case. A real IMCI/mhGAP case is a few sentences; this keeps the
  *  input well under the embedding model's 512-token context and the reasoning model's window. */
@@ -106,6 +109,16 @@ app.get("/health", (_req: Request, res: Response) => {
     residentModels: orchestrator.residentRoles(),
     residentMode: config.residentMode,
     medpsy: config.modelId,
+    model: {
+      name: modelIdentity.name,
+      path: modelIdentity.path,
+      sha256: modelIdentity.sha256,
+      productRuntime: {
+        name: modelIdentity.productRuntime.name,
+        version: modelIdentity.productRuntime.version,
+      },
+      officialRuntime: modelIdentity.officialRuntime,
+    },
     chunks: chunkCount(),
     citationMapHealthy: citationMapHealthy(),
     // null until the prewarm self-test runs; true = native ragSearch returns hits; false = store wiped.
@@ -285,6 +298,7 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
 
 /** Start listening. Returns the http.Server so tests can use an ephemeral port + close cleanly. */
 export function startServer(port = config.port) {
+  loadModelContract();
   // Last-line defence: a stray async rejection (e.g. a write to a socket that died at the wrong tick)
   // must never take the whole server down mid-demo. Log and keep serving.
   process.on("unhandledRejection", (reason) => {

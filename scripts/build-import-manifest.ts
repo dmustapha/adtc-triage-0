@@ -42,7 +42,7 @@ export const PLANNED_SOURCE_PATHS = [
 
 const MODIFIED_FOR_ADTC = new Set<string>([
   "package-lock.json", "package.json", "public/app.html", "public/assets/js/triage.js",
-  "src/qvac/engine.ts", "src/server.ts",
+  "src/config.ts", "src/qvac/engine.ts", "src/server.ts",
   "src/triage/triage.ts", "tests/integration/http-validation.test.ts",
   "tests/integration/server.test.ts", "tests/integration/triage.test.ts", "tests/unit/config.test.ts",
   "tsconfig.json",
@@ -53,13 +53,14 @@ const MODIFICATION_REASONS: Record<string, string> = {
   "package.json": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and test package contract.",
   "public/app.html": "Removed speech and multilingual controls so the imported UI exposes only the authorized English text workflow.",
   "public/assets/js/triage.js": "Removed microphone, speech synthesis, and translation-facing behavior from the English text workflow.",
+  "src/config.ts": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection.",
   "src/qvac/engine.ts": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline.",
-  "src/server.ts": "Removed optional speech and translation routes, imports, and prewarming while preserving English text triage.",
+  "src/server.ts": "Preserved English text triage while adding fail-closed canonical model startup and distinct shared-runtime health identity.",
   "src/triage/triage.ts": "Removed translation dependencies so routing, grounding, and triage operate on English text only.",
   "tests/integration/http-validation.test.ts": "Changed audio-route validation into assertions that excluded STT and TTS routes are not registered.",
-  "tests/integration/server.test.ts": "Removed the TTS model prerequisite and characterized the excluded TTS route while retaining text-triage coverage.",
+  "tests/integration/server.test.ts": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities.",
   "tests/integration/triage.test.ts": "Removed multilingual integration cases that require the excluded translation models.",
-  "tests/unit/config.test.ts": "Made the cold-workspace model-source assertion truthful because Task 3 excludes bundled model weights.",
+  "tests/unit/config.test.ts": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection.",
   "tsconfig.json": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract.",
 };
 

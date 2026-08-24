@@ -78,3 +78,5 @@
 2026-08-24T13:33:00Z | hackathon-build | COMPLETE | exact-baseline-import-authorized-install-retry | Task 3 verified: 76 imports, focused 9/9, full 155 pass/0 fail/24 skip, typecheck and all parity boundaries green.
 2026-08-24T13:35:00Z | hackathon-build | START | canonical-medpsy-parity | Task 4 canonical MedPsy identity and atomic credential-free downloader started under TDD; no weights or publication.
 2026-08-24T13:43:00Z | hackathon-build | COMPLETE | canonical-medpsy-parity | Exact MedPsy identity locked; focused 6/6 and typecheck green; project/tracked model-byte scans empty.
+2026-08-24T13:44:00Z | hackathon-build | START | shared-runtime-binding | Task 5 binding QVAC product and official profiler metadata to the same canonical GGUF; no weights or network.
+2026-08-24T13:52:00Z | hackathon-build | COMPLETE | shared-runtime-binding | Focused 15 pass/0 fail/3 skip and full 168 pass/0 fail/23 skip; canonical fail-closed shared GGUF binding verified.

@@ -21,7 +21,6 @@ const skip = chunkCount() > 0 ? false : "store not ingested";
 let server: { address(): { port: number } | string | null; close(): void };
 let base = "";
 before(async () => {
-  if (skip) return;
   await new Promise<void>((resolveReady) => {
     server = app.listen(0, () => resolveReady()) as never;
   });
@@ -56,12 +55,15 @@ async function readSse(res: Response): Promise<Array<{ event: string; data: any 
   return out;
 }
 
-test("GET /health reports ok + ingested chunks", { skip, timeout: 60_000 }, async () => {
+test("GET /health reports canonical shared-runtime identity", { timeout: 60_000 }, async () => {
   const r = await fetch(`${base}/health`);
   const h = await r.json();
   assert.equal(h.ok, true);
-  assert.ok(h.chunks > 0, "store has chunks");
-  assert.equal(h.medpsy, "1.7b");
+  assert.equal(h.medpsy, "medpsy-1.7b-q4");
+  assert.equal(h.model.path, "model/medpsy-1.7b-q4_k_m-imat.gguf");
+  assert.equal(h.model.sha256, "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880");
+  assert.deepEqual(h.model.productRuntime, { name: "QVAC SDK", version: "0.13.3" });
+  assert.equal(h.model.officialRuntime, "llama.cpp");
 });
 
 test("POST /triage streams citation-first then a grounded, non-EMERGENCY card for pneumonia", { skip, timeout: 300_000 }, async () => {

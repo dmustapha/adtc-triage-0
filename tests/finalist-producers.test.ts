@@ -47,10 +47,13 @@ test("OLMo-2 7B recovery freezes the exact approved identity without rewriting h
   const finalists = JSON.parse(await readFile("config/model-finalists.json", "utf8"));
   const shortlist = JSON.parse(await readFile("evidence/finalists/replacement-shortlist.json", "utf8"));
   const candidate = JSON.parse(await readFile("evidence/finalists/replacement/olmo-2-1124-7b-instruct-q4-k-m-candidate.json", "utf8"));
-  const historicalFinalists = { ...finalists };
-  delete historicalFinalists[candidate.candidateId];
+  // Freeze only the historical OLMo namespace. Task 4 explicitly superseded the active MedPsy
+  // output path; canonical MedPsy identity/parity is asserted separately by model-parity.test.ts.
+  const historicalFinalists = Object.fromEntries(
+    Object.entries(finalists).filter(([candidateId]) => candidateId.startsWith("olmo-") && candidateId !== candidate.candidateId),
+  );
   const historicalShortlist = shortlist.candidates.filter((item: any) => item.candidateId !== candidate.candidateId);
-  assert.equal(createHash("sha256").update(JSON.stringify(historicalFinalists)).digest("hex"), "56c524838ca237ef86fcdff97bbbc1162b40bf5a6241b22aec14a8a9304212f6");
+  assert.equal(createHash("sha256").update(JSON.stringify(historicalFinalists)).digest("hex"), "2619f4803b235616c5b62421a3fc89066f0256012a75287b65fd529dcb3ee7b7");
   assert.equal(createHash("sha256").update(JSON.stringify(historicalShortlist)).digest("hex"), "be2ee3eb1654fb2e6c928d0c0e38cd9ea0ffa063ddc63b79d491ba21215acd1a");
   assert.deepEqual(finalists[candidate.candidateId], candidate.model);
   assert.deepEqual(candidate, {

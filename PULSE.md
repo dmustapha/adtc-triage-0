@@ -458,3 +458,21 @@
 
 #### For Next Skill
 - Bind QVAC and profiler metadata to the same canonical GGUF without downloading weights.
+
+---
+### build — 2026-08-24T13:52:00Z
+**Status:** PARTIAL
+**Session(s):** 9, Task 5 shared runtime binding
+
+#### Done
+- Bound QVAC product configuration, health reporting, and official profiler metadata to one canonical MedPsy GGUF.
+- Passed focused 15/0/3 and full 168/0/23 plus typecheck, manifest, diff, and no-weight gates.
+
+#### Key Decisions
+- [USER] Historical OLMo verdicts remain byte-untouched; the test-only hash scope excludes active MedPsy configuration and freezes historical OLMo entries.
+
+#### Blockers for Downstream
+- Phase 2 remains blocked pending fresh evidence and a truthful signed decision.
+
+#### For Next Skill
+- Freeze the English clinical product contract and separate product versus profiler policies.
