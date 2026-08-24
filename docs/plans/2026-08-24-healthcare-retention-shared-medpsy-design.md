@@ -6,6 +6,14 @@
 **Working directory:** `/Users/MAC/adtc-2026`
 **Source project:** `/Users/MAC/triage-0` at public baseline commit `74424721bc75f564808eacce42d7f7f42676ae0f`
 
+## Authority and supersession
+
+This approved design is the controlling product decision for the healthcare-retention recovery. It supersedes the clean-build and OLMo-only product assumptions in `FORGE-INTAKE.md`, `PRD.md`, `ARCHITECTURE.md`, `PLAN.md`, `DOMAIN-GUIDE.md`, `FEATURE-OBSERVABLES.md`, `PRE-BUILD-READINESS.md`, and `research/ADTC-PIPELINE-SKILL-OVERRIDES.md` wherever they conflict.
+
+Those documents remain preserved as historical Forge and Build inputs. `BUILD-REPORT.md`, `POSTMORTEM.md`, prior `PULSE.md` entries, and all existing `evidence/` artifacts remain immutable evidence of what was attempted and why it stopped.
+
+The import baseline is frozen at public Triage-0 commit `74424721bc75f564808eacce42d7f7f42676ae0f`. Changing that baseline requires a new explicit design decision and provenance review.
+
 ## 1. Decision
 
 Retain the healthcare submission. Do not implement the creative-writing pivot.
@@ -99,7 +107,7 @@ Reuse is authorized by the user as owner of Triage-0. Eligibility risk is contro
 Create a file-level provenance ledger containing:
 
 - source repository URL;
-- source commit `74424721bc75f564808eacce42d7f7f42676ae0f` unless a later exact approved baseline is selected before import;
+- source commit `74424721bc75f564808eacce42d7f7f42676ae0f`;
 - original creation dates;
 - original Apache-2.0 license;
 - each reused file and its source SHA-256;
@@ -285,4 +293,3 @@ Do not invoke Hackathon Build directly.
 ## 15. Approval record
 
 The user approved this approach on 2026-08-24 with: “go with 1”.
-
