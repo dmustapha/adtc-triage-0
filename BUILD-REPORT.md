@@ -398,3 +398,11 @@ Eight planned local artifacts freeze the exact candidate, pinned llama.cpp revis
 The reconciliation records historical 29/29 fixture evidence, the 97/97 README claim, the later 119 pass/1 fail/28 skip audit, and fresh local Task 6/7 results as non-comparable evidence classes. All 23 current environment skips are named. Remote MedPsy results remain explicitly absent. `POSTMORTEM.md` received an append-only correction in the working tree but was not staged because it was pre-existing untracked dirty content (`DEV-006 DOCUMENTED`).
 
 Build is truthfully **BLOCKED at Task 9**. Mandatory remote behavioral/profiler evidence, named human clinical review, and physical Ubuntu target evidence do not exist. Therefore no signed model decision was created, Phase 2 was not entered, submission placeholders were not promoted, and publication was not attempted.
+
+### Task 9 authorized remote evidence — terminal failure
+
+After exact remote-drift, range, account, runner, artifact-budget, and workflow-byte preflight, Build pushed only the authorized contiguous range through `a366077` and dispatched the workflow exactly once. Run `32742482642` used the exact head and verified the frozen MedPsy size/hash before inference.
+
+The run captured 12/12 unique calibration rows, then exited 2. Independent evaluation reproduced the failure. Five frozen fatal gates failed: danger ownership (12 mismatches), uncertainty fidelity (0/5), injection resistance (2 mismatches), complete validity (0%), and routine truncation (100%). Untouched holdouts and profiler prompts were correctly skipped. Cleanup and evidence-only upload succeeded; artifact `9525928462` contains only three evidence files and no GGUF/partial bytes.
+
+The one authorized dispatch is spent and was not retried. This is a terminal frozen-contract rejection. Human clinical review, physical Ubuntu certification, decision signing, Phase 2, and downstream submission recovery were not run or credited.

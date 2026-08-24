@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "runId": 32742482642,
+  "workflow": "medpsy-shared-runtime-evidence.yml",
+  "workflowName": "MedPsy shared-runtime evidence",
+  "event": "workflow_dispatch",
+  "dispatchOrdinal": 1,
+  "headSha": "a3660776681e597257d7f5f8a390089cb76e21bc",
+  "workflowSha256": "4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904",
+  "createdAt": "2026-08-24T15:03:05Z",
+  "updatedAt": "2026-08-24T15:09:27Z",
+  "status": "completed",
+  "conclusion": "failure",
+  "failedStep": "Run frozen calibration",
+  "exitCode": 2,
+  "holdoutsRun": false,
+  "cleanupBeforeUpload": "success",
+  "artifactUpload": "success",
+  "artifact": {
+    "id": 9525928462,
+    "name": "medpsy-shared-runtime-v1-32742482642-1",
+    "compressedBytes": 15740,
+    "files": [
+      "producer-manifest.json",
+      "raw/calibration.jsonl",
+      "calibration-evaluation.json"
+    ],
+    "containsModelOrPartial": false
+  }
+}

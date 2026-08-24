@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "revision": "medpsy-shared-runtime-v1",
+  "freezeRule": "candidate, prompts, cases, gates, and producers frozen before inference; no tuning after holdout observation",
+  "candidate": {
+    "schemaVersion": 1,
+    "candidateId": "medpsy-1.7b-q4",
+    "name": "MedPsy-1.7B-Q4_K_M-imatrix",
+    "revision": "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "url": "https://huggingface.co/qvac/MedPsy-1.7B-GGUF/resolve/fd4cecc90c2de8dce4b112795456a54be9c59363/medpsy-1.7b-q4_k_m-imat.gguf",
+    "filename": "medpsy-1.7b-q4_k_m-imat.gguf",
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+    "quantization": "GGUF Q4_K_M",
+    "parametersEstimate": "2.03B",
+    "license": "Apache-2.0",
+    "languageScope": [
+      "en"
+    ],
+    "officialRuntime": "llama.cpp",
+    "productRuntime": {
+      "name": "QVAC SDK",
+      "version": "0.13.3",
+      "modelPath": "model/medpsy-1.7b-q4_k_m-imat.gguf"
+    }
+  },
+  "llamaRevision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  "chatTemplate": {
+    "source": "embedded-gguf",
+    "jinja": true,
+    "override": null
+  },
+  "evidenceTier": "remote-ci-direct-llama.cpp",
+  "host": "github-actions-ubuntu-24.04",
+  "calibration": {
+    "cases": 12,
+    "idsSha256": "0aab5c57c5f7d06950da0a1ba630f4987c37b5f3b7c2ffd76b6835da1ed9520b"
+  },
+  "evaluation": {
+    "pediatricCases": 50,
+    "generalMedicalCases": 50,
+    "idsSha256": "c7919e11e0fae68dc5deba4a79b02da26e83c7398c6e5c76027bf2db47322686"
+  },
+  "calibrationEvaluationOverlap": 0,
+  "inputHashes": {
+    "candidate": "1100c5061aa4350383610860c9f1fd76e9fdbe606dcc7e8412378ebddedd29f7",
+    "licenseDecision": "204d2601c84ceda1b40b45fed05ff3d1951894c69bb395c65dc74231b33026af",
+    "metadata": "df941ccefd0345ccdc88cb3ee83ea2973c50018c529405e6083a7613f969f97d",
+    "productPolicy": "ba206590a38ef6f7c89e6abb500befa59769a02ec1843d5efdc799f3435168e2",
+    "profilerPolicy": "30350eae31418c39c476e6868464eb41d31aac1b006152efdcea5aef2bd69d35",
+    "corpus": "6fd2a1351bf2bcb9ef7927aacf55ecf0aff65f7505d82243a00ece83df4a5f50",
+    "calibration": "713e9ae319d51fe3a6b5cc3af56df57b75648c642c8af5548bc25351648880fa",
+    "extractionSchema": "364181eaaaf6a0cdcc871a08995e5fbc4b62b0926d67670c35071f76b768aace",
+    "grammar": "657d9b33289a374a2d610fc37534268bf9ee9e49201b5cd97555529985b4c305",
+    "expectations": "d45e8f092c8e59f033db84d34a69e91c15b7d23032e4c779bf6ee4956bcd2774",
+    "fatalGates": "f9b963392e1e6a916f92ac432e7a776f8876b517202b4e0ad8dc68ad01e9b9ce",
+    "reviewRubric": "4c43e50bbbab5bbb317a0f93107480c0b3599fa15fc2a501dfa6eb5a917296e2",
+    "rawProducer": "94c370af4be1c3746d20d57c386e7f2a3057c4400196ed307e18015635d68fda",
+    "evaluator": "e4bc5a9a2c69d9a5f5b13d95872b2425db69b78dca36723c347c98927eadc526",
+    "manifestProducer": "b2b9f91feb47ee0b28248280530c760f8ff32b3713fab9a3c63a4ca70a83d3ed",
+    "workflow": "4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904"
+  },
+  "expectedArtifacts": [
+    "producer-manifest.json",
+    "raw/calibration.jsonl",
+    "raw/evaluation.jsonl",
+    "raw/profiler.jsonl",
+    "calibration-evaluation.json",
+    "evaluation.json",
+    "hashes.sha256"
+  ],
+  "unresolved": [
+    "humanClinicalReview",
+    "physicalTargetLaptop"
+  ]
+}

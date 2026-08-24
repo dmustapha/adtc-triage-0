@@ -525,3 +525,20 @@
 
 #### For Next Skill
 - Obtain explicit publication authority, run the evidence-only workflow, then obtain truthful human and target-hardware evidence before signing.
+
+---
+### build — 2026-08-24T15:11:00Z
+**Status:** BLOCKED
+**Session(s):** 10, sole authorized remote MedPsy run
+
+#### Done
+- Lease-checked and pushed only the authorized 16-commit range; remote workflow bytes matched exactly.
+- Dispatched exactly once: run 32742482642 on head a366077.
+- Verified 12 unique calibration rows, reproduced evaluator failure, and confirmed cleanup/upload contained no model bytes.
+
+#### Blockers for Downstream
+- Five frozen calibration fatal gates failed; holdouts/profiler correctly skipped and the one-shot dispatch is spent.
+- Human, physical, signing, Phase 2, and downstream recovery are forbidden under this failed contract.
+
+#### For Next Skill
+- Stop for an explicit requirements revision. Never retry or tune against this calibration evidence without new authority.

@@ -149,11 +149,22 @@
     "scope": "Local producer/static verification only; the valid raw runner and workflow were not invoked."
   },
   "remoteEvidence": {
-    "status": "absent-pending-approved-publication-gate",
-    "workflowDispatched": false,
-    "runId": null,
-    "artifactPaths": [],
-    "result": null,
-    "limitations": "No MedPsy behavioral, profiler, target-hardware, or human-review result is claimed by this local reconciliation."
+    "status": "calibration-failed-terminal",
+    "workflowDispatched": true,
+    "dispatchCount": 1,
+    "runId": 32742482642,
+    "headSha": "a3660776681e597257d7f5f8a390089cb76e21bc",
+    "artifactPaths": [
+      "evidence/medpsy-shared-runtime-v1/remote-run-32742482642/producer-manifest.json",
+      "evidence/medpsy-shared-runtime-v1/remote-run-32742482642/raw/calibration.jsonl",
+      "evidence/medpsy-shared-runtime-v1/remote-run-32742482642/calibration-evaluation.json",
+      "evidence/medpsy-shared-runtime-v1/remote-run-32742482642/run-metadata.json",
+      "evidence/medpsy-shared-runtime-v1/remote-run-32742482642/independent-calibration-review.json"
+    ],
+    "result": "reject",
+    "failedFatalGates": ["dangerOwnership", "uncertaintyFidelity", "injectionResistance", "completeValid", "routineTruncation"],
+    "holdoutsRun": false,
+    "weightsUploadedOrRetained": false,
+    "limitations": "Calibration failure correctly prevented untouched holdouts, profiler prompts, human review, physical review, signing, and Phase 2. No retry is authorized."
   }
 }

@@ -87,3 +87,8 @@
 2026-08-24T14:06:00Z | hackathon-build | START | quality-reconciliation-local-only | Task 8 historical/fresh local quality reconciliation; remote evidence remains explicitly pending.
 2026-08-24T14:12:00Z | hackathon-build | COMPLETE | quality-reconciliation-local-only | Historical and fresh local evidence reconciled without promotion; remote result remains absent.
 2026-08-24T14:12:00Z | hackathon-build | BLOCKED | human-physical-decision-gate | Remote MedPsy, named human clinical, and physical Ubuntu evidence absent; no signed decision or Phase 2.
+2026-08-24T14:47:48Z | build | BLOCKED | build | type=external action=escalate
+2026-08-24T15:01:24Z | conductor | START | resume | Resuming from url_preverify
+2026-08-24T15:01:24Z | build | START | build | Dispatching build
+2026-08-24T15:03:05Z | hackathon-build | START | remote-medpsy-evidence | Authorized exact push landed at a366077; sole workflow dispatch run 32742482642 queued from matching head.
+2026-08-24T15:09:27Z | hackathon-build | BLOCKED | remote-medpsy-evidence | Run 32742482642 failed five frozen calibration fatal gates; holdouts skipped; cleanup/upload passed; no weights retained; no retry authorized.

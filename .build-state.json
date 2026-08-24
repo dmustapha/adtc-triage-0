@@ -2,7 +2,7 @@
   "project": "Triage-0 ADTC",
   "currentPhase": "shared-medpsy-healthcare-recovery",
   "currentStep": "9",
-  "currentSubStep": "blocked-mandatory-remote-human-physical-evidence",
+  "currentSubStep": "blocked-remote-medpsy-calibration-failed",
   "status": "blocked",
   "autonomous_mode": true,
   "completedSteps": ["1.1", "1.2", "1.3-machinery", "1.3-replacement-shortlist", "1.3-replacement-lineage", "1.3-replacement-raw-gate-executed", "1.3-template-compliance-fix", "1.3-attempt-4-candidate-freeze", "1.3-attempt-4-lineage", "1.3-attempt-4-producer-freeze", "1.3-attempt-4-remote-evidence", "1.3-attempt-4-raw-gate", "1.3-product-contract-revision-freeze", "1.3-product-contract-calibration", "2-legal-provenance", "3-exact-baseline-import", "4-canonical-medpsy-parity", "5-shared-runtime-binding", "6-clinical-product-contract", "7-fresh-medpsy-evidence-local-build", "8-quality-reconciliation-local-only"],
@@ -110,6 +110,12 @@
       "started_at": "2026-08-24T14:06:00Z",
       "completed_at": "2026-08-24T14:12:00Z",
       "evidence": "PASS LOCAL RECONCILIATION: historical 29/29 fixture, 97/97 README claim, 119/1/28 audit, and fresh Task 6/7 local evidence recorded without promotion; remote evidence explicitly absent"
+    },
+    {
+      "phase": "remote-medpsy-evidence-run-32742482642",
+      "started_at": "2026-08-24T15:03:05Z",
+      "completed_at": "2026-08-24T15:09:27Z",
+      "evidence": "FAIL: exact GGUF verified and 12/12 calibration rows captured, but five frozen fatal gates failed; holdouts skipped; cleanup and evidence-only upload passed; sole dispatch budget spent"
     }
   ],
   "fileGroups": {
@@ -229,10 +235,14 @@
     ,{"command": "Task 7 typecheck/YAML/JSON/diff/no-weight boundaries", "exitCode": 0, "result": "strict TypeScript; YAML_OK; JSON 2/2; diff clean; project/tracked GGUF and partial scans empty"}
     ,{"command": "Task 8 reconciliation JSON and immutable source hashes", "exitCode": 0, "result": "3 historical records; 23 exact Task 6 skip names; remote absent/pending; historical source hashes verified"}
     ,{"command": "Task 8 diff/no-weight boundaries", "exitCode": 0, "result": "diff clean; project/tracked GGUF and partial scans empty"}
+    ,{"command": "lease-checked publication push", "exitCode": 0, "result": "remote main revalidated at a754781; exact 16-commit range pushed to a366077; remote workflow SHA-256 matched 4e37e97053a1b23410de3d11eb19e38de18df4e974070e1662b417eaf67f2904"}
+    ,{"command": "GitHub Actions run 32742482642", "exitCode": 2, "result": "exact head a366077; immutable GGUF verified; 12 calibration rows captured; frozen calibration failed; holdouts/profiler skipped; cleanup and evidence-only upload passed"}
+    ,{"command": "independent MedPsy calibration review", "exitCode": 2, "result": "raw hash matched; 12 unique exact-identity rows; evaluator failure reproduced; dangerOwnership, uncertaintyFidelity, injectionResistance, completeValid, and routineTruncation fatal gates failed"}
+    ,{"command": "remote artifact and local no-weight audit", "exitCode": 0, "result": "artifact 9525928462 contains only producer manifest, calibration JSONL, and evaluation JSON; no GGUF/part/partial uploaded, tracked, or retained"}
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T14:12:00Z",
+  "timestamp": "2026-08-24T15:11:00Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -243,7 +253,7 @@
   ],
   "resume_attempt": "shared-medpsy-healthcare-recovery-v1",
   "recovery_scope": "transparent import from exact Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f; MedPsy-1.7B Q4 only; QVAC product plus direct llama.cpp profiler over identical GGUF bytes; no model search; historical evidence immutable",
-  "blocked_reason": "Task 9 mandatory gate cannot run truthfully: remote MedPsy behavioral/profiler evidence was not dispatched during Build, named human clinical review is absent, and physical target-Ubuntu evidence is absent. No signed model decision or Phase 2 authorization exists.",
+  "blocked_reason": "The sole authorized MedPsy workflow run 32742482642 failed five frozen calibration fatal gates. Untouched holdouts and profiler prompts were correctly skipped. The one-shot dispatch budget is spent; human, physical, signing, and Phase 2 gates must not run.",
   "withdrawn_evidence": {
     "workflowRunId": "32652354894",
     "reason": "-no-cnv disabled the embedded GGUF chat template; its behavioral verdict is not evidence"
@@ -267,7 +277,7 @@
     ,"After authorized Anvil snapshot cleanup restored 57 GiB free, external retry 2 launched exactly one clean full npm install; it downloaded QVAC artifacts but exited 1 on registry EIDLETIMEOUT with about 50 GiB remaining."
     ,"Audited the partial result: all 11 direct dependencies are missing, lock root remains 0 runtime and 3 development dependencies, and dependency-based verification fails at loader/type resolution before test bodies execute."
   ],
-  "what_is_needed": "After an explicitly authorized publication checkpoint, run and independently verify the evidence-only MedPsy workflow with weights deleted before upload; then obtain named human clinical review and truthful physical Ubuntu target evidence. Only a complete pass may produce the signed model decision and authorize Phase 2.",
+  "what_is_needed": "An explicit user-directed requirements revision is required. Do not retry run 32742482642, tune against calibration output, run holdouts, seek human/physical approval, sign a decision, or enter Phase 2 under the failed frozen MedPsy contract.",
   "healthcare_recovery": {
     "recovery_id": "shared-medpsy-healthcare-recovery-v1",
     "source_repository": "https://github.com/dmustapha/triage-0",
@@ -287,6 +297,9 @@
     "model_search_allowed": false,
     "model_decision_exists": false,
     "phase_2_authorized": false,
+    "remote_evidence_run_id": "32742482642",
+    "remote_evidence_status": "calibration-failed-terminal",
+    "remote_dispatch_count": 1,
     "prior_olmo_blocked_reason": "The authorized OLMo product-contract revision failed exact frozen calibration in run 32684188985; the historical verdict remains preserved."
   }
 }
