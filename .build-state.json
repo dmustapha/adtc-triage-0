@@ -525,7 +525,6 @@
         ".build-state.json",
         "BUILD-REPORT.md",
         "FOR[Dami].md",
-        "tasks/todo.md",
         "docs/prompts/prompt-log.md",
         "PULSE.md",
         ".codebase-manifest.md"
