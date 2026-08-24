@@ -292,7 +292,7 @@ app.post("/triage", async (req: Request, res: Response) => {
     });
 
     // Observe the first internal delta for honest TTFT telemetry, but never expose raw reasoning tokens.
-    send("stage", { key: "reason", label: "Reasoning on-device", detail: "MedPsy 1.7B · GPU" });
+    send("stage", { key: "reason", label: "Reasoning on-device", detail: "QVAC SDK 0.13.3 · on-device" });
     const reasonStart = Date.now();
     let firstDeltaSent = false;
     const result = await triageFromHits(english, grounding, ctx, {
@@ -308,7 +308,7 @@ app.post("/triage", async (req: Request, res: Response) => {
       },
     });
 
-    send("stage", { key: "classify", label: `Classified: ${result.classification}`, detail: "1 of 27 WHO classes", cls: result.classification });
+    send("stage", { key: "classify", label: `Classified: ${result.classification}`, detail: "schema-validated clinical extraction", cls: result.classification });
     send("card", { card: result.card, classification: result.classification, citationChunk: result.citationChunk, attempts: result.attempts, perf: lastCompletionPerf() });
 
     // Task #22: the grounded WHO management plan lands as a SEPARATE event AFTER the card, so the
