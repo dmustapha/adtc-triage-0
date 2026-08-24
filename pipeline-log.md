@@ -98,3 +98,5 @@
 2026-08-24T16:56:43Z | hackathon-build | START | structured-danger-evidence-plane-v2 | Resuming the approved requirements revision at Task 1 under TDD; local-only, with no publication, workflow dispatch, model download, or weight retention.
 2026-08-24T17:50:13Z | hackathon-build | COMPLETE | structured-danger-revision-task-4 | Worker checklist committed at 8367bd8; focused 13/13 and full 207 pass/0 fail/22 skip; model-free deterministic emergency smoke passed.
 2026-08-24T17:50:13Z | hackathon-build | START | structured-danger-revision-task-5 | Exact-one-JSON framing adapter started under TDD; local-only and no model bytes.
+2026-08-24T17:56:00Z | hackathon-build | COMPLETE | structured-danger-revision-task-5 | Exact-one-JSON framing committed at 4aabd44; focused 12/12 and typecheck green.
+2026-08-24T17:56:00Z | hackathon-build | START | structured-danger-revision-task-6 | Split product/raw evidence planes started under TDD; local-only, no inference or weights.

@@ -1,8 +1,8 @@
 {
   "project": "Triage-0 ADTC",
   "currentPhase": "structured-danger-evidence-plane-v2",
-  "currentStep": "revision-task-5",
-  "currentSubStep": "task-5-tdd-red",
+  "currentStep": "revision-task-6",
+  "currentSubStep": "task-6-tdd-red",
   "status": "in-progress",
   "autonomous_mode": true,
   "completedSteps": [
@@ -30,7 +30,8 @@
     "revision-task-1",
     "revision-task-2",
     "revision-task-3",
-    "revision-task-4"
+    "revision-task-4",
+    "revision-task-5"
   ],
   "expected_phases": [
     "contract-sources-and-real-finalist-gate",
@@ -147,7 +148,7 @@
       "phase": "structured-danger-evidence-plane-v2",
       "started_at": "2026-08-24T16:56:43Z",
       "completed_at": null,
-      "evidence": "IN PROGRESS: Tasks 1-4 committed at ffbebe4, 8c6d923, ff6d829, 8367bd8; Task 4 full suite 207 pass/0 fail/22 skip; Task 5 exact-one-JSON framing started under TDD"
+      "evidence": "IN PROGRESS: Tasks 1-5 committed through 4aabd44; Task 5 exact-one-JSON focused 12/12 and typecheck green; Task 6 split evidence planes started"
     }
   ],
   "fileGroups": {
@@ -423,6 +424,15 @@
       "written": true,
       "verified": true,
       "commit": "8367bd8"
+    },
+    "revision-task-5": {
+      "files": [
+        "scripts/medpsy-shared-runtime-v2/json-framing.ts",
+        "tests/medpsy-json-framing.test.ts"
+      ],
+      "written": true,
+      "verified": true,
+      "commit": "4aabd44"
     }
   },
   "deviations": [
@@ -1038,11 +1048,16 @@
       "command": "Task 4 typecheck/import manifest/static boundaries",
       "exitCode": 0,
       "result": "strict TypeScript; 76 immutable imports (57 reused, 19 modified-for-ADTC); diff clean; no project/tracked GGUF or partial; QVAC cache empty"
+    },
+    {
+      "command": "Task 5 exact-one-JSON focused + typecheck",
+      "exitCode": 0,
+      "result": "12 total; 12 pass; 0 fail/skip/todo; strict TypeScript clean; exact raw stdout preserved"
     }
   ],
   "screenshot_paths": [],
   "context_percentage": 0,
-  "timestamp": "2026-08-24T17:50:55Z",
+  "timestamp": "2026-08-24T17:55:38Z",
   "requirements_revision_workflow_run_id": "32684188985",
   "requirements_revision_workflow_head_sha": "29e75309ec083fa415525b148c01e5ca01cf5234",
   "requirements_revision_manifest_sha256": "0fc91427b1adb08129d5b5afc25c5c36578d871f9e778072fcebbc0df06d5b90",
@@ -1087,7 +1102,8 @@
     "Implemented deterministic structured-danger domain at 8c6d923; independently found and corrected model-selected severe-pneumonia authority leak under all-absent structured state while preserving non-respiratory safeguards.",
     "Task 3 RED exposed the intended pre-runtime validation leak but also triggered QVAC provisioning; interrupted immediately, audited exact process/path provenance, removed only incomplete run-created bytes, and added a mandatory no-triageContext/no-network observer regression before rerun.",
     "Implemented and committed production pre-model structured-danger gating at ff6d829; deterministic branches prove zero runtime calls, exact import ledger reconciled, and full suite passes 204/0/22.",
-    "Implemented worker-facing age and seven-observation checklist at 8367bd8; tampered age units remain disabled, chest indrawing is labeled non-emergency, model red_flags are not rendered, and full suite passes 207/0/22."
+    "Implemented worker-facing age and seven-observation checklist at 8367bd8; tampered age units remain disabled, chest indrawing is labeled non-emergency, model red_flags are not rendered, and full suite passes 207/0/22.",
+    "Implemented and committed exact-one-JSON framing at 4aabd44 after 10 expected adversarial failures; prefixes, suffixes, multiple values, truncation, malformed JSON, and mutated terminal markers fail closed."
   ],
   "what_is_needed": "Complete local Tasks 1-10 under the approved structured-danger and split-evidence revision; external publication, remote product evidence, named human review, physical target-laptop evidence, and model-decision signing remain separate unauthorized checkpoints.",
   "healthcare_recovery": {
@@ -1104,7 +1120,7 @@
     "planned_import_count": 76,
     "import_status": "complete",
     "import_red": "characterization RED: 1 test, 0 pass, 1 fail before excluded modality removal",
-    "import_resume_hint": "Structured-danger revision Tasks 1-4 are complete. Resume at Task 5 exact-one-JSON framing; preserve no-network/no-weight and immutable historical evidence boundaries.",
+    "import_resume_hint": "Structured-danger revision Tasks 1-5 are complete. Resume at Task 6 split product/raw evidence planes; preserve immutable historical evidence and no-weight boundaries.",
     "application_imported": true,
     "model_search_allowed": false,
     "model_decision_exists": false,

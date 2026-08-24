@@ -436,3 +436,9 @@ Commit `8367bd8` adds patient age and seven accessible tri-state observations to
 TDD recorded 12 total / 10 pass / 2 expected failures before the checklist API existed, a separate tampered-age-unit failure, and 13 total / 12 pass / 1 expected failure when a model-generated flag was deliberately exposed. Final independent evidence is focused 13/13, full suite 229 total / 207 pass / 0 fail / 22 un-ingested-store/citation skips, strict TypeScript, 76-entry manifest verification (57 reused, 19 modified-for-ADTC), clean diff, empty QVAC caches, and no project/tracked GGUF or partial artifact.
 
 A model-free runnable checkpoint was also exercised: the static UI returned HTTP 200 and a fully structured known-emergency request returned deterministic HTTP 200 SSE with the fixed IMCI citation and no QVAC/model access. This checkpoint does not prove the all-absent grounded MedPsy path, which truthfully still requires canonical model bytes and an ingested store.
+
+### Structured-danger revision Task 5 — exact-one-JSON framing
+
+Commit `4aabd44` adds a character-scanning adapter for official llama.cpp stdout. It tracks strings, escapes, and object/array nesting; preserves the original stdout byte-for-byte; returns the normalized JSON payload and explicit framing metadata; accepts only whitespace plus the documented terminal `[end of text]` marker; and fails closed on prefixes, suffixes, multiple values, truncation, malformed JSON, and mutated markers.
+
+TDD recorded 12 total / 2 pass / 10 expected failures before implementation. Fresh independent GREEN is 12/12 with zero failures/skips/todo; strict TypeScript and scoped diff checks pass. Source SHA-256 is `fbe8d54cd0e32efd0180cd4e33f03edc6b5dbe21ac38a92e88d09f52bce19db2`; test SHA-256 is `137f087dcb9aecfd1411b2046e0836738851c82dde568f46e104ba676c16e565`.
