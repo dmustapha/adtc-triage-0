@@ -71,8 +71,8 @@
 | DI-S1 | scope-handoff | forge | P0 | Freeze the narrow clinical taxonomy, exact claim, resource budgets, and feature observables | PRD and architecture encode real P0 behavior and cuttable QVAC adapters | done |
 | DI-S2 | scope-handoff | build | P0 | Reach an early valid Devpost submission-survival checkpoint before P1 work | Required repository, report, prompts, profiler values, video plan, and saved draft are present | open |
 | DI-S3 | scope-handoff | verify_preflight | P0 | Close every item in the ADTC-specific Definition of Done | Clean clone, offline app, parity, safety, provenance, physical evidence, and submitted Devpost entry pass | open |
-| DI-B1 | build | stress_test | P1 | Clarify the header `Online` badge so it cannot imply internet connectivity | Offline/localhost semantics are explicit and screenshot-tested | open |
-| DI-B2 | build | stress_test | P1 | Hide or qualify pre-run `This ran on the device` copy until inference evidence exists | Pre-run, deterministic-only, and real-inference states make no premature execution claim | open |
+| DI-B1 | build | stress_test | P1 | Clarify the header `Online` badge so it cannot imply internet connectivity | Verified five viewports and live transitions: badge says Browser online/offline and never implies inference | done |
+| DI-B2 | build | stress_test | P1 | Hide or qualify pre-run `This ran on the device` copy until inference evidence exists | Removed unconditional network-proof footer; pre-run model and egress proof remain absent until health evidence exists | done |
 | DI-W1 | wire | deploy | P1 | Replace the placeholder root REPORT with an evidence-bound healthcare report | Correct domain and identity placeholders remain explicit; no missing QVAC, physical, clinical, signing, or submission proof is promoted | open |
 
 ## Skill Sections
@@ -674,3 +674,56 @@
 
 #### For Next Skill
 - Design Forge may assess the verified local UI only; do not infer resident-model, offline-inference, clinical, physical, or submission proof.
+
+---
+### design_forge — 2026-08-24T20:17:47Z
+**Status:** SKIPPED
+**Session(s):** Design Gate Tier C
+
+#### Done
+- Recorded the user's explicit Tier C Design Gate answer.
+- Preserved the compact Triage-0 hierarchy and previously verified Chrome fidelity evidence.
+
+#### Key Decisions
+- [USER] [D-DF1] Skip Design Forge truthfully. Commit `06865d2` already restored and independently verified the intended compact hierarchy; Debug only corrected evidence copy and local security behavior.
+
+#### Blockers for Downstream
+- None introduced by the design skip. Existing QVAC, clinical, physical, signing, and submission claim blocks remain active.
+
+#### For Next Skill
+- Stress the existing verified UI and deterministic local path without redesigning it or promoting unavailable model evidence.
+
+---
+### stress_test — 2026-08-24T20:45:00Z
+**Status:** COMPLETE
+**Session(s):** 1
+
+#### Done
+- Executed 86 planned P0 case groups and six real Chrome captures.
+- Fixed one premature network-proof claim under focused RED/GREEN and updated provenance.
+- Passed 286/264/0/22 tests, typecheck, provenance, diff, JSON, process, weight, and secret gates.
+
+#### Additions (not in PRD/Architecture)
+- None.
+
+#### Deviations
+- [USER] Real GGUF/QVAC, physical Ubuntu, publication, and external mutation remained unauthorized.
+- [SKILL] Used an owned ephemeral Express listener because production correctly fails closed without canonical bytes.
+
+#### Verified Facts
+- [VF-ST1] Five widths have zero overflow; console has zero warnings; browser requests are loopback-only.
+- [VF-ST2] Browser online/offline and pre-run evidence copy remain truthful with empty store and no resident model.
+- [VF-ST3] Port 58507 is closed and no Stress process remains.
+
+#### Assumptions
+- None.
+
+#### Blockers for Downstream
+- Diagnosis-first classification plus antibiotic/management rendering remains beyond the narrow PRD claim.
+- Live QVAC/store, named review, physical Ubuntu, signing, profiler, media, and submission evidence remain absent.
+
+#### Key Decisions
+- [SKILL] [D-ST1] Confidence is 81/100 for the claim-limited local build only; Verify HOLD remains unchanged.
+
+#### For Next Skill
+- Deploy must remain no-mutation and claim-limited, action stale REPORT DI-W1, and preserve all evidence blocks.
