@@ -110,6 +110,31 @@ test("product evaluator accepts only complete real QVAC product-path rows", asyn
   assert.equal(output.gates.productPath.status, "pass");
 });
 
+test("product evaluator accepts mixed deterministic and real QVAC rows without weakening model invocation", async () => {
+  const fixture = await productFixture();
+  fixture.rows.push({
+    caseId: "CAL-PRODUCT-002",
+    evidenceKind: "real-product-execution",
+    modelInvoked: false,
+    structuredRoute: "DETERMINISTIC_EMERGENCY",
+    stages: ["deterministic-policy", "deterministic-reconciliation", "source-bound-plan-assembly"],
+    citationsValidated: true,
+    noEgress: true,
+    outputValid: true,
+    labelReviewStatus: "reviewed",
+    clinicalReview: {
+      reviewerName: "Test Fixture Reviewer",
+      reviewerRole: "test-only fixture",
+      reviewedAt: "2026-08-24T00:00:00Z",
+    },
+  } as any);
+  const { result, outputPath } = await evaluate(fixture);
+  assert.equal(result.status, 0, result.stderr);
+  const output = JSON.parse(await readFile(outputPath, "utf8"));
+  assert.equal(output.gates.productPath.status, "pass");
+  assert.equal(output.gates.productPath.result.modelInvokedCases, 1);
+});
+
 test("product evaluator rejects direct one-pass llama rows and unit fixtures", async () => {
   for (const input of [
     await productFixture({ producerKind: "direct-one-pass-llama.cpp" }),
@@ -305,4 +330,55 @@ test("product manifest binds the corpus, sealed holdout design, and review rubri
   for (const key of ["calibrationCorpus", "holdoutManifest", "reviewRubric", "corpusMethod"]) {
     assert.match(manifest.sourceHashes[key], /^[a-f0-9]{64}$/);
   }
+});
+
+test("QVAC v2 producer requires supported-platform evidence and calls the production orchestration", async () => {
+  const source = await readFile("scripts/medpsy-product-v2/run-qvac.ts", "utf8");
+  assert.match(source, /QVAC_SUPPORTED_PLATFORM_EVIDENCE/);
+  assert.match(source, /readFile\(supportedPlatformEvidencePath\)/);
+  assert.match(source, /supportedPlatformEvidenceSha256/);
+  assert.match(source, /GITHUB_ACTIONS/);
+  assert.match(source, /orchestrator\.getMedpsy/);
+  assert.match(source, /orchestrator\.getEmbeddings/);
+  assert.match(source, /runTriage\(/);
+  assert.match(source, /evaluateDangerPolicy\(/);
+  assert.match(source, /setTriageExecutionObserver/);
+  assert.match(source, /readPerfRows/);
+  assert.match(source, /retryAttempts/);
+  assert.match(source, /citationsValidated/);
+  assert.match(source, /guard\.arm\(true\)/);
+  assert.match(source, /guard\.violations/);
+  const loop = source.indexOf("for (const item");
+  const qvacBranch = source.indexOf('decision.route === "QVAC"');
+  const medpsyLoad = source.indexOf("orchestrator.getMedpsy");
+  const embeddingLoad = source.indexOf("orchestrator.getEmbeddings");
+  assert.ok(loop >= 0 && qvacBranch > loop, "each case reaches deterministic policy first");
+  assert.ok(medpsyLoad > qvacBranch && embeddingLoad > qvacBranch, "QVAC models load lazily only after the QVAC branch");
+});
+
+test("QVAC v2 producer fails closed before holdout and never claims Ubuntu support", async () => {
+  const source = await readFile("scripts/medpsy-product-v2/run-qvac.ts", "utf8");
+  assert.match(source, /calibrationEvaluationPath/);
+  assert.match(source, /calibration evaluation did not pass/);
+  assert.match(source, /calibration\.manifestSha256\s*!==\s*sha256\(manifestBytes\)/);
+  assert.match(source, /calibrationEvaluationSha256/);
+  assert.doesNotMatch(source, /QVAC.{0,40}(Ubuntu|ubuntu).{0,40}(support|supported)/s);
+  assert.match(source, /production-qvac-orchestration/);
+  assert.match(source, /supported-platform-qvac-product/);
+});
+
+test("QVAC producer separates public defaults from the internal conflict fixture before model access", async () => {
+  const corpus = JSON.parse(await readFile("config/medpsy-product-v2/calibration-corpus.json", "utf8"));
+  const omitted = corpus.cases.find((item: any) => item.id === "MPCAL2-019");
+  const conflict = corpus.cases.find((item: any) => item.id === "MPCAL2-020");
+  assert.equal(omitted.inputSurface, "public-structured-api");
+  assert.equal(omitted.request.dangerObservations, undefined);
+  assert.equal(conflict.inputSurface, "internal-reconciliation-fixture");
+  assert.equal(conflict.request.dangerObservations.vomitsEverything, "CONFLICT");
+
+  const source = await readFile("scripts/medpsy-product-v2/run-qvac.ts", "utf8");
+  assert.match(source, /item\.inputSurface === "internal-reconciliation-fixture"[\s\S]*\? item\.request[\s\S]*: StructuredDangerRequestSchema\.parse/);
+  const policy = source.indexOf("evaluateDangerPolicy(parsed.patientAge, parsed.dangerObservations)");
+  const qvac = source.indexOf('if (decision.route === "QVAC")');
+  assert.ok(policy >= 0 && qvac > policy, "internal conflict reaches deterministic policy before the QVAC boundary");
 });

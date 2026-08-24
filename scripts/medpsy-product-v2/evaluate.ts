@@ -16,8 +16,13 @@ const forbiddenSuffixes = fatal.forbiddenArtifactSuffixes.map((value: string) =>
 const artifacts = Array.isArray(input.artifacts) ? input.artifacts.map(String) : [];
 
 function productPathValid(row: any): boolean {
-  return row.evidenceKind === fatal.requiredEvidenceKind && row.modelInvoked === true &&
-    contract.requiredProductStages.every((stage: string) => row.stages?.includes(stage));
+  if (row.evidenceKind !== fatal.requiredEvidenceKind) return false;
+  if (row.modelInvoked === true) {
+    return contract.requiredProductStages.every((stage: string) => row.stages?.includes(stage));
+  }
+  const deterministicRoutes = new Set(["DETERMINISTIC_EMERGENCY", "ASSESSMENT_REQUIRED", "NON_EMERGENCY_PNEUMONIA"]);
+  return row.modelInvoked === false && deterministicRoutes.has(row.structuredRoute) &&
+    ["deterministic-policy", "deterministic-reconciliation"].every((stage) => row.stages?.includes(stage));
 }
 
 async function calibrationReady(): Promise<boolean> {

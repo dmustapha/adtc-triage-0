@@ -152,3 +152,41 @@ test("raw and product evidence labels cannot be confused", async () => {
   const { result } = await evaluate(rawFixture({ namespace: product.namespace, evidenceTier: product.evidenceTier }));
   assert.equal(result.status, 2);
 });
+
+test("raw v2 producer invokes pinned official llama.cpp and preserves dual hashes", async () => {
+  const source = await readFile("scripts/medpsy-raw-profiler-v2/run-raw.ts", "utf8");
+  assert.match(source, /normalizeJsonStdout/);
+  assert.match(source, /(?:execFile|run)\(\s*"llama-cli"/);
+  for (const token of ["-t", "4", "-ngl", "0", "-c", "2048", "-n", "128", "--temp", "0", "--jinja", "--single-turn"]) {
+    assert.ok(source.includes(JSON.stringify(token)), `pinned llama argument ${token}`);
+  }
+  assert.match(source, /rawSha256/);
+  assert.match(source, /normalizedSha256/);
+  assert.match(source, /contract\.candidate\.bytes/);
+  assert.match(source, /contract\.candidate\.sha256/);
+});
+
+test("evidence v2 workflow is raw-only Ubuntu evidence with strict cleanup and artifact allowlist", async () => {
+  const workflow = await readFile(".github/workflows/medpsy-evidence-v2.yml", "utf8");
+  for (const frozen of [
+    "qvac/MedPsy-1.7B-GGUF",
+    "fd4cecc90c2de8dce4b112795456a54be9c59363",
+    "medpsy-1.7b-q4_k_m-imat.gguf",
+    "1282439360",
+    "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880",
+    "c8ade30036139e32108fee53d8b7164dbfda4bee",
+  ]) assert.ok(workflow.includes(frozen), `workflow freezes ${frozen}`);
+  assert.match(workflow, /runs-on:\s*ubuntu-24\.04/);
+  assert.doesNotMatch(workflow, /self-hosted|larger-runner|runs-on:\s*\[[^\]]/);
+  assert.match(workflow, /run-raw\.ts/);
+  assert.doesNotMatch(workflow, /run-qvac\.ts|supported-platform-qvac-product/);
+  assert.match(workflow, /if:\s*success\(\)/);
+
+  const cleanup = workflow.indexOf("Remove model bytes, partials, and caches before upload");
+  const upload = workflow.indexOf("Upload strict raw evidence allowlist");
+  assert.ok(cleanup >= 0 && upload > cleanup, "cleanup precedes upload");
+  assert.match(workflow, /rm -rf .*model.*\.qvac/);
+  assert.match(workflow, /path:\s*\|\s*\n(?:\s+[^\n]+\n)+/);
+  assert.doesNotMatch(workflow.slice(upload), /^\s+evidence\/\*\*/m);
+  assert.doesNotMatch(workflow.slice(upload), /\.gguf|\.partial|\.part/);
+});
