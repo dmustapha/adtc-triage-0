@@ -110,7 +110,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "9cdbf5f8c4119123feaf122dd34cbd98e3d6942fa38bc99025d82b979b21fff9",
+      "destinationSha256": "83525d76d24532c04225aec6628b4a5abbfe134c7471f003b20d244fdcdd4186",
       "modification": {
         "status": "modified",
         "reason": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow."

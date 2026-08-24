@@ -8,10 +8,13 @@ test("pre-run performance panel does not claim an assessment or network proof", 
   const html = readFileSync(new URL("../public/app.html", import.meta.url), "utf8");
   const page = new JSDOM(html).window.document;
   const lead = page.querySelector(".perf-lead")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+  const footer = page.querySelector(".perf-foot span")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
   assert.doesNotMatch(lead, /this ran on the device/i);
   assert.doesNotMatch(lead, /no network was used/i);
   assert.match(lead, /run an assessment/i);
+  assert.doesNotMatch(footer, /nothing leaves this computer/i);
+  assert.match(footer, /egress guard is armed/i);
 });
 
 test("connectivity badge distinguishes browser reachability from app egress proof", () => {
