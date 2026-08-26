@@ -139,14 +139,20 @@
             <div class="reason" id="reasoning"></div>
           </div>
           <div id="card" class="hidden" role="status" aria-live="polite"></div>
+          <div id="continuationRegion" class="continuation-region hidden" aria-live="polite">
+            <p><strong>Optional supervised continuation.</strong> The deterministic respiratory result above remains authoritative. Continue only to request a provisional WHO classification for human review.</p>
+            <button id="continueAssessment" class="btn btn--primary" type="button">Continue to supervised WHO classification</button>
+            <p id="continuationStatus" class="status" role="status"></p>
+          </div>
           <div id="confirmationRegion" class="confirmation-region hidden" aria-live="polite">
-            <p><strong>Human review required.</strong> Confirm the provisional WHO protocol class, correct the record, or reject it. No reference action appears before confirmation.</p>
+            <p class="confirmation-instructions"><strong>Human review required.</strong> Confirm the provisional WHO protocol class, correct the record, or reject it. No reference action appears before confirmation.</p>
             <div class="confirmation-actions">
               <button id="confirmAssessment" class="btn btn--primary" type="button">Confirm reviewed class</button>
               <button id="correctAssessment" class="btn" type="button">Correct record</button>
               <button id="rejectAssessment" class="btn" type="button">Reject</button>
             </div>
             <p id="confirmationStatus" class="status" role="status"></p>
+            <div id="confirmationPlan"></div>
           </div>
           <div id="citationBox" class="hidden"></div>
           <div id="err" class="err" role="alert" aria-live="assertive"></div>

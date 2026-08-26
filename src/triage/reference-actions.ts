@@ -60,6 +60,16 @@ function matchingBand(bands: DoseBand[], age: number, weight: number): DoseBand 
   return matches.length === 1 ? matches[0]! : null;
 }
 
+function medicineBearingImmediate(entry: ProtocolEntry): boolean {
+  if (!entry.medicines.length) return false;
+  const text = entry.action.text.toLowerCase();
+  const namedMedicine = entry.medicines.some((medicine) => {
+    const names = medicine.name.toLowerCase().split(/\s*\+\s*|\s*\(|\//).filter((name) => name.length > 3);
+    return names.some((name) => text.includes(name));
+  });
+  return namedMedicine || /antibiotic|antimalarial|artesunate|quinine|zinc|\biron\b|therapeutic food|antiepileptic|medication/.test(text);
+}
+
 function sourcePlan(entry: ProtocolEntry, severity: Severity, selectedBands: Map<string, DoseBand> | null): ManagementPlan {
   const doc = docFor(entry.protocol);
   const cite = (page: number) => ({ doc, page });
@@ -68,7 +78,10 @@ function sourcePlan(entry: ProtocolEntry, severity: Severity, selectedBands: Map
     strength: medicine.strength,
     dose: medicine.dose,
     frequency: medicine.frequency,
-    bands: medicine.bands ? [selectedBands.get(medicine.name)!] : undefined,
+    bands: medicine.bands?.map((band) => ({ ...band, citation: cite(medicine.page) })),
+    ...(medicine.bands && selectedBands.get(medicine.name)
+      ? { selectedBand: { ...selectedBands.get(medicine.name)!, citation: cite(medicine.page) } }
+      : {}),
     citation: cite(medicine.page),
   }));
   const referral = entry.referral ?? (severity === "EMERGENCY" ? emergencyReferral(entry.protocol) : null);
@@ -81,8 +94,12 @@ function sourcePlan(entry: ProtocolEntry, severity: Severity, selectedBands: Map
       when: entry.follow_up.text,
       detail: entry.follow_up_detail?.text,
       citation: cite(entry.follow_up.page),
+      ...(entry.follow_up_detail ? { detailCitation: cite(entry.follow_up_detail.page) } : {}),
     } : null,
     referral: referral ? { criterion: referral.text, citation: cite(referral.page) } : null,
+    ...(!(selectedBands === null && medicineBearingImmediate(entry))
+      ? { immediateAction: { text: entry.action.text, citation: cite(entry.action.page) } }
+      : {}),
   };
 }
 
@@ -125,21 +142,29 @@ export function projectReferenceActions(
   const entry = lookupProtocol(classification);
   if (!entry) return { referenceActions: null, doseState: { status: "NOT_APPLICABLE", missingFields: [] } };
   if (entry.medicines.length === 0) {
-    return { referenceActions: sourcePlan(entry, severity, new Map()), doseState: { status: "NOT_APPLICABLE", missingFields: [] } };
+    return { referenceActions: sourcePlan(entry, severity, new Map()), doseState: { status: "NOT_APPLICABLE", missingFields: [], medicineReferenceAvailable: false } };
+  }
+
+  const hasDoseBands = entry.medicines.some((medicine) => Boolean(medicine.bands?.length));
+  if (!hasDoseBands) {
+    if (!safetyReady(eligibility)) {
+      return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_SAFETY_REVIEW", missingFields: [], medicineReferenceAvailable: true } };
+    }
+    return { referenceActions: sourcePlan(entry, severity, new Map()), doseState: { status: "NOT_APPLICABLE", missingFields: [], medicineReferenceAvailable: true } };
   }
 
   const missingFields = missingInputs(eligibility);
   if (missingFields.length) {
-    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_MISSING_INPUTS", missingFields } };
+    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_MISSING_INPUTS", missingFields, medicineReferenceAvailable: true } };
   }
   if (!safetyReady(eligibility)) {
-    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_SAFETY_REVIEW", missingFields: [] } };
+    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_SAFETY_REVIEW", missingFields: [], medicineReferenceAvailable: true } };
   }
 
   const selectedBands = selectBands(entry, eligibility.patientAgeMonths!, eligibility.patientWeightKg!);
   if (!selectedBands) {
-    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_SAFETY_REVIEW", missingFields: [] } };
+    return { referenceActions: lockedPlan(entry, severity), doseState: { status: "LOCKED_SAFETY_REVIEW", missingFields: [], medicineReferenceAvailable: true } };
   }
   const status = selectedBands.size ? "AVAILABLE_REFERENCE_BAND" : "NOT_APPLICABLE";
-  return { referenceActions: sourcePlan(entry, severity, selectedBands), doseState: { status, missingFields: [] } };
+  return { referenceActions: sourcePlan(entry, severity, selectedBands), doseState: { status, missingFields: [], medicineReferenceAvailable: true } };
 }

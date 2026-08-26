@@ -7,6 +7,8 @@ export interface ConfirmationBinding {
   citationKeys: string[];
   policyVersion: string;
   owner: string;
+  fixedSeverity?: "EMERGENCY" | "URGENT" | "ROUTINE" | "SELF_CARE" | "UNKNOWN";
+  sourceAction?: { text: string; doc: string; page: number };
 }
 
 export type ConfirmationDecision = "CONFIRM" | "REJECT";
@@ -37,11 +39,17 @@ function sameBinding(first: ConfirmationBinding, second: ConfirmationBinding): b
     && first.policyVersion === second.policyVersion
     && first.owner === second.owner
     && first.citationKeys.length === second.citationKeys.length
-    && first.citationKeys.every((key, index) => key === second.citationKeys[index]);
+    && first.citationKeys.every((key, index) => key === second.citationKeys[index])
+    && first.fixedSeverity === second.fixedSeverity
+    && JSON.stringify(first.sourceAction) === JSON.stringify(second.sourceAction);
 }
 
 function copyBinding(binding: ConfirmationBinding): ConfirmationBinding {
-  return { ...binding, citationKeys: [...binding.citationKeys] };
+  return {
+    ...binding,
+    citationKeys: [...binding.citationKeys],
+    ...(binding.sourceAction ? { sourceAction: { ...binding.sourceAction } } : {}),
+  };
 }
 
 function copyPayload(payload: ConfirmationPayload): ConfirmationPayload {
@@ -92,14 +100,7 @@ export class ConfirmationStore {
     if (record.binding.owner !== owner) return { ok: false, reason: "OWNER_MISMATCH" };
     if (expected && !sameBinding(record.binding, expected)) return { ok: false, reason: "BINDING_MISMATCH" };
     if (record.decision) {
-      if (record.decision !== decision) return { ok: false, reason: "USED" };
-      return {
-        ok: true,
-        decision,
-        binding: copyBinding(record.binding),
-        ...(record.payload ? { payload: copyPayload(record.payload) } : {}),
-        replayed: true,
-      };
+      return { ok: false, reason: "USED" };
     }
     record.decision = decision;
     return {

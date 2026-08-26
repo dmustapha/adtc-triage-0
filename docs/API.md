@@ -43,11 +43,21 @@ Send `Content-Type: application/json`:
 
 Age is bounded to 0–130 years or 0–1,560 months; weight to 0.5–300 kg. Observation values are `PRESENT`, `ABSENT`, or `NOT_ASSESSED`. Respiratory rate, when supplied, is an integer from 1 through 200.
 
-After validation, the response is `text/event-stream`. Deterministic routes emit `stage`, then either `assessment_required` or `citation` + `card`, then exactly one `done`. Model-assisted routes emit `job`, one or more `stage`, optional `citation` and `first_token`, `card`, optional `provisional`, then one `done`. Failure emits one `error`, then `done {"ok":false}`.
+After validation, the response is `text/event-stream`. Deterministic routes emit `stage`, then either `assessment_required` or `citation` + `card`, an optional `continuation` grant for eligible respiratory records, then exactly one `done`. The initial respiratory route never retrieves or runs the model. Broader non-respiratory model-assisted routes emit `job`, one or more `stage`, optional `citation` and `first_token`, `card`, optional `provisional`, then one `done`. Failure emits one `error`, then `done {"ok":false}`.
 
 The card is allowlisted to: `outcome`, `finding`, `basis`, `nextAssessmentStep`, `matchedCriteria`, `missingFields`, `recorded`, `thresholdComparison`, `emergencyObservations`, `sourceRule`, `assistance`, `uncertainty`, `reviewState`, `recordedFacts`, and `inferredFacts`. Classifier severity, raw red flags, diagnosis, prescription, and model-authored actions are excluded. A `provisional` event may name the human-gated WHO class and protocol.
 
 Pre-SSE failures are JSON: `400` invalid record, `409` narrative/structured conflict, `413` oversized body.
+
+## `POST /triage/continue`
+
+```json
+{ "token": "opaque grant from an eligible deterministic respiratory result" }
+```
+
+The strict token-only request explicitly continues the server-owned record snapshot. Unknown, expired, foreign-owner, replayed, altered or ineligible grants fail before inference. Queue saturation releases the reservation so the same owner can retry; once inference owns the job, the grant is consumed. Success is SSE: `job`, one or more real `stage`/`citation` events and optional `first_token`, `card`, `provisional`, then exactly one `done`. No management plan is sent before confirmation.
+
+Failures: `400` malformed/extra fields, `403 OWNER_MISMATCH`, `404 NOT_FOUND`, `409 USED` or `BINDING_MISMATCH`, `410 EXPIRED`, and the queue/recovery codes below.
 
 ## `POST /triage/confirm`
 
@@ -55,7 +65,7 @@ Pre-SSE failures are JSON: `400` invalid record, `409` narrative/structured conf
 { "token": "opaque grant from provisional event", "decision": "CONFIRM" }
 ```
 
-The decision is `CONFIRM` or `REJECT`. Grants are owner-, record-, class-, citation-, and policy-bound and expire after five minutes. An identical owner/decision replay is idempotent and returns `replayed:true`; a decision flip is rejected. Failures: `403 OWNER_MISMATCH`, `404 NOT_FOUND`, `409 USED` or `BINDING_MISMATCH`, `410 EXPIRED`.
+The decision is `CONFIRM` or `REJECT`. Grants are owner-, record-, class-, citation-, and policy-bound and expire after five minutes. Every decision consumes the grant; an identical replay and a decision flip are both rejected as `USED`. A confirmed response projects severity, cited immediate action and the complete eligible management plan only from the frozen protocol table. Failures: `403 OWNER_MISMATCH`, `404 NOT_FOUND`, `409 USED` or `BINDING_MISMATCH`, `410 EXPIRED`.
 
 ## `POST /assist`
 

@@ -116,8 +116,11 @@ export const ManagementPlanSchema = z.object({
         frequency: z.string().optional(), // e.g. "give two times daily for 5 days"
         duration: z.string().optional(),
         bands: z // real per-weight-band amounts (sourced from the WHO dosing tables, never fabricated)
-          .array(z.object({ band: z.string().min(1), dose: z.string().min(1) }))
+          .array(z.object({ band: z.string().min(1), dose: z.string().min(1), citation: PlanCitationSchema.optional() }))
           .optional(),
+        selectedBand: z.object({
+          band: z.string().min(1), dose: z.string().min(1), citation: PlanCitationSchema,
+        }).optional(),
         citation: PlanCitationSchema,
       }),
     )
@@ -126,10 +129,14 @@ export const ManagementPlanSchema = z.object({
   home_care: z.array(z.object({ advice: z.string().min(1), citation: PlanCitationSchema })).default([]),
   return_now: z.array(z.object({ sign: z.string().min(1), citation: PlanCitationSchema })).default([]),
   follow_up: z
-    .object({ when: z.string().min(1), detail: z.string().optional(), citation: PlanCitationSchema })
+    .object({
+      when: z.string().min(1), detail: z.string().optional(), citation: PlanCitationSchema,
+      detailCitation: PlanCitationSchema.optional(),
+    })
     .nullable()
     .default(null),
   referral: z.object({ criterion: z.string().min(1), citation: PlanCitationSchema }).nullable().default(null),
+  immediateAction: z.object({ text: z.string().min(1), citation: PlanCitationSchema }).optional(),
 });
 export type ManagementPlan = z.infer<typeof ManagementPlanSchema>;
 
@@ -162,11 +169,22 @@ export const ProvisionalAssessmentSchema = z.object({
 export const DoseStateSchema = z.object({
   status: z.enum(["NOT_APPLICABLE", "LOCKED_MISSING_INPUTS", "LOCKED_SAFETY_REVIEW", "AVAILABLE_REFERENCE_BAND"]),
   missingFields: z.array(z.string().min(1)),
+  medicineReferenceAvailable: z.boolean().optional(),
 }).strict();
 
 export const ConfirmedAssessmentSchema = z.object({
   reviewState: z.literal("CONFIRMED"),
   ...ProvisionalAssessmentShape,
+  referenceActions: ManagementPlanSchema,
+  doseState: DoseStateSchema,
+}).strict();
+
+export const ConfirmedReferenceResponseSchema = z.object({
+  reviewState: z.literal("CONFIRMED"),
+  classification: z.string().min(1),
+  protocol: z.enum(["IMCI", "mhGAP"]),
+  severity: z.enum(SEVERITIES),
+  immediateAction: z.object({ text: z.string().min(1), citation: PlanCitationSchema }).optional(),
   referenceActions: ManagementPlanSchema,
   doseState: DoseStateSchema,
 }).strict();

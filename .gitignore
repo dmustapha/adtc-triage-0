@@ -10,6 +10,11 @@ data/rag/citation-map.json
 node_modules/
 dist/
 .env
+.env.local
+.env*.local
+.vercel/
+.claude/
+build/
 .release-private-key.pem
 *.log
 .DS_Store

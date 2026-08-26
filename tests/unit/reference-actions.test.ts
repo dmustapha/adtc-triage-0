@@ -103,6 +103,8 @@ test("allergy, contraindication, and applicability gates keep medicine bands loc
     const result = project("PNEUMONIA", overrides);
     assert.equal(result.doseState.status, "LOCKED_SAFETY_REVIEW");
     assert.deepEqual(result.referenceActions?.medicines, []);
+    assert.equal(result.referenceActions?.immediateAction, undefined, "medicine-bearing immediate action stays locked");
+    assert.ok(result.referenceActions?.home_care.length, "non-medicine actions remain visible");
   }
 });
 
@@ -118,7 +120,11 @@ test("amoxicillin age and weight boundaries select exactly one source row withou
   for (const { patientAgeMonths, patientWeightKg, band } of cases) {
     const result = project("PNEUMONIA", { patientAgeMonths, patientWeightKg });
     assert.equal(result.doseState.status, "AVAILABLE_REFERENCE_BAND");
-    assert.deepEqual(result.referenceActions?.medicines[0]?.bands?.map((row) => row.band), [band]);
+    assert.equal(result.referenceActions?.medicines[0]?.selectedBand?.band, band);
+    assert.deepEqual(
+      result.referenceActions?.medicines[0]?.bands?.map((row) => row.band),
+      PROTOCOL_TABLE.PNEUMONIA.medicines[0]?.bands?.map((row) => row.band),
+    );
   }
 });
 
@@ -139,7 +145,7 @@ test("every encoded dose table selects exact boundary rows and rejects conflicti
   for (const [classification, patientAgeMonths, patientWeightKg, band] of cases) {
     const result = project(classification, { patientAgeMonths, patientWeightKg });
     assert.equal(result.doseState.status, "AVAILABLE_REFERENCE_BAND", `${classification}: ${band}`);
-    assert.equal(result.referenceActions?.medicines[0]?.bands?.[0]?.band, band);
+    assert.equal(result.referenceActions?.medicines[0]?.selectedBand?.band, band);
   }
 
   const conflicting = project("PNEUMONIA", { patientAgeMonths: 12, patientWeightKg: 9.999 });
@@ -158,7 +164,7 @@ test("multi-medicine tables select one source row per medicine", () => {
   for (const [patientAgeMonths, patientWeightKg, orsBand, zincBand] of cases) {
     const result = project("SOME DEHYDRATION", { patientAgeMonths, patientWeightKg });
     assert.equal(result.doseState.status, "AVAILABLE_REFERENCE_BAND");
-    assert.deepEqual(result.referenceActions?.medicines.map((medicine) => medicine.bands?.[0]?.band), [orsBand, zincBand]);
+    assert.deepEqual(result.referenceActions?.medicines.map((medicine) => medicine.selectedBand?.band), [orsBand, zincBand]);
   }
 });
 
@@ -168,12 +174,45 @@ test("classes without a source dose band remain explicitly not applicable", () =
   assert.deepEqual(result.doseState.missingFields, []);
 });
 
+test("adult mhGAP medicines without weight bands do not require pediatric dose inputs", () => {
+  const result = project("DEPRESSION", {
+    patientAgeMonths: undefined,
+    patientWeightKg: undefined,
+  });
+  assert.equal(result.doseState.status, "NOT_APPLICABLE");
+  assert.deepEqual(result.doseState.missingFields, []);
+  assert.deepEqual(result.referenceActions?.medicines.map((medicine) => ({
+    name: medicine.name,
+    frequency: medicine.frequency,
+  })), [{
+    name: "Fluoxetine",
+    frequency: "Start 10 mg daily for one week then 20 mg daily",
+  }]);
+});
+
 test("reference output never adds an individualized dose or prescription sentence", () => {
   const result = project("PNEUMONIA");
   assert.equal(result.doseState.status, "AVAILABLE_REFERENCE_BAND");
   assert.doesNotMatch(publicText(result), /computedDose|prescription|you should (take|give)|administer to (the|this) patient/i);
   for (const medicine of result.referenceActions?.medicines ?? []) {
     assert.equal(Object.hasOwn(medicine, "computedDose"), false);
-    assert.equal(medicine.bands?.length, 1, "only the applicable frozen source row is shown");
+    assert.ok(medicine.bands?.length, "the complete frozen source table is shown");
+    assert.ok(medicine.selectedBand, "one applicable source row is identified separately");
+  }
+});
+
+test("every dose row and follow-up detail carries its own source citation", () => {
+  for (const [classification, entry] of Object.entries(PROTOCOL_TABLE)) {
+    const result = project(classification);
+    for (const medicine of result.referenceActions?.medicines ?? []) {
+      for (const row of medicine.bands ?? []) {
+        assert.deepEqual(row.citation, { doc: docFor(entry.protocol), page: entry.medicines.find((item) => item.name === medicine.name)?.page });
+      }
+    }
+    if (entry.follow_up_detail) {
+      assert.deepEqual(result.referenceActions?.follow_up?.detailCitation, {
+        doc: docFor(entry.protocol), page: entry.follow_up_detail.page,
+      });
+    }
   }
 });

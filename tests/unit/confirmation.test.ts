@@ -39,8 +39,7 @@ test("confirmation and rejection are terminal one-use decisions", async () => {
     const grant = store.issue(binding);
     assert.equal(store.consume(grant.token, binding.owner, decision, binding).ok, true);
     const replay = store.consume(grant.token, binding.owner, decision, binding);
-    assert.equal(replay.ok, true, "retrying the same semantic decision is idempotent");
-    if (replay.ok) assert.equal(replay.replayed, true);
+    assert.deepEqual(replay, { ok: false, reason: "USED" });
     const opposite = decision === "CONFIRM" ? "REJECT" : "CONFIRM";
     assert.deepEqual(store.consume(grant.token, binding.owner, opposite, binding), { ok: false, reason: "USED" });
   }

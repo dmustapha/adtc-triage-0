@@ -126,13 +126,10 @@ test("respiratory boundaries are deterministic at 50 and 40 while 49 and 39 reta
     }), { owner: "matrix-owner" });
 
     assert.equal(result.outcome, fast ? "PROMPT_SUPERVISED_REVIEW" : "NO_ESCALATION_CRITERION_RECORDED");
-    if (fast) assert.deepEqual(harness.calls, []);
-    else {
-      assert.deepEqual(harness.calls, ["context", "route", "retrieval", "model"]);
-      assert.equal(result.reviewState, "DETERMINISTIC");
-      assert.equal(result.classification, undefined);
-      assert.equal((result.assistance as { status?: string })?.status, "COMPLETED");
-    }
+    assert.deepEqual(harness.calls, []);
+    assert.equal(result.reviewState, "DETERMINISTIC");
+    assert.equal(result.classification, undefined);
+    assert.equal(result.assistance, undefined, "the internal deterministic result carries no model assistance");
   }
 });
 

@@ -104,6 +104,20 @@ test("tracked public artifacts state the revised authority and evidence split", 
   assert.doesNotMatch(claims, /raw one-pass extraction proves product safety/i);
 });
 
+test("public documentation describes respiratory continuation and one-use confirmation truthfully", async () => {
+  const readme = await readFile("README.md", "utf8");
+  const report = await readFile("REPORT.md", "utf8");
+  const api = await readFile("docs/API.md", "utf8");
+
+  assert.match(readme, /POST[^\n]*`\/triage\/continue`/);
+  assert.match(api, /## `POST \/triage\/continue`/);
+  assert.match(api, /replay[^\n]*rejected/i);
+  assert.doesNotMatch(api, /replay is idempotent/i);
+  assert.match(report, /eligible respiratory[^\n]*explicit continuation/i);
+  assert.match(report, /complete[^\n]*management plan/i);
+  assert.doesNotMatch(report, /management-plan output is suppressed at server and renderer boundaries/i);
+});
+
 async function historicalRunAggregate(): Promise<string> {
   const root = "evidence/medpsy-shared-runtime-v1/remote-run-32742482642";
   const files: string[] = [];

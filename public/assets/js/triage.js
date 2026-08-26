@@ -63,11 +63,13 @@
     phase: "RECORD",
     requestFingerprint: null,
     confirmationToken: null,
+    continuationToken: null,
     abortController: null,
     terminal: false,
     recordChangedDuringRun: false,
     generation: 0,
     confirmationPending: false,
+    continuationPending: false,
   };
 
   function clinicalInput() { return $("clinicalCase") || $("case"); }
@@ -464,7 +466,36 @@
       var provenance = card.querySelector(".supporting-reference, .assistance, .uncertainty");
       if (provenance) provenance.insertAdjacentElement("beforebegin", summary); else card.append(summary);
     }
-    if ($("confirmationRegion")) $("confirmationRegion").classList.remove("hidden");
+    if ($("confirmationRegion")) {
+      $("confirmationRegion").classList.remove("hidden");
+      var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
+      var actions = $("confirmationRegion").querySelector(".confirmation-actions");
+      if (instructions) instructions.classList.remove("hidden");
+      if (actions) actions.classList.remove("hidden");
+    }
+  }
+
+  function renderContinuation(data) {
+    if (!data || !data.eligible || !data.token || !$('continuationRegion')) return;
+    clinicalState.continuationToken = data.token;
+    clinicalState.phase = "DETERMINISTIC";
+    if ($('continueAssessment')) $('continueAssessment').textContent = "Continue to supervised WHO classification";
+    $('continuationRegion').classList.remove('hidden');
+    $('continuationStatus').textContent = "Ready for optional local model-assisted review.";
+  }
+
+  function citationText(citation) {
+    if (!citation || !citation.doc || citation.page == null) return "";
+    return citation.doc + ", page " + citation.page + ".";
+  }
+
+  function appendCitation(parent, citation) {
+    var text = citationText(citation);
+    if (!text) return;
+    var cite = document.createElement("small");
+    cite.className = "plan-citation";
+    cite.textContent = "Source: " + text;
+    parent.appendChild(cite);
   }
 
   function appendActionList(parent, heading, items, valueKey) {
@@ -475,7 +506,11 @@
     var list = document.createElement("ul");
     items.forEach(function (item) {
       var row = document.createElement("li");
-      row.textContent = item[valueKey] || item.name || "Source action";
+      var value = item && (item[valueKey] || item.name);
+      var text = document.createElement("span");
+      text.textContent = value || "Source action";
+      row.appendChild(text);
+      appendCitation(row, item && item.citation);
       list.appendChild(row);
     });
     section.append(title, list);
@@ -483,43 +518,179 @@
   }
 
   function renderReferenceActions(result) {
-    if (!$("confirmationRegion")) return;
+    if (!$("confirmationRegion") || !$("confirmationPlan")) return;
     $("confirmationRegion").classList.remove("hidden");
-    $("confirmationRegion").textContent = "";
+    var target = $("confirmationPlan");
+    target.textContent = "";
+    var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
+    var controls = $("confirmationRegion").querySelector(".confirmation-actions");
+    if (instructions) instructions.classList.add("hidden");
+    if (controls) controls.classList.add("hidden");
     var title = document.createElement("h3");
-    title.textContent = "Confirmed WHO reference actions";
-    $("confirmationRegion").appendChild(title);
+    title.textContent = "Confirmed WHO management plan";
+    target.appendChild(title);
     var actions = result.referenceActions || {};
-    appendActionList($("confirmationRegion"), "Referral", actions.referral ? [actions.referral] : [], "criterion");
-    appendActionList($("confirmationRegion"), "Return now", actions.return_now, "sign");
-    appendActionList($("confirmationRegion"), "Supportive actions", actions.supportive, "item");
-    appendActionList($("confirmationRegion"), "Home care", actions.home_care, "advice");
-    appendActionList($("confirmationRegion"), "Medicine source rows", actions.medicines, "name");
-    if (!actions.medicines || !actions.medicines.length) return;
-    var dose = document.createElement("p");
-    dose.className = "dose-state";
-    dose.textContent = "Dose-band state: " + formatEnum(result.doseState && result.doseState.status);
-    if (result.doseState && result.doseState.missingFields && result.doseState.missingFields.length) {
-      dose.textContent += ". Missing: " + result.doseState.missingFields.join(", ");
+    var summary = document.createElement("section");
+    summary.className = "confirmed-summary";
+    var identity = document.createElement("p");
+    identity.textContent = "Classification: " + (result.classification || "Not available") + ". Severity: " + formatEnum(result.severity || "UNKNOWN") + ".";
+    summary.appendChild(identity);
+    var immediate = result.immediateAction || actions.immediateAction;
+    if (immediate && immediate.text) {
+      var immediateTitle = document.createElement("h4");
+      immediateTitle.textContent = "Immediate action";
+      var immediateText = document.createElement("p");
+      immediateText.textContent = immediate.text;
+      summary.append(immediateTitle, immediateText);
+      appendCitation(summary, immediate.citation);
     }
-    if (result.doseState && result.doseState.status === "LOCKED_SAFETY_REVIEW") {
-      dose.textContent += ". Complete the allergy, contraindication, and protocol-applicability review before medicine source rows can unlock.";
-      ["allergiesReviewed", "contraindicationsReviewed", "protocolApplicability"].forEach(function (id) {
-        if ($(id)) $(id).setAttribute("aria-invalid", String($(id).value === "NOT_ASSESSED"));
+    target.appendChild(summary);
+    appendActionList(target, "Referral", actions.referral ? [actions.referral] : [], "criterion");
+    if (actions.medicines && actions.medicines.length) {
+      var medicines = document.createElement("section");
+      var medicineTitle = document.createElement("h4");
+      medicineTitle.textContent = "Medicines and source dose table";
+      medicines.appendChild(medicineTitle);
+      actions.medicines.forEach(function (medicine) {
+        var article = document.createElement("article");
+        article.className = "medicine-card";
+        var name = document.createElement("h5");
+        name.textContent = medicine.name || "Source medicine";
+        article.appendChild(name);
+        [["Medicine strength", medicine.strength], ["Frequency", medicine.frequency], ["Source dose instruction", medicine.dose]].forEach(function (row) {
+          if (!row[1]) return;
+          var detail = document.createElement("p");
+          detail.textContent = row[0] + ": " + row[1];
+          article.appendChild(detail);
+        });
+        appendCitation(article, medicine.citation);
+        if (medicine.bands && medicine.bands.length) {
+          var tableWrap = document.createElement("div");
+          tableWrap.className = "dose-table-wrap";
+          var table = document.createElement("table");
+          var head = document.createElement("thead");
+          var headRow = document.createElement("tr");
+          ["Source band", "Source amount", "Selection"].forEach(function (label) {
+            var th = document.createElement("th"); th.scope = "col"; th.textContent = label; headRow.appendChild(th);
+          });
+          head.appendChild(headRow); table.appendChild(head);
+          var body = document.createElement("tbody");
+          medicine.bands.forEach(function (band) {
+            var selected = medicine.selectedBand && medicine.selectedBand.band === band.band && medicine.selectedBand.dose === band.dose;
+            var tr = document.createElement("tr");
+            if (selected) tr.className = "is-selected";
+            var cells = [];
+            [band.band, band.dose, selected ? "Selected source band" : "Reference row"].forEach(function (value) {
+              var td = document.createElement("td"); td.textContent = value; tr.appendChild(td);
+              cells.push(td);
+            });
+            appendCitation(cells[2], band.citation);
+            body.appendChild(tr);
+          });
+          table.appendChild(body); tableWrap.appendChild(table); article.appendChild(tableWrap);
+        }
+        medicines.appendChild(article);
       });
+      target.appendChild(medicines);
     }
-    $("confirmationRegion").appendChild(dose);
+    appendActionList(target, "Supportive care", actions.supportive, "item");
+    appendActionList(target, "Home care", actions.home_care, "advice");
+    appendActionList(target, "Return immediately", actions.return_now, "sign");
+    if (actions.follow_up) {
+      appendActionList(target, "Follow-up timing", [{ item: actions.follow_up.when, citation: actions.follow_up.citation }], "item");
+      if (actions.follow_up.detail) appendActionList(target, "Assess at follow-up", [{ item: actions.follow_up.detail, citation: actions.follow_up.detailCitation }], "item");
+    }
+    if ((actions.medicines && actions.medicines.length) || (result.doseState && result.doseState.medicineReferenceAvailable)) {
+      var dose = document.createElement("p");
+      dose.className = "dose-state";
+      dose.textContent = "Dose-band state: " + formatEnum(result.doseState && result.doseState.status);
+      if (result.doseState && result.doseState.missingFields && result.doseState.missingFields.length) {
+        dose.textContent += ". Missing: " + result.doseState.missingFields.join(", ");
+      }
+      if (result.doseState && result.doseState.status === "LOCKED_SAFETY_REVIEW") {
+        dose.textContent += ". Complete the allergy, contraindication, and protocol-applicability review before medicine source rows can unlock.";
+        ["allergiesReviewed", "contraindicationsReviewed", "protocolApplicability"].forEach(function (id) {
+          if ($(id)) $(id).setAttribute("aria-invalid", String($(id).value === "NOT_ASSESSED"));
+        });
+      }
+      target.appendChild(dose);
+    }
   }
 
   function invalidateConfirmation() {
     clinicalState.generation += 1;
     clinicalState.phase = "RECORD";
     clinicalState.confirmationToken = null;
+    clinicalState.continuationToken = null;
     clinicalState.confirmationPending = false;
+    clinicalState.continuationPending = false;
     ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
     if ($("confirmationRegion")) {
-      $("confirmationRegion").textContent = "";
+      if ($("confirmationPlan")) $("confirmationPlan").textContent = "";
+      var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
+      var actions = $("confirmationRegion").querySelector(".confirmation-actions");
+      if (instructions) instructions.classList.remove("hidden");
+      if (actions) actions.classList.remove("hidden");
       $("confirmationRegion").classList.add("hidden");
+    }
+    if ($("continuationRegion")) {
+      $("continuationRegion").classList.add("hidden");
+      if ($("continuationStatus")) $("continuationStatus").textContent = "";
+    }
+  }
+
+  async function sendContinuation() {
+    if (!clinicalState.continuationToken || clinicalState.continuationPending || assessCtl) return;
+    var token = clinicalState.continuationToken;
+    var generation = clinicalState.generation;
+    clinicalState.continuationPending = true;
+    clinicalState.continuationToken = null;
+    if ($("continueAssessment")) $("continueAssessment").disabled = true;
+    $("continuationStatus").textContent = "Starting local supervised WHO review.";
+    assessCtl = new AbortController();
+    gotTerminal = false;
+    $("reasoningWrap").classList.remove("hidden");
+    startReasonTimer();
+    var buffer = "";
+    try {
+      var response = await fetch("/triage/continue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token }),
+        signal: assessCtl.signal,
+      });
+      if (!response.ok || !response.body) {
+        var failure = { error: "Continuation was not accepted." };
+        try { failure = await response.json(); } catch (e) {}
+        throw new Error(failure.error);
+      }
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      for (;;) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        var split;
+        while ((split = buffer.indexOf("\n\n")) >= 0) {
+          if (generation === clinicalState.generation) handleEvent(buffer.slice(0, split));
+          buffer = buffer.slice(split + 2);
+        }
+      }
+      if (generation === clinicalState.generation && !gotTerminal) throw new Error("No validated continuation result was received.");
+    } catch (error) {
+      if (generation === clinicalState.generation) {
+        $("err").textContent = error && error.name === "AbortError"
+          ? "The supervised continuation was stopped. Run the assessment again for a new one-use grant."
+          : "The deterministic respiratory result remains valid. " + (error.message || "Local continuation was unavailable.");
+      }
+    } finally {
+      stopReasonTimer();
+      assessCtl = null;
+      if (generation === clinicalState.generation) {
+        clinicalState.continuationPending = false;
+        $("continuationRegion").classList.add("hidden");
+        if ($("continueAssessment")) $("continueAssessment").disabled = false;
+      }
     }
   }
 
@@ -566,7 +737,7 @@
       clinicalState.phase = result.reviewState;
       if (result.reviewState === "CONFIRMED") renderReferenceActions(result);
       else if ($("confirmationRegion")) {
-        $("confirmationRegion").textContent = "The provisional classification was rejected. No reference actions were shown.";
+        if ($("confirmationPlan")) $("confirmationPlan").textContent = "The provisional classification was rejected. No reference actions were shown.";
       }
     } finally {
       if (generation === clinicalState.generation) {
@@ -659,6 +830,8 @@
       }
     } else if (ev === "provisional") {
       renderProvisional(d);
+    } else if (ev === "continuation") {
+      renderContinuation(d);
     } else if (ev === "abstain") {
       gotTerminal = true;
       finishStages();
@@ -801,6 +974,7 @@
     $("clinicalModePanel").addEventListener("change", function () { invalidateClinicalResult(); updateDangerChecklist(); });
   }
   if ($("confirmAssessment")) $("confirmAssessment").onclick = function () { sendConfirmation("CONFIRM").catch(function (e) { $("err").textContent = e.message; }); };
+  if ($("continueAssessment")) $("continueAssessment").onclick = function () { sendContinuation().catch(function (e) { $("err").textContent = e.message; }); };
   if ($("rejectAssessment")) $("rejectAssessment").onclick = function () { sendConfirmation("REJECT").catch(function (e) { $("err").textContent = e.message; }); };
   if ($("correctAssessment")) $("correctAssessment").onclick = function () { invalidateClinicalResult(); clinicalInput().focus(); };
   // Ctrl/Cmd+Enter from the case box submits, the way a clinician expects.
@@ -1039,6 +1213,8 @@
       updateDangerChecklist: updateDangerChecklist,
       invalidateClinicalResult: invalidateClinicalResult,
       renderProvisional: renderProvisional,
+      renderContinuation: renderContinuation,
+      sendContinuation: sendContinuation,
       sendConfirmation: sendConfirmation,
       clinicalState: clinicalState,
     };

@@ -28,7 +28,7 @@ const allAbsent = Object.fromEntries([
   "lowOxygenOrCentralCyanosis",
 ].map((key) => [key, "ABSENT"]));
 
-test("a failed MedPsy request initialization never starts the embeddings runtime", async () => {
+test("initial respiratory review is model-free and a failed continuation initializes MedPsy before embeddings", async () => {
   const runtime = orchestrator as unknown as {
     getMedpsy(): Promise<string>;
     getEmbeddings(): Promise<string>;
@@ -62,8 +62,22 @@ test("a failed MedPsy request initialization never starts the embeddings runtime
 
     assert.match(stream, /event: card/);
     assert.match(stream, /"outcome":"NO_ESCALATION_CRITERION_RECORDED"/);
-    assert.match(stream, /"assistance":\{"status":"UNAVAILABLE"/);
+    assert.match(stream, /"assistance":\{"status":"NOT_RUN"/);
+    assert.match(stream, /event: continuation/);
     assert.doesNotMatch(stream, /event: error/);
+    assert.equal(embeddingCalls, 0, "initial respiratory policy must not acquire either runtime");
+
+    const token = JSON.parse(stream.match(/event: continuation\ndata: (.+)/)![1]!).token;
+    const cookie = response.headers.get("set-cookie")?.split(";")[0];
+    const continued = await fetch(`${base}/triage/continue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(cookie ? { Cookie: cookie } : {}) },
+      body: JSON.stringify({ token }),
+    });
+    const continuedStream = await continued.text();
+    assert.match(continuedStream, /event: card/);
+    assert.match(continuedStream, /"reviewState":"DETERMINISTIC"/);
+    assert.match(continuedStream, /"assistance":\{"status":"UNAVAILABLE"/);
     assert.equal(embeddingCalls, 0, "embedding acquisition must wait for successful MedPsy initialization");
   } finally {
     runtime.getMedpsy = originalMedpsy;

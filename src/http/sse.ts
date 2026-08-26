@@ -10,7 +10,7 @@ export type SseStream = {
 export function openSse(response: Response, onDisconnect: () => void): SseStream {
   let open = true;
   response.setHeader("Content-Type", "text/event-stream");
-  response.setHeader("Cache-Control", "no-cache");
+  if (!response.hasHeader("Cache-Control")) response.setHeader("Cache-Control", "no-cache");
   response.setHeader("Connection", "keep-alive");
   response.flushHeaders?.();
   response.on("close", () => {

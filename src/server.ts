@@ -26,6 +26,7 @@ import { loadModelContract, readModelIdentity } from "./model-contract.js";
 import { createRestoredApp, registerRestoredRoutes } from "./http/create-app.js";
 import { createSupervisedWorkflow } from "./triage/supervised-workflow.js";
 import { ConfirmationStore } from "./triage/confirmation.js";
+import { ContinuationStore } from "./triage/continuation.js";
 import { projectReferenceActions } from "./triage/reference-actions.js";
 import { createPromptRunner } from "./prompt/runner.js";
 import { runtimeDiagnostics, safeErrorName } from "./logging.js";
@@ -176,12 +177,14 @@ if (config.debugRoute) {
 }
 
 const confirmationStore = new ConfirmationStore();
+const continuationStore = new ContinuationStore();
 const supervisedWorkflow = createSupervisedWorkflow({
   getContext: triageContext,
   routeCase,
   retrieveGrounding,
   triageFromHits,
   confirmationStore,
+  continuationStore,
   policyVersion: "restored-workflow-v1",
 });
 const localPromptRunner = createPromptRunner();

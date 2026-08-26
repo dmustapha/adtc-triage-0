@@ -5,7 +5,7 @@ Triage-0 is a local healthcare review tool for trained or supervised community h
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![QVAC SDK](https://img.shields.io/badge/QVAC_SDK-0.13.3-111827)](https://docs.qvac.tether.io/reference/release-notes/v0.13.x/)
-[![Tests](https://img.shields.io/badge/tests-512%2F512-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/latest_full_gate-533%2F533-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 This is an offline localhost product. There is no hosted inference service.
@@ -16,7 +16,7 @@ This is an offline localhost product. There is no hosted inference service.
 
 Frontline health workers often operate with weak connectivity, limited hardware and strict privacy constraints. Triage-0 provides two local workflows:
 
-1. A supervised WHO review that keeps emergency and respiratory decisions in deterministic code.
+1. A supervised WHO review that keeps emergency and respiratory decisions in deterministic code, then lets an eligible worker explicitly continue to provisional WHO classification and a human-confirmed source plan.
 2. An ordinary prompt runner that restores the original two-pass MedPsy workflow for bounded local questions.
 
 Both workflows share one serialized QVAC inference queue. The product uses one checksum-locked GGUF and makes no inference-time network calls after startup prewarming.
@@ -26,7 +26,7 @@ Both workflows share one serialized QVAC inference queue. The product uses one c
 - **Clinical authority is explicit:** recorded observations and fixed policy control emergency escalation.
 - **Respiratory thresholds are computed, not generated:** 2 to 11 months uses 50 breaths/minute or more; 12 to 59 months uses 40 breaths/minute or more.
 - **Model assistance is subordinate:** MedPsy may support a supervised review but cannot change a deterministic public finding.
-- **Source actions require confirmation:** provisional WHO classes do not unlock frozen source content until the same browser owner confirms the exact record.
+- **Source actions require confirmation:** eligible respiratory records require an explicit continuation first; provisional WHO classes do not unlock the complete frozen, cited management plan until the same browser owner confirms the exact record.
 - **Ordinary prompts are genuine:** the Prompt Review tab runs a 1,024-token reasoning pass, then a 512-token schema-constrained extraction and deterministic validation.
 - **Everything runs locally:** QVAC SDK 0.13.3 loads MedPsy and performs semantic WHO retrieval on the development machine.
 - **The official evidence path stays separate:** pinned direct `llama.cpp` uses the identical model bytes for participant profiling and prompt evidence.
@@ -50,7 +50,7 @@ Browser on 127.0.0.1
   |      |
   |      +--> Emergency and respiratory policy --> Public result
   |      |
-  |      +--> Eligible supervised review
+  |      +--> Eligible explicit continuation
   |              |
   |              v
   +--> Ordinary prompt --> Shared bounded FIFO queue
@@ -63,15 +63,18 @@ Browser on 127.0.0.1
                          |           |
                          +-----+-----+
                                v
-                    Schema validation and
-                    deterministic reconciliation
+                    Provisional classification
+                              |
+                     Human confirmation
+                              |
+                 Complete frozen WHO source plan
 
 Same GGUF bytes --> pinned direct llama.cpp --> official profiler evidence
 ```
 
 ### Authority order
 
-The server validates the structured record before allocating QVAC work. Any recorded emergency observation returns an emergency result immediately. Missing, conflicting or unsupported inputs fail closed. Complete supported respiratory records use the exact age threshold. Only unresolved supervised review cases and ordinary prompts enter the native inference queue.
+The server validates the structured record before allocating QVAC work. Any recorded emergency observation returns an emergency result immediately. Missing, conflicting or unsupported inputs fail closed. Complete supported respiratory records use the exact age threshold and return that deterministic result before any inference. Eligible fast-breathing, chest-indrawing and complete below-threshold records enter the native queue only after the worker explicitly continues. MedPsy may then propose a reconciled WHO class; only one-use human confirmation reveals the complete deterministic source plan. Ordinary prompts use their separate queue path.
 
 ### Model and source identity
 
@@ -110,8 +113,8 @@ npm run typecheck
 npm test
 npm run verify-import-manifest
 
-# Current verified result:
-# 512 tests passed, 0 failed, 0 skipped
+# Fresh deploy-to-GitHub release gate after the Interrogate documentation correction:
+# 533 tests passed, 0 failed, 0 skipped
 # 76 imported files verified against Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f
 ```
 
@@ -136,7 +139,7 @@ curl http://127.0.0.1:3010/health
 
 ### Suggested review cases
 
-1. Click **English example**, run the assessment and verify `32/min is below 40/min`.
+1. Click **English example**, run the assessment and verify `32/min is below 40/min`; then explicitly continue, review the provisional class and confirm it to inspect the complete cited plan.
 2. Mark **Cannot drink or breastfeed** present and verify the deterministic emergency route completes without model assistance.
 3. Open **Ask the local model**, select submitted Prompt 1 and verify it does not invent a respiratory rate.
 4. Run submitted Prompt 2 and verify it says the checklist must be completed before model-assisted review.
@@ -149,7 +152,8 @@ Do not start a second server or ingest worker. The native WHO store has single-w
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/health` | Report model, RAG, egress and queue readiness |
-| `POST` | `/triage` | Run deterministic or model-assisted supervised assessment over SSE |
+| `POST` | `/triage` | Return a deterministic respiratory result or run a broader supervised assessment over SSE |
+| `POST` | `/triage/continue` | Explicitly continue an eligible respiratory result through local WHO retrieval and provisional classification |
 | `POST` | `/triage/confirm` | Confirm or reject an owner-bound provisional result |
 | `POST` | `/assist` | Run a bounded ordinary prompt over SSE |
 | `DELETE` | `/jobs/:id` | Cancel an owned queued or active job |
@@ -193,7 +197,8 @@ tests/                  Unit, integration and real-runtime tests
 - Strict egress blocking is armed after startup prewarming.
 - Patient narratives are not persisted by the application.
 - Internal reasoning is never returned through the public API.
-- Public respiratory results exclude classifier severity, diagnosis, prescriptions, medicines, doses, treatment and model-authored management plans.
+- The initial respiratory result excludes classifier severity, diagnosis, prescriptions, medicines, doses, treatment and any model-authored plan.
+- After explicit continuation and human confirmation, the app may display only the complete deterministic plan frozen in the cited WHO protocol table; model prose never authors its actions or doses.
 - A below-threshold respiratory finding does not rule out illness or replace clinical judgment.
 - This prototype is for research, education and supervised review. It is not clinically validated medical software.
 

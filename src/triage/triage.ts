@@ -201,6 +201,7 @@ export interface TriageOptions {
   maxExtractAttempts?: number;
   retrieval?: "semantic" | "keyword";
   shortlist?: { cls: string; score: number }[];
+  requiredClassification?: string;
   structuredDanger?: DangerDecision;
 }
 
@@ -353,11 +354,17 @@ export async function triageFromHits(
   // PROMPT bias (below), not a grammar restriction — so the model still can, and usually does, pick a
   // shortlisted class, but a lay/abbreviated case is never grammar-forced to UNKNOWN. The deterministic
   // reconcilers + danger-sign severity gate are the backstop against a cross-symptom slip.
-  const extractSchema = buildExtractJsonSchema(CLASSIFICATION_ENUM);
+  const allowedExtractClasses = opts?.requiredClassification
+    ? [opts.requiredClassification, "UNKNOWN"]
+    : CLASSIFICATION_ENUM;
+  const extractSchema = buildExtractJsonSchema(allowedExtractClasses);
   // Rank-ordered shortlist injected into the extract prompt (soft bias). Empty on the degraded/no-embed
   // path (no router), where the model classifies from the decision rules alone.
   const shortlistBlock = opts?.shortlist?.length
     ? `SEMANTIC SHORTLIST — the classes whose defining WHO signs are closest to THIS case, ranked most-likely first: ${opts.shortlist.map((s) => s.cls).join(", ")}. Prefer one of these unless the case's signs clearly match a different classification; you may still choose any class from the full list, or UNKNOWN.\n\n`
+    : "";
+  const requiredClassBlock = opts?.requiredClassification
+    ? `STRUCTURED POLICY BOUNDARY — the recorded respiratory facts are compatible only with ${opts.requiredClassification}. Select that class if the evidence supports it; otherwise select UNKNOWN. No other class is allowed.\n\n`
     : "";
 
   // EXTRACT pass — GBNF-constrained json_schema → guaranteed shape; safeParse + retry.
@@ -366,7 +373,7 @@ export async function triageFromHits(
   for (let attempt = 1; attempt <= maxExtractAttempts; attempt++) {
     const history: ChatMessage[] = [
       { role: "system", content: SYS_EXTRACT },
-      { role: "user", content: `${extractUserBody}\n\nCLINICAL ASSESSMENT:\n${assessment}\n\n${shortlistBlock}Emit the JSON now.` },
+      { role: "user", content: `${extractUserBody}\n\nCLINICAL ASSESSMENT:\n${assessment}\n\n${requiredClassBlock}${shortlistBlock}Emit the JSON now.` },
     ];
     if (attempt > 1) {
       history.push({

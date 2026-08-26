@@ -105,6 +105,20 @@ const triage = (caseText: string, extra: Record<string, unknown> = {}) =>
     body: JSON.stringify({ caseText, ...extra }),
   });
 
+async function beginRespiratoryContinuation(caseText: string, extra: Record<string, unknown>) {
+  const initialResponse = await triage(caseText, extra);
+  const cookie = initialResponse.headers.get("set-cookie")?.split(";")[0];
+  const initial = await readSse(initialResponse);
+  const token = initial.find((event) => event.event === "continuation")?.data.token;
+  assert.ok(token, "initial deterministic result carries an explicit continuation token");
+  const continued = await fetch(`${base}/triage/continue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(cookie ? { Cookie: cookie } : {}) },
+    body: JSON.stringify({ token }),
+  });
+  return { initial, continued: await readSse(continued) };
+}
+
 async function observeRequest(body: Record<string, unknown>, failOnBoundary = false) {
   const boundaries: string[] = [];
   const restore = setTriageExecutionObserver((boundary: string) => {
@@ -217,12 +231,15 @@ test("fast breathing is deterministic and never crosses a QVAC or retrieval boun
   assert.ok(!events.some((event) => event.event === "stage" && ["retrieve", "reason"].includes(event.data.key)));
 });
 
-test("grounded /triage keeps reasoning private and reference actions gated", { skip, timeout: 300_000 }, async () => {
-  const r = await triage("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
+test("initial respiratory result is model-free and explicit continuation keeps reasoning private and actions gated", { skip, timeout: 300_000 }, async () => {
+  const flow = await beginRespiratoryContinuation("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
     patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT, respiratoryAssessment: respiratoryAssessment(32),
   });
-  assert.match(r.headers.get("content-type") || "", /text\/event-stream/);
-  const events = await readSse(r);
+  assert.deepEqual(flow.initial.map((event) => event.event), ["stage", "citation", "card", "continuation", "done"]);
+  assert.equal(flow.initial.find((event) => event.event === "citation")?.data.provenance, "fixed-policy");
+  assert.ok(!flow.initial.some((event) => event.event === "first_token"));
+
+  const events = flow.continued;
   const kinds = events.map((e) => e.event);
 
   const idx = (k: string) => kinds.indexOf(k);
@@ -252,10 +269,10 @@ test("grounded /triage keeps reasoning private and reference actions gated", { s
   assert.ok(idx("stage") >= 0 && idx("stage") < idx("card"), "stages stream before the card they describe");
 });
 
-test("grounded /triage keeps the deterministic respiratory result authoritative", { skip, timeout: 300_000 }, async () => {
-  const events = await readSse(await triage("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
+test("grounded respiratory continuation keeps the deterministic result authoritative", { skip, timeout: 300_000 }, async () => {
+  const { continued: events } = await beginRespiratoryContinuation("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
     patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT, respiratoryAssessment: respiratoryAssessment(32),
-  }));
+  });
   const get = (k: string) => events.find((e) => e.event === k)?.data;
 
   // citation: protocol/doc/page/section/score/retrieval.

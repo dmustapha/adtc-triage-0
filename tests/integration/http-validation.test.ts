@@ -120,7 +120,7 @@ test("POST /triage rejects invalid respiratory assessment values before inferenc
   }
 });
 
-test("POST /triage rejects contradictory narrative and structured observations", async () => {
+test("POST /triage lets a structured emergency observation win before narrative conflicts", async () => {
   const absent = Object.fromEntries([
     "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
     "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
@@ -130,11 +130,10 @@ test("POST /triage rejects contradictory narrative and structured observations",
     patientAge: { value: 7, unit: "months" },
     dangerObservations: { ...absent, cannotDrinkOrBreastfeed: "PRESENT" },
   });
-  assert.equal(response.status, 409);
-  assert.deepEqual(await response.json(), {
-    error: "The description conflicts with the structured assessment. Correct the patient record before continuing.",
-    conflicts: ["patientAge", "cannotDrinkOrBreastfeed"],
-  });
+  assert.equal(response.status, 200);
+  const stream = await response.text();
+  assert.match(stream, /"outcome":"EMERGENCY"/);
+  assert.doesNotMatch(stream, /event: continuation|event: first_token/);
 });
 
 // ── excluded optional modalities ───────────────────────────────────────────────────

@@ -9,6 +9,7 @@ import { canonicalClinicalRecord, clinicalRecordHash, findNarrativeConflicts, pa
 import { lookupProtocol, docFor, type ProtocolEntry } from "./protocol-table.js";
 import { evaluateRespiratoryAssessment, type RespiratoryDecision } from "./respiratory-assessment.js";
 import type { ConfirmationBinding, ConfirmationGrant, ConfirmationPayload } from "./confirmation.js";
+import type { ContinuationBinding, ContinuationConsumeResult, ContinuationGrant } from "./continuation.js";
 import type { RouteResult } from "./class-router.js";
 import type { ClinicalAssessmentRequest } from "./schema.js";
 import type { SearchHit } from "../rag/store.js";
@@ -26,6 +27,13 @@ type WorkflowDependencies = {
   retrieveGrounding: (caseText: string, context: TriageContext) => Promise<GroundingResult>;
   triageFromHits: (caseText: string, hits: SearchHit[], context: TriageContext, options: TriageOptions) => Promise<TriageResult>;
   confirmationStore: { issue(binding: ConfirmationBinding, payload?: ConfirmationPayload): ConfirmationGrant };
+  continuationStore?: {
+    issue(binding: ContinuationBinding, snapshot: unknown): ContinuationGrant;
+    consume(token: string, owner: string): ContinuationConsumeResult;
+    reserve?(token: string, owner: string): ContinuationConsumeResult;
+    commit?(token: string, owner: string): boolean;
+    release?(token: string, owner: string): boolean;
+  };
   policyVersion: string;
 };
 
@@ -47,6 +55,7 @@ export interface SupervisedAssessmentResult {
   citations?: Array<{ doc: string; page: number | string }>;
   uncertainty: string;
   confirmation?: { eligible: boolean; token: string | null; expiresAt: string | null; missingFields: string[] };
+  continuation?: { eligible: boolean; token: string | null; expiresAt: string | null; reason?: string };
   emergencyObservations?: string[];
   referenceActions?: unknown;
   plan?: unknown;
@@ -124,7 +133,44 @@ function issueBinding(
     citationKeys: [`${docFor(entry.protocol)}:${entry.citation.page}:${result.classification}`],
     policyVersion,
     owner,
+    fixedSeverity: entry.severity,
+    sourceAction: { text: entry.action.text, doc: docFor(entry.protocol), page: entry.action.page },
   };
+}
+
+function continuationEligible(decision: RespiratoryDecision): decision is RespiratoryDecision & {
+  outcome: "PROMPT_SUPERVISED_REVIEW" | "NO_ESCALATION_CRITERION_RECORDED";
+} {
+  return decision.outcome === "NO_ESCALATION_CRITERION_RECORDED"
+    || (decision.outcome === "PROMPT_SUPERVISED_REVIEW"
+      && decision.matchedCriteria.some((criterion) => criterion === "FAST_BREATHING" || criterion === "CHEST_INDRAWING"));
+}
+
+function deterministicWithContinuation(
+  dependencies: WorkflowDependencies,
+  request: ClinicalAssessmentRequest,
+  decision: RespiratoryDecision,
+  owner?: string,
+): SupervisedAssessmentResult {
+  const result = publicDeterministic(decision);
+  if (!owner || !dependencies.continuationStore || !continuationEligible(decision)) return result;
+  const recordHash = clinicalRecordHash(canonicalClinicalRecord(request));
+  try {
+    const grant = dependencies.continuationStore.issue({
+      recordHash,
+      outcome: decision.outcome,
+      matchedCriteria: [...decision.matchedCriteria],
+      policyVersion: dependencies.policyVersion,
+      owner,
+    }, request);
+    result.continuation = { eligible: true, token: grant.token, expiresAt: grant.expiresAt };
+  } catch {
+    result.continuation = {
+      eligible: false, token: null, expiresAt: null,
+      reason: "Supervised continuation capacity is currently unavailable; the deterministic result remains authoritative.",
+    };
+  }
+  return result;
 }
 
 function provisional(
@@ -196,8 +242,7 @@ function routingContext(request: ClinicalAssessmentRequest): string {
 
 function deterministicDecision(request: ClinicalAssessmentRequest): RespiratoryDecision | null {
   if (request.respiratoryAssessment) {
-    const decision = evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment);
-    return decision.modelInvoked ? null : decision;
+    return evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment);
   }
   const observations = normalizeDangerObservations(request.dangerObservations);
   if (EMERGENCY_OBSERVATION_KEYS.some((key) => observations[key] === "PRESENT")) {
@@ -216,22 +261,73 @@ function deterministicDecision(request: ClinicalAssessmentRequest): RespiratoryD
 
 export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
   return {
-    deterministic(input: unknown): SupervisedAssessmentResult | null {
+    deterministic(input: unknown, options?: { owner?: string }): SupervisedAssessmentResult | null {
       const parsed = parseClinicalRequest(input);
       if (!parsed.success) return null;
       const decision = deterministicDecision(parsed.data);
-      return decision ? publicDeterministic(decision) : null;
+      if (decision?.outcome === "EMERGENCY") return deterministicWithContinuation(dependencies, parsed.data, decision, options?.owner);
+      if (findNarrativeConflicts(canonicalClinicalRecord(parsed.data)).length) return null;
+      return decision ? deterministicWithContinuation(dependencies, parsed.data, decision, options?.owner) : null;
+    },
+    claimContinuation(token: string, owner: string) {
+      const store = dependencies.continuationStore;
+      const consumed = (store?.reserve ?? store?.consume)?.call(store, token, owner)
+        ?? { ok: false as const, reason: "NOT_FOUND" as const };
+      if (!consumed.ok) return consumed;
+      const parsed = parseClinicalRequest(consumed.snapshot);
+      if (!parsed.success || !parsed.data.respiratoryAssessment) return { ok: false as const, reason: "BINDING_MISMATCH" as const };
+      const decision = evaluateRespiratoryAssessment(
+        parsed.data.patientAge,
+        parsed.data.dangerObservations,
+        parsed.data.respiratoryAssessment,
+      );
+      const recordHash = clinicalRecordHash(canonicalClinicalRecord(parsed.data));
+      const bound = consumed.binding;
+      const matches = continuationEligible(decision)
+        && recordHash === bound.recordHash
+        && decision.outcome === bound.outcome
+        && dependencies.policyVersion === bound.policyVersion
+        && decision.matchedCriteria.length === bound.matchedCriteria.length
+        && decision.matchedCriteria.every((criterion, index) => criterion === bound.matchedCriteria[index]);
+      if (!matches) return { ok: false as const, reason: "BINDING_MISMATCH" as const };
+      return { ok: true as const, request: parsed.data, decision, token, owner };
+    },
+    commitContinuation(token: string, owner: string) {
+      return dependencies.continuationStore?.commit?.(token, owner) ?? true;
+    },
+    releaseContinuation(token: string, owner: string) {
+      return dependencies.continuationStore?.release?.(token, owner) ?? false;
+    },
+    async continueClaim(
+      claim: { request: ClinicalAssessmentRequest; decision: RespiratoryDecision },
+      options: AssessOptions,
+    ): Promise<SupervisedAssessmentResult> {
+      return assessWithModel(dependencies, claim.request, options, claim.decision);
     },
     async assess(input: unknown, options: AssessOptions): Promise<SupervisedAssessmentResult> {
       const parsed = parseClinicalRequest(input);
       if (!parsed.success) return unavailable("The recorded clinical assessment is incomplete or invalid.");
       const request = parsed.data;
       const deterministic = deterministicDecision(request);
-      if (deterministic) return publicDeterministic(deterministic);
+      if (deterministic?.outcome === "EMERGENCY") {
+        return deterministicWithContinuation(dependencies, request, deterministic, options.owner);
+      }
       if (findNarrativeConflicts(canonicalClinicalRecord(request)).length) {
         return unavailable("The narrative conflicts with authority-bearing structured observations; correct the record before review.");
       }
+      if (deterministic) return deterministicWithContinuation(dependencies, request, deterministic, options.owner);
 
+      return assessWithModel(dependencies, request, options);
+    },
+  };
+}
+
+async function assessWithModel(
+  dependencies: WorkflowDependencies,
+  request: ClinicalAssessmentRequest,
+  options: AssessOptions,
+  respiratoryContinuation?: RespiratoryDecision,
+): Promise<SupervisedAssessmentResult> {
       try {
         if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.");
         const context = await dependencies.getContext();
@@ -248,6 +344,7 @@ export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
             options,
             context,
             route.shortlist,
+            respiratoryContinuation,
           );
         }
         return await assessGrounded(
@@ -258,6 +355,7 @@ export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
           options,
           context,
           undefined,
+          respiratoryContinuation,
         );
       } catch {
         return unavailableWithPolicy(
@@ -265,8 +363,6 @@ export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
           "Model-assisted assessment is unavailable; the recorded-observation result remains authoritative and no provisional classification was issued.",
         );
       }
-    },
-  };
 }
 
 async function assessGrounded(
@@ -277,6 +373,7 @@ async function assessGrounded(
   options: AssessOptions,
   context: TriageContext,
   shortlist: RouteResult["shortlist"] | undefined,
+  respiratoryContinuation?: RespiratoryDecision,
 ) {
   if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.");
   const grounding = await dependencies.retrieveGrounding(retrievalQuery, context);
@@ -299,11 +396,18 @@ async function assessGrounded(
     provenance: "retrieved-reference",
   });
   const structuredDanger = evaluateDangerPolicy(request.patientAge, request.dangerObservations);
+  const expectedRespiratoryClass = respiratoryContinuation
+    ? respiratoryContinuation.matchedCriteria.includes("FAST_BREATHING")
+      || respiratoryContinuation.matchedCriteria.includes("CHEST_INDRAWING")
+      ? "PNEUMONIA"
+      : "COUGH OR COLD"
+    : null;
   options.onStage?.({ key: "reason", label: "Reasoning on-device", detail: "QVAC SDK 0.13.3 · on-device" });
   let firstToken = false;
   const result = await dependencies.triageFromHits(modelContext, hits, context, {
     retrieval: grounding.retrieval,
     shortlist,
+    ...(expectedRespiratoryClass ? { requiredClassification: expectedRespiratoryClass } : {}),
     structuredDanger,
     reasonPredict: 1024,
     extractPredict: 512,
@@ -315,11 +419,17 @@ async function assessGrounded(
     },
   });
   options.onStage?.({ key: "summarize", label: "Prepared assessment summary", detail: "bounded local review" });
-  const entry = lookupProtocol(result.classification);
+  if (expectedRespiratoryClass && result.classification !== expectedRespiratoryClass) {
+    return respiratoryWithAssistance(respiratoryContinuation!, {
+      status: "UNAVAILABLE", runtime: "QVAC SDK 0.13.3", model: "qvac/MedPsy-1.7B-GGUF",
+    }, `${respiratoryContinuation!.uncertainty} Model-assisted classification contradicted the structured respiratory record, so no provisional class was issued.`);
+  }
+  const reconciledResult = result;
+  const entry = lookupProtocol(reconciledResult.classification);
   const respiratory = request.respiratoryAssessment
     ? evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment)
     : undefined;
-  if (respiratory?.modelInvoked) {
+  if (respiratory?.modelInvoked && !respiratoryContinuation) {
     if (!entry) {
       return respiratoryWithAssistance(respiratory, {
         status: "UNAVAILABLE",
@@ -333,19 +443,19 @@ async function assessGrounded(
       model: "qvac/MedPsy-1.7B-GGUF",
       retrievalMode: grounding.retrieval,
     });
-    publicResult.attempts = result.attempts;
+    publicResult.attempts = reconciledResult.attempts;
     return publicResult;
   }
   if (!entry) return unavailable("The provisional class has no verified deterministic public action mapping.");
-  const binding = issueBinding(request, result, entry, dependencies.policyVersion, options.owner);
+  const binding = issueBinding(request, reconciledResult, entry, dependencies.policyVersion, options.owner);
   const grant = dependencies.confirmationStore.issue(binding, confirmationPayload(request));
-  const publicResult = provisional(request, result, grant, entry.protocol, respiratory);
+  const publicResult = provisional(request, reconciledResult, grant, entry.protocol, respiratoryContinuation);
   publicResult.assistance = {
     status: "COMPLETED",
     runtime: "QVAC SDK 0.13.3",
     model: "qvac/MedPsy-1.7B-GGUF",
     retrievalMode: grounding.retrieval,
   };
-  publicResult.attempts = result.attempts;
+  publicResult.attempts = reconciledResult.attempts;
   return publicResult;
 }

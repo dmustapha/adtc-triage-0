@@ -13,7 +13,8 @@ import { readFileSync } from "node:fs";
 // Element IDs the app wiring + supervised assessment renderer touch.
 const IDS = [
   "seeds", "rec", "status", "citationBox", "reasoning", "reasoningWrap", "reasonLabel", "reasonTimer",
-  "card", "err", "result", "confirmationRegion", "hTtft", "hTps", "hDev", "hChunks", "net", "assess",
+  "card", "err", "result", "continuationRegion", "continuationStatus",
+  "hTtft", "hTps", "hDev", "hChunks", "net", "assess",
 ];
 const DANGER_KEYS = [
   "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
@@ -32,7 +33,8 @@ const body = `<textarea id="case"></textarea>` +
   `<input type="radio" name="respiratory-concern" value="PRESENT"><input type="radio" name="respiratory-concern" value="ABSENT"><input type="radio" name="respiratory-concern" value="NOT_ASSESSED" checked>` +
   `<input id="respiratoryRatePerMinute" type="number"><select id="rateCountQuality"><option value="NOT_CONFIRMED">Not confirmed</option><option value="ONE_MINUTE_WHILE_CALM">One minute while calm</option></select>` +
   `<div id="dangerStatus"></div><div id="dangerSummary"></div>${dangerControls}` +
-  IDS.map((id) => `<div id="${id}"></div>`).join("");
+  IDS.map((id) => `<div id="${id}"></div>`).join("") +
+  `<div id="confirmationRegion" class="hidden"><p class="confirmation-instructions">Human review required.</p><div class="confirmation-actions"><button id="confirmAssessment">Confirm reviewed class</button><button id="correctAssessment">Correct record</button><button id="rejectAssessment">Reject</button></div><p id="confirmationStatus"></p><div id="confirmationPlan"></div></div>`;
 const dom = new JSDOM(`<!DOCTYPE html><body>${body}</body>`, { url: "http://localhost:3010/app" });
 const g = globalThis as Record<string, unknown>;
 g.window = dom.window;
@@ -146,6 +148,41 @@ test("a late confirmation response cannot restore actions after the record chang
   assert.equal(fe.clinicalState.confirmationToken, null);
   assert.match(el("confirmationRegion").className, /hidden/);
   assert.doesNotMatch(el("confirmationRegion").textContent, /Old-record action/);
+});
+
+test("record invalidation and provisional rendering preserve usable confirmation controls", () => {
+  fe.invalidateClinicalResult();
+  fe.renderProvisional({ token: "fresh-token", classification: "PNEUMONIA", protocol: "IMCI" });
+  assert.ok(el("confirmAssessment"));
+  assert.ok(el("rejectAssessment"));
+  assert.equal((el("confirmAssessment") as HTMLButtonElement).disabled, false);
+  assert.doesNotMatch(el("confirmationRegion").className, /hidden/);
+});
+
+test("confirmed plan DOM renders cited dose rows and separately cited follow-up detail", () => {
+  fe.renderReferenceActions({
+    classification: "PNEUMONIA", severity: "URGENT",
+    immediateAction: { text: "Give oral Amoxicillin for 5 days", citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 6 } },
+    referenceActions: {
+      medicines: [{
+        name: "Amoxicillin", strength: "250 mg per 5 ml", frequency: "Two times daily",
+        citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 7 },
+        bands: [{ band: "12 months up to 3 years", dose: "5 ml", citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 7 } }],
+        selectedBand: { band: "12 months up to 3 years", dose: "5 ml", citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 7 } },
+      }],
+      supportive: [], home_care: [], return_now: [], referral: null,
+      follow_up: {
+        when: "Follow up in 3 days", detail: "Assess breathing rate again",
+        citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 6 },
+        detailCitation: { doc: "WHO IMCI Chart Booklet (2014)", page: 32 },
+      },
+    },
+    doseState: { status: "AVAILABLE_REFERENCE_BAND", missingFields: [], medicineReferenceAvailable: true },
+  });
+  const region = el("confirmationRegion");
+  assert.match(region.textContent, /12 months up to 3 years.*5 ml.*WHO IMCI Chart Booklet \(2014\), page 7/s);
+  assert.match(region.textContent, /Assess at follow-up.*Assess breathing rate again.*page 32/s);
+  assert.equal(region.querySelectorAll("tbody tr.is-selected").length, 1);
 });
 
 test("structured form serializes the respiratory record without narrative inference", () => {

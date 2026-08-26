@@ -66,7 +66,7 @@ test("GET /health reports canonical shared-runtime identity", { timeout: 60_000 
   assert.equal(h.model.officialRuntime, "llama.cpp");
 });
 
-test("POST /triage keeps a below-threshold respiratory result neutral while assistance completes", { skip, timeout: 300_000 }, async () => {
+test("POST /triage keeps a below-threshold respiratory result neutral and model-free until continuation", { timeout: 30_000 }, async () => {
   const absent = Object.fromEntries([
     "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
     "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
@@ -89,13 +89,14 @@ test("POST /triage keeps a below-threshold respiratory result neutral while assi
   const events = await readSse(r);
   const kinds = events.map((e) => e.event);
 
-  // Citation must arrive BEFORE the card (E-5 sequencing).
+  // Fixed policy citation must arrive before the result card.
   const ci = kinds.indexOf("citation");
   const cardi = kinds.indexOf("card");
   assert.ok(ci >= 0, "got a citation event");
   assert.ok(cardi > ci, "card event arrives after citation");
 
   const citation = events[ci].data;
+  assert.equal(citation.provenance, "fixed-policy");
   assert.match(citation.doc, /IMCI/i, "cited the IMCI protocol");
   assert.ok(String(citation.page).match(/\d/), "citation has a real page");
 
@@ -104,13 +105,16 @@ test("POST /triage keeps a below-threshold respiratory result neutral while assi
   assert.equal(card.outcome, "NO_ESCALATION_CRITERION_RECORDED");
   assert.equal(card.thresholdComparison.respiratoryRatePerMinute, 32);
   assert.equal(card.thresholdComparison.thresholdPerMinute, 40);
-  assert.equal(card.assistance.status, "COMPLETED");
+  assert.equal(card.assistance.status, "NOT_RUN");
   assert.equal(card.reviewState, "DETERMINISTIC");
   assert.equal("classification" in card, false);
   assert.equal("protocol" in card, false);
-  assert.ok(events[cardi].data.perf, "card carries a perf payload for the HUD");
+  assert.equal(events[cardi].data.perf, undefined, "model-free policy result has no inference performance payload");
   assert.ok(!kinds.includes("plan"), "no reference actions before confirmation");
   assert.ok(!kinds.includes("provisional"), "a model classification cannot be promoted over the settled respiratory result");
+  const continuation = events.find((event) => event.event === "continuation")?.data;
+  assert.ok(continuation?.token, "eligible respiratory result offers an explicit continuation token");
+  assert.ok(!kinds.includes("first_token"), "initial respiratory policy does not initialize MedPsy");
   const publicText = JSON.stringify(events).replace(/not a diagnosis/gi, "");
   assert.doesNotMatch(publicText, /diagnos(?:e|is)|prescri(?:be|ption)|chain.of.thought|<think>|raw reasoning/i);
   assert.doesNotMatch(JSON.stringify(events), /PNEUMONIA|provisional WHO protocol classification/i);
