@@ -19,12 +19,12 @@ const EXPECTED_METADATA_MODEL = {
   packaging: "binary_bundle",
 } as const;
 
-const IDENTITY_PLACEHOLDERS = {
-  team_id: "your-team-id",
+const EXPECTED_IDENTITY = {
+  team_id: "triage-0",
   submitter: {
-    name: "your-name",
-    email: "your-email@domain.com",
-    github_handle: "your-github",
+    name: "Damilola Mustapha",
+    email: "damilolamustaphaa@gmail.com",
+    github_handle: "dmustapha",
   },
 } as const;
 
@@ -74,15 +74,18 @@ test("metadata remains English-only without unsupported language claims", () => 
   assert.doesNotMatch(claims, /multilingual|African[- ]language|French|Swahili|Yoruba|Hausa|Igbo/i);
 });
 
-test("explicit identity placeholders keep final packaging blocked", () => {
+test("verified Devpost and submitter identity completes metadata and profiler output", () => {
   const metadata = json("metadata.json");
+  const submission = json("submission.json").submission;
 
-  assert.equal(metadata.team_id, IDENTITY_PLACEHOLDERS.team_id);
-  assert.deepEqual(metadata.submitter, IDENTITY_PLACEHOLDERS.submitter);
+  assert.equal(metadata.team_id, EXPECTED_IDENTITY.team_id);
+  assert.deepEqual(metadata.submitter, EXPECTED_IDENTITY.submitter);
+  assert.equal(submission.team_id, EXPECTED_IDENTITY.team_id);
+  assert.deepEqual(submission.submitter, EXPECTED_IDENTITY.submitter);
   const blockers = [metadata.team_id, ...Object.values(metadata.submitter)].filter((value) =>
     /^your-|@domain\.com$/i.test(String(value)),
   );
-  assert.equal(blockers.length, 4, "final packaging must fail until all four real identity values are supplied");
+  assert.equal(blockers.length, 0, "verified submission identity must contain no template sentinel");
 });
 
 test("canonical model schema requires every shared-runtime identity field", () => {

@@ -2,7 +2,7 @@
   "schema_version": "1.1.0",
   "profiler_version": "adtc-profiler 0.1.0",
   "submission": {
-    "team_id": "your-team-id",
+    "team_id": "triage-0",
     "domain": "healthcare_medical",
     "language_scope": [
       "en"
@@ -10,9 +10,9 @@
     "african_alpha_claim": false,
     "budget_laptop_claim": true,
     "submitter": {
-      "name": "your-name",
-      "email": "your-email@domain.com",
-      "github_handle": "your-github"
+      "name": "Damilola Mustapha",
+      "email": "damilolamustaphaa@gmail.com",
+      "github_handle": "dmustapha"
     },
     "cross_disciplinary_pairing": {
       "discipline": "education",

@@ -3,7 +3,7 @@
 **Status:** Post-submission restored-workflow release; Devpost entry and existing video remain unchanged
 **Domain:** `healthcare_medical`
 **Language scope:** English only
-**Team ID:** Exact registered value unavailable after submission; `metadata.json` preserves the unresolved sentinel to avoid fabricating it
+**Team ID:** `triage-0` (verified Devpost project slug)
 **Model:** MedPsy-1.7B Q4_K_M imatrix
 
 ## Current authoritative gate policy
@@ -81,7 +81,7 @@ No repository test is skipped. Historical skip evidence remains historical and i
 | No-egress and 8 GB viability | Direct CPU-only runtime used four threads and zero GPU layers; model-backed no-egress and full test gates pass locally |
 | QVAC product plane | QVAC SDK 0.13.3 executed real local WHO retrieval and MedPsy assistance; reported separately from official profiler evidence |
 
-The generated profiler values are Apple development evidence, not organizer-audited scores. The participant identity fields in `submission.json` remain explicit placeholders and block release packaging.
+The generated profiler values are Apple development evidence, not organizer-audited scores. Participant identity is complete and consistent across `metadata.json` and `submission.json`.
 
 ## Submitted-prompt release gate
 
@@ -97,8 +97,7 @@ Prompt 1 separates recorded facts from uncertainty and does not invent a respira
 ## Constraints and unresolved gates
 
 - Authenticated Devpost no longer exposes the saved prompt fields after the deadline redirect, so byte-for-byte Devpost parity, including Prompt 2 comma punctuation, remains externally unverified. The user confirmed the submission is complete and supplied the exact saved strings; this is an external archival-parity gap, not a pending local implementation gate.
-- The full participant profiler completed and generated `submission.json`, but participant identity fields remain placeholders.
-- Submitter name, email, GitHub handle, and Devpost team ID remain explicit placeholders in `metadata.json`.
+- The full participant profiler completed and generated `submission.json`; the verified Devpost project slug and participant-confirmed submitter identity are present in both required JSON artifacts.
 - Respiratory remediation is locally complete: policy-settled respiratory outcomes keep internal classification private; public diagnosis, medicine, dose, treatment, and management-plan output is suppressed at server and renderer boundaries. The broader supervised workflow retains source-bound provisional classification and one-use human confirmation where deterministic respiratory policy has not already settled the result.
 - Known routes called with unsupported methods return explicit JSON 405 responses with exact `Allow` headers, and an empty `/perf-log.csv` returns a truthful 200 header-only CSV.
 - Current desktop and mobile screenshots prove deterministic respiratory, broad provisional/confirmed WHO, off-domain, exact-prompt, queue/cancel/retry, and responsive states. Final submission media remain separate artifacts.

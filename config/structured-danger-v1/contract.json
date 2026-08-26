@@ -150,7 +150,7 @@
     }
   },
   "releaseBlockers": {
-    "submitterIdentityPlaceholders": true,
+    "submitterIdentityPlaceholders": false,
     "signedModelDecisionPresent": false,
     "namedHumanClinicalReviewPresent": false,
     "physicalTargetLaptopEvidencePresent": false,

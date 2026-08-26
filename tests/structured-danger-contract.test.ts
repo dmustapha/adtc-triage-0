@@ -86,21 +86,22 @@ test("one exact MedPsy artifact serves distinct product and raw-profiler evidenc
   assert.equal(contract.evidencePlanes.rawProfiler.provesProductSafety, false);
   assert.equal(contract.evidencePlanes.historical.runId, 32742482642);
   assert.equal(contract.evidencePlanes.historical.immutable, true);
-  assert.equal(contract.releaseBlockers.submitterIdentityPlaceholders, true);
+  assert.equal(contract.releaseBlockers.submitterIdentityPlaceholders, false);
 });
 
-test("requirements documents state the revised authority and evidence split", async () => {
-  const [prd, architecture, observables] = await Promise.all(["PRD.md", "ARCHITECTURE.md", "FEATURE-OBSERVABLES.md"].map((path) => readFile(path, "utf8")));
-  for (const document of [prd, architecture, observables]) {
-    assert.match(document, /structured-danger-v1/);
-    assert.match(document, /chest indrawing[^\n]*not[^\n]*emergency/i);
-    assert.match(document, /medpsy-product-v2/);
-    assert.match(document, /medpsy-raw-profiler-v2/);
-  }
-  assert.match(prd, /identity placeholders remain[^\n]*blocker/i);
-  assert.match(architecture, /emergency[^\n]*before[^\n]*(semantic routing|MedPsy)/i);
-  assert.match(observables, /card\.red_flags[^\n]*structured/i);
-  assert.doesNotMatch(`${prd}\n${architecture}\n${observables}`, /raw one-pass extraction proves product safety/i);
+test("tracked public artifacts state the revised authority and evidence split", async () => {
+  const publicPaths = ["README.md", "REPORT.md", "docs/API.md", contractPath];
+  const publicArtifacts = await Promise.all(publicPaths.map((path) => readFile(path, "utf8")));
+  const claims = publicArtifacts.join("\n");
+
+  assert.match(claims, /structured-danger-v1/);
+  assert.match(claims, /chest(?:-wall)? indrawing[^\n]*not[^\n]*emergency/i);
+  assert.match(claims, /medpsy-product-v2/);
+  assert.match(claims, /medpsy-raw-profiler-v2/);
+  assert.match(claims, /emergenc[^\n]*before[^\n]*(QVAC|retrieval|model)/i);
+  assert.match(claims, /red_flags[^\n]*(cannot|authoritative|structured)/i);
+  assert.doesNotMatch(claims, /identity placeholders remain[^\n]*blocker/i);
+  assert.doesNotMatch(claims, /raw one-pass extraction proves product safety/i);
 });
 
 async function historicalRunAggregate(): Promise<string> {

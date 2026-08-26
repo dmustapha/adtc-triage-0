@@ -209,7 +209,7 @@ tests/                  Unit, integration and real-runtime tests
 
 The exact submitted prompts match across local metadata, prompt policy, report and generated profiler output. The already-completed Devpost entry cannot be independently exported after submission, so authenticated archival parity remains user-attested. The existing video predates this restored workflow and is not presented as current proof.
 
-The GitHub repository owner is verified through the authenticated account. The four submission identity fields remain an atomic unresolved block because the exact registered Devpost or ADTF team identifier is not recoverable from the repository or post-deadline project view. The template sentinels remain explicit to avoid mixing verified account data with an unknown team record.
+Submission identity is complete and consistent across `metadata.json` and `submission.json`. The ADTC Team ID is the verified Devpost project slug `triage-0`; the submitter name, registered email and GitHub handle were supplied and confirmed by the participant.
 
 Built for the [Africa Deep Tech Challenge 2026](https://adtc-2026.devpost.com/) Laptop LLM Challenge.
 
