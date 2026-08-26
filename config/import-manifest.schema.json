@@ -111,13 +111,14 @@
         "originalCreatedAt": { "type": "string", "format": "date-time" },
         "classification": { "enum": ["reused", "modified-for-adtc"] },
         "purpose": { "type": "string", "minLength": 1 },
+        "destinationStatus": { "enum": ["present", "removed"] },
         "destinationSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
         "modification": {
           "type": "object",
           "additionalProperties": false,
           "required": ["status", "reason"],
           "properties": {
-            "status": { "enum": ["pending-adaptation", "modified"] },
+            "status": { "enum": ["pending-adaptation", "modified", "removed"] },
             "reason": { "type": "string", "minLength": 1 }
           }
         }
@@ -126,7 +127,12 @@
     "completedImport": {
       "allOf": [
         { "$ref": "#/$defs/import" },
-        { "required": ["destinationSha256"] },
+        { "required": ["destinationStatus"] },
+        {
+          "if": { "properties": { "destinationStatus": { "const": "present" } } },
+          "then": { "required": ["destinationSha256"] },
+          "else": { "not": { "required": ["destinationSha256"] } }
+        },
         {
           "if": { "properties": { "classification": { "const": "modified-for-adtc" } } },
           "then": { "required": ["modification"] },

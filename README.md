@@ -1,190 +1,218 @@
-# ADTC 2026 — Submission Template
+# Triage-0: offline supervised WHO assessment
 
-This is the official template repository for the **Africa Deep Tech Challenge 2026** Laptop LLM track.
+Triage-0 is a local healthcare review tool for trained or supervised community health workers. It combines deterministic pediatric respiratory rules, local WHO retrieval and a bounded MedPsy workflow on an 8 GB laptop. Structured observations control escalation. Model output cannot diagnose, prescribe or override the fixed safety policy.
 
-Fork this repository, fill in the required files, and submit your repository URL via [adtc-2026.devpost.com](https://adtc-2026.devpost.com).
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![QVAC SDK](https://img.shields.io/badge/QVAC_SDK-0.13.3-111827)](https://docs.qvac.tether.io/reference/release-notes/v0.13.x/)
+[![Tests](https://img.shields.io/badge/tests-512%2F512-brightgreen)](#testing)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
----
+This is an offline localhost product. There is no hosted inference service.
 
-## ✅ Submission Checklist
+![Triage-0 respiratory assessment result](docs/images/landing.png)
 
-Before submitting, confirm every item:
+## What is Triage-0?
 
-- [ ] Your repository is **public** on GitHub
-- [ ] `metadata.json` is fully filled in — no placeholder values remain
-- [ ] `metadata.json` contains exactly **2 test prompts** in the `test_prompts` array, written for your chosen domain
-- [ ] `download_model.sh` successfully downloads your model to `model/`
-- [ ] The downloaded file is a valid **GGUF format** (`.gguf`) weight file
-- [ ] `model/*.gguf` is listed in `.gitignore` — do **not** commit large weight files
-- [ ] `REPORT.md` is filled in with your technical writeup
-- [ ] Running `bash download_model.sh` completes without errors
-- [ ] Your model runs entirely **offline** — zero external network calls during inference
+Frontline health workers often operate with weak connectivity, limited hardware and strict privacy constraints. Triage-0 provides two local workflows:
 
----
+1. A supervised WHO review that keeps emergency and respiratory decisions in deterministic code.
+2. An ordinary prompt runner that restores the original two-pass MedPsy workflow for bounded local questions.
 
-## 📁 Required File Structure
+Both workflows share one serialized QVAC inference queue. The product uses one checksum-locked GGUF and makes no inference-time network calls after startup prewarming.
 
-```
-your-submission/
-├── metadata.json          ← Required. Team, model, and test prompt metadata.
-├── download_model.sh      ← Required. Downloads your .gguf model weight file.
-├── REPORT.md              ← Required. Technical writeup (problem, design, benchmarks).
-├── model/
-│   └── your-model.gguf   ← Downloaded by the script above. Do NOT commit.
-└── .gitignore             ← Must exclude *.gguf and model/ from version control.
-```
+## Why it is different
 
----
+- **Clinical authority is explicit:** recorded observations and fixed policy control emergency escalation.
+- **Respiratory thresholds are computed, not generated:** 2 to 11 months uses 50 breaths/minute or more; 12 to 59 months uses 40 breaths/minute or more.
+- **Model assistance is subordinate:** MedPsy may support a supervised review but cannot change a deterministic public finding.
+- **Source actions require confirmation:** provisional WHO classes do not unlock frozen source content until the same browser owner confirms the exact record.
+- **Ordinary prompts are genuine:** the Prompt Review tab runs a 1,024-token reasoning pass, then a 512-token schema-constrained extraction and deterministic validation.
+- **Everything runs locally:** QVAC SDK 0.13.3 loads MedPsy and performs semantic WHO retrieval on the development machine.
+- **The official evidence path stays separate:** pinned direct `llama.cpp` uses the identical model bytes for participant profiling and prompt evidence.
 
-## 📝 metadata.json
+## Screenshots
 
-Fill in every field. No field should remain at its placeholder value.
+| Respiratory result | Deterministic emergency |
+|---|---|
+| ![Below-threshold result](docs/images/assessment-result.png) | ![Emergency result](docs/images/emergency-result.png) |
 
-```json
-{
-  "team_id": "your-team-id",
-  "domain": "coding_assistants",
-  "language_scope": ["en"],
-  "african_alpha_claim": false,
-  "budget_laptop_claim": true,
-  "submitter": {
-    "name": "your-name",
-    "email": "your-email@domain.com",
-    "github_handle": "your-github"
-  },
-  "cross_disciplinary_pairing": {
-    "discipline": "education",
-    "load_bearing": true,
-    "description": "Brief description of how your model serves a real-world domain."
-  },
-  "test_prompts": [
-    {
-      "prompt_id": "tp_001",
-      "prompt": "Your first test prompt, written for your chosen domain."
-    },
-    {
-      "prompt_id": "tp_002",
-      "prompt": "Your second test prompt, written for your chosen domain."
-    }
-  ],
-  "model": {
-    "name": "YourModel-Q4_K_M",
-    "runtime": "llama.cpp",
-    "quantization": "GGUF Q4_K_M",
-    "parameters_estimate": "1.1B",
-    "packaging": "binary_bundle"
-  },
-  "_runtime": {
-    "model_path": "model/your-model.gguf"
-  }
-}
+| Ordinary prompt review | Mobile result |
+|---|---|
+| ![Submitted prompt result](docs/images/prompt-review.png) | ![Mobile respiratory result](docs/images/mobile-assessment.png) |
+
+## How it works
+
+```text
+Browser on 127.0.0.1
+  |
+  +--> Structured clinical record
+  |      |
+  |      +--> Emergency and respiratory policy --> Public result
+  |      |
+  |      +--> Eligible supervised review
+  |              |
+  |              v
+  +--> Ordinary prompt --> Shared bounded FIFO queue
+                              |
+                              v
+                       QVAC SDK 0.13.3
+                         |           |
+                         v           v
+                  MedPsy GGUF    WHO HyperDB
+                         |           |
+                         +-----+-----+
+                               v
+                    Schema validation and
+                    deterministic reconciliation
+
+Same GGUF bytes --> pinned direct llama.cpp --> official profiler evidence
 ```
 
-### Field Reference
+### Authority order
 
-| Field | Required | Description |
+The server validates the structured record before allocating QVAC work. Any recorded emergency observation returns an emergency result immediately. Missing, conflicting or unsupported inputs fail closed. Complete supported respiratory records use the exact age threshold. Only unresolved supervised review cases and ordinary prompts enter the native inference queue.
+
+### Model and source identity
+
+| Item | Frozen value |
+|---|---|
+| Model repository | `qvac/MedPsy-1.7B-GGUF` |
+| Revision | `fd4cecc90c2de8dce4b112795456a54be9c59363` |
+| File | `medpsy-1.7b-q4_k_m-imat.gguf` |
+| Size | `1,282,439,360` bytes |
+| SHA-256 | `41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880` |
+| Product runtime | QVAC SDK `0.13.3` |
+| Official runtime | direct `llama.cpp` revision `c8ade30036139e32108fee53d8b7164dbfda4bee` |
+| WHO IMCI source | 80 pages, SHA-256 `d10fd1d040bdbdb6db4254b8095e1d1722d0a3d2f80c3651b3003301a8a6959f` |
+| Citation map | 994 entries, SHA-256 `b3dbe721df0cad19f84e88cbfd82c7e5738ac4becd26f0249b33c865534fbccf` |
+
+The GGUF, WHO PDFs and generated citation map are downloaded or regenerated locally. They are ignored by Git.
+
+## ADTC integration proof
+
+The official ADTC repository contract is load-bearing:
+
+- `metadata.json` freezes the healthcare domain, model identity and exactly two participant prompts.
+- `download_model.sh` provisions the anonymous immutable GGUF, verifies size and SHA-256, and remains idempotent.
+- `submission.json` records the full participant profiler run on the actual Apple development host.
+- Direct CPU-only `llama.cpp` uses four threads and zero GPU layers for official evidence.
+- QVAC remains a separate product plane over the same model bytes.
+
+Measured Apple development evidence is reported in [REPORT.md](REPORT.md). It is not organizer-audited Ubuntu performance.
+
+## Testing
+
+The complete serialized suite covers policy boundaries, schema validation, HTTP/SSE behavior, queue ownership, cancellation, timeouts, prompt validation, confirmation binding, QVAC execution, downloader behavior and browser contracts.
+
+```bash
+npm run typecheck
+npm test
+npm run verify-import-manifest
+
+# Current verified result:
+# 512 tests passed, 0 failed, 0 skipped
+# 76 imported files verified against Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f
+```
+
+Fresh headed-Chrome acceptance also covered desktop and 375px mobile layouts. It recorded zero console errors, zero warnings, no horizontal overflow and no visible interaction target below 44 pixels.
+
+## Try it locally (15 to 30 minutes)
+
+The first setup downloads a 1.28 GB model and two checksum-locked WHO documents. Download time depends on the connection. Inference is local after setup.
+
+```bash
+git clone https://github.com/dmustapha/adtc-triage-0.git
+cd adtc-triage-0
+npm run setup:local
+npm start
+```
+
+Open `http://127.0.0.1:3010/app` after the health endpoint reports ready:
+
+```bash
+curl http://127.0.0.1:3010/health
+```
+
+### Suggested review cases
+
+1. Click **English example**, run the assessment and verify `32/min is below 40/min`.
+2. Mark **Cannot drink or breastfeed** present and verify the deterministic emergency route completes without model assistance.
+3. Open **Ask the local model**, select submitted Prompt 1 and verify it does not invent a respiratory rate.
+4. Run submitted Prompt 2 and verify it says the checklist must be completed before model-assisted review.
+5. Cancel an active job, edit the input and retry.
+
+Do not start a second server or ingest worker. The native WHO store has single-writer ownership.
+
+## API reference
+
+| Method | Endpoint | Purpose |
 |---|---|---|
-| `team_id` | ✅ | Your unique team ID as registered on the ADTF portal |
-| `domain` | ✅ | Your challenge track. One of: `math_scientific_reasoning`, `healthcare_medical`, `agriculture`, `creative_writing`, `coding_assistants`, `corporate_enterprise`, `autonomous_ai_agents` |
-| `language_scope` | ✅ | Array of BCP-47 language codes. Must include at least one. |
-| `african_alpha_claim` | ✅ | `true` only if claiming the African Use Case Bonus |
-| `budget_laptop_claim` | ✅ | Must be `true` — all submissions target the 8 GB RAM laptop profile |
-| `submitter.name` | ✅ | Full name of the team member submitting the run |
-| `submitter.email` | ✅ | Valid email address linked to the registered team |
-| `submitter.github_handle` | ✅ | Verifiable GitHub username |
-| `cross_disciplinary_pairing.discipline` | ✅ | The deep-tech discipline your model serves |
-| `cross_disciplinary_pairing.load_bearing` | ✅ | `true` if the pairing is integral to the submission, not cosmetic |
-| `test_prompts` | ✅ | **Exactly 2 prompts** in your chosen domain. Organizers will add 2 hidden prompts to test for overfitting. |
-| `model.runtime` | ✅ | Must be `llama.cpp`. No other runtime is accepted. |
-| `model.quantization` | ✅ | Must be a GGUF quantization format (e.g. `GGUF Q4_K_M`, `GGUF Q5_K_M`) |
-| `model.parameters_estimate` | ✅ | Approximate parameter count (e.g. `135M`, `1.1B`, `7B`) |
-| `model.packaging` | ✅ | How the model is packaged. One of: `docker_image`, `docker_build_from_repo`, `binary_bundle` |
-| `_runtime.model_path` | ✅ | Relative path from repo root to your `.gguf` file (e.g. `model/my-model.gguf`) |
+| `GET` | `/health` | Report model, RAG, egress and queue readiness |
+| `POST` | `/triage` | Run deterministic or model-assisted supervised assessment over SSE |
+| `POST` | `/triage/confirm` | Confirm or reject an owner-bound provisional result |
+| `POST` | `/assist` | Run a bounded ordinary prompt over SSE |
+| `DELETE` | `/jobs/:id` | Cancel an owned queued or active job |
+| `GET` | `/perf-log` | Read bounded local product telemetry |
+| `GET` | `/perf-log.csv` | Read the same telemetry as CSV |
 
----
+See [docs/API.md](docs/API.md) for request schemas, event order, ownership and recovery codes.
 
-## 📥 download_model.sh
+## Tech stack
 
-This script **must** download your model weight file to the `model/` directory.
+| Layer | Technology |
+|---|---|
+| Browser interface | HTML, CSS and accessible vanilla JavaScript |
+| Local server | Node.js 22, TypeScript, Express |
+| Validation | Zod 4 |
+| Product inference | QVAC SDK 0.13.3, MedPsy GGUF |
+| Retrieval | QVAC embeddings and native HyperDB store |
+| Official evidence | Pinned direct `llama.cpp`, CPU-only |
+| Clinical sources | WHO IMCI Chart Booklet and mhGAP |
+| Tests | Node test runner, jsdom and real local runtime gates |
 
-Rules:
-- Must be idempotent — safe to run multiple times without re-downloading.
-- Must work without any credentials — your weights must be publicly accessible.
-- The downloaded file path must exactly match `_runtime.model_path` in `metadata.json`.
+## Project structure
 
-Recommended hosting options for your weights:
-- [Hugging Face](https://huggingface.co) — public model repos (free, best for GGUF files)
-- GitHub Release Assets — attach the `.gguf` file to a GitHub Release
-- Any stable public URL (GCS public bucket, S3 public object, etc.)
-
----
-
-## 📄 REPORT.md
-
-Your technical writeup. Judges and the LLM-based audit system will read this to understand your submission. Cover:
-
-1. **Problem** — What problem are you solving? Who is the target user in an African context?
-2. **Design Decisions** — What model did you start from? Why that quantization level? What alternatives did you evaluate?
-3. **Constraints** — What hardware, connectivity, or data constraints shaped your approach?
-4. **Benchmarks** — What inference speed and memory numbers did you observe on your development machine?
-
-Keep it factual and specific. One to three pages is ideal.
-
----
-
-## 🧪 Local Testing
-
-The ADTC profiler is open source. Install it directly from the official repository:
-
-```bash
-pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+```text
+public/                 Browser application
+src/http/               Sessions, SSE and request ownership
+src/prompt/             Two-pass ordinary prompt workflow
+src/qvac/               Runtime, queue, egress and telemetry adapters
+src/rag/                WHO ingestion and retrieval store
+src/triage/             Clinical records, policy and confirmation
+config/                 Frozen runtime, prompt and source contracts
+data/                   Local protocol and citation-map targets
+scripts/                Setup, evidence and verification tools
+submission/             Submitted-prompt and profiler evidence
+tests/                  Unit, integration and real-runtime tests
 ```
 
-Then run a local smoke test before submitting:
+## Privacy and safety boundaries
 
-```bash
-# 1. Download your weights
-bash download_model.sh
+- The supported server binds to `127.0.0.1`.
+- Strict egress blocking is armed after startup prewarming.
+- Patient narratives are not persisted by the application.
+- Internal reasoning is never returned through the public API.
+- Public respiratory results exclude classifier severity, diagnosis, prescriptions, medicines, doses, treatment and model-authored management plans.
+- A below-threshold respiratory finding does not rule out illness or replace clinical judgment.
+- This prototype is for research, education and supervised review. It is not clinically validated medical software.
 
-# 2. Run the profiler in participant mode
-adtc-profiler run \
-  --submission . \
-  --mode participant \
-  --output submission.json \
-  --skip-accuracy
+## Reproducibility and evidence
 
-# 3. Review your report
-cat submission.json
-```
+- [Technical report](REPORT.md)
+- [Prior-work provenance](PROVENANCE.md)
+- [Local API contract](docs/API.md)
+- [Domain guide](DOMAIN-GUIDE.md)
+- [Submission contract](metadata.json)
+- [Generated participant profiler result](submission.json)
+- [Submitted-prompt evidence](submission/profiler/)
 
-A valid run produces a `submission.json` with `"measured_on": "participant_laptop"`.
+The exact submitted prompts match across local metadata, prompt policy, report and generated profiler output. The already-completed Devpost entry cannot be independently exported after submission, so authenticated archival parity remains user-attested. The existing video predates this restored workflow and is not presented as current proof.
 
-The profiler source code, including the thermal monitoring logic and scoring formulas, is publicly readable at:
-[github.com/Africa-Deep-Tech-Foundation/adtc-profiler](https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler)
+The GitHub repository owner is verified through the authenticated account. The four submission identity fields remain an atomic unresolved block because the exact registered Devpost or ADTF team identifier is not recoverable from the repository or post-deadline project view. The template sentinels remain explicit to avoid mixing verified account data with an unknown team record.
 
----
+Built for the [Africa Deep Tech Challenge 2026](https://adtc-2026.devpost.com/) Laptop LLM Challenge.
 
-## ⚠️ Rules
+## License
 
-1. **Public repository required.** Your repository must be public at the time of evaluation.
-2. **No model weights in git.** Add `*.gguf` and `model/` to your `.gitignore`. The evaluator downloads weights fresh via `download_model.sh`.
-3. **100% offline during evaluation.** Your model must run with zero external network dependencies during our testing window. `download_model.sh` runs before the profiler starts, but once profiling begins, no outbound requests are permitted.
-4. **llama.cpp only.** All models must use GGUF weights and run through `llama.cpp`. No other runtime is supported by our evaluation framework.
-5. **8 GB RAM limit.** Your model must run within the standard laptop profile (4 vCPU, 8 GB RAM, integrated GPU only). Out-of-memory errors during evaluation result in automatic disqualification.
-6. **No size restriction.** There is no parameter count or file size cap — but the 8 GB RAM constraint is strict. Plan your quantization level accordingly.
-7. **Two test prompts required.** Your `metadata.json` must include exactly 2 prompts in the `test_prompts` array. Organizers will generate 2 additional hidden prompts within your domain. All 4 are used for scoring.
-
----
-
-## 🆘 Support
-
-Open an issue in this repository or contact the ADTF team at challenge@africadeeptech.org.
-
-View the full eligibility rules at [adtc-2026.devpost.com/rules](https://adtc-2026.devpost.com/rules).
-
----
-
-## 📄 License
-
-This template is licensed under the terms of the [GNU GPL v3 License](LICENSE).
-
+Repository code is available under the [MIT License](LICENSE). Model, WHO source and imported-code licensing are recorded separately in [PROVENANCE.md](PROVENANCE.md) and [REPORT.md](REPORT.md). This repository does not relicense model or WHO document bytes.

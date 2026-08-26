@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "kind": "submitted-prompt-product-evidence",
+  "plane": "QVAC supported product /assist",
+  "status": "fail",
+  "officialProfilerEvidence": "separate-and-unchanged",
+  "historicalOneShotEvidence": "preserved-and-unchanged",
+  "promptContract": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "sha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29"
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "sha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74"
+    }
+  ],
+  "runtime": {
+    "sdkVersion": "0.13.3",
+    "workflowVersion": "prompt-policy-v4"
+  },
+  "model": {
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "host": {
+    "label": "dami-darwin-arm64 Apple development host",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.0.0"
+  },
+  "startedAt": "2026-08-25T17:52:45.087Z",
+  "finishedAt": "2026-08-25T17:55:06.988Z",
+  "listenerClosed": true,
+  "workerClosed": true,
+  "executions": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 1,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "d73ff9ef-0e94-4be3-8170-41bef6b1ce62",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"d73ff9ef-0e94-4be3-8170-41bef6b1ce62\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 18251
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 2,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "32dfd010-ba71-4d01-a22e-3c54343c0a3a",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"32dfd010-ba71-4d01-a22e-3c54343c0a3a\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 13819
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 3,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "7a4ba2cd-5136-4d2e-801b-5858a1f7e48f",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"7a4ba2cd-5136-4d2e-801b-5858a1f7e48f\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 12910
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 1,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "4273178e-bf8a-41c9-bca1-a7d20f9523a0",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"4273178e-bf8a-41c9-bca1-a7d20f9523a0\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 32817
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 2,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "39535905-6a64-40a2-be40-90e91d9f07be",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"39535905-6a64-40a2-be40-90e91d9f07be\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 31934
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 3,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=90073e4f-cc65-4e6a-899d-80b2567919bc",
+      "jobId": "9c046413-8f63-464f-aa1f-2a372536d838",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"9c046413-8f63-464f-aa1f-2a372536d838\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 31904
+    }
+  ],
+  "evaluations": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    }
+  ],
+  "executionContract": {
+    "command": [
+      "/opt/homebrew/Cellar/node/24.10.0/bin/node",
+      "/Users/MAC/adtc-2026/scripts/submitted-prompt-evidence/run-product.ts",
+      "submission/profiler/submitted-prompt-product-exact-evidence-20260825T190000Z.json"
+    ],
+    "endpoint": "/assist",
+    "queue": "single-inference",
+    "reasonPredict": 1024,
+    "extractPredict": 512,
+    "maxExtractAttempts": 3,
+    "temperature": 0,
+    "rawReasoningPreserved": false
+  },
+  "runError": null
+}

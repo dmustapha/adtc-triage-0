@@ -84,14 +84,10 @@ test("health distinguishes canonical identity and both runtimes", async () => {
   }
 });
 
-test("startServer fails before listening when the canonical GGUF is absent", async () => {
-  const { startServer } = await import("../src/server.js");
-  let started: { close(): void } | undefined;
-  try {
-    assert.throws(() => { started = startServer(0); }, /missing canonical model/i);
-  } finally {
-    started?.close();
-  }
+test("server startup precondition rejects an isolated absent-model fixture", async () => {
+  const module = await modelContractModule();
+  assert.ok(module, "model-contract loader must exist");
+  assert.throws(() => module.loadModelContract(fixture({ writeModel: false })), /missing canonical model/i);
 });
 
 test("active model identity contains no OLMo path", async () => {

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 export const SOURCE_REPOSITORY = "https://github.com/dmustapha/triage-0";
@@ -41,35 +41,49 @@ export const PLANNED_SOURCE_PATHS = [
 ] as const;
 
 const MODIFIED_FOR_ADTC = new Set<string>([
-  "package-lock.json", "package.json", "public/app.html", "public/index.html", "public/assets/css/app.css", "public/assets/js/net.js", "public/assets/js/triage.js",
-  "src/config.ts", "src/qvac/engine.ts", "src/server.ts",
-  "src/triage/schema.ts", "src/triage/severity.ts", "src/triage/triage.ts",
+  "data/protocols/README.md", "package-lock.json", "package.json", "public/app.html", "public/index.html", "public/logo.png", "public/assets/css/app.css", "public/assets/js/net.js", "public/assets/js/triage.js",
+  "scripts/clinical-audit.ts", "scripts/ingest-protocols.ts", "scripts/patch-sdk-zod.mjs",
+  "src/config.ts", "src/qvac/engine.ts", "src/qvac/orchestrator.ts", "src/qvac/perf-logger.ts", "src/qvac/sdk.ts", "src/rag/store.ts", "src/server.ts",
+  "src/triage/class-router.ts", "src/triage/schema.ts", "src/triage/severity.ts", "src/triage/triage.ts",
   "tests/integration/http-validation.test.ts",
   "tests/integration/server.test.ts", "tests/integration/sse-contract.test.ts",
   "tests/integration/triage.test.ts", "tests/unit/config.test.ts", "tests/unit/frontend.test.ts",
-  "tests/unit/severity.test.ts", "tsconfig.json",
+  "tests/unit/class-router.test.ts", "tests/unit/perf-csv.test.ts", "tests/unit/perf-logger.test.ts", "tests/unit/severity.test.ts", "tsconfig.json",
 ]);
 
 const MODIFICATION_REASONS: Record<string, string> = {
+  "data/protocols/README.md": "Replaced manual-only WHO setup with the checksum-locked, idempotent protocol downloader used by clean local setup.",
   "package-lock.json": "Reconciled one lockfile for the merged ADTC evidence and Triage-0 application dependency contract.",
   "package.json": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and corrected integration-test package contract.",
-  "public/app.html": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow.",
-  "public/index.html": "Replaced imported speech, treatment, performance, benchmark, and unconditional offline claims with claim-limited English-text and runtime-readiness copy.",
-  "public/assets/css/app.css": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system.",
+  "public/app.html": "Restored the approved supervised WHO assessment and ordinary-prompt modes, preserved structured respiratory authority, and kept the exact two submitted prompts available as unchanged examples.",
+  "public/index.html": "Replaced imported unsupported claims with claim-limited copy that truthfully introduces pediatric IMCI, adult mhGAP, ordinary prompts, and observed runtime readiness.",
+  "public/logo.png": "Removed the redundant raster logo after the interface standardized on the imported SVG identity assets.",
+  "public/assets/css/app.css": "Removed obsolete public classification, plan, and raw-retrieval-excerpt styling; added result-first respiratory assessment, input-authority, and provenance styles; and raised mobile controls and operational text to comfortable touch targets.",
   "public/assets/js/net.js": "Distinguished browser network reachability from server-enforced on-device egress proof so UI badges cannot imply cloud inference or completed offline evidence.",
-  "public/assets/js/triage.js": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display.",
+  "public/assets/js/triage.js": "Made respiratory and broader WHO workflows reachable, rendered deterministic and provisional results through distinct result-first branches, enforced confirmation and dose-display gates, added the bounded ordinary-prompt path, and preserved truthful queue, cancellation, readiness, and provenance states.",
+  "scripts/clinical-audit.ts": "Kept clinical audit failures observable while preventing raw operational error content from entering console logs.",
+  "scripts/ingest-protocols.ts": "Made ingestion failures use the shared bounded error-name policy without exposing raw paths or SDK messages.",
+  "scripts/patch-sdk-zod.mjs": "Replaced vendor mutation with a read-only pinned QVAC/Zod compatibility gate and bounded failure output.",
   "src/config.ts": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection.",
-  "src/qvac/engine.ts": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline.",
-  "src/server.ts": "Preserved English text triage while parsing structured age and danger observations before QVAC context, semantic routing, retrieval, or MedPsy; deterministic emergency, assessment-required, and age-scoped chest-indrawing branches now short-circuit before runtime work.",
-  "src/triage/schema.ts": "Added strict structured patient-age and seven-field danger-observation request schemas with missing observations normalized to NOT_ASSESSED and request-level CONFLICT rejected.",
+  "src/qvac/engine.ts": "Removed excluded modality functions and bound queue abort signals to exact QVAC completion request cancellation without releasing native ownership before settlement.",
+  "src/qvac/orchestrator.ts": "Made unload and shutdown failures observable through bounded diagnostics while preserving safe stale-handle removal.",
+  "src/qvac/perf-logger.ts": "Exposed one canonical header-only CSV representation so an empty local telemetry dataset is truthful and stable without creating evidence rows.",
+  "src/qvac/sdk.ts": "Added the typed QVAC 0.13.3 completion request identifier and exact request-cancellation shim used by bounded clinical and prompt jobs.",
+  "src/rag/store.ts": "Preserved native QVAC retrieval and citation mapping while bounding parse diagnostics and removing raw path/error logging.",
+  "src/triage/class-router.ts": "Made the off-domain routing threshold finite and range-bounded so invalid environment configuration fails closed.",
+  "src/server.ts": "Made deterministic respiratory policy the sole public result authority; exposed only neutral assessment fields plus model/runtime/retrieval provenance; kept raw retrieval and classifier output private; made model initialization sequential; rejected record conflicts; and preserved exact method/readiness contracts.",
+  "src/triage/schema.ts": "Added strict structured patient-age, seven-field danger-observation, respiratory-concern, one-minute calm count-quality, and 1-200 respiratory-rate request schemas.",
   "src/triage/severity.ts": "Added authoritative structured danger state to severity entry points so free text and model red_flags cannot control the seven frozen atoms while non-respiratory and self-harm safeguards remain deterministic.",
   "src/triage/triage.ts": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags.",
-  "tests/integration/http-validation.test.ts": "Retained excluded-audio assertions and added invalid structured-age/value rejection proving requests reach neither triageContext nor runtime/download boundaries.",
-  "tests/integration/server.test.ts": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities.",
-  "tests/integration/sse-contract.test.ts": "Added model-free SSE coverage for omitted, partial, emergency, and chest-indrawing assessments with zero observed QVAC, semantic-routing, retrieval, or MedPsy calls; grounded model cases now send supported all-absent structured state.",
+  "tests/integration/http-validation.test.ts": "Added exact JSON 405 and Allow-header coverage, truthful header-only empty telemetry CSV behavior, narrative/structured conflict rejection, and a regression proving a bare listener reports liveness but not product readiness.",
+  "tests/integration/server.test.ts": "Kept canonical health identity coverage and changed the real model-backed hero loop to require a narrowed assessment payload with no public classification, plan, or clinical instructions.",
+  "tests/integration/sse-contract.test.ts": "Defined deterministic respiratory API/SSE outcomes, exact no-QVAC boundaries, fixed versus retrieved citation provenance, real QVAC assistance with truthful retrieval mode, and the absence of classifier, plan, treatment, and raw retrieval text from public payloads.",
   "tests/integration/triage.test.ts": "Replaced the model-dependent danger case with deterministic fixed-citation and citation-integrity coverage, and required supported all-absent grounded QVAC cases to observe a MedPsy call.",
   "tests/unit/config.test.ts": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection.",
-  "tests/unit/frontend.test.ts": "Added DOM, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and recorded-summary regressions for the structured checklist.",
+  "tests/unit/class-router.test.ts": "Added fail-closed boundary coverage for invalid off-domain router thresholds.",
+  "tests/unit/frontend.test.ts": "Defined the result-first respiratory form and card, toxic legacy excerpt suppression, distinct evidence provenance, truthful readiness, coherent examples, keyboard accessibility, cancellation behavior, and mobile touch-target regressions.",
+  "tests/unit/perf-csv.test.ts": "Added regression coverage for the canonical header-only empty telemetry dataset while preserving append and RFC-4180 escaping behavior.",
+  "tests/unit/perf-logger.test.ts": "Added bounded-tail telemetry and corrupt-row diagnostic coverage without exposing raw row content.",
   "tests/unit/severity.test.ts": "Added regressions proving authoritative structured state controls respiratory emergency and chest-indrawing decisions while model prose/red_flags cannot override all-absent state and non-respiratory safeguards remain intact.",
   "tsconfig.json": "Merged the imported DOM and interoperability requirements with the strict ADTC NodeNext compiler contract.",
 };
@@ -84,8 +98,9 @@ export interface ImportEntry {
   originalCreatedAt: string;
   classification: ImportClassification;
   purpose: string;
+  destinationStatus?: "present" | "removed";
   destinationSha256?: string;
-  modification?: { status: "pending-adaptation" | "modified"; reason: string };
+  modification?: { status: "pending-adaptation" | "modified" | "removed"; reason: string };
 }
 
 export interface ImportManifest {
@@ -114,15 +129,21 @@ export type ImportManifestDocument = ImportManifest | CompletedImportManifest;
 export function completeImportManifest(repositoryPath = DEFAULT_SOURCE_REPOSITORY_PATH): CompletedImportManifest {
   const manifest = buildImportManifest(repositoryPath);
   const imports = manifest.imports.map((entry) => {
+    if (!existsSync(entry.destinationPath)) {
+      if (entry.classification !== "modified-for-adtc") throw new Error(`Reused destination is missing: ${entry.destinationPath}`);
+      const reason = MODIFICATION_REASONS[entry.destinationPath];
+      if (!reason) throw new Error(`Missing removal reason: ${entry.destinationPath}`);
+      return { ...entry, destinationStatus: "removed" as const, modification: { status: "removed" as const, reason } };
+    }
     const destinationSha256 = createHash("sha256").update(readFileSync(entry.destinationPath)).digest("hex");
     if (entry.classification === "reused") {
       if (destinationSha256 !== entry.sourceSha256) throw new Error(`Reused destination differs from source: ${entry.destinationPath}`);
-      return { ...entry, destinationSha256 };
+      return { ...entry, destinationStatus: "present" as const, destinationSha256 };
     }
     const reason = MODIFICATION_REASONS[entry.destinationPath];
     if (!reason) throw new Error(`Missing modification reason: ${entry.destinationPath}`);
     const status = destinationSha256 === entry.sourceSha256 ? "pending-adaptation" as const : "modified" as const;
-    return { ...entry, destinationSha256, modification: { status, reason } };
+    return { ...entry, destinationStatus: "present" as const, destinationSha256, modification: { status, reason } };
   });
   return { ...manifest, kind: "completed-import", applicationImported: true, imports };
 }
@@ -179,10 +200,15 @@ export function buildImportManifest(repositoryPath = DEFAULT_SOURCE_REPOSITORY_P
       { path: "PROVENANCE.json", classification: "adtc-new", purpose: "Machine-readable provenance registry" },
       { path: "config/import-manifest.schema.json", classification: "adtc-new", purpose: "Pre-import manifest contract" },
       { path: "config/import-manifest.json", classification: "adtc-new", purpose: "Frozen planned file ledger" },
+      { path: "config/canonical-protocols.json", classification: "adtc-new", purpose: "Pinned WHO PDF origins, byte counts, and hashes" },
       { path: "config/model-license-decision.json", classification: "adtc-new", purpose: "Disclosed-risk model license record" },
       { path: "scripts/build-import-manifest.ts", classification: "adtc-new", purpose: "Git-object manifest builder" },
+      { path: "scripts/setup-local.sh", classification: "adtc-new", purpose: "Supported clean-machine dependency, corpus, store, and readiness setup" },
       { path: "scripts/verify-import-manifest.ts", classification: "adtc-new", purpose: "Pinned-object verifier" },
+      { path: "download_protocols.sh", classification: "adtc-new", purpose: "Fail-closed checksum-locked WHO protocol downloader" },
+      { path: "src/logging.ts", classification: "adtc-new", purpose: "Bounded secret-safe operational diagnostic codes and counters" },
       { path: "tests/import-provenance.test.ts", classification: "adtc-new", purpose: "Provenance regression contract" },
+      { path: "tests/protocol-downloader.test.ts", classification: "adtc-new", purpose: "WHO downloader idempotence and fail-closed regression contract" },
     ],
     thirdPartyDependencies: [
       { name: "MedPsy-1.7B Q4_K_M GGUF", classification: "third-party", basis: "Publisher-declared Apache-2.0 weights with attribution; bytes are downloaded separately and are not retained in Git", unresolvedRisk: "Model-card wording and incomplete upstream training-data provenance require disclosed-risk review" },

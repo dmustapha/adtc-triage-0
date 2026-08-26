@@ -12,7 +12,7 @@
     },
     {
       "prompt_id": "tp_002",
-      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted classification. State that recorded danger observations and deterministic policy—not model output—control escalation. Do not diagnose or prescribe."
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe."
     }
   ]
 }

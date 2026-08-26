@@ -185,7 +185,11 @@ export interface RouteResult {
  *  cleanly in that gap — it abstains A1(0.781)/A2(0.692)/A3(0.819) and the un-encoded RA7 PTSD (0.826),
  *  while passing every V/MS/CB and every textbook clinical case. (Non-English NE cases score low here by
  *  design; Phase 4 translates them to English BEFORE routing.) Overridable via ROUTER_OFF_DOMAIN. */
-export const OFF_DOMAIN_THRESHOLD = Number(process.env.ROUTER_OFF_DOMAIN ?? 0.84);
+const configuredThreshold = Number(process.env.ROUTER_OFF_DOMAIN ?? 0.84);
+if (!Number.isFinite(configuredThreshold) || configuredThreshold < 0 || configuredThreshold > 1) {
+  throw new RangeError("ROUTER_OFF_DOMAIN must be a number from 0 through 1.");
+}
+export const OFF_DOMAIN_THRESHOLD = configuredThreshold;
 /** Always shortlist at least this many classes (so a near-tie second class is offered to the model). */
 const SHORTLIST_MIN = 3;
 /** Include any class within this cosine margin of the best (surfaces near-tie candidates). */

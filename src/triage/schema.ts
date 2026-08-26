@@ -6,6 +6,10 @@
 // code (severity.ts) and `protocol_citation` is injected from the retrieved chunk — neither is model-
 // authored. This keeps the two things the model is bad at (severity bucketing, citing) out of its hands.
 import { z } from "zod";
+
+const INVISIBLE_CONTROLS = /[\u0000\u200B\u200E-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/u;
+const safeDetail = z.string().trim().min(1).max(500)
+  .refine((text) => !INVISIBLE_CONTROLS.test(text), "Invisible control characters are not allowed.");
 import { CLASSIFICATION_ENUM } from "./protocol-table.js";
 import { DANGER_OBSERVATION_KEYS } from "./danger-observations.js";
 
@@ -15,7 +19,13 @@ export type Severity = (typeof SEVERITIES)[number];
 export const PatientAgeSchema = z.object({
   value: z.number().finite().nonnegative(),
   unit: z.enum(["months", "years"]),
-}).strict();
+}).strict().superRefine((age, context) => {
+  const maximum = age.unit === "years" ? 130 : 1560;
+  if (age.value > maximum) context.addIssue({
+    code: "too_big", origin: "number", maximum, inclusive: true,
+    path: ["value"], message: `Patient age must not exceed ${maximum} ${age.unit}.`,
+  });
+});
 
 const DangerObservationRequestValueSchema = z.enum(["PRESENT", "ABSENT", "NOT_ASSESSED"]);
 const dangerObservationShape = {
@@ -33,10 +43,54 @@ const DEFAULT_DANGER_OBSERVATIONS = Object.fromEntries(
 ) as Record<(typeof DANGER_OBSERVATION_KEYS)[number], "NOT_ASSESSED">;
 
 export const DangerObservationsRequestSchema = z.object(dangerObservationShape).strict().default(DEFAULT_DANGER_OBSERVATIONS);
+export const RespiratoryAssessmentRequestSchema = z.object({
+  coughOrDifficultBreathing: DangerObservationRequestValueSchema,
+  respiratoryRatePerMinute: z.number().int().min(1).max(200).optional(),
+  rateCountQuality: z.enum(["ONE_MINUTE_WHILE_CALM", "NOT_CONFIRMED"]),
+}).strict();
 export const StructuredDangerRequestSchema = z.object({
   patientAge: PatientAgeSchema.optional(),
   dangerObservations: DangerObservationsRequestSchema,
+  respiratoryAssessment: RespiratoryAssessmentRequestSchema.optional(),
 }).strict();
+
+export const MedicationSafetyReviewStateSchema = z.enum(["CONFIRMED_NONE", "PRESENT", "NOT_ASSESSED"]);
+export const MedicationSafetySchema = z.object({
+  allergiesReviewed: MedicationSafetyReviewStateSchema.default("NOT_ASSESSED"),
+  contraindicationsReviewed: MedicationSafetyReviewStateSchema.default("NOT_ASSESSED"),
+  allergyDetails: z.array(safeDetail).max(20).default([]),
+  contraindicationDetails: z.array(safeDetail).max(20).default([]),
+}).strict().superRefine((value, context) => {
+  if (value.allergiesReviewed === "PRESENT" && value.allergyDetails.length === 0) {
+    context.addIssue({ code: "custom", path: ["allergyDetails"], message: "Record known allergies." });
+  }
+  if (value.contraindicationsReviewed === "PRESENT" && value.contraindicationDetails.length === 0) {
+    context.addIssue({ code: "custom", path: ["contraindicationDetails"], message: "Record known contraindications." });
+  }
+});
+
+export const ProtocolApplicabilitySchema = z.object({
+  status: z.enum(["CONFIRMED_APPLICABLE", "NOT_APPLICABLE", "NOT_ASSESSED"]).default("NOT_ASSESSED"),
+  details: z.array(safeDetail).max(20).default([]),
+}).strict();
+
+export const ClinicalAssessmentRequestSchema = z.object({
+  caseText: z.string().max(2000)
+    .refine((text) => text.trim().length > 0, "Case description is required.")
+    .refine((text) => !INVISIBLE_CONTROLS.test(text), "Invisible control characters are not allowed."),
+  patientAge: PatientAgeSchema.optional(),
+  patientWeightKg: z.number().finite().min(0.5).max(300).optional(),
+  dangerObservations: DangerObservationsRequestSchema,
+  respiratoryAssessment: RespiratoryAssessmentRequestSchema.optional(),
+  medicationSafety: MedicationSafetySchema.default({
+    allergiesReviewed: "NOT_ASSESSED",
+    contraindicationsReviewed: "NOT_ASSESSED",
+    allergyDetails: [],
+    contraindicationDetails: [],
+  }),
+  protocolApplicability: ProtocolApplicabilitySchema.default({ status: "NOT_ASSESSED", details: [] }),
+}).strict();
+export type ClinicalAssessmentRequest = z.infer<typeof ClinicalAssessmentRequestSchema>;
 
 /** A citation injected from a real retrieved chunk (never model-authored). Used by every plan line. */
 export const PlanCitationSchema = z.object({
@@ -78,6 +132,44 @@ export const ManagementPlanSchema = z.object({
   referral: z.object({ criterion: z.string().min(1), citation: PlanCitationSchema }).nullable().default(null),
 });
 export type ManagementPlan = z.infer<typeof ManagementPlanSchema>;
+
+export const ReviewStateSchema = z.enum(["DETERMINISTIC", "PROVISIONAL", "CONFIRMED", "REJECTED", "UNAVAILABLE"]);
+const ReviewCitationSchema = PlanCitationSchema.strict();
+const ReviewFactsSchema = z.array(z.string().min(1)).max(50);
+const ConfirmationMetadataSchema = z.object({
+  eligible: z.boolean(),
+  token: z.string().min(1).nullable(),
+  expiresAt: z.string().datetime().nullable(),
+  missingFields: z.array(z.string().min(1)),
+}).strict();
+
+const ProvisionalAssessmentShape = {
+  classification: z.string().min(1),
+  protocol: z.enum(["IMCI", "mhGAP"]),
+  recordedFacts: ReviewFactsSchema,
+  inferredFacts: ReviewFactsSchema,
+  uncertainty: z.string().min(1),
+  basis: z.string().min(1),
+  citations: z.array(ReviewCitationSchema).min(1),
+  confirmation: ConfirmationMetadataSchema,
+};
+
+export const ProvisionalAssessmentSchema = z.object({
+  reviewState: z.literal("PROVISIONAL"),
+  ...ProvisionalAssessmentShape,
+}).strict();
+
+export const DoseStateSchema = z.object({
+  status: z.enum(["NOT_APPLICABLE", "LOCKED_MISSING_INPUTS", "LOCKED_SAFETY_REVIEW", "AVAILABLE_REFERENCE_BAND"]),
+  missingFields: z.array(z.string().min(1)),
+}).strict();
+
+export const ConfirmedAssessmentSchema = z.object({
+  reviewState: z.literal("CONFIRMED"),
+  ...ProvisionalAssessmentShape,
+  referenceActions: ManagementPlanSchema,
+  doseState: DoseStateSchema,
+}).strict();
 
 /** The triage card surfaced to the health worker. `protocol_citation` always resolves to a real
  *  ingested WHO chunk (never invented). `plan` is the grounded management plan (Task #22), attached

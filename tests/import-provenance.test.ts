@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
@@ -148,6 +148,15 @@ test("completed import ledger proves destination parity or records ADTC modifica
 
   assert.equal(manifest.applicationImported, true, "application import must be recorded complete");
   for (const entry of manifest.imports) {
+    if (entry.destinationStatus === "removed") {
+      assert.equal(existsSync(entry.destinationPath), false, entry.destinationPath);
+      assert.equal(entry.destinationSha256, undefined, entry.destinationPath);
+      assert.equal(entry.classification, "modified-for-adtc", entry.destinationPath);
+      assert.equal(entry.modification?.status, "removed", entry.destinationPath);
+      assert.ok(entry.modification?.reason, entry.destinationPath);
+      continue;
+    }
+    assert.equal(entry.destinationStatus, "present", entry.destinationPath);
     const destinationBytes = readFileSync(entry.destinationPath);
     const destinationSha256 = createHash("sha256").update(destinationBytes).digest("hex");
 

@@ -1,6 +1,7 @@
 // File: scripts/ingest-protocols.ts
 // Thin CLI entry. Run: npm run ingest
 import { ingestAll } from "../src/rag/ingest.js";
+import { safeErrorName } from "../src/logging.js";
 
 ingestAll()
   .then(({ total }) => {
@@ -8,6 +9,6 @@ ingestAll()
     process.exit(0);
   })
   .catch((err) => {
-    process.stderr.write(`Ingest failed: ${(err as Error).message}\n`);
+    process.stderr.write(`Ingest failed safely (${safeErrorName(err)}).\n`);
     process.exit(1);
   });

@@ -1,7 +1,7 @@
 // triage.js · the Triage-0 tool logic, extracted from the original inline script.
-// The wiring contract is unchanged: same element IDs, same /transcribe + /triage (SSE) + /tts calls,
-// same citation-first event order. Only the rendered markup was restyled to the Guided design (no emoji,
-// friendly clinician copy, severity carried by a labelled badge). Plain vanilla JS, no build step.
+// The active English text workflow uses /health and /triage SSE, with citation-first metadata and a
+// narrowed assessment renderer. Removed speech and management events cannot recreate public capability.
+// Plain vanilla JS, no build step.
 (function () {
   var $ = function (id) { return document.getElementById(id); };
 
@@ -19,51 +19,19 @@
     chip: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>'
   };
 
-  // ---- i18n: the whole flow from the case downwards renders in the case's language (en/fr/es) ----
-  // The UI language is set from the detected language (the `detect` stage event / card.source_language),
-  // so a French case shows French chrome, reasoning and audio. Templates use {placeholder} substitution.
+  // English-only public assessment copy. Templates use {placeholder} substitution.
   var I18N = {
     en: {
-      langName: { en: "English", fr: "French", es: "Spanish" },
-      reason_search: "Searching the guidelines", reason_read: "Reading the matched guideline", reason_think: "Reasoning through the protocol",
-      st_detect: "Detected {lang}", st_translate_in: "Translated case → English", st_retrieve: "Searched {n} WHO passages",
-      st_reason: "Reasoning on-device", st_classify: "Classified: {cls}", st_translate_out: "Translated output → {lang}", st_plan: "Built WHO management plan",
-      d_langdetect: "on-device langdetect", d_nmt_in: "on-device Bergamot NMT", d_retrieval: "semantic retrieval", d_medpsy: "QVAC SDK 0.13.3 · on-device", d_classes: "schema-validated clinical extraction", d_nmt_out: "on-device NMT", d_grounded: "grounded in the cited protocol",
-      cite_from: "From the WHO {protocol} guideline", cite_from_generic: "From the WHO guideline", cite_src: "{doc}, page {page}. Found in the guidelines on this device.",
-      classification: "Classification", classes_hint: "Structured review output", conf_high: "high confidence", conf_medium: "medium confidence", conf_low: "low confidence",
-      plan_pending: "Preparing the full management plan", plan_head: "Management plan", plan_meds: "Medicines", plan_supportive: "Supportive care", plan_home: "Home care", plan_return: "Return immediately if", plan_followup: "Follow-up", plan_referral: "Referral", plan_at_visit: "At the visit: {detail}",
-      plan_foot: "Every line is taken verbatim from the WHO guidelines on this device. Doses are the WHO weight-band amounts; confirm the child’s weight.",
-      sev_EMERGENCY: "Refer now", sev_URGENT: "Treat now and follow up", sev_ROUTINE: "Home care", sev_SELF_CARE: "Self-care advice", sev_UNKNOWN: "No matching guideline",
-      abstain_msg: "This didn't match a WHO protocol. Triage-0 covers under-5 childhood illness and mental health for any age — check the description fits (the person's age and the signs you see), then rephrase or tap Speak again. If it is a real case outside this scope, escalate to a clinician.",
-      audio_preparing: "Preparing the spoken guidance…", audio_listen: "Listen to the guidance", audio_ready: "Spoken guidance ready", audio_ready_s: "Spoken guidance ready · {s} s on this device", audio_fail: "Couldn't prepare the audio.", step2: "What the guideline says",
-    },
-    fr: {
-      langName: { en: "anglais", fr: "français", es: "espagnol" },
-      reason_search: "Recherche dans les protocoles", reason_read: "Lecture du protocole correspondant", reason_think: "Raisonnement selon le protocole",
-      st_detect: "Langue détectée : {lang}", st_translate_in: "Cas traduit en anglais", st_retrieve: "{n} passages OMS consultés",
-      st_reason: "Raisonnement sur l'appareil", st_classify: "Classé : {cls}", st_translate_out: "Résultat traduit en {lang}", st_plan: "Plan de prise en charge OMS établi",
-      d_langdetect: "détection sur l'appareil", d_nmt_in: "NMT Bergamot sur l'appareil", d_retrieval: "recherche sémantique", d_medpsy: "QVAC SDK 0.13.3 · on-device", d_classes: "extraction clinique validée par schéma", d_nmt_out: "NMT sur l'appareil", d_grounded: "fondé sur le protocole cité",
-      cite_from: "D'après le guide OMS {protocol}", cite_from_generic: "D'après le guide OMS", cite_src: "{doc}, page {page}. Trouvé dans les protocoles sur cet appareil.",
-      classification: "Classification", classes_hint: "Résultat de revue structurée", conf_high: "confiance élevée", conf_medium: "confiance moyenne", conf_low: "confiance faible",
-      plan_pending: "Préparation du plan de prise en charge", plan_head: "Plan de prise en charge", plan_meds: "Médicaments", plan_supportive: "Soins de soutien", plan_home: "Soins à domicile", plan_return: "Revenir immédiatement si", plan_followup: "Suivi", plan_referral: "Orientation", plan_at_visit: "À la visite : {detail}",
-      plan_foot: "Chaque ligne est tirée textuellement des protocoles OMS sur cet appareil. Les doses sont les quantités OMS par tranche de poids ; confirmez le poids de l'enfant.",
-      sev_EMERGENCY: "Orienter maintenant", sev_URGENT: "Traiter maintenant et suivre", sev_ROUTINE: "Soins à domicile", sev_SELF_CARE: "Conseils d'autosoins", sev_UNKNOWN: "Aucun protocole correspondant",
-      abstain_msg: "Cela ne correspond à aucun protocole OMS. Triage-0 couvre les maladies de l'enfant de moins de 5 ans et la santé mentale à tout âge — vérifiez que la description correspond (l'âge de la personne et les signes observés), puis reformulez ou appuyez à nouveau sur Parler. S'il s'agit d'un vrai cas hors de ce champ, orientez vers un clinicien.",
-      audio_preparing: "Préparation de la lecture vocale…", audio_listen: "Écouter les consignes", audio_ready: "Lecture vocale prête", audio_ready_s: "Lecture vocale prête · {s} s sur cet appareil", audio_fail: "Impossible de préparer l'audio.", step2: "Ce que dit le protocole",
-    },
-    es: {
-      langName: { en: "inglés", fr: "francés", es: "español" },
-      reason_search: "Buscando en los protocolos", reason_read: "Leyendo el protocolo correspondiente", reason_think: "Razonando según el protocolo",
-      st_detect: "Idioma detectado: {lang}", st_translate_in: "Caso traducido al inglés", st_retrieve: "{n} pasajes de la OMS consultados",
-      st_reason: "Razonando en el dispositivo", st_classify: "Clasificado: {cls}", st_translate_out: "Resultado traducido al {lang}", st_plan: "Plan de manejo de la OMS elaborado",
-      d_langdetect: "detección en el dispositivo", d_nmt_in: "NMT Bergamot en el dispositivo", d_retrieval: "búsqueda semántica", d_medpsy: "QVAC SDK 0.13.3 · on-device", d_classes: "extracción clínica validada por esquema", d_nmt_out: "NMT en el dispositivo", d_grounded: "basado en el protocolo citado",
-      cite_from: "Del manual de la OMS {protocol}", cite_from_generic: "Del manual de la OMS", cite_src: "{doc}, página {page}. Encontrado en los protocolos de este dispositivo.",
-      classification: "Clasificación", classes_hint: "Resultado de revisión estructurada", conf_high: "confianza alta", conf_medium: "confianza media", conf_low: "confianza baja",
-      plan_pending: "Preparando el plan de manejo", plan_head: "Plan de manejo", plan_meds: "Medicamentos", plan_supportive: "Cuidados de apoyo", plan_home: "Cuidados en casa", plan_return: "Vuelva de inmediato si", plan_followup: "Seguimiento", plan_referral: "Derivación", plan_at_visit: "En la visita: {detail}",
-      plan_foot: "Cada línea está tomada textualmente de los protocolos de la OMS en este dispositivo. Las dosis son las cantidades de la OMS por franja de peso; confirme el peso del niño.",
-      sev_EMERGENCY: "Derivar ahora", sev_URGENT: "Tratar ahora y dar seguimiento", sev_ROUTINE: "Cuidados en casa", sev_SELF_CARE: "Consejos de autocuidado", sev_UNKNOWN: "Ningún protocolo correspondiente",
-      abstain_msg: "Esto no coincide con ningún protocolo de la OMS. Triage-0 cubre las enfermedades de menores de 5 años y la salud mental a cualquier edad — verifique que la descripción encaje (la edad de la persona y los signos que observa), luego reformule o pulse Hablar de nuevo. Si es un caso real fuera de este alcance, derive a un clínico.",
-      audio_preparing: "Preparando la lectura en voz alta…", audio_listen: "Escuchar las indicaciones", audio_ready: "Lectura lista", audio_ready_s: "Lectura lista · {s} s en este dispositivo", audio_fail: "No se pudo preparar el audio.", step2: "Lo que dice el protocolo",
+      langName: { en: "English" },
+      reason_search: "Checking supporting references", reason_read: "Supporting reference found", reason_think: "Preparing the assessment summary",
+      st_detect: "Recorded assessment received", st_retrieve: "Checked {n} local reference passages",
+      st_reason: "Local model-assisted review", st_summarize: "Prepared assessment summary",
+      d_langdetect: "structured observations", d_retrieval: "local reference lookup", d_medpsy: "QVAC SDK 0.13.3 · on-device", d_summary: "bounded local review",
+      cite_from: "Supporting reference", cite_from_generic: "Supporting reference", cite_fixed: "Fixed policy reference", cite_retrieved: "Retrieved WHO reference", cite_src: "{doc}, page {page}.",
+      outcome: "Assessment outcome", observations: "Recorded observations", uncertainty: "Uncertainty", reference: "Supporting reference",
+      model_summary: "Model-assisted summary", source_excerpt: "Retrieved WHO excerpt", input_authority: "How this result was produced",
+      abstain_msg: "This assessment is outside the supported scope. Escalate to a qualified clinician.",
+      step2: "Assessment outcome",
     },
   };
   var uiLang = "en";
@@ -91,36 +59,114 @@
     ["stridorWhenCalm", "Stridor when calm"],
     ["lowOxygenOrCentralCyanosis", "Low oxygen or central cyanosis"],
   ];
+  var clinicalState = {
+    phase: "RECORD",
+    requestFingerprint: null,
+    confirmationToken: null,
+    abortController: null,
+    terminal: false,
+    recordChangedDuringRun: false,
+    generation: 0,
+    confirmationPending: false,
+  };
+
+  function clinicalInput() { return $("clinicalCase") || $("case"); }
 
   function selectedDangerValue(key) {
     var selected = document.querySelector('input[name="danger-' + key + '"]:checked');
     return selected ? selected.value : "NOT_ASSESSED";
   }
 
+  function selectedRespiratoryConcern() {
+    var selected = document.querySelector('input[name="respiratory-concern"]:checked');
+    return selected ? selected.value : "NOT_ASSESSED";
+  }
+
   function readStructuredDanger() {
     var observations = {};
     DANGER_SIGNS.forEach(function (sign) { observations[sign[0]] = selectedDangerValue(sign[0]); });
-    return {
+    var rateText = $("respiratoryRatePerMinute") ? $("respiratoryRatePerMinute").value.trim() : "";
+    var structured = {
       patientAge: { value: Number($("patientAgeValue").value), unit: $("patientAgeUnit").value },
       dangerObservations: observations,
     };
+    var respiratoryConcern = selectedRespiratoryConcern();
+    var broaderFocus = $("assessmentFocus") && $("assessmentFocus").value === "BROADER_WHO";
+    if (!broaderFocus && respiratoryConcern !== "NOT_ASSESSED") {
+      structured.respiratoryAssessment = {
+        coughOrDifficultBreathing: respiratoryConcern,
+        rateCountQuality: $("rateCountQuality") ? $("rateCountQuality").value : "NOT_CONFIRMED",
+      };
+      if (rateText !== "") structured.respiratoryAssessment.respiratoryRatePerMinute = Number(rateText);
+    }
+    if ($("patientWeightKg") && $("patientWeightKg").value.trim() !== "") {
+      structured.patientWeightKg = Number($("patientWeightKg").value);
+    }
+    if ($("allergiesReviewed")) {
+      structured.medicationSafety = {
+        allergiesReviewed: $("allergiesReviewed").value,
+        contraindicationsReviewed: $("contraindicationsReviewed").value,
+        allergyDetails: [],
+        contraindicationDetails: [],
+      };
+      structured.protocolApplicability = { status: $("protocolApplicability").value, details: [] };
+    }
+    return structured;
   }
 
-  function hasSupportedAge(age) {
-    if (age.unit !== "months" && age.unit !== "years") return false;
+  function ageBand(age) {
+    if (age.unit !== "months" && age.unit !== "years") return "unsupported";
     var months = age.unit === "years" ? age.value * 12 : age.value;
-    return Number.isFinite(months) && months >= 2 && months < 60;
+    if (!Number.isFinite(months) || months < 0 || months > 1560) return "unsupported";
+    if (months >= 2 && months < 60) return "young-child";
+    if (months >= 18 * 12) return "adult";
+    return "unsupported";
   }
 
   function updateDangerChecklist() {
     var structured = readStructuredDanger();
     var values = structured.dangerObservations;
     var assessed = DANGER_SIGNS.filter(function (sign) { return values[sign[0]] !== "NOT_ASSESSED"; }).length;
-    var ageReady = hasSupportedAge(structured.patientAge);
-    var ready = assessed === DANGER_SIGNS.length && ageReady;
+    var band = ageBand(structured.patientAge);
+    var ageReady = band !== "unsupported";
+    var emergency = DANGER_SIGNS.some(function (sign) {
+      return sign[0] !== "chestIndrawing" && values[sign[0]] === "PRESENT";
+    });
+    var respiratory = structured.respiratoryAssessment || { coughOrDifficultBreathing: "NOT_ASSESSED", rateCountQuality: "NOT_CONFIRMED" };
+    var broaderFocus = $("assessmentFocus") && $("assessmentFocus").value === "BROADER_WHO";
+    var rateReady = Number.isInteger(respiratory.respiratoryRatePerMinute) &&
+      respiratory.respiratoryRatePerMinute >= 1 && respiratory.respiratoryRatePerMinute <= 200;
+    var chestReview = values.chestIndrawing === "PRESENT" && respiratory.coughOrDifficultBreathing === "PRESENT";
+    var respiratoryReady = respiratory.coughOrDifficultBreathing === "ABSENT" || chestReview ||
+      (respiratory.coughOrDifficultBreathing === "PRESENT" && rateReady &&
+        respiratory.rateCountQuality === "ONE_MINUTE_WHILE_CALM");
+    var adultReady = band === "adult";
+    var childReady = band === "young-child" && assessed === DANGER_SIGNS.length && (broaderFocus || respiratoryReady);
+    var policyReady = emergency || adultReady || childReady;
+    var narrativeReady = Boolean(clinicalInput() && clinicalInput().value.trim());
+    var weightText = $("patientWeightKg") ? $("patientWeightKg").value.trim() : "";
+    var weightReady = !weightText || (Number(weightText) >= 0.5 && Number(weightText) <= 300);
+    var ready = policyReady && narrativeReady && weightReady;
+    if ($("patientAgeValue")) $("patientAgeValue").setAttribute("aria-invalid", String(Boolean($("patientAgeValue").value) && !ageReady));
+    if ($("patientWeightKg")) $("patientWeightKg").setAttribute("aria-invalid", String(!weightReady));
+    document.querySelectorAll("[data-danger-key]").forEach(function (fieldset) {
+      var missing = values[fieldset.dataset.dangerKey] === "NOT_ASSESSED";
+      fieldset.setAttribute("aria-invalid", String(band === "young-child" && !emergency && missing));
+    });
+    var breathingIncomplete = band === "young-child" && !broaderFocus && !emergency && !respiratoryReady;
+    if ($("respiratoryAssessment")) $("respiratoryAssessment").setAttribute("aria-invalid", String(breathingIncomplete));
+    var rateRequired = breathingIncomplete && respiratory.coughOrDifficultBreathing === "PRESENT" && !chestReview;
+    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").setAttribute("aria-invalid", String(rateRequired && !rateReady));
+    if ($("rateCountQuality")) $("rateCountQuality").setAttribute("aria-invalid", String(rateRequired && respiratory.rateCountQuality !== "ONE_MINUTE_WHILE_CALM"));
     var status = assessed + " of " + DANGER_SIGNS.length + " signs assessed.";
-    if (ready) status += " Ready for guidance.";
-    else if (!ageReady) status += " Age required (2 months to under 5 years).";
+    if (emergency) status += " Emergency observation ready for assessment.";
+    else if (policyReady && !narrativeReady) status += " Describe the recorded case to continue.";
+    else if (policyReady && !weightReady) status += " Weight must be between 0.5 and 300 kg, or left blank.";
+    else if (adultReady) status += " Ready for adult WHO assessment.";
+    else if (ready && broaderFocus) status += " Ready for broader WHO assessment.";
+    else if (ready) status += " Ready for respiratory assessment.";
+    else if (!ageReady) status += " Supported age required: 2 months to under 5 years, or 18 years and older.";
+    else if (assessed === DANGER_SIGNS.length) status += " Complete the breathing assessment.";
     if ($("dangerStatus")) $("dangerStatus").textContent = status;
     if ($("dangerSummary")) {
       $("dangerSummary").textContent = "Recorded checklist: " + DANGER_SIGNS.map(function (sign) {
@@ -133,6 +179,7 @@
   }
 
   // ---- guidelines loaded count (for the live readout) + empty-store setup banner (H-7) ----
+  function refreshHealth() {
   fetch("/health").then(function (r) { return r.json(); }).then(function (h) {
     if ($("hChunks")) $("hChunks").textContent = h.chunks != null ? h.chunks : "·";
 
@@ -173,15 +220,32 @@
     // returned no hits on the startup self-test (ragLive===false — store wiped). Either way every triage
     // would abstain, so surface a loud, actionable banner instead of letting it look like intended behavior.
     var banner = $("setupBanner");
-    if (banner && (h.chunks === 0 || h.ragLive === false)) {
-      banner.innerHTML =
-        "<strong>Setup needed.</strong> The WHO guideline store is empty, so every case will abstain. " +
-        "Run <code>npm run ingest</code> in the project folder, then restart the server.";
+    if (banner && h.ready === false) {
+      if (h.inference && h.inference.recoveryRequired) {
+        banner.innerHTML = "<strong>Local inference restart required.</strong> Stop and restart the supported app server before retrying.";
+      } else if (h.chunks === 0 || h.citationMapHealthy === false || h.ragLive === false) {
+        banner.innerHTML = "<strong>WHO reference store not ready.</strong> Restore the verified protocol files, run <code>npm run ingest</code>, then restart the supported app server.";
+      } else {
+        banner.innerHTML = "<strong>Runtime loading.</strong> Keep this page open while the local model and WHO reference engine finish loading.";
+      }
+      banner.classList.remove("hidden");
+      setTimeout(refreshHealth, 2000);
+    } else if (banner && h.ready === true) {
+      banner.classList.add("hidden");
+    }
+  }).catch(function () {
+    var banner = $("setupBanner");
+    if (banner) {
+      banner.innerHTML = "<strong>Local runtime unreachable.</strong> Confirm the supported server is running, then retry this page.";
       banner.classList.remove("hidden");
     }
-  }).catch(function () {});
+    if ($("hChunks")) $("hChunks").textContent = "Unavailable";
+    setTimeout(refreshHealth, 2000);
+  });
+  }
+  refreshHealth();
 
-  // ---- audio helpers: resample any recording to 16 kHz mono WAV ----
+  // ---- dormant baseline audio helpers: unreachable in the English text workflow ----
   // Whisper (the STT model) expects 16 kHz mono; browsers capture at 44.1/48 kHz and the @qvac SDK does
   // NOT resample, so a raw recording transcribes to garbage (or empty for webm/opus). Decode the blob with
   // the browser's own audio stack and re-render at 16 kHz mono, then hand /transcribe a clean WAV it reads
@@ -226,8 +290,25 @@
     seedRow.querySelectorAll(".seed").forEach(function (b) {
       b.addEventListener("click", function () {
         var t = b.getAttribute("data-fill") || "";
-        var ta = $("case");
+        var ta = clinicalInput();
         if (ta) { ta.value = t; ta.focus(); }
+        if (b.dataset.ageValue && $("patientAgeValue")) $("patientAgeValue").value = b.dataset.ageValue;
+        if (b.dataset.ageUnit && $("patientAgeUnit")) $("patientAgeUnit").value = b.dataset.ageUnit;
+        if (b.dataset.observations === "absent") {
+          DANGER_SIGNS.forEach(function (sign) {
+            var absent = document.querySelector('input[name="danger-' + sign[0] + '"][value="ABSENT"]');
+            if (absent) absent.checked = true;
+          });
+        }
+        if (b.dataset.respiratoryConcern) {
+          var concern = document.querySelector('input[name="respiratory-concern"][value="' + b.dataset.respiratoryConcern + '"]');
+          if (concern) concern.checked = true;
+        }
+        if (b.dataset.respiratoryRate && $("respiratoryRatePerMinute")) {
+          $("respiratoryRatePerMinute").value = b.dataset.respiratoryRate;
+        }
+        if ($("rateCountQuality")) $("rateCountQuality").value = "ONE_MINUTE_WHILE_CALM";
+        updateDangerChecklist();
         if ($("status")) $("status").textContent = "";
       });
     });
@@ -238,61 +319,125 @@
     var box = $("citationBox");
     box.classList.remove("hidden");
     // The card pass (SSE "card") calls this a SECOND time to refine the early raw-chunk citation to the
-    // classification-correct one. If a citation is already shown, update its text IN PLACE — replacing the
+    // stable reference metadata. If a citation is already shown, update its text IN PLACE — replacing the
     // whole innerHTML would recreate the .cite node and replay its cite-in entrance animation ~20s later,
     // a visible flicker (Phase-7 rehearsal). Keeping the node stable swaps the text with no re-animation.
     var cite = box.querySelector(".cite");
     if (cite) {
-      cite.querySelector(".q").textContent = '"' + c.section + '"';
       cite.querySelector(".src").textContent = t("cite_src", { doc: c.doc, page: c.page });
       return;
     }
-    var fromTxt = c.protocol ? t("cite_from", { protocol: esc(c.protocol) }) : t("cite_from_generic");
+    var fromTxt = c.provenance === "fixed-policy" ? t("cite_fixed")
+      : c.provenance === "retrieved-reference" ? t("cite_retrieved")
+      : c.protocol ? t("cite_from", { protocol: esc(c.protocol) }) : t("cite_from_generic");
     box.innerHTML =
       '<div class="cite">' +
         '<span class="from">' + ICON.guide + fromTxt + "</span>" +
-        '<span class="q">"' + esc(c.section) + '"</span>' +
         '<span class="src">' + t("cite_src", { doc: esc(c.doc), page: esc(String(c.page)) }) + "</span>" +
       "</div>";
   }
 
-  function renderCard(card, classification) {
+  function observationLabel(key) {
+    var match = DANGER_SIGNS.find(function (sign) { return sign[0] === key; });
+    return match ? match[1] : key;
+  }
+
+  function formatEnum(value) {
+    return String(value == null ? "Not recorded" : value).toLowerCase().replace(/_/g, " ")
+      .replace(/\b\w/g, function (letter) { return letter.toUpperCase(); });
+  }
+
+  function renderThreshold(comparison) {
+    if (!comparison) return "";
+    var rate = comparison.respiratoryRatePerMinute;
+    var relation = comparison.relation === "AT_OR_ABOVE" ? "at or above" : "below";
+    return '<div class="threshold-comparison"><span>Threshold comparison</span><strong>' +
+      esc(rate) + "/min is " + relation + " " + esc(comparison.thresholdPerMinute) + "/min</strong></div>";
+  }
+
+  function renderRecorded(recorded) {
+    if (!recorded) return "";
+    var rows = [
+      ["Age", recorded.ageMonths == null ? "Not recorded" : recorded.ageMonths + " months"],
+      ["Cough or difficult breathing", formatEnum(recorded.coughOrDifficultBreathing)],
+      ["Breathing rate", recorded.respiratoryRatePerMinute == null ? "Not recorded" : recorded.respiratoryRatePerMinute + "/min"],
+      ["Count quality", formatEnum(recorded.rateCountQuality)],
+    ];
+    Object.keys(recorded.observations || {}).forEach(function (key) {
+      rows.push([observationLabel(key), formatEnum(recorded.observations[key])]);
+    });
+    return '<div class="recorded"><h3>' + t("observations") + '</h3><ul>' + rows.map(function (row) {
+      return '<li><span>' + esc(row[0]) + '</span><strong>' + esc(row[1]) + '</strong></li>';
+    }).join("") + "</ul></div>";
+  }
+
+  function renderAssistance(assistance) {
+    if (!assistance) return "";
+    var details = assistance.status === "COMPLETED"
+      ? [assistance.runtime, assistance.model, assistance.retrievalMode + " retrieval"].filter(Boolean).join(" | ")
+      : assistance.status === "UNAVAILABLE" ? "Local assistance was unavailable; the deterministic result is unchanged."
+      : "No model or retrieval assistance ran for this deterministic route.";
+    return '<div class="assistance"><span>Model and retrieval assistance</span><strong>' +
+      esc(formatEnum(assistance.status)) + '</strong><p>' + esc(details) + "</p></div>";
+  }
+
+  function outcomeTone(outcome) {
+    if (outcome === "EMERGENCY") return "EMERGENCY";
+    if (outcome === "PROMPT_SUPERVISED_REVIEW") return "URGENT";
+    if (outcome === "NO_ESCALATION_CRITERION_RECORDED") return "ROUTINE";
+    return "UNKNOWN";
+  }
+
+  function renderBroadRecorded(facts) {
+    if (!facts || !facts.length) return "";
+    return '<div class="recorded"><h3>' + t("observations") + '</h3><ul>' + facts.map(function (fact) {
+      return '<li><span>' + esc(fact) + "</span></li>";
+    }).join("") + "</ul></div>";
+  }
+
+  function renderBroadCard(card) {
+    var provisional = card.reviewState === "PROVISIONAL";
+    var label = provisional ? "Supervised Review Required" : "Assistance Unavailable";
+    var finding = provisional
+      ? "A provisional WHO protocol classification is ready for trained-worker review."
+      : card.uncertainty || "No supported WHO review result was available.";
+    var next = provisional
+      ? "Confirm, correct, or reject the provisional class before any reference action is shown."
+      : "Review the recorded case and use an appropriate clinical pathway outside this tool.";
+    var basis = card.basis ? '<div class="basis"><span>Basis</span><p>' + esc(card.basis) + "</p></div>" : "";
+    $("card").innerHTML = '<div class="verdict"><div class="outcome-banner tone-' + (provisional ? "URGENT" : "UNKNOWN") + '">' +
+      ICON.alert + esc(label) + '</div></div><h3>Finding</h3><p class="finding">' + esc(finding) + "</p>" + basis +
+      '<div class="next-step"><span>Next assessment step</span><p>' + esc(next) + "</p></div>" +
+      renderBroadRecorded(card.recordedFacts) + renderAssistance(card.assistance) +
+      (provisional ? '<div class="uncertainty"><span>' + t("uncertainty") + "</span><p>" + esc(card.uncertainty) + "</p></div>" : "");
+  }
+
+  function renderCard(card) {
     finishStages();
     $("reasoningWrap").classList.add("hidden");
     $("card").classList.remove("hidden");
-    var sev = card.severity;
-    var ico = (sev === "ROUTINE" || sev === "SELF_CARE") ? ICON.check : ICON.alert;
-    // Clinical order: Severity (how urgent) -> Classification (what it is) -> Why -> Action -> Management.
-    // The WHO classification is shown as "Classification" (not "Diagnosis"): IMCI/mhGAP produce a
-    // protocol classification, and the tool is decision-SUPPORT, not a diagnoser (see the disclaimer).
-    // 1D: the model's self-reported confidence (already in the payload — previously dropped). Neutral
-    // styling; high gets the single accent, medium/low stay muted (severity remains the only loud colour).
-    var conf = card.confidence;
-    var confChip = (conf && sev !== "UNKNOWN")
-      ? '<span class="conf conf--' + esc(conf) + '" title="The model\'s self-reported confidence in this classification">' + esc(t("conf_" + conf)) + "</span>"
-      : "";
-    var dx = (classification && sev !== "UNKNOWN")
-      ? '<div class="dx"><span class="dx-label">' + t("classification") + '</span><span class="dx-name">' + esc(classification) + "</span>" + confChip + '<span class="dx-hint">' + t("classes_hint") + "</span></div>"
-      : "";
-    // Phase 4: non-English cases are routed via an on-device English translation and the card is translated
-    // back. Flag it so the worker knows the text is machine-translated while the WHO citation stays English.
-    var TR_BANNER = {
-      fr: "Traduit du français — texte non textuel ; citation OMS en anglais",
-      es: "Traducido del español — texto no textual ; cita OMS en inglés",
-    };
-    var banner = card.translated
-      ? '<div class="tr-banner" role="note">' + esc(TR_BANNER[card.source_language] || "Translated — not verbatim WHO; citation in English") + "</div>"
-      : "";
+    if (card.reviewState && !card.outcome) {
+      renderBroadCard(card);
+      lastCard = card;
+      return;
+    }
+    var tone = outcomeTone(card.outcome);
+    var ico = tone === "ROUTINE" ? ICON.check : ICON.alert;
+    var source = card.sourceRule ? '<div class="supporting-reference"><span>Authoritative source rule</span><strong>' +
+      esc(card.sourceRule.doc) + ", page " + esc(String(card.sourceRule.page)) + '</strong><p>' +
+      esc(card.sourceRule.section) + "</p></div>" : "";
+    var missing = card.missingFields && card.missingFields.length
+      ? '<div class="missing-fields"><span>Missing recorded fields</span><p>' + esc(card.missingFields.join(", ")) + "</p></div>" : "";
     $("card").innerHTML =
       '<div class="verdict">' +
-        '<div class="sev ' + sev + '">' + ico + sev + "</div>" +
-        '<div class="sev-note">' + t("sev_" + sev) + "</div>" +
+        '<div class="outcome-banner tone-' + tone + '">' + ico + esc(formatEnum(card.outcome)) + "</div>" +
       "</div>" +
-      banner +
-      dx +
-      (sev !== "UNKNOWN" && card.reasoning ? '<div class="why">' + esc(card.reasoning) + "</div>" : "") +
-      '<div class="action">' + (sev === "UNKNOWN" ? t("abstain_msg") : esc(card.action)) + "</div>" +
-      (sev !== "UNKNOWN" ? '<div id="planWrap" class="plan-pending" role="status" aria-live="polite">' + t("plan_pending") + "</div>" : "") +
+      '<h3>Finding</h3><p class="finding">' + esc(card.finding) + "</p>" +
+      renderThreshold(card.thresholdComparison) +
+      '<div class="basis"><span>Basis</span><p>' + esc(card.basis) + "</p></div>" +
+      '<div class="next-step"><span>Next assessment step</span><p>' + esc(card.nextAssessmentStep) + "</p></div>" +
+      missing + renderRecorded(card.recorded) + source + renderAssistance(card.assistance) +
+      '<div class="uncertainty"><span>' + t("uncertainty") + "</span><p>" + esc(card.uncertainty) + "</p></div>" +
       "";
     lastCard = card;
     // On a small screen the verdict can land below the fold once the reasoning box has grown;
@@ -302,70 +447,137 @@
     }
   }
 
-  // ---- management plan (Task #22) ----
-  // Each line is grounded + cited server-side; the renderer only lays it out. Empty groups are skipped,
-  // so a partial plan (some components missing) renders gracefully with no empty headings.
-  function shortDoc(doc) {
-    // "WHO IMCI Chart Booklet (2014)" -> "WHO IMCI"; "WHO mhGAP Intervention Guide v2.0" -> "WHO mhGAP".
-    return String(doc).split(/\s+/).slice(0, 2).join(" ");
-  }
-  function citeMini(c) {
-    if (!c) return "";
-    return '<span class="cmini">' + esc(shortDoc(c.doc)) + " p." + esc(String(c.page)) + "</span>";
-  }
-  function pgroup(title, inner) {
-    return '<div class="pgroup"><h4>' + esc(title) + "</h4>" + inner + "</div>";
-  }
-  function prow(text, c) {
-    return '<div class="prow"><span class="ptext">' + esc(text) + "</span>" + citeMini(c) + "</div>";
-  }
-  function listGroup(title, arr, field) {
-    if (!arr || !arr.length) return "";
-    return pgroup(title, arr.map(function (x) { return prow(x[field], x.citation); }).join(""));
-  }
-  function doseTable(bands) {
-    if (!bands || !bands.length) return "";
-    return '<table class="dose"><thead><tr><th>Age / weight</th><th>Dose</th></tr></thead><tbody>' +
-      bands.map(function (b) {
-        return '<tr><td class="dose-band">' + esc(b.band) + '</td><td class="dose-amt">' + esc(b.dose) + "</td></tr>";
-      }).join("") + "</tbody></table>";
-  }
-  function renderPlan(plan) {
-    var wrap = $("planWrap");
-    if (!wrap) return;
-    var parts = [];
-    if (plan && plan.medicines && plan.medicines.length) {
-      var meds = plan.medicines.map(function (m) {
-        var head = '<div class="med-top"><span class="med-name">' + esc(m.name) + "</span>" + citeMini(m.citation) + "</div>";
-        var sub = [];
-        if (m.strength) sub.push(esc(m.strength));
-        if (m.frequency) sub.push(esc(m.frequency));
-        if (m.duration) sub.push(esc(m.duration));
-        var subHtml = sub.length ? '<div class="med-sub">' + sub.join(" &middot; ") + "</div>" : "";
-        // Real per-weight-band dosing table; fall back to the legacy "By weight band" line only if no bands.
-        var detail = (m.bands && m.bands.length) ? doseTable(m.bands) : (m.dose ? '<div class="med-sub">Dose: ' + esc(m.dose) + "</div>" : "");
-        return '<div class="med">' + head + subHtml + detail + "</div>";
-      }).join("");
-      parts.push(pgroup(t("plan_meds"), meds));
+  function renderProvisional(data) {
+    clinicalState.phase = "PROVISIONAL";
+    clinicalState.confirmationToken = data.token;
+    var card = $("card");
+    if (card && !card.querySelector(".provisional-summary")) {
+      var summary = document.createElement("section");
+      summary.className = "provisional-summary";
+      var label = document.createElement("span");
+      label.textContent = "Provisional WHO protocol classification";
+      var value = document.createElement("strong");
+      value.textContent = data.classification + " · " + data.protocol;
+      var boundary = document.createElement("p");
+      boundary.textContent = "Human confirmation is required. This is not a diagnosis and no reference action is unlocked.";
+      summary.append(label, value, boundary);
+      var provenance = card.querySelector(".supporting-reference, .assistance, .uncertainty");
+      if (provenance) provenance.insertAdjacentElement("beforebegin", summary); else card.append(summary);
     }
-    parts.push(listGroup(t("plan_supportive"), plan && plan.supportive, "item"));
-    parts.push(listGroup(t("plan_home"), plan && plan.home_care, "advice"));
-    parts.push(listGroup(t("plan_return"), plan && plan.return_now, "sign"));
-    if (plan && plan.follow_up) {
-      var fuInner = '<div class="prow"><span class="ptext">' + esc(plan.follow_up.when) + "</span>" + citeMini(plan.follow_up.citation) + "</div>";
-      if (plan.follow_up.detail) fuInner += '<div class="prow-detail">' + t("plan_at_visit", { detail: esc(plan.follow_up.detail) }) + "</div>";
-      parts.push(pgroup(t("plan_followup"), fuInner));
+    if ($("confirmationRegion")) $("confirmationRegion").classList.remove("hidden");
+  }
+
+  function appendActionList(parent, heading, items, valueKey) {
+    if (!items || !items.length) return;
+    var section = document.createElement("section");
+    var title = document.createElement("h4");
+    title.textContent = heading;
+    var list = document.createElement("ul");
+    items.forEach(function (item) {
+      var row = document.createElement("li");
+      row.textContent = item[valueKey] || item.name || "Source action";
+      list.appendChild(row);
+    });
+    section.append(title, list);
+    parent.appendChild(section);
+  }
+
+  function renderReferenceActions(result) {
+    if (!$("confirmationRegion")) return;
+    $("confirmationRegion").classList.remove("hidden");
+    $("confirmationRegion").textContent = "";
+    var title = document.createElement("h3");
+    title.textContent = "Confirmed WHO reference actions";
+    $("confirmationRegion").appendChild(title);
+    var actions = result.referenceActions || {};
+    appendActionList($("confirmationRegion"), "Referral", actions.referral ? [actions.referral] : [], "criterion");
+    appendActionList($("confirmationRegion"), "Return now", actions.return_now, "sign");
+    appendActionList($("confirmationRegion"), "Supportive actions", actions.supportive, "item");
+    appendActionList($("confirmationRegion"), "Home care", actions.home_care, "advice");
+    appendActionList($("confirmationRegion"), "Medicine source rows", actions.medicines, "name");
+    if (!actions.medicines || !actions.medicines.length) return;
+    var dose = document.createElement("p");
+    dose.className = "dose-state";
+    dose.textContent = "Dose-band state: " + formatEnum(result.doseState && result.doseState.status);
+    if (result.doseState && result.doseState.missingFields && result.doseState.missingFields.length) {
+      dose.textContent += ". Missing: " + result.doseState.missingFields.join(", ");
     }
-    if (plan && plan.referral) parts.push(pgroup(t("plan_referral"), prow(plan.referral.criterion, plan.referral.citation)));
-    parts = parts.filter(Boolean);
-    if (!parts.length) { wrap.innerHTML = ""; wrap.className = ""; return; }
-    wrap.className = "";
-    wrap.innerHTML =
-      '<div class="plan">' +
-        '<div class="plan-head">' + ICON.guide + t("plan_head") + "</div>" +
-        parts.join("") +
-        '<div class="plan-foot">' + t("plan_foot") + "</div>" +
-      "</div>";
+    if (result.doseState && result.doseState.status === "LOCKED_SAFETY_REVIEW") {
+      dose.textContent += ". Complete the allergy, contraindication, and protocol-applicability review before medicine source rows can unlock.";
+      ["allergiesReviewed", "contraindicationsReviewed", "protocolApplicability"].forEach(function (id) {
+        if ($(id)) $(id).setAttribute("aria-invalid", String($(id).value === "NOT_ASSESSED"));
+      });
+    }
+    $("confirmationRegion").appendChild(dose);
+  }
+
+  function invalidateConfirmation() {
+    clinicalState.generation += 1;
+    clinicalState.phase = "RECORD";
+    clinicalState.confirmationToken = null;
+    clinicalState.confirmationPending = false;
+    ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
+    if ($("confirmationRegion")) {
+      $("confirmationRegion").textContent = "";
+      $("confirmationRegion").classList.add("hidden");
+    }
+  }
+
+  function invalidateClinicalResult() {
+    var result = $("result");
+    var hadResult = result && !result.classList.contains("hidden") && $("card") && $("card").textContent.trim();
+    var interrupted = Boolean(assessCtl);
+    invalidateConfirmation();
+    if (interrupted) {
+      clinicalState.recordChangedDuringRun = true;
+      assessCtl.abort();
+    }
+    if (!hadResult && !interrupted) return;
+    result.classList.add("hidden");
+    result.removeAttribute("aria-busy");
+    $("card").textContent = "";
+    $("citationBox").textContent = "";
+    $("citationBox").classList.add("hidden");
+    $("reasoningWrap").classList.add("hidden");
+    lastCard = null;
+    $("status").textContent = "Recorded data changed. Run the assessment again.";
+  }
+
+  async function sendConfirmation(decision) {
+    if (!clinicalState.confirmationToken || clinicalState.confirmationPending) return;
+    var token = clinicalState.confirmationToken;
+    var generation = clinicalState.generation;
+    clinicalState.confirmationPending = true;
+    if ($("confirmationRegion")) $("confirmationRegion").setAttribute("aria-busy", "true");
+    if ($("confirmationStatus")) $("confirmationStatus").textContent = decision === "CONFIRM"
+      ? "Applying the reviewed confirmation."
+      : "Recording the rejection.";
+    ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = true; });
+    try {
+      var response = await fetch("/triage/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, decision: decision }),
+      });
+      var result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Confirmation could not be applied.");
+      if (generation !== clinicalState.generation || token !== clinicalState.confirmationToken || clinicalState.phase !== "PROVISIONAL") return;
+      clinicalState.confirmationToken = null;
+      clinicalState.phase = result.reviewState;
+      if (result.reviewState === "CONFIRMED") renderReferenceActions(result);
+      else if ($("confirmationRegion")) {
+        $("confirmationRegion").textContent = "The provisional classification was rejected. No reference actions were shown.";
+      }
+    } finally {
+      if (generation === clinicalState.generation) {
+        clinicalState.confirmationPending = false;
+        if ($("confirmationRegion")) $("confirmationRegion").removeAttribute("aria-busy");
+        if (clinicalState.phase === "PROVISIONAL" && $("confirmationStatus")) {
+          $("confirmationStatus").textContent = "Confirmation was not applied. Review the error and retry.";
+        }
+        ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
+      }
+    }
   }
 
   // ---- on-device pipeline readout ----
@@ -382,21 +594,17 @@
       if (ic) ic.innerHTML = ICON.checkSm;
     }
   }
-  // Build the stage label/detail in the case's language from the event's key + data (lang/count/cls),
-  // falling back to the backend's English label if a template is missing.
+  // Build the bounded public stage label and fall back to the server label if needed.
   function stageLabel(d) {
     switch (d.key) {
-      case "detect": return t("st_detect", { lang: langName(d.lang || uiLang) });
-      case "translate_in": return t("st_translate_in");
+      case "detect": return t("st_detect");
       case "retrieve": return t("st_retrieve", { n: d.count != null ? d.count : "" });
       case "reason": return t("st_reason");
-      case "classify": return t("st_classify", { cls: d.cls || "" });
-      case "translate_out": return t("st_translate_out", { lang: langName(d.lang || uiLang) });
-      case "plan": return t("st_plan");
+      case "summarize": return t("st_summarize");
       default: return d.label || d.key;
     }
   }
-  var STAGE_DETAIL = { detect: "d_langdetect", translate_in: "d_nmt_in", retrieve: "d_retrieval", reason: "d_medpsy", classify: "d_classes", translate_out: "d_nmt_out", plan: "d_grounded" };
+  var STAGE_DETAIL = { detect: "d_langdetect", retrieve: "d_retrieval", reason: "d_medpsy", summarize: "d_summary" };
   function renderStage(d) {
     var box = $("plSteps");
     if (!box || !d || !d.key) return;
@@ -422,11 +630,14 @@
     if (!ev || !dataLine) return;
     var d;
     // A malformed frame must be skipped, not kill the whole stream.
-    try { d = JSON.parse(dataLine); } catch (e) { return; }
+    try { d = JSON.parse(dataLine); } catch (e) {
+      gotTerminal = true;
+      $("err").textContent = "The local assessment response was malformed. Restart the supported app before retrying.";
+      $("reasoningWrap").classList.add("hidden");
+      return;
+    }
     if (ev === "stage") {
-      // The detect stage sets the whole flow's language, so every later stage + the card localize.
-      if (d.key === "detect" && d.lang) {
-        setUiLang(d.lang);
+      if (d.key === "detect") {
         var h2 = $("h-guideline"); if (h2) h2.textContent = t("step2");
         $("reasonLabel").textContent = t("reason_search");
       }
@@ -438,40 +649,23 @@
       $("hTtft").textContent = (d.ttftMs / 1000).toFixed(1) + " s";
       // H-1 staged status: the model has started producing its assessment.
       $("reasonLabel").textContent = t("reason_think");
-    } else if (ev === "reasoning") {
-      // The model reasons in English internally. For a non-English case we DON'T stream that English text
-      // (it would break the "everything in the case's language" flow) — the localized pipeline readout shows
-      // progress and the card's translated "why" carries the reasoning in the case's language.
-      if (uiLang !== "en") return;
-      var r = $("reasoning");
-      // Only autoscroll if the worker is already near the bottom, so reading back does not get yanked.
-      var atBottom = r.scrollHeight - r.scrollTop - r.clientHeight < 40;
-      r.textContent += d.delta.replace(/<\/?think>/g, "");
-      if (atBottom) r.scrollTop = r.scrollHeight;
-    } else if (ev === "card") {
+    } else if (ev === "card" || ev === "assessment_required") {
       gotTerminal = true;
-      renderCard(d.card, d.classification);
-      // Replace the early (raw-chunk) citation with the card's clean, classification-correct citation.
-      if (d.card && d.card.protocol_citation && d.card.protocol_citation.section) renderCitation({
-        section: d.card.protocol_citation.section, doc: d.card.protocol_citation.doc, page: d.card.protocol_citation.page,
-      });
+      renderCard(d.card);
       if (d.perf) {
         if (d.perf.ttftMs != null) $("hTtft").textContent = (d.perf.ttftMs / 1000).toFixed(1) + " s";
         $("hTps").textContent = d.perf.tokensPerSec != null ? Number(d.perf.tokensPerSec).toFixed(1) : "·";
         $("hDev").textContent = (d.perf.backendDevice || "·").toUpperCase();
       }
-    } else if (ev === "plan") {
-      renderPlan(d.plan);
-      // Full plan is in — synthesize the whole spoken guidance in the background now.
+    } else if (ev === "provisional") {
+      renderProvisional(d);
     } else if (ev === "abstain") {
       gotTerminal = true;
-      // Render even an abstain in the case's language (the detect stage also set this; belt-and-suspenders).
-      if (d.lang) setUiLang(d.lang);
       finishStages();
       renderCard(d.card);
     } else if (ev === "error") {
       gotTerminal = true;
-      $("err").textContent = d.error;
+      $("err").textContent = d.reason || d.error || "Local assistance is unavailable. Check readiness, then retry.";
       $("reasoningWrap").classList.add("hidden");
     }
   }
@@ -499,19 +693,21 @@
   }
 
   // ---- assess -> /triage (SSE) ----
-  // H-2: an AbortController lets the worker Stop an in-flight assessment; the Get-guidance button toggles
+  // H-2: an AbortController lets the worker stop an in-flight assessment; the Run-assessment button toggles
   // to a Stop button for the duration (mirrors the mic Speak/Stop toggle) and aborts the fetch on click.
   var assessCtl = null;
   async function runAssess() {
-    var caseText = $("case").value.trim();
-    if (!caseText) { $("status").textContent = "Describe or record a case first."; $("case").focus(); return; }
-    if (!updateDangerChecklist()) { $("status").textContent = "Complete the supported patient age and all seven signs first."; return; }
+    var caseText = clinicalInput().value.trim();
+    if (!caseText) { $("status").textContent = "Describe or record a case first."; clinicalInput().setAttribute("aria-invalid", "true"); clinicalInput().focus(); return; }
+    if (!updateDangerChecklist()) { $("status").textContent = $("dangerStatus").textContent || "Complete the recorded assessment first."; return; }
     var structuredDanger = readStructuredDanger();
     // Re-entrancy guard: a run is already in flight (assessCtl set). The keyboard path (Ctrl/Cmd+Enter)
     // bypasses the button, so without this a second run would overwrite assessCtl + the shared timer
     // interval (stopping the live one) and start a second /triage the single-job engine only queues.
     if (assessCtl) return;
     gotTerminal = false;
+    invalidateConfirmation();
+    clinicalState.recordChangedDuringRun = false;
     assessCtl = new AbortController();
     // Toggle the button into Stop mode (kept enabled so the worker can abort). Restored in `finally`.
     var assessLabel = $("assess").innerHTML;
@@ -538,12 +734,20 @@
       var r = await fetch("/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caseText: caseText, patientAge: structuredDanger.patientAge, dangerObservations: structuredDanger.dangerObservations }),
+        body: JSON.stringify({
+          caseText: caseText,
+          patientAge: structuredDanger.patientAge,
+          dangerObservations: structuredDanger.dangerObservations,
+          respiratoryAssessment: structuredDanger.respiratoryAssessment,
+          patientWeightKg: structuredDanger.patientWeightKg,
+          medicationSafety: structuredDanger.medicationSafety,
+          protocolApplicability: structuredDanger.protocolApplicability
+        }),
         signal: assessCtl.signal
       });
       // Guard before reading the stream: a non-2xx or bodyless response has no readable stream.
       if (!r.ok || !r.body) {
-        var msg = "Could not get guidance (" + r.status + ").";
+        var msg = "Could not run assessment (" + r.status + ").";
         try { var j = await r.json(); if (j && j.error) msg = j.error; } catch (e) {}
         throw new Error(msg);
       }
@@ -558,20 +762,19 @@
       }
       // Stream closed cleanly but no card/abstain/error arrived: do not leave a silent blank card.
       if (!gotTerminal) {
-        $("err").textContent = "The guidance did not finish. Try again.";
+        $("err").textContent = "The assessment did not finish. Try again.";
         $("reasoningWrap").classList.add("hidden");
       }
     } catch (e) {
       // H-2: a worker-initiated Stop aborts the fetch → AbortError. That is not a failure; show a calm
       // "Stopped." and clear the reasoning box rather than an error.
       if (e && e.name === "AbortError") {
-        $("status").textContent = "Stopped.";
+        $("status").textContent = clinicalState.recordChangedDuringRun
+          ? "Recorded data changed. Run the assessment again."
+          : "Stopped.";
         $("err").textContent = "";
-        // If a card already rendered, drop its still-pending plan placeholder so it does not hang.
-        var pw = $("planWrap");
-        if (pw && /plan-pending/.test(pw.className)) { pw.textContent = ""; pw.className = ""; }
       } else {
-        $("err").textContent = "Could not get guidance. " + e.message;
+        $("err").textContent = "Could not run assessment. " + e.message;
       }
       $("reasoningWrap").classList.add("hidden");
     } finally {
@@ -590,12 +793,231 @@
   if ($("dangerChecklist")) {
     $("dangerChecklist").addEventListener("change", updateDangerChecklist);
     $("patientAgeValue").addEventListener("input", updateDangerChecklist);
+    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").addEventListener("input", updateDangerChecklist);
     updateDangerChecklist();
   }
+  if ($("clinicalModePanel")) {
+    $("clinicalModePanel").addEventListener("input", function () { invalidateClinicalResult(); updateDangerChecklist(); });
+    $("clinicalModePanel").addEventListener("change", function () { invalidateClinicalResult(); updateDangerChecklist(); });
+  }
+  if ($("confirmAssessment")) $("confirmAssessment").onclick = function () { sendConfirmation("CONFIRM").catch(function (e) { $("err").textContent = e.message; }); };
+  if ($("rejectAssessment")) $("rejectAssessment").onclick = function () { sendConfirmation("REJECT").catch(function (e) { $("err").textContent = e.message; }); };
+  if ($("correctAssessment")) $("correctAssessment").onclick = function () { invalidateClinicalResult(); clinicalInput().focus(); };
   // Ctrl/Cmd+Enter from the case box submits, the way a clinician expects.
-  if ($("case")) $("case").addEventListener("keydown", function (e) {
+  if (clinicalInput()) clinicalInput().addEventListener("keydown", function (e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runAssess(); }
   });
+
+  function setMode(mode) {
+    var clinical = mode === "clinical";
+    if ($("clinicalModePanel")) $("clinicalModePanel").hidden = !clinical;
+    if ($("promptModePanel")) $("promptModePanel").hidden = clinical;
+    document.querySelectorAll(".mode-tab").forEach(function (button) {
+      var selected = button.dataset.mode === mode;
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+  }
+
+  document.querySelectorAll(".mode-tab").forEach(function (button) {
+    button.addEventListener("click", function () { setMode(button.dataset.mode); });
+  });
+  ["promptExample1", "promptExample2"].forEach(function (id) {
+    if ($(id)) $(id).addEventListener("click", function () {
+      $("ordinaryPrompt").value = $(id).dataset.prompt;
+      updatePromptReadiness();
+      $("ordinaryPrompt").focus();
+    });
+  });
+
+  var promptState = {
+    jobId: null,
+    abortController: null,
+    terminal: false,
+    runId: 0,
+    lastPrompt: "",
+    retryable: true,
+    cancelMessage: null,
+  };
+
+  function updatePromptReadiness() {
+    if (!$("ordinaryPrompt") || !$("runPrompt")) return;
+    var ready = Boolean($("ordinaryPrompt").value.trim());
+    $("ordinaryPrompt").setAttribute("aria-invalid", String(Boolean($("ordinaryPrompt").value) && !ready));
+    if (!promptState.abortController) $("runPrompt").disabled = !ready;
+  }
+
+  function promptMessage(kind, title, data) {
+    var promptResult = $("promptResult");
+    if (!promptResult) return;
+    promptResult.textContent = "";
+    promptResult.hidden = false;
+    promptResult.dataset.state = kind;
+    var heading = document.createElement("h3");
+    heading.textContent = title;
+    var answer = document.createElement("p");
+    var message = data.answer || data.reason || data.error || "No public answer was produced.";
+    answer.textContent = data.code ? message + " (" + data.code + ")" : message;
+    promptResult.append(heading, answer);
+    ["uncertainty", "limitations"].forEach(function (key) {
+      if (!data[key] || !data[key].length) return;
+      var label = document.createElement("h4");
+      label.textContent = formatEnum(key);
+      var list = document.createElement("ul");
+      data[key].forEach(function (line) {
+        var item = document.createElement("li");
+        item.textContent = line;
+        list.appendChild(item);
+      });
+      promptResult.append(label, list);
+    });
+  }
+
+  function handlePromptEvent(event, data, runId) {
+    if (runId !== promptState.runId || promptState.terminal) return;
+    if (event === "job") promptState.jobId = data.id;
+    else if (event === "stage") $("promptStatus").textContent = data.label || "Running locally.";
+    else if (event === "answer") {
+      promptState.terminal = true;
+      $("promptStatus").textContent = "Complete.";
+      promptMessage("completed", "Local answer", data);
+    } else if (event === "rejected") {
+      promptState.terminal = true;
+      promptState.retryable = data.retryable !== false;
+      if (data.status === "UNAVAILABLE") {
+        $("promptStatus").textContent = "Local assistance unavailable.";
+        promptMessage("unavailable", "Local assistance unavailable", data);
+      } else if (data.status === "CANCELLED") {
+        $("promptStatus").textContent = "Cancelled.";
+        promptMessage("cancelled", "Local run cancelled", data);
+      } else {
+        $("promptStatus").textContent = "Answer withheld.";
+        promptMessage("rejected", "Answer withheld", data);
+      }
+    } else if (event === "error") {
+      promptState.terminal = true;
+      promptState.retryable = data.retryable !== false;
+      $("promptStatus").textContent = "Local assistance unavailable.";
+      promptMessage("unavailable", "Local assistance unavailable", data);
+    }
+  }
+
+  function consumePromptFrames(buffer, runId) {
+    var split;
+    while ((split = buffer.indexOf("\n\n")) >= 0) {
+      var block = buffer.slice(0, split);
+      buffer = buffer.slice(split + 2);
+      var event = (block.match(/^event: (.*)$/m) || [])[1];
+      var line = (block.match(/^data: (.*)$/m) || [])[1];
+      if (!event || !line) continue;
+      try { handlePromptEvent(event, JSON.parse(line), runId); } catch (e) {
+        handlePromptEvent("error", {
+          code: "MALFORMED_RESPONSE",
+          reason: "The local prompt response was malformed. Restart the supported app before retrying.",
+          retryable: false,
+        }, runId);
+      }
+    }
+    return buffer;
+  }
+
+  async function runPrompt() {
+    var prompt = $("ordinaryPrompt").value;
+    if (!prompt.trim()) { $("promptStatus").textContent = "Enter a prompt first."; $("ordinaryPrompt").setAttribute("aria-invalid", "true"); $("ordinaryPrompt").focus(); return; }
+    promptState.runId += 1;
+    var runId = promptState.runId;
+    promptState.jobId = null;
+    promptState.terminal = false;
+    promptState.retryable = true;
+    promptState.cancelMessage = null;
+    promptState.lastPrompt = prompt;
+    promptState.abortController = new AbortController();
+    $("promptResult").hidden = true;
+    $("promptStatus").textContent = "Starting local two-pass review.";
+    $("runPrompt").disabled = true;
+    $("cancelPrompt").hidden = false;
+    $("retryPrompt").hidden = true;
+    var buffer = "";
+    try {
+      var response = await fetch("/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt }),
+        signal: promptState.abortController.signal,
+      });
+      if (!response.ok) {
+        var failure = { error: "Local prompt request was not accepted.", code: "REQUEST_REJECTED", retryable: false };
+        try { failure = await response.json(); } catch (e) {}
+        promptState.retryable = failure.retryable !== false;
+        throw new Error(failure.error + (failure.code ? " (" + failure.code + ")" : ""));
+      }
+      if (!response.body) { promptState.retryable = true; throw new Error("The local prompt response had no readable stream."); }
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      for (;;) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        buffer = consumePromptFrames(buffer, runId);
+      }
+      if (!promptState.terminal && runId === promptState.runId) {
+        promptState.terminal = true;
+        promptMessage("unavailable", "Incomplete local response", { reason: "No validated terminal answer was received." });
+      }
+    } catch (error) {
+      if (runId !== promptState.runId) return;
+      promptState.terminal = true;
+      if (error && error.name === "AbortError") $("promptStatus").textContent = promptState.cancelMessage || "Stopped locally.";
+      else promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
+    } finally {
+      if (runId === promptState.runId) {
+        promptState.abortController = null;
+        updatePromptReadiness();
+        $("cancelPrompt").hidden = true;
+        $("retryPrompt").hidden = !promptState.retryable;
+      }
+    }
+  }
+
+  async function cancelPrompt() {
+    promptState.cancelMessage = null;
+    if (promptState.jobId) {
+      try {
+        var response = await fetch("/jobs/" + encodeURIComponent(promptState.jobId), { method: "DELETE" });
+        if (response.status === 409) {
+          $("promptStatus").textContent = "The local job had already finished; waiting for its terminal result.";
+          return;
+        }
+        if (!response.ok) {
+          $("promptStatus").textContent = "Cancellation could not be confirmed; the local run is still active.";
+          return;
+        }
+        promptState.cancelMessage = "Cancelled by user.";
+      } catch (error) {
+        $("promptStatus").textContent = "Cancellation could not be confirmed; the local run is still active.";
+        return;
+      }
+    } else {
+      promptState.cancelMessage = "Stopped before a local job was assigned.";
+    }
+    if (promptState.abortController) promptState.abortController.abort();
+  }
+
+  function retryPrompt() {
+    promptState.jobId = null;
+    promptState.terminal = false;
+    if (promptState.lastPrompt) $("ordinaryPrompt").value = promptState.lastPrompt;
+    runPrompt();
+  }
+
+  if ($("runPrompt")) $("runPrompt").onclick = runPrompt;
+  if ($("cancelPrompt")) $("cancelPrompt").onclick = cancelPrompt;
+  if ($("retryPrompt")) $("retryPrompt").onclick = retryPrompt;
+  if ($("ordinaryPrompt")) {
+    $("ordinaryPrompt").addEventListener("input", updatePromptReadiness);
+    updatePromptReadiness();
+  }
 
   var lastCard = null;
   // Test hook (browser-safe: `module` is undefined in the browser, so this is a no-op there and the
@@ -605,12 +1027,9 @@
       esc: esc,
       renderCitation: renderCitation,
       renderCard: renderCard,
-      renderPlan: renderPlan,
+      renderReferenceActions: renderReferenceActions,
       renderStage: renderStage,
-      doseTable: doseTable,
       handleEvent: handleEvent,
-      shortDoc: shortDoc,
-      citeMini: citeMini,
       // Exported for the jsdom Stop/timer test (H-1/H-2). These drive the /triage flow, so the test can
       // stub fetch + AbortController and assert the abort path, staged label, and timer lifecycle.
       runAssess: runAssess,
@@ -618,6 +1037,10 @@
       stopReasonTimer: stopReasonTimer,
       readStructuredDanger: readStructuredDanger,
       updateDangerChecklist: updateDangerChecklist,
+      invalidateClinicalResult: invalidateClinicalResult,
+      renderProvisional: renderProvisional,
+      sendConfirmation: sendConfirmation,
+      clinicalState: clinicalState,
     };
   }
 })();

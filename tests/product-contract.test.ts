@@ -54,7 +54,19 @@ test("historical finalist generation evidence remains byte-frozen", async () => 
 });
 
 test("the SSE boundary never exposes model chain-of-thought", async () => {
-  const server = await readFile("src/server.ts", "utf8");
-  assert.doesNotMatch(server, /send\("reasoning"/);
-  assert.match(server, /send\("first_token"/);
+  const surface = `${await readFile("src/server.ts", "utf8")}\n${await readFile("src/http/create-app.ts", "utf8")}`;
+  assert.doesNotMatch(surface, /(?:send|stream\.send)\(["']reasoning["']/);
+  assert.match(surface, /stream\.send\(["']stage["']/);
+});
+
+test("provisional classification is supervised and source actions remain deterministic", async () => {
+  const [workflow, actions] = await Promise.all([
+    readFile("src/triage/supervised-workflow.ts", "utf8"),
+    readFile("src/triage/reference-actions.ts", "utf8"),
+  ]);
+  assert.match(workflow, /provisional WHO protocol classification, not a diagnosis/i);
+  assert.match(workflow, /confirmation:\s*\{\s*eligible:\s*true,\s*token:/s);
+  assert.doesNotMatch(workflow, /referenceActions:\s*result\.card|plan:\s*result\.card/);
+  assert.match(actions, /lookupProtocol\(classification\)/);
+  assert.doesNotMatch(actions, /modelDraft|retrievedText|reasoning/);
 });

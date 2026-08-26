@@ -4,6 +4,7 @@
 // so all SDK-shape reconciliation lives here. Verified shapes: see RECONCILE.md +
 // dist/client/api/{embed,rag,completion,load-model}.d.ts.
 import * as qvac from "@qvac/sdk";
+import { recordDiagnostic } from "../logging.js";
 
 /** Native per-completion stats surfaced on `final.stats` (engine.completionTimed).
  *  Verified live shape (RECONCILE.md Phase-2): the addon reports `generatedTokens` + `promptTokens`
@@ -33,9 +34,11 @@ export interface QvacCompletionFinal {
   toolCalls?: unknown[];
   tool_calls?: unknown[];
   stats: QvacStats;
+  stopReason?: "eos" | "length" | "stopSequence" | "cancelled" | "error";
 }
 
 export interface QvacCompletionRun {
+  requestId: string;
   events: AsyncIterable<QvacCompletionEvent>;
   final: Promise<QvacCompletionFinal>;
 }
@@ -106,6 +109,10 @@ export const completion = (args: {
   responseFormat?: unknown;
 }): QvacCompletionRun => {
   return (qvac as any).completion(args) as QvacCompletionRun;
+};
+
+export const cancelRequest = async (requestId: string): Promise<void> => {
+  await (qvac as any).cancel({ requestId });
 };
 
 // RECONCILED live (Phase 3, RECONCILE.md): transcribe returns a plain STRING (not {text}); audioChunk
@@ -228,8 +235,9 @@ export const ragReindex = async (workspace: string): Promise<{ reindexed: boolea
 export const ragDeleteWorkspace = async (workspace: string): Promise<void> => {
   try {
     await (qvac as any).ragDeleteWorkspace({ workspace });
-  } catch {
+  } catch (error) {
     // workspace did not exist — idempotent no-op
+    recordDiagnostic("RAG_DELETE_SKIPPED", error);
   }
 };
 
@@ -241,7 +249,7 @@ export const ragListWorkspaces = async (): Promise<Array<{ name: string; open: b
 export const close = (): void => {
   try {
     (qvac as any).close?.();
-  } catch {
-    /* noop */
+  } catch (error) {
+    recordDiagnostic("SDK_CLOSE_FAILED", error);
   }
 };

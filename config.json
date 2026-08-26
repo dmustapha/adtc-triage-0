@@ -24,7 +24,7 @@
     "Public GGUF weights excluded from Git",
     "llama.cpp runtime with zero network access during evaluation",
     "REPORT.md with problem, constraints, alternatives, decisions, tools, benchmarks, and visual proof",
-    "Full participant profiler output in submission.json",
+    "/Users/MAC/adtc-2026/submission.json — full participant profiler output",
     "Short video no longer than 120 seconds",
     "Plain numeric self-reported Sperf and Seff fields on Devpost"
   ],

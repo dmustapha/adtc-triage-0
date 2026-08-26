@@ -66,11 +66,24 @@ test("GET /health reports canonical shared-runtime identity", { timeout: 60_000 
   assert.equal(h.model.officialRuntime, "llama.cpp");
 });
 
-test("POST /triage streams citation-first then a grounded, non-EMERGENCY card for pneumonia", { skip, timeout: 300_000 }, async () => {
+test("POST /triage keeps a below-threshold respiratory result neutral while assistance completes", { skip, timeout: 300_000 }, async () => {
+  const absent = Object.fromEntries([
+    "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
+    "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
+  ].map((key) => [key, "ABSENT"]));
   const r = await fetch(`${base}/triage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ caseText: "2-year-old, cough 3 days, chest indrawing, breathing 52 a minute, alert and drinking, no danger signs." }),
+    body: JSON.stringify({
+      caseText: "2-year-old with cough for 3 days, alert and drinking.",
+      patientAge: { value: 24, unit: "months" },
+      dangerObservations: absent,
+      respiratoryAssessment: {
+        coughOrDifficultBreathing: "PRESENT",
+        respiratoryRatePerMinute: 32,
+        rateCountQuality: "ONE_MINUTE_WHILE_CALM",
+      },
+    }),
   });
   assert.match(r.headers.get("content-type") || "", /text\/event-stream/);
   const events = await readSse(r);
@@ -87,20 +100,20 @@ test("POST /triage streams citation-first then a grounded, non-EMERGENCY card fo
   assert.ok(String(citation.page).match(/\d/), "citation has a real page");
 
   const card = events[cardi].data.card;
-  assert.notEqual(card.severity, "EMERGENCY", `home-treatment pneumonia must not be EMERGENCY (got ${card.severity})`);
-  assert.ok(["URGENT", "ROUTINE"].includes(card.severity));
+  assert.ok(!("severity" in card));
+  assert.equal(card.outcome, "NO_ESCALATION_CRITERION_RECORDED");
+  assert.equal(card.thresholdComparison.respiratoryRatePerMinute, 32);
+  assert.equal(card.thresholdComparison.thresholdPerMinute, 40);
+  assert.equal(card.assistance.status, "COMPLETED");
+  assert.equal(card.reviewState, "DETERMINISTIC");
+  assert.equal("classification" in card, false);
+  assert.equal("protocol" in card, false);
   assert.ok(events[cardi].data.perf, "card carries a perf payload for the HUD");
-
-  // #22: the grounded management plan arrives as a SEPARATE event AFTER the card (progressive enhancement).
-  const pi = kinds.indexOf("plan");
-  assert.ok(pi > cardi, "plan event arrives after the card");
-  const plan = events[pi].data.plan;
-  assert.ok(plan.medicines.length >= 1, "plan surfaces at least one medicine for PNEUMONIA");
-  assert.match(plan.medicines.map((m: any) => m.name).join(" ").toLowerCase(), /amoxicillin/);
-  for (const m of plan.medicines) {
-    assert.ok(m.citation && String(m.citation.page).match(/\d/), "each medicine carries a real page citation");
-    if (m.dose) assert.equal(m.dose, "By weight band", "dose is banded guidance, never a fabricated amount");
-  }
+  assert.ok(!kinds.includes("plan"), "no reference actions before confirmation");
+  assert.ok(!kinds.includes("provisional"), "a model classification cannot be promoted over the settled respiratory result");
+  const publicText = JSON.stringify(events).replace(/not a diagnosis/gi, "");
+  assert.doesNotMatch(publicText, /diagnos(?:e|is)|prescri(?:be|ption)|chain.of.thought|<think>|raw reasoning/i);
+  assert.doesNotMatch(JSON.stringify(events), /PNEUMONIA|provisional WHO protocol classification/i);
 });
 
 test("POST /triage rejects an oversized case with a friendly 400 (no embedder overflow)", { skip, timeout: 30_000 }, async () => {
@@ -118,7 +131,7 @@ test("POST /tts is absent from the English text baseline", { skip, timeout: 30_0
   const r = await fetch(`${base}/tts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: "Give oral amoxicillin for five days and follow up in three days." }),
+    body: JSON.stringify({ text: "Assessment summary." }),
   });
   assert.equal(r.status, 404);
 });

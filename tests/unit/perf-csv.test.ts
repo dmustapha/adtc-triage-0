@@ -53,6 +53,21 @@ test("CSV header column order is exact and stable", async () => {
   assert.equal(firstLine, EXPECTED_HEADER, "header columns are in the exact documented order");
 });
 
+test("readPerfCsv returns a canonical header without creating evidence rows", async () => {
+  const { readPerfCsv, perfCsvPath } = await import("../../src/qvac/perf-logger.js");
+  const emptyDir = mkdtempSync(join(tmpdir(), "triage0-empty-perfcsv-"));
+  const previous = process.env.TRIAGE0_PERF_DIR;
+  try {
+    process.env.TRIAGE0_PERF_DIR = emptyDir;
+    const path = perfCsvPath();
+    assert.equal(readPerfCsv(), EXPECTED_HEADER + "\n");
+    assert.throws(() => readFileSync(path, "utf8"), /ENOENT/);
+  } finally {
+    process.env.TRIAGE0_PERF_DIR = previous;
+    rmSync(emptyDir, { recursive: true, force: true });
+  }
+});
+
 test("csvCell escapes commas, quotes, and newlines; a comma-bearing field round-trips", async () => {
   const { logPerf, perfCsvPath } = await import("../../src/qvac/perf-logger.js");
   // A modelId carrying every awkward CSV character at once.

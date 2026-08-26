@@ -20,11 +20,13 @@
   "passes": [
     {
       "name": "reason",
+      "predict": 1024,
       "temperature": 0,
       "outputExposure": "internal-only"
     },
     {
       "name": "extract",
+      "predict": 512,
       "temperature": 0,
       "constraint": "json-schema-to-GBNF",
       "validation": "TriageExtractSchema.safeParse",

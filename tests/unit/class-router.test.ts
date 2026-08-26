@@ -7,6 +7,7 @@
 // unroutable — with no error, just a case that never reaches it. This test fails the build instead.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { CLASS_PROTOTYPES, CLASS_GROUP, OFF_DOMAIN_THRESHOLD } from "../../src/triage/class-router.js";
 import { CLASSIFICATION_ENUM } from "../../src/triage/protocol-table.js";
 
@@ -41,4 +42,14 @@ test("every routable class belongs to exactly one symptom group", () => {
 test("off-domain threshold is in a sane calibrated range", () => {
   // Guards a fat-fingered override: outside this band the gate would abstain everything or nothing.
   assert.ok(OFF_DOMAIN_THRESHOLD > 0.5 && OFF_DOMAIN_THRESHOLD < 0.95, `OFF_DOMAIN_THRESHOLD=${OFF_DOMAIN_THRESHOLD} out of sane range`);
+});
+
+test("off-domain threshold rejects non-finite configuration", () => {
+  const run = spawnSync(process.execPath, ["--import", "tsx", "--eval", "import('./src/triage/class-router.ts')"], {
+    cwd: process.cwd(),
+    env: { ...process.env, ROUTER_OFF_DOMAIN: "NaN" },
+    encoding: "utf8",
+  });
+  assert.notEqual(run.status, 0);
+  assert.match(run.stderr, /ROUTER_OFF_DOMAIN/);
 });

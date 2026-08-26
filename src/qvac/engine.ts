@@ -3,8 +3,10 @@
 // pulls native stats from final.stats, and writes one perf-log row. RECONCILED against the
 // Phase-0 event shape: contentDelta events carry text on `ev.text`; final answer is `final.contentText`.
 import { performance } from "node:perf_hooks";
+import { recordDiagnostic } from "../logging.js";
 import {
   ChatMessage,
+  cancelRequest,
   completion,
   embed,
   embedBatch,
@@ -20,6 +22,7 @@ export interface CompletionResult {
   text: string;
   toolCalls: unknown[];
   stats: QvacStats;
+  stopReason?: "eos" | "length" | "stopSequence" | "cancelled" | "error";
 }
 
 const ZERO_STATS: QvacStats = {
@@ -89,6 +92,7 @@ export async function completionTimed(args: {
   generationParams?: { predict?: number; temp?: number; reasoning_budget?: -1 | 0; [k: string]: unknown };
   responseFormat?: unknown;
   onDelta?: (chunk: string) => void;
+  signal?: AbortSignal;
 }): Promise<CompletionResult> {
   const t0 = performance.now();
   const run = completion({
@@ -101,16 +105,22 @@ export async function completionTimed(args: {
   });
 
   let text = "";
-  for await (const ev of run.events) {
-    const delta =
-      (ev.type === "contentDelta" ? ev.text : undefined) ??
-      ev.contentDelta ?? ev.content ?? ev.delta ?? "";
-    if (delta) {
-      text += delta;
-      args.onDelta?.(delta);
+  let final: Awaited<typeof run.final>;
+  const unbindAbort = bindCompletionAbort(args.signal, run.requestId);
+  try {
+    for await (const ev of run.events) {
+      const delta =
+        (ev.type === "contentDelta" ? ev.text : undefined) ??
+        ev.contentDelta ?? ev.content ?? ev.delta ?? "";
+      if (delta) {
+        text += delta;
+        args.onDelta?.(delta);
+      }
     }
+    final = await run.final;
+  } finally {
+    unbindAbort();
   }
-  const final = await run.final;
   const durationMs = performance.now() - t0;
   const stats: QvacStats = final.stats ?? ZERO_STATS;
   // Use `||` not `??`: a completed-but-empty `contentText` (model hit the predict cap mid-<think> and
@@ -135,7 +145,19 @@ export async function completionTimed(args: {
     durationMs: safeRound(durationMs),
   });
 
-  return { text: finalText, toolCalls, stats };
+  return { text: finalText, toolCalls, stats, stopReason: final.stopReason };
+}
+
+export function bindCompletionAbort(
+  signal: AbortSignal | undefined,
+  requestId: string,
+  cancel: (id: string) => Promise<void> = cancelRequest,
+): () => void {
+  if (!signal) return () => undefined;
+  const abort = () => { void cancel(requestId).catch((error) => recordDiagnostic("NATIVE_CANCEL_FAILED", error)); };
+  if (signal.aborted) abort();
+  else signal.addEventListener("abort", abort, { once: true });
+  return () => signal.removeEventListener("abort", abort);
 }
 
 export async function embedTimed(args: {

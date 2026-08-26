@@ -9,38 +9,33 @@
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts tests/unit/*.test.ts tests/integration/*.test.ts",
     "test:unit": "node --import tsx --test tests/unit/*.test.ts",
     "test:e2e": "TRIAGE01_E2E=1 node --import tsx --test tests/integration/server.test.ts",
-    "start": "tsx src/server.ts",
+    "start": "bash scripts/start-supported.sh",
     "dev": "tsx watch src/server.ts",
+    "setup:local": "bash scripts/setup-local.sh",
+    "download:protocols": "bash download_protocols.sh",
+    "doctor": "tsx scripts/local-doctor.ts",
     "ingest": "tsx scripts/ingest-protocols.ts",
     "postinstall": "node scripts/patch-sdk-zod.mjs",
     "create-release-key": "tsx scripts/create-release-key.ts",
     "extract-chat-template": "tsx scripts/extract-gguf-chat-template.ts",
     "build-finalist-bundle": "tsx scripts/build-finalist-bundle.ts",
     "finalist-gate": "tsx scripts/run-finalist-gate.ts",
-    "freeze-model": "tsx scripts/freeze-model.ts",
     "verify-sources": "tsx scripts/verify-sources.ts",
     "attest-source": "tsx scripts/attest-source.ts",
-    "verify-provenance": "tsx scripts/verify-provenance.ts",
-    "generate-provenance": "tsx scripts/generate-provenance.ts",
-    "sign-provenance": "tsx scripts/sign-provenance.ts",
-    "aggregate-physical": "tsx scripts/aggregate-physical-release.ts",
-    "seed-demo": "tsx scripts/seed-demo.ts",
     "build-import-manifest": "tsx scripts/build-import-manifest.ts",
     "verify-import-manifest": "tsx scripts/verify-import-manifest.ts"
   },
   "dependencies": {
     "@qvac/sdk": "0.13.3",
-    "express": "^4.21.2",
-    "multer": "^1.4.5-lts.1",
-    "pdf-parse": "^1.1.1",
-    "zod": "^4.0.17"
+    "express": "4.22.2",
+    "pdf-parse": "1.1.4",
+    "zod": "4.4.3"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/multer": "^1.4.12",
-    "@types/node": "^22.15.0",
-    "jsdom": "^29.1.1",
-    "tsx": "^4.20.0",
-    "typescript": "^5.9.0"
+    "@types/express": "4.17.25",
+    "@types/node": "22.20.1",
+    "jsdom": "29.1.1",
+    "tsx": "4.23.12",
+    "typescript": "5.9.3"
   }
 }

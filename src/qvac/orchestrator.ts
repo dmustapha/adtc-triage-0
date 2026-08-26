@@ -11,6 +11,7 @@
 import { config, registry, medpsySpec, ttsSpec, type ModelSpec, type TtsLang } from "../config.js";
 import { loadModelTimed, unloadModelTimed } from "./engine.js";
 import { close } from "./sdk.js";
+import { recordDiagnostic } from "../logging.js";
 
 interface Resident {
   modelId: string;
@@ -67,9 +68,10 @@ class Orchestrator {
     if (!r) return;
     try {
       await unloadModelTimed(r.modelId, role, phase);
-    } catch {
+    } catch (error) {
       // Unload failed (e.g. GPU freed externally) — still remove stale entry
       // so later ensure() re-loads instead of returning a dead modelId.
+      recordDiagnostic("MODEL_UNLOAD_FAILED", error);
     }
     this.residents.delete(role);
   }
@@ -106,8 +108,9 @@ class Orchestrator {
       // Different language than what's loaded — force-unload before loading the new voice.
       try {
         await unloadModelTimed(current.modelId, "tts", phase);
-      } catch {
+      } catch (error) {
         /* GPU may have freed it externally; drop the stale handle either way */
+        recordDiagnostic("VOICE_UNLOAD_FAILED", error);
       }
       this.residents.delete("tts");
     }
@@ -138,8 +141,9 @@ class Orchestrator {
     for (const [role, r] of this.residents) {
       try {
         await unloadModelTimed(r.modelId, role, "shutdown");
-      } catch {
+      } catch (error) {
         /* best-effort */
+        recordDiagnostic("SHUTDOWN_UNLOAD_FAILED", error);
       }
     }
     this.residents.clear();

@@ -5,9 +5,11 @@
 // RAG_THRESHOLD, RESIDENT_MODE parse; and the model registry carries every role the orchestrator needs.
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
+import { isAbsolute } from "node:path";
 
 // Snapshot the env keys this module reads, so each test starts from a clean slate.
-const KEYS = ["MODEL_ID", "PORT", "RAG_THRESHOLD", "RESIDENT_MODE", "EMBED_SRC", "HF_TOKEN"] as const;
+const KEYS = ["MODEL_ID", "PORT", "RAG_THRESHOLD", "RESIDENT_MODE", "EMBED_SRC", "HF_TOKEN", "TRIAGE0_DEBUG_ROUTE", "TRIAGE0_DEBUG_PLAN", "TRIAGE0_NO_PREWARM", "TRIAGE0_EGRESS_NONSTRICT"] as const;
 const original: Record<string, string | undefined> = {};
 for (const k of KEYS) original[k] = process.env[k];
 
@@ -32,11 +34,18 @@ test("MODEL_ID cannot select an alternate medical model", async () => {
   assert.doesNotMatch(registry.medpsy.modelSrc, /^https?:\/\//);
 });
 
-test("medpsySpec fails closed while canonical model bytes are absent", async () => {
+test("medpsySpec verifies canonical bytes and gives QVAC an absolute local path", async () => {
   delete process.env.MODEL_ID;
   const { config, medpsySpec } = await freshConfig();
   assert.equal(config.modelId, "medpsy-1.7b-q4");
-  assert.throws(() => medpsySpec(), /missing canonical model/i);
+  const canonical = new URL("../../model/medpsy-1.7b-q4_k_m-imat.gguf", import.meta.url);
+  if (!existsSync(canonical)) {
+    assert.throws(() => medpsySpec(), /missing canonical model/i);
+    return;
+  }
+  const spec = medpsySpec();
+  assert.ok(isAbsolute(spec.modelSrc), "QVAC requires an absolute file path");
+  assert.match(spec.modelSrc, /model\/medpsy-1\.7b-q4_k_m-imat\.gguf$/);
 });
 
 test("RAG_THRESHOLD parses as a number; default is 0.685", async () => {
@@ -68,6 +77,32 @@ test("RESIDENT_MODE is taken verbatim; default is 'resident'", async () => {
   delete process.env.RESIDENT_MODE;
   const { config: dft } = await freshConfig();
   assert.equal(dft.residentMode, "resident");
+});
+
+test("numeric and enum configuration rejects non-finite or unsafe values", async () => {
+  process.env.PORT = "Infinity";
+  await assert.rejects(freshConfig(), /PORT/);
+  process.env.PORT = "3010";
+  process.env.RAG_THRESHOLD = "NaN";
+  await assert.rejects(freshConfig(), /RAG_THRESHOLD/);
+  process.env.RAG_THRESHOLD = "0.685";
+  process.env.RESIDENT_MODE = "surprise";
+  await assert.rejects(freshConfig(), /RESIDENT_MODE/);
+});
+
+test("operational flags accept only explicit boolean values", async () => {
+  process.env.TRIAGE0_DEBUG_ROUTE = "false";
+  process.env.TRIAGE0_DEBUG_PLAN = "1";
+  process.env.TRIAGE0_NO_PREWARM = "true";
+  process.env.TRIAGE0_EGRESS_NONSTRICT = "0";
+  const { config } = await freshConfig();
+  assert.equal(config.debugRoute, false);
+  assert.equal(config.debugPlan, true);
+  assert.equal(config.prewarmEnabled, false);
+  assert.equal(config.egressStrict, true);
+
+  process.env.TRIAGE0_DEBUG_ROUTE = "unexpected";
+  await assert.rejects(freshConfig(), /TRIAGE0_DEBUG_ROUTE/);
 });
 
 test("registry carries every role the orchestrator loads (stt/tts/embeddings/medpsy)", async () => {

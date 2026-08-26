@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.1.0",
+  "profiler_version": "adtc-profiler 0.1.0",
+  "submission": {
+    "team_id": "your-team-id",
+    "domain": "healthcare_medical",
+    "language_scope": [
+      "en"
+    ],
+    "african_alpha_claim": false,
+    "budget_laptop_claim": true,
+    "submitter": {
+      "name": "your-name",
+      "email": "your-email@domain.com",
+      "github_handle": "your-github"
+    },
+    "cross_disciplinary_pairing": {
+      "discipline": "education",
+      "load_bearing": true,
+      "description": "Community health education is load-bearing: the English-only offline prototype helps supervised workers record a structured pediatric respiratory assessment, while deterministic policy, not model output, owns escalation."
+    },
+    "test_prompts": [
+      {
+        "prompt_id": "tp_001",
+        "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings."
+      },
+      {
+        "prompt_id": "tp_002",
+        "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe."
+      }
+    ],
+    "model": {
+      "name": "MedPsy-1.7B-Q4_K_M-imatrix",
+      "runtime": "llama.cpp",
+      "quantization": "GGUF Q4_K_M",
+      "parameters_estimate": "2.03B",
+      "packaging": "binary_bundle"
+    }
+  },
+  "environment": {
+    "measured_on": "participant_laptop",
+    "cpu_model": "Apple M1",
+    "ram_gb": 8.0,
+    "gpu": "integrated only",
+    "os": "macOS-26.0.1-arm64-arm-64bit"
+  },
+  "throughput": {
+    "tokens_per_second_generation": 26.54,
+    "first_token_latency_ms": 4274.7,
+    "prompt_tokens": 512,
+    "generated_tokens": 128
+  },
+  "memory": {
+    "peak_rss_mb": 1081.47,
+    "steady_state_rss_mb": 1053.25,
+    "peak_vms_mb": 851964.33
+  },
+  "accuracy": [
+    {
+      "benchmark": "arc_easy",
+      "dataset_version": "lm-eval-harness",
+      "language": "en",
+      "samples": 50,
+      "score": 0.7,
+      "metric": "acc_norm"
+    }
+  ],
+  "cpu_thermal": {
+    "cpu_percent_p99": 100.0,
+    "core_temp_c_peak": null,
+    "throttled": false
+  },
+  "reproducibility": {
+    "git_commit_sha": "479836c71a4d",
+    "docker_image_digest": "unknown",
+    "random_seed": 42
+  },
+  "model_info": {
+    "params_count": 2031739904,
+    "context_length": 40960,
+    "architecture": "qwen3",
+    "claimed_params_estimate": "2.03B",
+    "params_match": true
+  }
+}

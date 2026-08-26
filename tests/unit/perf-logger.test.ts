@@ -50,3 +50,11 @@ test("readPerfRows tolerates a corrupt line without throwing", async () => {
   const after = readPerfRows();
   assert.equal(after.length, before, "the corrupt line is skipped, valid rows survive");
 });
+
+test("bounded telemetry reads return only the newest requested rows", async () => {
+  const { readPerfCsv, readPerfRows } = await import("../../src/qvac/perf-logger.js");
+  const rows = readPerfRows(2);
+  assert.equal(rows.length, 2);
+  assert.equal(rows.at(-1)?.durationMs, 2);
+  assert.equal(readPerfCsv(2).trim().split("\n").length, 3, "header plus two bounded rows");
+});

@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 1,
+  "kind": "submitted-prompt-official-product-evidence",
+  "plane": "pinned official llama.cpp application workflow",
+  "status": "pass",
+  "historicalRawOneShotEvidence": "preserved-and-unchanged",
+  "runtime": {
+    "name": "llama.cpp",
+    "frontend": "llama-server",
+    "revision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+    "cpuOnly": true,
+    "threads": 4,
+    "gpuLayers": 0
+  },
+  "workflow": {
+    "version": "prompt-policy-v4",
+    "reasonPredict": 1024,
+    "extractPredict": 512,
+    "maxExtractAttempts": 3,
+    "temperature": 0
+  },
+  "selection": {
+    "promptId": null,
+    "limit": null,
+    "selectedCaseIds": [
+      "tp_001-product-repeat-1",
+      "tp_001-product-repeat-2",
+      "tp_001-product-repeat-3",
+      "tp_002-product-repeat-1",
+      "tp_002-product-repeat-2",
+      "tp_002-product-repeat-3"
+    ]
+  },
+  "host": {
+    "label": "dami-darwin-arm64",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.0.0"
+  },
+  "model": {
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "server": {
+    "command": [
+      "/Users/MAC/.cache/adtc-2026/llama.cpp-c8ade300-server-source/build-server-cpu/bin/llama-server",
+      "-m",
+      "model/medpsy-1.7b-q4_k_m-imat.gguf",
+      "-t",
+      "4",
+      "-ngl",
+      "0",
+      "-c",
+      "2048",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "61188",
+      "--jinja",
+      "--reasoning-format",
+      "none",
+      "--reasoning-budget",
+      "0",
+      "--no-webui"
+    ],
+    "loopbackOnly": true,
+    "startupError": null,
+    "gracefulShutdown": true,
+    "listenerClosed": true,
+    "rawStdout": "",
+    "rawStderr": "warning: no usable GPU found, --gpu-layers option will be ignored\nwarning: one possible reason is that llama.cpp was compiled without GPU support\nwarning: consult docs/build.md for compilation instructions\nbuild: 1 (c8ade30) with Apple clang version 17.0.0 (clang-1700.0.13.5) for arm64-apple-darwin25.0.0\nsystem info: n_threads = 4, n_threads_batch = 4, total_threads = 8\n\nsystem_info: n_threads = 4 (n_threads_batch = 4) / 8 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 | \n\nWeb UI is disabled\nmain: binding port with default address family\nmain: HTTP server is listening, hostname: 127.0.0.1, port: 61188, http threads: 7\nmain: loading model\nsrv    load_model: loading model 'model/medpsy-1.7b-q4_k_m-imat.gguf'\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nllama_model_loader: loaded meta data with 34 key-value pairs and 311 tensors from model/medpsy-1.7b-q4_k_m-imat.gguf (version GGUF V3 (latest))\nllama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.\nllama_model_loader: - kv   0:                       general.architecture str              = qwen3\nllama_model_loader: - kv   1:                               general.type str              = model\nllama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20\nllama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000\nllama_model_loader: - kv   4:                      general.sampling.temp f32              = 0.600000\nllama_model_loader: - kv   5:                               general.name str              = MedPsy 1.7B\nllama_model_loader: - kv   6:                           general.basename str              = MedPsy\nllama_model_loader: - kv   7:                         general.size_label str              = 1.7B\nllama_model_loader: - kv   8:                          qwen3.block_count u32              = 28\nllama_model_loader: - kv   9:                       qwen3.context_length u32              = 40960\nllama_model_loader: - kv  10:                     qwen3.embedding_length u32              = 2048\nllama_model_loader: - kv  11:                  qwen3.feed_forward_length u32              = 6144\nllama_model_loader: - kv  12:                 qwen3.attention.head_count u32              = 16\nllama_model_loader: - kv  13:              qwen3.attention.head_count_kv u32              = 8\nllama_model_loader: - kv  14:                       qwen3.rope.freq_base f32              = 1000000.000000\nllama_model_loader: - kv  15:     qwen3.attention.layer_norm_rms_epsilon f32              = 0.000001\nllama_model_loader: - kv  16:                 qwen3.attention.key_length u32              = 128\nllama_model_loader: - kv  17:               qwen3.attention.value_length u32              = 128\nllama_model_loader: - kv  18:                       tokenizer.ggml.model str              = gpt2\nllama_model_loader: - kv  19:                         tokenizer.ggml.pre str              = qwen2\nllama_model_loader: - kv  20:                      tokenizer.ggml.tokens arr[str,151936]  = [\"!\", \"\\\"\", \"#\", \"$\", \"%\", \"&\", \"'\", ...\nllama_model_loader: - kv  21:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...\nllama_model_loader: - kv  22:                      tokenizer.ggml.merges arr[str,151387]  = [\"Ġ Ġ\", \"ĠĠ ĠĠ\", \"i n\", \"Ġ t\",...\nllama_model_loader: - kv  23:                tokenizer.ggml.eos_token_id u32              = 151645\nllama_model_loader: - kv  24:            tokenizer.ggml.padding_token_id u32              = 151643\nllama_model_loader: - kv  25:                tokenizer.ggml.bos_token_id u32              = 151643\nllama_model_loader: - kv  26:               tokenizer.ggml.add_bos_token bool             = false\nllama_model_loader: - kv  27:                    tokenizer.chat_template str              = {%- set persona = 'You are MedPsy, a ...\nllama_model_loader: - kv  28:               general.quantization_version u32              = 2\nllama_model_loader: - kv  29:                          general.file_type u32              = 15\nllama_model_loader: - kv  30:                      quantize.imatrix.file str              = /data/alex/health/ggufs/imatrix.dat\nllama_model_loader: - kv  31:                   quantize.imatrix.dataset str              = /data/akshay/MedHealth/calibration_sm...\nllama_model_loader: - kv  32:             quantize.imatrix.entries_count u32              = 196\nllama_model_loader: - kv  33:              quantize.imatrix.chunks_count u32              = 100\nllama_model_loader: - type  f32:  113 tensors\nllama_model_loader: - type q4_K:  169 tensors\nllama_model_loader: - type q6_K:   29 tensors\nprint_info: file format = GGUF V3 (latest)\nprint_info: file type   = Q4_K - Medium\nprint_info: file size   = 1.19 GiB (5.03 BPW) \nload: special tokens cache size = 26\nload: token to piece cache size = 0.9311 MB\nprint_info: arch             = qwen3\nprint_info: vocab_only       = 0\nprint_info: n_ctx_train      = 40960\nprint_info: n_embd           = 2048\nprint_info: n_layer          = 28\nprint_info: n_head           = 16\nprint_info: n_head_kv        = 8\nprint_info: n_rot            = 128\nprint_info: n_swa            = 0\nprint_info: is_swa_any       = 0\nprint_info: n_embd_head_k    = 128\nprint_info: n_embd_head_v    = 128\nprint_info: n_gqa            = 2\nprint_info: n_embd_k_gqa     = 1024\nprint_info: n_embd_v_gqa     = 1024\nprint_info: f_norm_eps       = 0.0e+00\nprint_info: f_norm_rms_eps   = 1.0e-06\nprint_info: f_clamp_kqv      = 0.0e+00\nprint_info: f_max_alibi_bias = 0.0e+00\nprint_info: f_logit_scale    = 0.0e+00\nprint_info: f_attn_scale     = 0.0e+00\nprint_info: n_ff             = 6144\nprint_info: n_expert         = 0\nprint_info: n_expert_used    = 0\nprint_info: causal attn      = 1\nprint_info: pooling type     = 0\nprint_info: rope type        = 2\nprint_info: rope scaling     = linear\nprint_info: freq_base_train  = 1000000.0\nprint_info: freq_scale_train = 1\nprint_info: n_ctx_orig_yarn  = 40960\nprint_info: rope_finetuned   = unknown\nprint_info: model type       = 1.7B\nprint_info: model params     = 2.03 B\nprint_info: general.name     = MedPsy 1.7B\nprint_info: vocab type       = BPE\nprint_info: n_vocab          = 151936\nprint_info: n_merges         = 151387\nprint_info: BOS token        = 151643 '<|endoftext|>'\nprint_info: EOS token        = 151645 '<|im_end|>'\nprint_info: EOT token        = 151645 '<|im_end|>'\nprint_info: PAD token        = 151643 '<|endoftext|>'\nprint_info: LF token         = 198 'Ċ'\nprint_info: FIM PRE token    = 151659 '<|fim_prefix|>'\nprint_info: FIM SUF token    = 151661 '<|fim_suffix|>'\nprint_info: FIM MID token    = 151660 '<|fim_middle|>'\nprint_info: FIM PAD token    = 151662 '<|fim_pad|>'\nprint_info: FIM REP token    = 151663 '<|repo_name|>'\nprint_info: FIM SEP token    = 151664 '<|file_sep|>'\nprint_info: EOG token        = 151643 '<|endoftext|>'\nprint_info: EOG token        = 151645 '<|im_end|>'\nprint_info: EOG token        = 151662 '<|fim_pad|>'\nprint_info: EOG token        = 151663 '<|repo_name|>'\nprint_info: EOG token        = 151664 '<|file_sep|>'\nprint_info: max token length = 256\nload_tensors: loading model tensors, this can take a while... (mmap = true)\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nload_tensors:   CPU_Mapped model buffer size =  1217.35 MiB\n.....................................................................\nllama_context: constructing llama_context\nllama_context: non-unified KV cache requires ggml_set_rows() - forcing unified KV cache\nllama_context: n_seq_max     = 1\nllama_context: n_ctx         = 2048\nllama_context: n_ctx_per_seq = 2048\nllama_context: n_batch       = 2048\nllama_context: n_ubatch      = 512\nllama_context: causal_attn   = 1\nllama_context: flash_attn    = 0\nllama_context: kv_unified    = true\nllama_context: freq_base     = 1000000.0\nllama_context: freq_scale    = 1\nllama_context: n_ctx_per_seq (2048) < n_ctx_train (40960) -- the full capacity of the model will not be utilized\nllama_context:        CPU  output buffer size =     0.58 MiB\nllama_kv_cache_unified:        CPU KV buffer size =   224.00 MiB\nllama_kv_cache_unified: size =  224.00 MiB (  2048 cells,  28 layers,  1/ 1 seqs), K (f16):  112.00 MiB, V (f16):  112.00 MiB\nllama_kv_cache_unified: LLAMA_SET_ROWS=0, using old ggml_cpy() method for backwards compatibility\nllama_context:        CPU compute buffer size =   300.75 MiB\nllama_context: graph nodes  = 1154\nllama_context: graph splits = 394 (with bs=512), 1 (with bs=1)\ncommon_init_from_params: added <|endoftext|> logit bias = -inf\ncommon_init_from_params: added <|im_end|> logit bias = -inf\ncommon_init_from_params: added <|fim_pad|> logit bias = -inf\ncommon_init_from_params: added <|repo_name|> logit bias = -inf\ncommon_init_from_params: added <|file_sep|> logit bias = -inf\ncommon_init_from_params: setting dry_penalty_last_n to ctx_size = 2048\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv          init: initializing slots, n_slots = 1\nslot         init: id  0 | task -1 | new slot n_ctx_slot = 2048\nmain: model loaded\nmain: chat template, chat_template: {%- set persona = 'You are MedPsy, a medical and healthcare AI assistant developed by QVAC.' %}\n\n{%- if tools %}\n    {{- '<|im_start|>system\\n' + persona }}\n    {%- if messages[0].role == 'system' %}\n        {{- '\\n' + messages[0].content }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {{- '<|im_start|>system\\n' + persona }}\n    {%- if messages[0].role == 'system' %}\n        {{- '\\n' + messages[0].content }}\n    {%- endif %}\n    {{- '<|im_end|>\\n' }}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and message.content is string and not(message.content.startswith('<tool_response>') and message.content.endswith('</tool_response>')) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if message.content is string %}\n        {%- set content = message.content %}\n    {%- else %}\n        {%- set content = '' %}\n    {%- endif %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in content %}\n                {%- set reasoning_content = content.split('</think>')[0].rstrip('\\n').split('<think>')[-1].lstrip('\\n') %}\n                {%- set content = content.split('</think>')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n\n        {{- '<|im_start|>' + message.role }}\n        {% generation %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and reasoning_content) %}\n                {{- '<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- content }}\n            {%- endif %}\n        {%- else %}\n            {{- content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>' }}\n        {% endgeneration %}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}, example_format: '<|im_start|>system\nYou are MedPsy, a medical and healthcare AI assistant developed by QVAC.\nYou are a helpful assistant<|im_end|>\n<|im_start|>user\nHello<|im_end|>\n<|im_start|>assistant\nHi there<|im_end|>\n<|im_start|>user\nHow are you?<|im_end|>\n<|im_start|>assistant\n'\nmain: server is listening on http://127.0.0.1:61188 - starting the main loop\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: GET /health 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 0 | processing task\nslot update_slots: id  0 | task 0 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 199\nslot update_slots: id  0 | task 0 | kv cache rm [0, end)\nslot update_slots: id  0 | task 0 | prompt processing progress, n_past = 199, n_tokens = 199, progress = 1.000000\nslot update_slots: id  0 | task 0 | prompt done, n_past = 199, n_tokens = 199\nslot      release: id  0 | task 0 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 0 | \nprompt eval time =    3189.91 ms /   199 tokens (   16.03 ms per token,    62.38 tokens per second)\n       eval time =    4099.28 ms /    63 tokens (   65.07 ms per token,    15.37 tokens per second)\n      total time =    7289.18 ms /   262 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 64 | processing task\nslot update_slots: id  0 | task 64 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 64 | kv cache rm [25, end)\nslot update_slots: id  0 | task 64 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 64 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 64 | stop processing: n_past = 481, truncated = 0\nslot print_timing: id  0 | task 64 | \nprompt eval time =    2150.69 ms /   316 tokens (    6.81 ms per token,   146.93 tokens per second)\n       eval time =    9414.17 ms /   141 tokens (   66.77 ms per token,    14.98 tokens per second)\n      total time =   11564.86 ms /   457 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 206 | processing task\nslot update_slots: id  0 | task 206 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 199\nslot update_slots: id  0 | task 206 | kv cache rm [25, end)\nslot update_slots: id  0 | task 206 | prompt processing progress, n_past = 199, n_tokens = 174, progress = 0.874372\nslot update_slots: id  0 | task 206 | prompt done, n_past = 199, n_tokens = 174\nslot      release: id  0 | task 206 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 206 | \nprompt eval time =    1770.88 ms /   174 tokens (   10.18 ms per token,    98.26 tokens per second)\n       eval time =    2593.52 ms /    63 tokens (   41.17 ms per token,    24.29 tokens per second)\n      total time =    4364.39 ms /   237 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 270 | processing task\nslot update_slots: id  0 | task 270 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 270 | kv cache rm [25, end)\nslot update_slots: id  0 | task 270 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 270 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 270 | stop processing: n_past = 481, truncated = 0\nslot print_timing: id  0 | task 270 | \nprompt eval time =    2304.13 ms /   316 tokens (    7.29 ms per token,   137.15 tokens per second)\n       eval time =  100614.87 ms /   141 tokens (  713.58 ms per token,     1.40 tokens per second)\n      total time =  102919.00 ms /   457 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 412 | processing task\nslot update_slots: id  0 | task 412 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 199\nslot update_slots: id  0 | task 412 | kv cache rm [25, end)\nslot update_slots: id  0 | task 412 | prompt processing progress, n_past = 199, n_tokens = 174, progress = 0.874372\nslot update_slots: id  0 | task 412 | prompt done, n_past = 199, n_tokens = 174\nslot      release: id  0 | task 412 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 412 | \nprompt eval time =    1417.95 ms /   174 tokens (    8.15 ms per token,   122.71 tokens per second)\n       eval time =    2733.79 ms /    63 tokens (   43.39 ms per token,    23.04 tokens per second)\n      total time =    4151.74 ms /   237 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 476 | processing task\nslot update_slots: id  0 | task 476 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 476 | kv cache rm [25, end)\nslot update_slots: id  0 | task 476 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 476 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 476 | stop processing: n_past = 481, truncated = 0\nslot print_timing: id  0 | task 476 | \nprompt eval time =    2973.71 ms /   316 tokens (    9.41 ms per token,   106.26 tokens per second)\n       eval time =    7552.78 ms /   141 tokens (   53.57 ms per token,    18.67 tokens per second)\n      total time =   10526.49 ms /   457 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 618 | processing task\nslot update_slots: id  0 | task 618 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 196\nslot update_slots: id  0 | task 618 | kv cache rm [25, end)\nslot update_slots: id  0 | task 618 | prompt processing progress, n_past = 196, n_tokens = 171, progress = 0.872449\nslot update_slots: id  0 | task 618 | prompt done, n_past = 196, n_tokens = 171\nslot      release: id  0 | task 618 | stop processing: n_past = 464, truncated = 0\nslot print_timing: id  0 | task 618 | \nprompt eval time =    2051.97 ms /   171 tokens (   12.00 ms per token,    83.33 tokens per second)\n       eval time =   22473.53 ms /   269 tokens (   83.54 ms per token,    11.97 tokens per second)\n      total time =   24525.50 ms /   440 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 888 | processing task\nslot update_slots: id  0 | task 888 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 520\nslot update_slots: id  0 | task 888 | kv cache rm [25, end)\nslot update_slots: id  0 | task 888 | prompt processing progress, n_past = 520, n_tokens = 495, progress = 0.951923\nslot update_slots: id  0 | task 888 | prompt done, n_past = 520, n_tokens = 495\nslot      release: id  0 | task 888 | stop processing: n_past = 777, truncated = 0\nslot print_timing: id  0 | task 888 | \nprompt eval time =    3103.01 ms /   495 tokens (    6.27 ms per token,   159.52 tokens per second)\n       eval time =   92911.58 ms /   258 tokens (  360.12 ms per token,     2.78 tokens per second)\n      total time =   96014.58 ms /   753 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 1147 | processing task\nslot update_slots: id  0 | task 1147 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 196\nslot update_slots: id  0 | task 1147 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1147 | prompt processing progress, n_past = 196, n_tokens = 171, progress = 0.872449\nslot update_slots: id  0 | task 1147 | prompt done, n_past = 196, n_tokens = 171\nslot      release: id  0 | task 1147 | stop processing: n_past = 464, truncated = 0\nslot print_timing: id  0 | task 1147 | \nprompt eval time =    1106.42 ms /   171 tokens (    6.47 ms per token,   154.55 tokens per second)\n       eval time =    8032.19 ms /   269 tokens (   29.86 ms per token,    33.49 tokens per second)\n      total time =    9138.61 ms /   440 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 1417 | processing task\nslot update_slots: id  0 | task 1417 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 520\nslot update_slots: id  0 | task 1417 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1417 | prompt processing progress, n_past = 520, n_tokens = 495, progress = 0.951923\nslot update_slots: id  0 | task 1417 | prompt done, n_past = 520, n_tokens = 495\nslot      release: id  0 | task 1417 | stop processing: n_past = 777, truncated = 0\nslot print_timing: id  0 | task 1417 | \nprompt eval time =    2162.51 ms /   495 tokens (    4.37 ms per token,   228.90 tokens per second)\n       eval time =    8684.59 ms /   258 tokens (   33.66 ms per token,    29.71 tokens per second)\n      total time =   10847.11 ms /   753 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 1676 | processing task\nslot update_slots: id  0 | task 1676 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 196\nslot update_slots: id  0 | task 1676 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1676 | prompt processing progress, n_past = 196, n_tokens = 171, progress = 0.872449\nslot update_slots: id  0 | task 1676 | prompt done, n_past = 196, n_tokens = 171\nslot      release: id  0 | task 1676 | stop processing: n_past = 464, truncated = 0\nslot print_timing: id  0 | task 1676 | \nprompt eval time =    1086.12 ms /   171 tokens (    6.35 ms per token,   157.44 tokens per second)\n       eval time =    8542.23 ms /   269 tokens (   31.76 ms per token,    31.49 tokens per second)\n      total time =    9628.36 ms /   440 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 1946 | processing task\nslot update_slots: id  0 | task 1946 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 520\nslot update_slots: id  0 | task 1946 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1946 | prompt processing progress, n_past = 520, n_tokens = 495, progress = 0.951923\nslot update_slots: id  0 | task 1946 | prompt done, n_past = 520, n_tokens = 495\nslot      release: id  0 | task 1946 | stop processing: n_past = 777, truncated = 0\nslot print_timing: id  0 | task 1946 | \nprompt eval time =    2362.46 ms /   495 tokens (    4.77 ms per token,   209.53 tokens per second)\n       eval time =    8093.77 ms /   258 tokens (   31.37 ms per token,    31.88 tokens per second)\n      total time =   10456.23 ms /   753 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv    operator(): operator(): cleaning up before exit...\n"
+  },
+  "promptContract": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "sha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29"
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "sha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74"
+    }
+  ],
+  "executions": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "repeat": 1,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the observations",
+          "Fast breathing status could not be assessed due to missing rate measurement"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Cannot determine if cough is significant or requires intervention",
+          "Age-specific danger signs not fully addressed in observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 18916,
+      "traceIndexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "repeat": 2,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the observations",
+          "Fast breathing status could not be assessed due to missing rate measurement"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Cannot determine if cough is significant or requires intervention",
+          "Age-specific danger signs not fully addressed in observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 107321,
+      "traceIndexes": [
+        2,
+        3
+      ]
+    },
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "repeat": 3,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the observations",
+          "Fast breathing status could not be assessed due to missing rate measurement"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Cannot determine if cough is significant or requires intervention",
+          "Age-specific danger signs not fully addressed in observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 14728,
+      "traceIndexes": [
+        4,
+        5
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "repeat": 1,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on model output alone. Always follow the deterministic policy. Never use the model to decide on care without first confirming with real-world observations.",
+        "uncertainty": [
+          "The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment",
+          "Escalation depends on documented observations, not model outputs",
+          "Community health workers must act on recorded danger signs per local protocols"
+        ],
+        "limitations": [
+          "This is a guideline for supervised community health workers; clinical decisions require in-person assessment",
+          "Model outputs may have limitations; always prioritize verified observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 120622,
+      "traceIndexes": [
+        6,
+        7
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "repeat": 2,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on model output alone. Always follow the deterministic policy. Never use the model to decide on care without first confirming with real-world observations.",
+        "uncertainty": [
+          "The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment",
+          "Escalation depends on documented observations, not model outputs",
+          "Community health workers must act on recorded danger signs per local protocols"
+        ],
+        "limitations": [
+          "This is a guideline for supervised community health workers; clinical decisions require in-person assessment",
+          "Model outputs may have limitations; always prioritize verified observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 20026,
+      "traceIndexes": [
+        8,
+        9
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "repeat": 3,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on model output alone. Always follow the deterministic policy. Never use the model to decide on care without first confirming with real-world observations.",
+        "uncertainty": [
+          "The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment",
+          "Escalation depends on documented observations, not model outputs",
+          "Community health workers must act on recorded danger signs per local protocols"
+        ],
+        "limitations": [
+          "This is a guideline for supervised community health workers; clinical decisions require in-person assessment",
+          "Model outputs may have limitations; always prioritize verified observations"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 20124,
+      "traceIndexes": [
+        10,
+        11
+      ]
+    }
+  ],
+  "traces": [
+    {
+      "phase": "assist-reason",
+      "requestSha256": "c802346b5b11646d0a4b20e53055a925d891d181e4445cedde25661f6637211e",
+      "caseId": "tp_001-product-repeat-1",
+      "responseSha256": "5731c9c8bba3faafdf83141634f722b8ac2a9177a813d180aed2954586741bb1",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 7314,
+      "generatedTokens": 63,
+      "tokensPerSecond": 15.368552526297302,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "4fe180cac6e85b3ec8ed547e14e063648e74be2addb2b61326e82a3b4945c935",
+      "caseId": "tp_001-product-repeat-1",
+      "responseSha256": "8d895c568df6cd4fa316b965e2b768f7d9f655eb1e6050e2e32e94cf2c98d842",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the observations\",\n    \"Fast breathing status could not be assessed due to missing rate measurement\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Cannot determine if cough is significant or requires intervention\",\n    \"Age-specific danger signs not fully addressed in observations\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 11588,
+      "generatedTokens": 141,
+      "tokensPerSecond": 14.97742233250515,
+      "error": null
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "c802346b5b11646d0a4b20e53055a925d891d181e4445cedde25661f6637211e",
+      "caseId": "tp_001-product-repeat-2",
+      "responseSha256": "3b0e76354014397a17529576253a3083e7dd4c9d97f230a3da55eae2a96a9fe3",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 4380,
+      "generatedTokens": 63,
+      "tokensPerSecond": 24.291338749659246,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "4fe180cac6e85b3ec8ed547e14e063648e74be2addb2b61326e82a3b4945c935",
+      "caseId": "tp_001-product-repeat-2",
+      "responseSha256": "f10d3687c80fa3166cb62f110d2c50a462021f5816887647f6aa5756a1c651ed",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the observations\",\n    \"Fast breathing status could not be assessed due to missing rate measurement\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Cannot determine if cough is significant or requires intervention\",\n    \"Age-specific danger signs not fully addressed in observations\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 102935,
+      "generatedTokens": 141,
+      "tokensPerSecond": 1.4013833422710449,
+      "error": null
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "c802346b5b11646d0a4b20e53055a925d891d181e4445cedde25661f6637211e",
+      "caseId": "tp_001-product-repeat-3",
+      "responseSha256": "9e26fce0944887415ce70ea0d565cb228733649a969a21b000bbd1860d0529bd",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 4174,
+      "generatedTokens": 63,
+      "tokensPerSecond": 23.044930298230664,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "4fe180cac6e85b3ec8ed547e14e063648e74be2addb2b61326e82a3b4945c935",
+      "caseId": "tp_001-product-repeat-3",
+      "responseSha256": "052e4cee94f67c6ed3265c67494cccf0511bcf1b6f1e4b8298c9896f153f6ace",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent; respiratory rate was not recorded, so fast-breathing status cannot be determined. Uncertainty includes the lack of respiratory rate data.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the observations\",\n    \"Fast breathing status could not be assessed due to missing rate measurement\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Cannot determine if cough is significant or requires intervention\",\n    \"Age-specific danger signs not fully addressed in observations\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 10547,
+      "generatedTokens": 141,
+      "tokensPerSecond": 18.668612792316054,
+      "error": null
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "10b28098121ed9392d6ac962c02fe37c6e9898d31f387f6363f3683c16b60255",
+      "caseId": "tp_002-product-repeat-1",
+      "responseSha256": "c1b47cb82add2a36c4bcd16491b1532062da2619cad462782009585a76cd81bc",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 24553,
+      "generatedTokens": 269,
+      "tokensPerSecond": 11.969637168704693,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "57c892b4716807b4516b42c9f450435688f4268a99467af1266e41b37de09c43",
+      "caseId": "tp_002-product-repeat-1",
+      "responseSha256": "352e1afde6515b31d1b70ff970c1a3d4733d6d30d4e08fcb531ee63fbf99f5bd",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations (e.g., fast breathing, chest retractions, bluish lips, inability to eat/drink) are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on the model's prediction alone. Always follow the deterministic policy: if danger signs are present, seek immediate medical care. Never use the model to decide on care without first confirming with real-world observations.\"\n  ,\n  \"uncertainty\": [\n    \"The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment\",\n    \"Escalation depends on documented observations, not model outputs\",\n    \"Community health workers must act on recorded danger signs per local protocols\"\n  ],\n  \"limitations\": [\n    \"This is a guideline for supervised community health workers; clinical decisions require in-person assessment\",\n    \"Model outputs may have limitations; always prioritize verified observations\",\n    \"Emergency signs require immediate action per local emergency protocols\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 96052,
+      "generatedTokens": 258,
+      "tokensPerSecond": 2.776833660312672,
+      "error": null
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "10b28098121ed9392d6ac962c02fe37c6e9898d31f387f6363f3683c16b60255",
+      "caseId": "tp_002-product-repeat-2",
+      "responseSha256": "48c3781ab2516d60f0cf51c8a5263776f61e177193ee5378e6ff42e583444103",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 9155,
+      "generatedTokens": 269,
+      "tokensPerSecond": 33.49025614069991,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "57c892b4716807b4516b42c9f450435688f4268a99467af1266e41b37de09c43",
+      "caseId": "tp_002-product-repeat-2",
+      "responseSha256": "3c278a56d3a2f77606bdb5bc25ec00deb8b52e407da0ccafa16bd46edd3ecd97",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations (e.g., fast breathing, chest retractions, bluish lips, inability to eat/drink) are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on the model's prediction alone. Always follow the deterministic policy: if danger signs are present, seek immediate medical care. Never use the model to decide on care without first confirming with real-world observations.\"\n  ,\n  \"uncertainty\": [\n    \"The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment\",\n    \"Escalation depends on documented observations, not model outputs\",\n    \"Community health workers must act on recorded danger signs per local protocols\"\n  ],\n  \"limitations\": [\n    \"This is a guideline for supervised community health workers; clinical decisions require in-person assessment\",\n    \"Model outputs may have limitations; always prioritize verified observations\",\n    \"Emergency signs require immediate action per local emergency protocols\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 10865,
+      "generatedTokens": 258,
+      "tokensPerSecond": 29.707775664841023,
+      "error": null
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "10b28098121ed9392d6ac962c02fe37c6e9898d31f387f6363f3683c16b60255",
+      "caseId": "tp_002-product-repeat-3",
+      "responseSha256": "1dd9394d97a7dd26d6206df11b56f0da809a3353b92f61345e43d39216706afa",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 9645,
+      "generatedTokens": 269,
+      "tokensPerSecond": 31.49059133711392,
+      "error": null
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "57c892b4716807b4516b42c9f450435688f4268a99467af1266e41b37de09c43",
+      "caseId": "tp_002-product-repeat-3",
+      "responseSha256": "790f6a7677748f5c09835570fd19403d0ca6547ed6cbb5a73ffeefc9986501ad",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist is a critical tool for community health workers to systematically identify urgent breathing issues in children. Completing it first ensures all key observations (e.g., fast breathing, chest retractions, bluish lips, inability to eat/drink) are documented before model-assisted review. This is because the model relies on these specific, observable facts to provide accurate guidance. Escalation decisions must be based on the actual danger signs recorded by the health worker, not on the model's prediction alone. Always follow the deterministic policy: if danger signs are present, seek immediate medical care. Never use the model to decide on care without first confirming with real-world observations.\"\n  ,\n  \"uncertainty\": [\n    \"The model's role is supportive, not diagnostic; it provides suggestions for review but does not replace clinical judgment\",\n    \"Escalation depends on documented observations, not model outputs\",\n    \"Community health workers must act on recorded danger signs per local protocols\"\n  ],\n  \"limitations\": [\n    \"This is a guideline for supervised community health workers; clinical decisions require in-person assessment\",\n    \"Model outputs may have limitations; always prioritize verified observations\",\n    \"Emergency signs require immediate action per local emergency protocols\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 10476,
+      "generatedTokens": 258,
+      "tokensPerSecond": 31.87634941668134,
+      "error": null
+    }
+  ],
+  "evaluations": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    }
+  ]
+}

@@ -16,6 +16,7 @@ import {
 } from "../qvac/sdk.js";
 import { embedBatchTimed } from "../qvac/engine.js";
 import { logPerf } from "../qvac/perf-logger.js";
+import { safeErrorName } from "../logging.js";
 
 export interface Citation {
   protocol: string; // "IMCI" | "mhGAP"
@@ -78,7 +79,7 @@ export function loadCitationMap(): CitationMap {
     _mapMtime = mtime;
     _mapHealthy = true;
   } catch (err) {
-    if (_mapHealthy) console.error(`[store] citation sidecar at ${p} failed to parse — citations degrade until fixed:`, (err as Error)?.message);
+    if (_mapHealthy) console.error(`[store] citation sidecar failed to parse; citations degraded (${safeErrorName(err)})`);
     _mapHealthy = false;
     _map ??= {};
   }

@@ -21,12 +21,12 @@ const EXPECTED_TEST_PROMPTS = [
   {
     prompt_id: "tp_002",
     prompt:
-      "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted classification. State that recorded danger observations and deterministic policy—not model output—control escalation. Do not diagnose or prescribe.",
+      "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
   },
 ] as const;
 
 const EXPECTED_PAIRING_DESCRIPTION =
-  "Community health education is load-bearing: the English-only offline prototype helps supervised workers record a structured pediatric respiratory assessment, while deterministic policy—not model output—owns escalation.";
+  "Community health education is load-bearing: the English-only offline prototype helps supervised workers record a structured pediatric respiratory assessment, while deterministic policy, not model output, owns escalation.";
 
 function rawFixture(overrides: Record<string, unknown> = {}) {
   const rawStdout = '  {"classification":"routine"}  [end of text]\n';

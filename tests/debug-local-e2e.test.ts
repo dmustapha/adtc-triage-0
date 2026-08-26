@@ -43,7 +43,8 @@ test("local app serves truthful health and deterministic emergency SSE without Q
       assert.match(triage.headers.get("content-type") ?? "", /text\/event-stream/);
       assert.match(events, /event: citation/);
       assert.match(events, /event: card/);
-      assert.match(events, /"severity":"EMERGENCY"/);
+      assert.match(events, /"outcome":"EMERGENCY"/);
+      assert.doesNotMatch(events, /"severity"|"redFlags"/);
       assert.match(events, /event: done/);
       assert.deepEqual(boundaries, []);
     } finally {

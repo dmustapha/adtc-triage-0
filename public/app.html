@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<!-- Triage-0 . the tool. Speak or type a case, the WHO citation lands first, the reasoning streams,
-     the triage card renders, hear it read aloud. Live performance readout, offline badge, disclaimer.
-     100% on-device. Logic in assets/js/triage.js (wiring unchanged from the original). -->
+<!-- Triage-0 supervised assessment. Logic lives in assets/js/triage.js. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triage-0 . offline clinical guidance</title>
+  <title>Triage-0: supervised WHO assessment and local prompt review</title>
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
@@ -15,7 +13,7 @@
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
 <body>
-  <div class="disclaimer">Research and education only. <b>Triage-0</b> helps a trained health worker. It shows WHO guidance. It does not diagnose or prescribe.</div>
+  <div class="disclaimer">Research and education only. <b>Triage-0</b> supports a trained health worker with supervised assessment. It does not prescribe or replace clinical judgment.</div>
 
   <div class="wrap wrap--narrow">
     <header class="app-head">
@@ -23,26 +21,32 @@
         <span class="mark"><img src="/assets/img/logo.svg" alt="" width="36" height="36" /></span>
         <span>
           <span class="wordmark">Triage<span>-0</span></span>
-          <span class="tag" style="display:block">offline clinical guidance</span>
+          <span class="tag" style="display:block">supervised WHO assessment and local prompt review</span>
         </span>
       </a>
       <span id="net" class="badge"><span class="pip pip--ring"></span><span class="badge-txt">Network status</span></span>
     </header>
 
     <main class="app-main">
-      <h1 class="sr-only">Triage-0 clinical guidance</h1>
+      <h1 class="sr-only">Triage-0 supervised WHO assessment and local prompt review</h1>
       <!-- H-7: shown only when the RAG store is empty (citation map missing OR native store wiped), so a
            fresh setup that skipped `npm run ingest` is obvious instead of silently abstaining on every case -->
       <div id="setupBanner" class="setup-banner hidden" role="alert"></div>
+      <nav class="mode-switch" role="tablist" aria-label="Workflow mode">
+        <button class="mode-tab is-active" type="button" role="tab" data-mode="clinical" aria-selected="true" aria-controls="clinicalModePanel">Assess a case</button>
+        <button class="mode-tab" type="button" role="tab" data-mode="prompt" aria-selected="false" aria-controls="promptModePanel">Ask the local model</button>
+      </nav>
+      <div id="clinicalModePanel" role="tabpanel" data-testid="clinical-mode">
       <!-- step 1 -->
       <section aria-labelledby="h-describe">
         <div class="step-label"><span class="step-num">1</span><h2 id="h-describe" class="display">Describe the patient</h2></div>
         <div class="panel">
           <p class="hint">Type the age and what you see.</p>
-          <textarea id="case" aria-label="Patient case" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
+          <textarea id="clinicalCase" name="clinicalCase" aria-label="Patient case" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
+          <p class="input-authority-note">Structured age and observations control escalation. The description is used for WHO reference lookup and model-assisted summarization.</p>
           <p class="multiling">English text workflow.</p>
           <div class="seeds" id="seeds" aria-label="Fill an example case">
-            <button class="seed" type="button" data-fill="18 month old with cough for three days and difficult breathing; alert and drinking.">English example</button>
+            <button class="seed" type="button" data-age-value="18" data-age-unit="months" data-observations="absent" data-respiratory-concern="PRESENT" data-respiratory-rate="32" data-fill="18 month old with cough for three days and difficult breathing; breathing counted at 32 per minute for one minute while calm; alert and drinking.">English example</button>
           </div>
           <details id="dangerDisclosure" class="assessment-disclosure">
             <summary>
@@ -51,11 +55,18 @@
             </summary>
             <fieldset id="dangerChecklist" class="danger-checklist">
               <legend>Danger and breathing signs checklist</legend>
-              <p class="danger-help">Required: enter an age from 2 months to under 5 years and record each observed sign.</p>
+              <p class="danger-help">For young children, enter an age from 2 months to under 5 years and record every sign. Adult WHO assessment accepts age 18 years or older; complete respiratory fields only when relevant.</p>
               <div class="age-fields">
                 <div>
+                  <label for="assessmentFocus">Assessment focus</label>
+                  <select id="assessmentFocus">
+                    <option value="RESPIRATORY">Cough or difficult breathing</option>
+                    <option value="BROADER_WHO">Other WHO symptom review</option>
+                  </select>
+                </div>
+                <div>
                   <label for="patientAgeValue">Patient age</label>
-                  <input id="patientAgeValue" type="number" min="0" step="any" inputmode="decimal" autocomplete="off" />
+                  <input id="patientAgeValue" type="number" min="0" max="1560" step="any" inputmode="decimal" autocomplete="off" aria-describedby="dangerStatus" />
                 </div>
                 <div>
                   <label for="patientAgeUnit">Age unit</label>
@@ -64,13 +75,46 @@
                     <option value="years">Years</option>
                   </select>
                 </div>
+                <div>
+                  <label for="patientWeightKg">Patient weight (kg)</label>
+                  <input id="patientWeightKg" type="number" min="0.5" max="300" step="0.1" inputmode="decimal" autocomplete="off" />
+                </div>
               </div>
+              <details class="safety-disclosure">
+                <summary>Reference-action safety review <span>required only before source actions unlock</span></summary>
+                <div class="safety-grid">
+                  <div><label for="allergiesReviewed">Allergy review</label><select id="allergiesReviewed"><option value="NOT_ASSESSED">Not assessed</option><option value="CONFIRMED_NONE">No known allergy recorded</option><option value="PRESENT">Known allergy present</option></select></div>
+                  <div><label for="contraindicationsReviewed">Contraindication review</label><select id="contraindicationsReviewed"><option value="NOT_ASSESSED">Not assessed</option><option value="CONFIRMED_NONE">None recorded</option><option value="PRESENT">Present</option></select></div>
+                  <div><label for="protocolApplicability">Protocol applicability</label><select id="protocolApplicability"><option value="NOT_ASSESSED">Not assessed</option><option value="CONFIRMED_APPLICABLE">Confirmed applicable</option><option value="NOT_APPLICABLE">Not applicable</option></select></div>
+                </div>
+              </details>
+              <fieldset id="respiratoryAssessment" class="respiratory-assessment">
+                <legend>Breathing assessment <span>required for the cough or difficult-breathing focus</span></legend>
+                <div class="respiratory-grid">
+                  <div class="respiratory-concern">
+                    <span class="field-label">Cough or difficult breathing</span>
+                    <div class="tri-state"><label><input type="radio" name="respiratory-concern" value="PRESENT" />Present</label><label><input type="radio" name="respiratory-concern" value="ABSENT" />Absent</label><label><input type="radio" name="respiratory-concern" value="NOT_ASSESSED" checked />Not assessed</label></div>
+                  </div>
+                  <div>
+                    <label for="respiratoryRatePerMinute">Breaths per minute</label>
+                    <input id="respiratoryRatePerMinute" type="number" min="1" max="200" step="1" inputmode="numeric" autocomplete="off" aria-describedby="dangerStatus" />
+                  </div>
+                  <div>
+                    <label for="rateCountQuality">Count quality</label>
+                    <select id="rateCountQuality">
+                      <option value="NOT_CONFIRMED">Not confirmed</option>
+                      <option value="ONE_MINUTE_WHILE_CALM">One minute while calm</option>
+                    </select>
+                  </div>
+                </div>
+                <p class="respiratory-help">For a breathing concern, count for one minute while the child is calm.</p>
+              </fieldset>
               <div class="danger-signs">
                 <fieldset data-danger-key="cannotDrinkOrBreastfeed"><legend>Cannot drink or breastfeed</legend><div class="tri-state"><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="PRESENT" />Present</label><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="ABSENT" />Absent</label><label><input type="radio" name="danger-cannotDrinkOrBreastfeed" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
                 <fieldset data-danger-key="vomitsEverything"><legend>Vomits everything</legend><div class="tri-state"><label><input type="radio" name="danger-vomitsEverything" value="PRESENT" />Present</label><label><input type="radio" name="danger-vomitsEverything" value="ABSENT" />Absent</label><label><input type="radio" name="danger-vomitsEverything" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
                 <fieldset data-danger-key="convulsions"><legend>Convulsions</legend><div class="tri-state"><label><input type="radio" name="danger-convulsions" value="PRESENT" />Present</label><label><input type="radio" name="danger-convulsions" value="ABSENT" />Absent</label><label><input type="radio" name="danger-convulsions" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
                 <fieldset data-danger-key="lethargicOrUnconscious"><legend>Lethargic or unconscious</legend><div class="tri-state"><label><input type="radio" name="danger-lethargicOrUnconscious" value="PRESENT" />Present</label><label><input type="radio" name="danger-lethargicOrUnconscious" value="ABSENT" />Absent</label><label><input type="radio" name="danger-lethargicOrUnconscious" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
-                <fieldset data-danger-key="chestIndrawing"><legend>Chest indrawing <span>breathing classification sign, not an emergency sign by itself</span></legend><div class="tri-state"><label><input type="radio" name="danger-chestIndrawing" value="PRESENT" />Present</label><label><input type="radio" name="danger-chestIndrawing" value="ABSENT" />Absent</label><label><input type="radio" name="danger-chestIndrawing" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
+                <fieldset data-danger-key="chestIndrawing"><legend>Chest indrawing <span>breathing observation, not an emergency sign by itself</span></legend><div class="tri-state"><label><input type="radio" name="danger-chestIndrawing" value="PRESENT" />Present</label><label><input type="radio" name="danger-chestIndrawing" value="ABSENT" />Absent</label><label><input type="radio" name="danger-chestIndrawing" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
                 <fieldset data-danger-key="stridorWhenCalm"><legend>Stridor when calm</legend><div class="tri-state"><label><input type="radio" name="danger-stridorWhenCalm" value="PRESENT" />Present</label><label><input type="radio" name="danger-stridorWhenCalm" value="ABSENT" />Absent</label><label><input type="radio" name="danger-stridorWhenCalm" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
                 <fieldset data-danger-key="lowOxygenOrCentralCyanosis"><legend>Low oxygen or central cyanosis</legend><div class="tri-state"><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="PRESENT" />Present</label><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="ABSENT" />Absent</label><label><input type="radio" name="danger-lowOxygenOrCentralCyanosis" value="NOT_ASSESSED" checked />Not assessed</label></div></fieldset>
               </div>
@@ -78,7 +122,7 @@
             </fieldset>
           </details>
           <div class="actions">
-            <button class="btn btn--primary" id="assess" type="button" disabled aria-describedby="dangerStatus">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+            <button class="btn btn--primary" id="assess" type="button" disabled aria-describedby="dangerStatus">Run assessment<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             <span id="status" class="status" role="status"></span>
           </div>
         </div>
@@ -86,20 +130,48 @@
 
       <!-- step 2 -->
       <section id="result" class="hidden" aria-labelledby="h-guideline">
-        <div class="step-label"><span class="step-num">2</span><h2 id="h-guideline" class="display">What the guideline says</h2></div>
+        <div class="step-label"><span class="step-num">2</span><h2 id="h-guideline" class="display">Assessment outcome</h2></div>
         <div class="panel">
-          <div id="citationBox" class="hidden"></div>
           <div id="reasoningWrap" class="hidden" aria-live="polite" aria-atomic="false">
-            <div class="muted" style="display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:13.5px"><span class="spin" aria-hidden="true"></span><span id="reasonLabel">Searching the guidelines</span><span id="reasonTimer" class="rtimer" aria-hidden="true"></span></div>
-            <!-- On-device pipeline readout: each row is a REAL step the server emitted as an SSE `stage`
-                 event (detect -> translate -> retrieve -> reason -> classify -> plan). Fills the reasoning
-                 wait with honest proof of the 6-model on-device pipeline, not a decorative animation. -->
+            <div class="muted" style="display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:13.5px"><span class="spin" aria-hidden="true"></span><span id="reasonLabel">Checking supporting references</span><span id="reasonTimer" class="rtimer" aria-hidden="true"></span></div>
+            <!-- Each row is emitted by an executed local assessment stage. -->
             <ol id="plSteps" class="pl-steps" aria-label="On-device pipeline steps"></ol>
             <div class="reason" id="reasoning"></div>
           </div>
           <div id="card" class="hidden" role="status" aria-live="polite"></div>
+          <div id="confirmationRegion" class="confirmation-region hidden" aria-live="polite">
+            <p><strong>Human review required.</strong> Confirm the provisional WHO protocol class, correct the record, or reject it. No reference action appears before confirmation.</p>
+            <div class="confirmation-actions">
+              <button id="confirmAssessment" class="btn btn--primary" type="button">Confirm reviewed class</button>
+              <button id="correctAssessment" class="btn" type="button">Correct record</button>
+              <button id="rejectAssessment" class="btn" type="button">Reject</button>
+            </div>
+            <p id="confirmationStatus" class="status" role="status"></p>
+          </div>
+          <div id="citationBox" class="hidden"></div>
           <div id="err" class="err" role="alert" aria-live="assertive"></div>
         </div>
+      </section>
+      </div>
+
+      <section id="promptModePanel" role="tabpanel" data-testid="prompt-mode" hidden aria-labelledby="h-prompt">
+        <div class="step-label"><span class="step-num">A</span><h2 id="h-prompt" class="display">Ask the local model</h2></div>
+        <div class="panel prompt-workspace">
+          <p class="hint">Run a bounded two-pass local answer. The internal reasoning draft is never displayed.</p>
+          <label class="field-label" for="ordinaryPrompt">Prompt</label>
+          <textarea id="ordinaryPrompt" name="ordinaryPrompt" maxlength="4000" aria-describedby="promptStatus" placeholder="Ask for a plain-language summary or explanation."></textarea>
+          <div class="prompt-examples" aria-label="Submitted prompt examples">
+            <button id="promptExample1" class="seed" type="button" data-prompt="Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.">Use submitted Prompt 1</button>
+            <button id="promptExample2" class="seed" type="button" data-prompt="Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.">Use submitted Prompt 2</button>
+          </div>
+          <div class="workflow-actions">
+            <button id="runPrompt" class="btn btn--primary" type="button" disabled>Run local prompt</button>
+            <button id="cancelPrompt" class="btn" type="button" hidden>Cancel</button>
+            <button id="retryPrompt" class="btn" type="button" hidden>Retry</button>
+            <span id="promptStatus" class="status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div id="promptResult" class="panel prompt-result" aria-live="polite" aria-atomic="false" hidden></div>
       </section>
 
       <!-- live performance -->
@@ -113,9 +185,9 @@
             <div class="num"><div class="k">First answer in</div><div class="v" id="hTtft">·</div></div>
             <div class="num"><div class="k">Tokens / sec</div><div class="v" id="hTps">·</div></div>
             <div class="num is-live"><div class="k">Running on</div><div class="v" id="hDev">·</div></div>
-            <div class="num"><div class="k">Guidelines loaded</div><div class="v" id="hChunks">·</div></div>
+            <div class="num"><div class="k">References available</div><div class="v" id="hChunks">·</div></div>
           </div>
-          <div class="perf-foot"><span>Network protection is reported when the local egress guard is armed.</span><a href="/perf-log.csv">Download the log</a></div>
+          <div class="perf-foot"><span>Network protection is reported when the local egress guard is armed.</span><a href="/perf-log.csv">Download local runtime log</a></div>
         </div>
       </section>
     </main>

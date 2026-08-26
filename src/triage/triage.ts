@@ -11,6 +11,7 @@
 // Model lifecycle is the caller's (server in Phase 4, the test harness now) — the orchestrator is Phase 3.
 import { completionTimed } from "../qvac/engine.js";
 import { config } from "../config.js";
+import { safeErrorName } from "../logging.js";
 import { search, keywordSearch, type SearchHit } from "../rag/store.js";
 import {
   TriageExtractSchema,
@@ -51,7 +52,15 @@ import type { ChatMessage } from "../qvac/sdk.js";
 const MAX_EXTRACT_ATTEMPTS = 3;
 /** Reason-pass token budget. High enough to finish the <think> block + conclusion on a dense case
  *  (the danger-sign case needed ~900). The demo path (E-5) overrides this lower for latency. */
-const DEFAULT_REASON_PREDICT = Number(process.env.REASON_PREDICT) || 1024;
+function predictionBudget(name: string, fallback: number, maximum: number): number {
+  const value = Number(process.env[name] ?? fallback);
+  if (!Number.isInteger(value) || value < 1 || value > maximum) {
+    throw new RangeError(`${name} must be an integer from 1 through ${maximum}.`);
+  }
+  return value;
+}
+
+const DEFAULT_REASON_PREDICT = predictionBudget("REASON_PREDICT", 1024, 2048);
 /** Extract-pass token cap. The extract emits a small GBNF-constrained JSON object (classification + a
  *  one-line action + a BRIEF reasoning + a short red_flags array + a confidence enum) — ~95 tokens in
  *  practice. WITHOUT a cap, a degenerate reason assessment (e.g. a translated case whose <think> block
@@ -60,7 +69,7 @@ const DEFAULT_REASON_PREDICT = Number(process.env.REASON_PREDICT) || 1024;
  *  overflow` (live-caught in Phase-7 rehearsal on a Spanish meningitis case). 512 is ~5× the real extract
  *  size — it never truncates a legitimate "brief" extract, but bounds a runaway well under ctx so the
  *  worst case is a retry, not a crashed request. */
-const DEFAULT_EXTRACT_PREDICT = Number(process.env.EXTRACT_PREDICT) || 512;
+const DEFAULT_EXTRACT_PREDICT = predictionBudget("EXTRACT_PREDICT", 512, 1024);
 
 export type TriageExecutionBoundary = "qvac-context" | "semantic-routing" | "grounding" | "medpsy";
 let executionObserver: ((boundary: TriageExecutionBoundary) => void) | undefined;
@@ -188,6 +197,8 @@ export interface TriageResult {
 export interface TriageOptions {
   onReasonDelta?: (chunk: string) => void;
   reasonPredict?: number;
+  extractPredict?: number;
+  maxExtractAttempts?: number;
   retrieval?: "semantic" | "keyword";
   shortlist?: { cls: string; score: number }[];
   structuredDanger?: DangerDecision;
@@ -351,7 +362,8 @@ export async function triageFromHits(
 
   // EXTRACT pass — GBNF-constrained json_schema → guaranteed shape; safeParse + retry.
   let lastErr = "";
-  for (let attempt = 1; attempt <= MAX_EXTRACT_ATTEMPTS; attempt++) {
+  const maxExtractAttempts = opts?.maxExtractAttempts ?? MAX_EXTRACT_ATTEMPTS;
+  for (let attempt = 1; attempt <= maxExtractAttempts; attempt++) {
     const history: ChatMessage[] = [
       { role: "system", content: SYS_EXTRACT },
       { role: "user", content: `${extractUserBody}\n\nCLINICAL ASSESSMENT:\n${assessment}\n\n${shortlistBlock}Emit the JSON now.` },
@@ -372,7 +384,7 @@ export async function triageFromHits(
       // Without it the extract sampled DEPRESSION for a purely-physical case on some runs (MS2). The GBNF
       // enum grammar still constrains the output; temp 0 just removes the sampling noise on the boundary.
       // `predict` caps a runaway (see DEFAULT_EXTRACT_PREDICT) so a degenerate assessment can never overflow ctx.
-      generationParams: { temp: 0, predict: DEFAULT_EXTRACT_PREDICT },
+      generationParams: { temp: 0, predict: opts?.extractPredict ?? DEFAULT_EXTRACT_PREDICT },
     });
     const parsed = TriageExtractSchema.safeParse(parseExtract(extractRun.text));
     if (parsed.success) {
@@ -460,7 +472,7 @@ export async function triageFromHits(
     }
     lastErr = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
   }
-  throw new Error(`Triage extract failed after ${MAX_EXTRACT_ATTEMPTS} attempts: ${lastErr}`);
+  throw new Error(`Triage extract failed after ${maxExtractAttempts} attempts: ${lastErr}`);
 }
 
 /**
@@ -808,7 +820,7 @@ export async function assemblePlan(
     const comp: Record<string, SearchHit[]> = {};
     for (const key of Object.keys(q)) comp[key] = await retrieveComponent(q[key], ctx);
 
-    if (process.env.TRIAGE0_DEBUG_PLAN) console.error("[plan] proto:", proto, "| comp ids:", JSON.stringify(Object.fromEntries(Object.entries(comp).map(([k, v]) => [k, v.map((h) => `${h.protocol}|${h.id}`)]))));
+    if (config.debugPlan) console.error("[plan] protocol/components:", proto, Object.fromEntries(Object.entries(comp).map(([key, hits]) => [key, hits.length])));
     // Same-protocol fence (see PROTOCOL FENCE above).
     const sameProto = (arr: SearchHit[]) => (proto ? arr.filter((c) => c.protocol === proto) : arr);
     const primary = sameProto(primaryHits);
@@ -856,10 +868,10 @@ export async function assemblePlan(
       plan.referral = { criterion: rf.text, citation: citationOf(rf.hit) };
     }
 
-    if (process.env.TRIAGE0_DEBUG_PLAN) console.error("[plan] grounded:", JSON.stringify(plan));
+    if (config.debugPlan) console.error("[plan] projected action counts:", plan.medicines.length, plan.supportive.length, plan.home_care.length, plan.return_now.length);
     return plan;
   } catch (err) {
-    if (process.env.TRIAGE0_DEBUG_PLAN) console.error("[plan] EXCEPTION:", (err as Error)?.stack ?? err);
+    if (config.debugPlan) console.error("[plan] projection failed:", safeErrorName(err));
     return plan;
   }
 }

@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "kind": "submitted-prompt-official-product-evidence",
+  "plane": "pinned official llama.cpp application workflow",
+  "status": "fail",
+  "historicalRawOneShotEvidence": "preserved-and-unchanged",
+  "runtime": {
+    "name": "llama.cpp",
+    "frontend": "llama-server",
+    "revision": "c8ade30036139e32108fee53d8b7164dbfda4bee",
+    "cpuOnly": true,
+    "threads": 4,
+    "gpuLayers": 0
+  },
+  "workflow": {
+    "version": "prompt-policy-v3",
+    "reasonPredict": 1024,
+    "extractPredict": 512,
+    "maxExtractAttempts": 3,
+    "temperature": 0
+  },
+  "host": {
+    "label": "MacBook Pro MacBookPro17,1; Apple M1; 8 GB; macOS 26.0.1 (25A362); Apple development evidence",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.0.0"
+  },
+  "model": {
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "server": {
+    "command": [
+      "/Users/MAC/.cache/adtc-2026/llama.cpp-c8ade300-server-source/build-server-cpu/bin/llama-server",
+      "-m",
+      "model/medpsy-1.7b-q4_k_m-imat.gguf",
+      "-t",
+      "4",
+      "-ngl",
+      "0",
+      "-c",
+      "2048",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "51282",
+      "--jinja",
+      "--reasoning-format",
+      "none",
+      "--no-webui"
+    ],
+    "loopbackOnly": true,
+    "startupError": null,
+    "gracefulShutdown": true,
+    "listenerClosed": true,
+    "rawStdout": "",
+    "rawStderr": "warning: no usable GPU found, --gpu-layers option will be ignored\nwarning: one possible reason is that llama.cpp was compiled without GPU support\nwarning: consult docs/build.md for compilation instructions\nbuild: 1 (c8ade30) with Apple clang version 17.0.0 (clang-1700.0.13.5) for arm64-apple-darwin25.0.0\nsystem info: n_threads = 4, n_threads_batch = 4, total_threads = 8\n\nsystem_info: n_threads = 4 (n_threads_batch = 4) / 8 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 | \n\nWeb UI is disabled\nmain: binding port with default address family\nmain: HTTP server is listening, hostname: 127.0.0.1, port: 51282, http threads: 7\nmain: loading model\nsrv    load_model: loading model 'model/medpsy-1.7b-q4_k_m-imat.gguf'\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nllama_model_loader: loaded meta data with 34 key-value pairs and 311 tensors from model/medpsy-1.7b-q4_k_m-imat.gguf (version GGUF V3 (latest))\nllama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.\nllama_model_loader: - kv   0:                       general.architecture str              = qwen3\nllama_model_loader: - kv   1:                               general.type str              = model\nllama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20\nllama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000\nllama_model_loader: - kv   4:                      general.sampling.temp f32              = 0.600000\nllama_model_loader: - kv   5:                               general.name str              = MedPsy 1.7B\nllama_model_loader: - kv   6:                           general.basename str              = MedPsy\nllama_model_loader: - kv   7:                         general.size_label str              = 1.7B\nllama_model_loader: - kv   8:                          qwen3.block_count u32              = 28\nllama_model_loader: - kv   9:                       qwen3.context_length u32              = 40960\nllama_model_loader: - kv  10:                     qwen3.embedding_length u32              = 2048\nllama_model_loader: - kv  11:                  qwen3.feed_forward_length u32              = 6144\nllama_model_loader: - kv  12:                 qwen3.attention.head_count u32              = 16\nllama_model_loader: - kv  13:              qwen3.attention.head_count_kv u32              = 8\nllama_model_loader: - kv  14:                       qwen3.rope.freq_base f32              = 1000000.000000\nllama_model_loader: - kv  15:     qwen3.attention.layer_norm_rms_epsilon f32              = 0.000001\nllama_model_loader: - kv  16:                 qwen3.attention.key_length u32              = 128\nllama_model_loader: - kv  17:               qwen3.attention.value_length u32              = 128\nllama_model_loader: - kv  18:                       tokenizer.ggml.model str              = gpt2\nllama_model_loader: - kv  19:                         tokenizer.ggml.pre str              = qwen2\nllama_model_loader: - kv  20:                      tokenizer.ggml.tokens arr[str,151936]  = [\"!\", \"\\\"\", \"#\", \"$\", \"%\", \"&\", \"'\", ...\nllama_model_loader: - kv  21:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...\nllama_model_loader: - kv  22:                      tokenizer.ggml.merges arr[str,151387]  = [\"Ġ Ġ\", \"ĠĠ ĠĠ\", \"i n\", \"Ġ t\",...\nllama_model_loader: - kv  23:                tokenizer.ggml.eos_token_id u32              = 151645\nllama_model_loader: - kv  24:            tokenizer.ggml.padding_token_id u32              = 151643\nllama_model_loader: - kv  25:                tokenizer.ggml.bos_token_id u32              = 151643\nllama_model_loader: - kv  26:               tokenizer.ggml.add_bos_token bool             = false\nllama_model_loader: - kv  27:                    tokenizer.chat_template str              = {%- set persona = 'You are MedPsy, a ...\nllama_model_loader: - kv  28:               general.quantization_version u32              = 2\nllama_model_loader: - kv  29:                          general.file_type u32              = 15\nllama_model_loader: - kv  30:                      quantize.imatrix.file str              = /data/alex/health/ggufs/imatrix.dat\nllama_model_loader: - kv  31:                   quantize.imatrix.dataset str              = /data/akshay/MedHealth/calibration_sm...\nllama_model_loader: - kv  32:             quantize.imatrix.entries_count u32              = 196\nllama_model_loader: - kv  33:              quantize.imatrix.chunks_count u32              = 100\nllama_model_loader: - type  f32:  113 tensors\nllama_model_loader: - type q4_K:  169 tensors\nllama_model_loader: - type q6_K:   29 tensors\nprint_info: file format = GGUF V3 (latest)\nprint_info: file type   = Q4_K - Medium\nprint_info: file size   = 1.19 GiB (5.03 BPW) \nload: special tokens cache size = 26\nload: token to piece cache size = 0.9311 MB\nprint_info: arch             = qwen3\nprint_info: vocab_only       = 0\nprint_info: n_ctx_train      = 40960\nprint_info: n_embd           = 2048\nprint_info: n_layer          = 28\nprint_info: n_head           = 16\nprint_info: n_head_kv        = 8\nprint_info: n_rot            = 128\nprint_info: n_swa            = 0\nprint_info: is_swa_any       = 0\nprint_info: n_embd_head_k    = 128\nprint_info: n_embd_head_v    = 128\nprint_info: n_gqa            = 2\nprint_info: n_embd_k_gqa     = 1024\nprint_info: n_embd_v_gqa     = 1024\nprint_info: f_norm_eps       = 0.0e+00\nprint_info: f_norm_rms_eps   = 1.0e-06\nprint_info: f_clamp_kqv      = 0.0e+00\nprint_info: f_max_alibi_bias = 0.0e+00\nprint_info: f_logit_scale    = 0.0e+00\nprint_info: f_attn_scale     = 0.0e+00\nprint_info: n_ff             = 6144\nprint_info: n_expert         = 0\nprint_info: n_expert_used    = 0\nprint_info: causal attn      = 1\nprint_info: pooling type     = 0\nprint_info: rope type        = 2\nprint_info: rope scaling     = linear\nprint_info: freq_base_train  = 1000000.0\nprint_info: freq_scale_train = 1\nprint_info: n_ctx_orig_yarn  = 40960\nprint_info: rope_finetuned   = unknown\nprint_info: model type       = 1.7B\nprint_info: model params     = 2.03 B\nprint_info: general.name     = MedPsy 1.7B\nprint_info: vocab type       = BPE\nprint_info: n_vocab          = 151936\nprint_info: n_merges         = 151387\nprint_info: BOS token        = 151643 '<|endoftext|>'\nprint_info: EOS token        = 151645 '<|im_end|>'\nprint_info: EOT token        = 151645 '<|im_end|>'\nprint_info: PAD token        = 151643 '<|endoftext|>'\nprint_info: LF token         = 198 'Ċ'\nprint_info: FIM PRE token    = 151659 '<|fim_prefix|>'\nprint_info: FIM SUF token    = 151661 '<|fim_suffix|>'\nprint_info: FIM MID token    = 151660 '<|fim_middle|>'\nprint_info: FIM PAD token    = 151662 '<|fim_pad|>'\nprint_info: FIM REP token    = 151663 '<|repo_name|>'\nprint_info: FIM SEP token    = 151664 '<|file_sep|>'\nprint_info: EOG token        = 151643 '<|endoftext|>'\nprint_info: EOG token        = 151645 '<|im_end|>'\nprint_info: EOG token        = 151662 '<|fim_pad|>'\nprint_info: EOG token        = 151663 '<|repo_name|>'\nprint_info: EOG token        = 151664 '<|file_sep|>'\nprint_info: max token length = 256\nload_tensors: loading model tensors, this can take a while... (mmap = true)\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nload_tensors:   CPU_Mapped model buffer size =  1217.35 MiB\n.....................................................................\nllama_context: constructing llama_context\nllama_context: non-unified KV cache requires ggml_set_rows() - forcing unified KV cache\nllama_context: n_seq_max     = 1\nllama_context: n_ctx         = 2048\nllama_context: n_ctx_per_seq = 2048\nllama_context: n_batch       = 2048\nllama_context: n_ubatch      = 512\nllama_context: causal_attn   = 1\nllama_context: flash_attn    = 0\nllama_context: kv_unified    = true\nllama_context: freq_base     = 1000000.0\nllama_context: freq_scale    = 1\nllama_context: n_ctx_per_seq (2048) < n_ctx_train (40960) -- the full capacity of the model will not be utilized\nllama_context:        CPU  output buffer size =     0.58 MiB\nllama_kv_cache_unified:        CPU KV buffer size =   224.00 MiB\nllama_kv_cache_unified: size =  224.00 MiB (  2048 cells,  28 layers,  1/ 1 seqs), K (f16):  112.00 MiB, V (f16):  112.00 MiB\nllama_kv_cache_unified: LLAMA_SET_ROWS=0, using old ggml_cpy() method for backwards compatibility\nllama_context:        CPU compute buffer size =   300.75 MiB\nllama_context: graph nodes  = 1154\nllama_context: graph splits = 394 (with bs=512), 1 (with bs=1)\ncommon_init_from_params: added <|endoftext|> logit bias = -inf\ncommon_init_from_params: added <|im_end|> logit bias = -inf\ncommon_init_from_params: added <|fim_pad|> logit bias = -inf\ncommon_init_from_params: added <|repo_name|> logit bias = -inf\ncommon_init_from_params: added <|file_sep|> logit bias = -inf\ncommon_init_from_params: setting dry_penalty_last_n to ctx_size = 2048\ncommon_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv  log_server_r: request: GET /health 127.0.0.1 503\nsrv          init: initializing slots, n_slots = 1\nslot         init: id  0 | task -1 | new slot n_ctx_slot = 2048\nmain: model loaded\nmain: chat template, chat_template: {%- set persona = 'You are MedPsy, a medical and healthcare AI assistant developed by QVAC.' %}\n\n{%- if tools %}\n    {{- '<|im_start|>system\\n' + persona }}\n    {%- if messages[0].role == 'system' %}\n        {{- '\\n' + messages[0].content }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {{- '<|im_start|>system\\n' + persona }}\n    {%- if messages[0].role == 'system' %}\n        {{- '\\n' + messages[0].content }}\n    {%- endif %}\n    {{- '<|im_end|>\\n' }}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and message.content is string and not(message.content.startswith('<tool_response>') and message.content.endswith('</tool_response>')) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if message.content is string %}\n        {%- set content = message.content %}\n    {%- else %}\n        {%- set content = '' %}\n    {%- endif %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in content %}\n                {%- set reasoning_content = content.split('</think>')[0].rstrip('\\n').split('<think>')[-1].lstrip('\\n') %}\n                {%- set content = content.split('</think>')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n\n        {{- '<|im_start|>' + message.role }}\n        {% generation %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and reasoning_content) %}\n                {{- '<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- content }}\n            {%- endif %}\n        {%- else %}\n            {{- content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>' }}\n        {% endgeneration %}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}, example_format: '<|im_start|>system\nYou are MedPsy, a medical and healthcare AI assistant developed by QVAC.\nYou are a helpful assistant<|im_end|>\n<|im_start|>user\nHello<|im_end|>\n<|im_start|>assistant\nHi there<|im_end|>\n<|im_start|>user\nHow are you?<|im_end|>\n<|im_start|>assistant\n'\nmain: server is listening on http://127.0.0.1:51282 - starting the main loop\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: GET /health 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 0 | processing task\nslot update_slots: id  0 | task 0 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 225\nslot update_slots: id  0 | task 0 | kv cache rm [0, end)\nslot update_slots: id  0 | task 0 | prompt processing progress, n_past = 225, n_tokens = 225, progress = 1.000000\nslot update_slots: id  0 | task 0 | prompt done, n_past = 225, n_tokens = 225\nslot      release: id  0 | task 0 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 0 | \nprompt eval time =    3461.13 ms /   225 tokens (   15.38 ms per token,    65.01 tokens per second)\n       eval time =    3350.00 ms /    37 tokens (   90.54 ms per token,    11.04 tokens per second)\n      total time =    6811.13 ms /   262 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 38 | processing task\nslot update_slots: id  0 | task 38 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 38 | kv cache rm [25, end)\nslot update_slots: id  0 | task 38 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 38 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 38 | stop processing: n_past = 472, truncated = 0\nslot print_timing: id  0 | task 38 | \nprompt eval time =    3314.80 ms /   316 tokens (   10.49 ms per token,    95.33 tokens per second)\n       eval time =  155750.49 ms /   132 tokens ( 1179.93 ms per token,     0.85 tokens per second)\n      total time =  159065.29 ms /   448 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 171 | processing task\nslot update_slots: id  0 | task 171 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 225\nslot update_slots: id  0 | task 171 | kv cache rm [25, end)\nslot update_slots: id  0 | task 171 | prompt processing progress, n_past = 225, n_tokens = 200, progress = 0.888889\nslot update_slots: id  0 | task 171 | prompt done, n_past = 225, n_tokens = 200\nslot      release: id  0 | task 171 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 171 | \nprompt eval time =    3272.60 ms /   200 tokens (   16.36 ms per token,    61.11 tokens per second)\n       eval time =    8611.38 ms /    37 tokens (  232.74 ms per token,     4.30 tokens per second)\n      total time =   11883.98 ms /   237 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 209 | processing task\nslot update_slots: id  0 | task 209 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 209 | kv cache rm [25, end)\nslot update_slots: id  0 | task 209 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 209 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 209 | stop processing: n_past = 472, truncated = 0\nslot print_timing: id  0 | task 209 | \nprompt eval time =    3694.48 ms /   316 tokens (   11.69 ms per token,    85.53 tokens per second)\n       eval time =  171149.74 ms /   132 tokens ( 1296.59 ms per token,     0.77 tokens per second)\n      total time =  174844.22 ms /   448 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 342 | processing task\nslot update_slots: id  0 | task 342 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 225\nslot update_slots: id  0 | task 342 | kv cache rm [25, end)\nslot update_slots: id  0 | task 342 | prompt processing progress, n_past = 225, n_tokens = 200, progress = 0.888889\nslot update_slots: id  0 | task 342 | prompt done, n_past = 225, n_tokens = 200\nslot      release: id  0 | task 342 | stop processing: n_past = 261, truncated = 0\nslot print_timing: id  0 | task 342 | \nprompt eval time =    3978.27 ms /   200 tokens (   19.89 ms per token,    50.27 tokens per second)\n       eval time =    6314.83 ms /    37 tokens (  170.67 ms per token,     5.86 tokens per second)\n      total time =   10293.11 ms /   237 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 380 | processing task\nslot update_slots: id  0 | task 380 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 341\nslot update_slots: id  0 | task 380 | kv cache rm [25, end)\nslot update_slots: id  0 | task 380 | prompt processing progress, n_past = 341, n_tokens = 316, progress = 0.926686\nslot update_slots: id  0 | task 380 | prompt done, n_past = 341, n_tokens = 316\nslot      release: id  0 | task 380 | stop processing: n_past = 472, truncated = 0\nslot print_timing: id  0 | task 380 | \nprompt eval time =    2646.71 ms /   316 tokens (    8.38 ms per token,   119.39 tokens per second)\n       eval time =   23679.65 ms /   132 tokens (  179.39 ms per token,     5.57 tokens per second)\n      total time =   26326.37 ms /   448 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 513 | processing task\nslot update_slots: id  0 | task 513 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 222\nslot update_slots: id  0 | task 513 | kv cache rm [25, end)\nslot update_slots: id  0 | task 513 | prompt processing progress, n_past = 222, n_tokens = 197, progress = 0.887387\nslot update_slots: id  0 | task 513 | prompt done, n_past = 222, n_tokens = 197\nslot      release: id  0 | task 513 | stop processing: n_past = 552, truncated = 0\nslot print_timing: id  0 | task 513 | \nprompt eval time =    2929.45 ms /   197 tokens (   14.87 ms per token,    67.25 tokens per second)\n       eval time =  156017.89 ms /   331 tokens (  471.35 ms per token,     2.12 tokens per second)\n      total time =  158947.34 ms /   528 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 845 | processing task\nslot update_slots: id  0 | task 845 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 625\nslot update_slots: id  0 | task 845 | kv cache rm [25, end)\nslot update_slots: id  0 | task 845 | prompt processing progress, n_past = 625, n_tokens = 600, progress = 0.960000\nslot update_slots: id  0 | task 845 | prompt done, n_past = 625, n_tokens = 600\nslot      release: id  0 | task 845 | stop processing: n_past = 823, truncated = 0\nslot print_timing: id  0 | task 845 | \nprompt eval time =    6975.06 ms /   600 tokens (   11.63 ms per token,    86.02 tokens per second)\n       eval time =   92672.89 ms /   199 tokens (  465.69 ms per token,     2.15 tokens per second)\n      total time =   99647.95 ms /   799 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 1045 | processing task\nslot update_slots: id  0 | task 1045 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 646\nslot update_slots: id  0 | task 1045 | kv cache rm [616, end)\nslot update_slots: id  0 | task 1045 | prompt processing progress, n_past = 646, n_tokens = 30, progress = 0.046440\nslot update_slots: id  0 | task 1045 | prompt done, n_past = 646, n_tokens = 30\nslot      release: id  0 | task 1045 | stop processing: n_past = 810, truncated = 0\nslot print_timing: id  0 | task 1045 | \nprompt eval time =    1543.64 ms /    30 tokens (   51.45 ms per token,    19.43 tokens per second)\n       eval time =   23374.15 ms /   165 tokens (  141.66 ms per token,     7.06 tokens per second)\n      total time =   24917.79 ms /   195 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 1211 | processing task\nslot update_slots: id  0 | task 1211 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 646\nslot update_slots: id  0 | task 1211 | need to evaluate at least 1 token for each active slot, n_past = 646, n_prompt_tokens = 646\nslot update_slots: id  0 | task 1211 | kv cache rm [645, end)\nslot update_slots: id  0 | task 1211 | prompt processing progress, n_past = 646, n_tokens = 1, progress = 0.001548\nslot update_slots: id  0 | task 1211 | prompt done, n_past = 646, n_tokens = 1\nslot      release: id  0 | task 1211 | stop processing: n_past = 828, truncated = 0\nslot print_timing: id  0 | task 1211 | \nprompt eval time =     152.91 ms /     1 tokens (  152.91 ms per token,     6.54 tokens per second)\n       eval time =   19497.99 ms /   183 tokens (  106.55 ms per token,     9.39 tokens per second)\n      total time =   19650.90 ms /   184 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Hermes 2 Pro\nslot launch_slot_: id  0 | task 1395 | processing task\nslot update_slots: id  0 | task 1395 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 222\nslot update_slots: id  0 | task 1395 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1395 | prompt processing progress, n_past = 222, n_tokens = 197, progress = 0.887387\nslot update_slots: id  0 | task 1395 | prompt done, n_past = 222, n_tokens = 197\nslot      release: id  0 | task 1395 | stop processing: n_past = 552, truncated = 0\nslot print_timing: id  0 | task 1395 | \nprompt eval time =    2930.49 ms /   197 tokens (   14.88 ms per token,    67.22 tokens per second)\n       eval time =   79091.90 ms /   331 tokens (  238.95 ms per token,     4.19 tokens per second)\n      total time =   82022.39 ms /   528 tokens\nsrv  update_slots: all slots are idle\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv  params_from_: Chat format: Content-only\nslot launch_slot_: id  0 | task 1727 | processing task\nslot update_slots: id  0 | task 1727 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 625\nslot update_slots: id  0 | task 1727 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1727 | prompt processing progress, n_past = 625, n_tokens = 600, progress = 0.960000\nslot update_slots: id  0 | task 1727 | prompt done, n_past = 625, n_tokens = 600\nsrv  log_server_r: request: GET /slots 127.0.0.1 501\nsrv  params_from_: Chat format: Hermes 2 Pro\nsrv  cancel_tasks: cancel task, id_task = 1727\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nslot      release: id  0 | task 1727 | stop processing: n_past = 710, truncated = 0\nslot launch_slot_: id  0 | task 1814 | processing task\nslot update_slots: id  0 | task 1814 | new prompt, n_ctx_slot = 2048, n_keep = 0, n_prompt_tokens = 222\nslot update_slots: id  0 | task 1814 | kv cache rm [25, end)\nslot update_slots: id  0 | task 1814 | prompt processing progress, n_past = 222, n_tokens = 197, progress = 0.887387\nslot update_slots: id  0 | task 1814 | prompt done, n_past = 222, n_tokens = 197\nsrv  cancel_tasks: cancel task, id_task = 1814\nsrv  log_server_r: request: POST /v1/chat/completions 127.0.0.1 200\nsrv    operator(): operator(): cleaning up before exit...\n"
+  },
+  "promptContract": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "sha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29"
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "sha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74"
+    }
+  ],
+  "executions": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "repeat": 1,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the record",
+          "Fast-breathing status could not be assessed due to missing rate data"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Age-specific respiratory norms not included in query"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 166071,
+      "traceIndexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "repeat": 2,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the record",
+          "Fast-breathing status could not be assessed due to missing rate data"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Age-specific respiratory norms not included in query"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 186916,
+      "traceIndexes": [
+        2,
+        3
+      ]
+    },
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "caseId": "tp_001-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "repeat": 3,
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.",
+        "uncertainty": [
+          "Respiratory rate was not documented in the record",
+          "Fast-breathing status could not be assessed due to missing rate data"
+        ],
+        "limitations": [
+          "No clinical context provided for interpretation",
+          "Age-specific respiratory norms not included in query"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "durationMs": 36811,
+      "traceIndexes": [
+        4,
+        5
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "repeat": 1,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "CONTRADICTION",
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "durationMs": 303408,
+      "traceIndexes": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "repeat": 2,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "UNAVAILABLE",
+        "answer": null,
+        "reason": "Local model assistance is unavailable.",
+        "validation": {
+          "passed": false,
+          "categories": []
+        }
+      },
+      "done": false,
+      "durationMs": 262118,
+      "traceIndexes": [
+        10
+      ]
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "caseId": "tp_002-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "repeat": 3,
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "result": {
+        "status": "UNAVAILABLE",
+        "answer": null,
+        "reason": "Local model assistance is unavailable.",
+        "validation": {
+          "passed": false,
+          "categories": []
+        }
+      },
+      "done": false,
+      "durationMs": 180054,
+      "traceIndexes": []
+    }
+  ],
+  "traces": [
+    {
+      "phase": "assist-reason",
+      "requestSha256": "ee866166bcd2f9ce4f9117a94fdab5351542b5140fa43aeb8ff648f94ffb9d26",
+      "responseSha256": "18c24b6ad3f79058b632cb8065947685d186c33481d867437f5aa6c32be68269",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 6851,
+      "generatedTokens": 37,
+      "tokensPerSecond": 11.044782713303112
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "8c4805fc894828a08770bd5299098616760766704a85cfd4456c0f2e5bbe8708",
+      "responseSha256": "97df37ecf60da0989e74edfe425233d12c4197d0162646295f71c4dd252c7c0b",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the record\",\n    \"Fast-breathing status could not be assessed due to missing rate data\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Age-specific respiratory norms not included in query\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 159173,
+      "generatedTokens": 132,
+      "tokensPerSecond": 0.8475093722016541
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "ee866166bcd2f9ce4f9117a94fdab5351542b5140fa43aeb8ff648f94ffb9d26",
+      "responseSha256": "65e9bbf304aac8b1bc5c769e31b6d046bf164e00c5639ad454ca66e901427029",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 12022,
+      "generatedTokens": 37,
+      "tokensPerSecond": 4.296640027498497
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "8c4805fc894828a08770bd5299098616760766704a85cfd4456c0f2e5bbe8708",
+      "responseSha256": "716fa0cd7437e70153c80ad01ff232c125da13e743b61cbe42fff400cde32cb5",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the record\",\n    \"Fast-breathing status could not be assessed due to missing rate data\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Age-specific respiratory norms not included in query\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 174877,
+      "generatedTokens": 132,
+      "tokensPerSecond": 0.771254458230553
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "ee866166bcd2f9ce4f9117a94fdab5351542b5140fa43aeb8ff648f94ffb9d26",
+      "responseSha256": "fc39e207be04a2e1aee5de5a1be2e071199051125657423697551b747a7055ea",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 10415,
+      "generatedTokens": 37,
+      "tokensPerSecond": 5.859219735625671
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "8c4805fc894828a08770bd5299098616760766704a85cfd4456c0f2e5bbe8708",
+      "responseSha256": "3d81da92312e802c50ec34da51a7ef1a21832318877c5e42221ce33bdce3690b",
+      "rawOutput": "{\n  \"answer\": \"The recorded facts are: a two-year-old has had a cough for three days; all seven structured danger and breathing observations were absent. Uncertain facts: respiratory rate was not recorded, so fast-breathing status cannot be determined. No additional clinical details were provided for analysis.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate was not documented in the record\",\n    \"Fast-breathing status could not be assessed due to missing rate data\"\n  ],\n  \"limitations\": [\n    \"No clinical context provided for interpretation\",\n    \"Age-specific respiratory norms not included in query\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 26392,
+      "generatedTokens": 132,
+      "tokensPerSecond": 5.574405539269893
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "deb2dc57e2525d748689adbcf9354236c5d4ed5725361a34da52fedaed4d196e",
+      "responseSha256": "9fc691bf580dcdc445b955efbe4c969527ab2932b2d7febb34fa522ebc243f0e",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 158997,
+      "generatedTokens": 331,
+      "tokensPerSecond": 2.121551627740937
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "b43f5c5dfd8108d342c9ace80c40ccdbbf36e46b32c0a6b400067b467f6a826f",
+      "responseSha256": "92a9015434b47dec664f1c5e98ff0dfd5e40bd9809ed1723ef170637780b8143",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist is a critical tool for identifying urgent warning signs. If incomplete (e.g., no respiratory rate recorded), fast-breathing status cannot be confirmed. **Only documented observations and deterministic clinical policies (e.g., 'if oxygen saturation <90% or respiratory rate >40/min in infants, escalate immediately') control escalation.** Models provide supportive insights but cannot replace real-time clinical judgment. Always complete the checklist first per local protocols before model review. Do not use model outputs alone to decide on care. For a record without respiratory rate, fast-breathing status remains unverified.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate not recorded in this specific case\",\n    \"Fast-breathing status cannot be determined without rate measurement\"\n  ],\n  \"limitations\": [\n    \"Models require complete clinical data for reliable risk assessment\",\n    \"Deterministic policies override model outputs in clinical decision-making\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 99718,
+      "generatedTokens": 199,
+      "tokensPerSecond": 2.147337710204669
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "171581f9bf248436ea758e4d251ce19ba1ffd107f9e4dc4f0ec324bf1b2b0186",
+      "responseSha256": "a335793c5a279da30cf20b3912b2b301c9435d101163a6a845c2fa729f9feb9a",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist requires complete documentation before model review to ensure accurate risk assessment. Without recorded respiratory rate, fast-breathing status cannot be confirmed. Only documented observations and predefined clinical policies (e.g., 'if RR >40/min in infants, escalate') control escalation. Models support but do not replace clinical judgment; deterministic actions based on verified data drive decisions. Always complete the checklist first per local protocols.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate not recorded\",\n    \"Fast-breathing status unverifiable without rate\",\n    \"Escalation controlled by policies, not model output\"\n  ],\n  \"limitations\": [\n    \"Models require complete clinical data for reliable review\",\n    \"Clinical judgment overrides model outputs in emergencies\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 24966,
+      "generatedTokens": 165,
+      "tokensPerSecond": 7.059081431253146
+    },
+    {
+      "phase": "assist-extract",
+      "requestSha256": "171581f9bf248436ea758e4d251ce19ba1ffd107f9e4dc4f0ec324bf1b2b0186",
+      "responseSha256": "aad7e242a004fbaf4fd271211e5c8acb51857247718701b43bd189793ae51f64",
+      "rawOutput": "{\n  \"answer\": \"The pediatric respiratory danger-sign checklist requires complete documentation of all key observations (including respiratory rate) before model-assisted review. Without recorded respiratory rate, fast-breathing status cannot be confirmed. Only documented clinical observations and predefined deterministic policies (e.g., 'if RR >40/min in infants, escalate immediately') control escalation decisions. Models provide supportive insights but cannot replace real-time clinical judgment; thus, escalation follows recorded danger signs per local protocols, not model outputs alone. Always verify observations per WHO/UNICEF guidelines before review.\"\n  ,\n  \"uncertainty\": [\n    \"Respiratory rate not recorded in current record\",\n    \"Fast-breathing status cannot be determined without RR measurement\"\n  ],\n  \"limitations\": [\n    \"Models require complete clinical data for reliable risk assessment\",\n    \"Deterministic policies must be followed per local emergency protocols\"\n  ]\n}",
+      "privateReasoningPreserved": false,
+      "durationMs": 19691,
+      "generatedTokens": 183,
+      "tokensPerSecond": 9.385581377529473
+    },
+    {
+      "phase": "assist-reason",
+      "requestSha256": "deb2dc57e2525d748689adbcf9354236c5d4ed5725361a34da52fedaed4d196e",
+      "responseSha256": "11653efaac5ee6c9d8482db3c8eede8477b4576b8680904762dc74b605db4587",
+      "rawOutput": null,
+      "privateReasoningPreserved": false,
+      "durationMs": 82056,
+      "generatedTokens": 331,
+      "tokensPerSecond": 4.185004932616236
+    }
+  ],
+  "evaluations": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    }
+  ]
+}

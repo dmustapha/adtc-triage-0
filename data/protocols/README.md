@@ -2,25 +2,25 @@
 # WHO Protocol Sources (real, citation-grounded)
 
 Triage-0 grounds every recommendation in REAL World Health Organization field protocols, ingested
-**live** at build time from their official born-digital PDFs. Triage-0 never fabricates citations —
+**live** at build time from their official born-digital PDFs. Triage-0 never fabricates citations:
 the strings the judge sees are extracted verbatim from these public documents.
 
-Both PDFs are **not committed** (gitignored, large). Fetch them before `npm run ingest`.
+Both PDFs are **not committed** (gitignored, large). Run `npm run download:protocols` to fetch and verify the two pinned byte identities before `npm run ingest`.
 
-## 1. IMCI — child illness (`imci-chart-booklet.pdf`)
+## 1. IMCI: child illness (`imci-chart-booklet.pdf`)
 - **Document:** WHO Integrated Management of Childhood Illness (IMCI) Chart Booklet, **March 2014** (ISBN 978-92-4-150682-3).
-- **Covers:** cough/fast breathing (pneumonia), general danger signs, diarrhoea/dehydration, fever, malnutrition — the child cases in the demo.
+- **Covers:** cough/fast breathing (pneumonia), general danger signs, diarrhoea/dehydration, fever, and malnutrition in the child cases.
 - **Official PDF (text-extractable, born-digital):** https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf
 - **WHO publications page:** https://www.who.int/publications/m/item/integrated-management-of-childhood-illness---chart-booklet-(march-2014)
-- Note: an older 473 KB copy on WHO IRIS is CID-encoded and NOT text-extractable — use the cdn.who.int file above.
+- Note: an older 473 KB copy on WHO IRIS is CID-encoded and NOT text-extractable. Use the cdn.who.int file above.
 
-## 2. mhGAP — mental health (`mhgap-intervention-guide.pdf`)
+## 2. mhGAP: mental health (`mhgap-intervention-guide.pdf`)
 - **Document:** WHO mhGAP Intervention Guide v2.0 (ISBN 9789241549790, 2016).
-- **Covers:** depression assessment, follow-up, referral — the adult mental-health case in the demo.
+- **Covers:** depression assessment, follow-up, and referral in the adult mental-health case.
 - **IRIS item:** https://iris.who.int/items/9c42b21c-dfc9-4c2b-b32d-e1caa5befbbc
 - **Direct PDF:** https://iris.who.int/server/api/core/bitstreams/6ded7ffd-9d69-493a-b48a-0b3e6250c173/content
 
-## Fetch both
+## Fetch both (manual equivalent)
 ```bash
 UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 curl -A "$UA" -L -o data/protocols/imci-chart-booklet.pdf \

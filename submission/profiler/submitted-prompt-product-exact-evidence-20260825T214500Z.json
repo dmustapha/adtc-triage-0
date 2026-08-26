@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "kind": "submitted-prompt-product-evidence",
+  "plane": "QVAC supported product /assist",
+  "status": "pass",
+  "officialProfilerEvidence": "separate-and-unchanged",
+  "historicalOneShotEvidence": "preserved-and-unchanged",
+  "promptContract": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "sha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29"
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "sha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74"
+    }
+  ],
+  "runtime": {
+    "sdkVersion": "0.13.3",
+    "workflowVersion": "prompt-policy-v4"
+  },
+  "model": {
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "host": {
+    "label": "dami-darwin-arm64 Apple development host",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.0.0"
+  },
+  "startedAt": "2026-08-25T20:32:35.062Z",
+  "finishedAt": "2026-08-25T20:34:34.966Z",
+  "listenerClosed": true,
+  "workerClosed": true,
+  "executions": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 1,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "261d3645-a7a3-499a-95be-8be07d8e1c4b",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"261d3645-a7a3-499a-95be-8be07d8e1c4b\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 17071
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 2,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "70f5dad9-87c2-47ce-a5a6-7679631ed4c2",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"70f5dad9-87c2-47ce-a5a6-7679631ed4c2\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 12694
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 3,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "a09b3e50-7784-4942-ad15-df43fe706c14",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.",
+        "uncertainty": [
+          "Respiratory rate not recorded, so fast breathing cannot be assessed."
+        ],
+        "limitations": [
+          "No clinical context provided for age-specific respiratory rate thresholds."
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"a09b3e50-7784-4942-ad15-df43fe706c14\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"Two-year-old with 3-day cough, all seven structured danger/breathing observations absent. Respiratory rate not recorded, fast-breathing status unknown.\",\"uncertainty\":[\"Respiratory rate not recorded, so fast breathing cannot be assessed.\"],\"limitations\":[\"No clinical context provided for age-specific respiratory rate thresholds.\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 12203
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 1,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "5f5b4bcb-f078-40a9-adfb-a24cb9869496",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.",
+        "uncertainty": [
+          "This is a general guideline; local protocols may vary",
+          "Model accuracy depends on data quality, but clinical judgment is paramount"
+        ],
+        "limitations": [
+          "Models may have limitations in edge cases",
+          "Community health workers should be trained to recognize danger signs"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"5f5b4bcb-f078-40a9-adfb-a24cb9869496\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.\",\"uncertainty\":[\"This is a general guideline; local protocols may vary\",\"Model accuracy depends on data quality, but clinical judgment is paramount\"],\"limitations\":[\"Models may have limitations in edge cases\",\"Community health workers should be trained to recognize danger signs\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 24834
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 2,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "09dc7948-65b2-4c12-acf1-d785a33fbb1d",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.",
+        "uncertainty": [
+          "This is a general guideline; local protocols may vary",
+          "Model accuracy depends on data quality, but clinical judgment is paramount"
+        ],
+        "limitations": [
+          "Models may have limitations in edge cases",
+          "Community health workers should be trained to recognize danger signs"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"09dc7948-65b2-4c12-acf1-d785a33fbb1d\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.\",\"uncertainty\":[\"This is a general guideline; local protocols may vary\",\"Model accuracy depends on data quality, but clinical judgment is paramount\"],\"limitations\":[\"Models may have limitations in edge cases\",\"Community health workers should be trained to recognize danger signs\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 25006
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 3,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=eb867a4d-6a99-44f8-890e-913641507ea9",
+      "jobId": "c5554ade-75fd-49b8-b80a-ab689a8e68af",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "answer",
+      "result": {
+        "status": "COMPLETED",
+        "answer": "The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.",
+        "uncertainty": [
+          "This is a general guideline; local protocols may vary",
+          "Model accuracy depends on data quality, but clinical judgment is paramount"
+        ],
+        "limitations": [
+          "Models may have limitations in edge cases",
+          "Community health workers should be trained to recognize danger signs"
+        ],
+        "validation": {
+          "passed": true,
+          "categories": []
+        }
+      },
+      "done": true,
+      "rawTranscript": "event: job\ndata: {\"id\":\"c5554ade-75fd-49b8-b80a-ab689a8e68af\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: answer\ndata: {\"status\":\"COMPLETED\",\"answer\":\"The pediatric respiratory danger-sign checklist must be fully completed before model review because models depend on complete clinical observations. Incomplete data risks missing critical signs that require immediate action. The deterministic policy mandates that documented danger observations—not model outputs—determine escalation. Always prioritize real-time clinical facts over algorithmic predictions. If any danger sign is present. Never rely on model outputs for urgent decisions.\",\"uncertainty\":[\"This is a general guideline; local protocols may vary\",\"Model accuracy depends on data quality, but clinical judgment is paramount\"],\"limitations\":[\"Models may have limitations in edge cases\",\"Community health workers should be trained to recognize danger signs\"],\"validation\":{\"passed\":true,\"categories\":[]}}\n\nevent: done\ndata: {\"ok\":true}\n\n",
+      "durationMs": 27962
+    }
+  ],
+  "evaluations": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "status": "pass",
+      "failures": []
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "status": "pass",
+      "failures": []
+    }
+  ],
+  "executionContract": {
+    "command": [
+      "/opt/homebrew/Cellar/node/24.10.0/bin/node",
+      "/Users/MAC/adtc-2026/scripts/submitted-prompt-evidence/run-product.ts",
+      "submission/profiler/submitted-prompt-product-exact-evidence-20260825T214500Z.json"
+    ],
+    "endpoint": "/assist",
+    "queue": "single-inference",
+    "reasonPredict": 1024,
+    "extractPredict": 512,
+    "maxExtractAttempts": 3,
+    "temperature": 0,
+    "rawReasoningPreserved": false
+  },
+  "runError": null
+}

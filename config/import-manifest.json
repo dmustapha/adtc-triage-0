@@ -52,6 +52,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
     },
     {
@@ -60,9 +61,14 @@
       "sourceGitObject": "9b2c1ee0992b89e7950f963a7ff803542bf68562",
       "sourceSha256": "3015554641ab746342cb2bcc9c08aa1f59909e01c11412c37399b4d8c3a55a42",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "3015554641ab746342cb2bcc9c08aa1f59909e01c11412c37399b4d8c3a55a42"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "846c7553e0ba3516d48299ccb3c688010304bdd5b21a5219d87dd67825445c36",
+      "modification": {
+        "status": "modified",
+        "reason": "Replaced manual-only WHO setup with the checksum-locked, idempotent protocol downloader used by clean local setup."
+      }
     },
     {
       "sourcePath": "data/rag/dose-tables.txt",
@@ -72,6 +78,7 @@
       "originalCreatedAt": "2026-06-21T21:06:46+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "6a2d590e7ec2e2be1eea55633396c00d71c3032f2ead83f05b295cd77978c8fd"
     },
     {
@@ -82,7 +89,8 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "5889a41e340377c7e7720bbcbebb60a234e92b17405eea837a6643e7e7857617",
+      "destinationStatus": "present",
+      "destinationSha256": "fe8d897e054ad113d73aa980e254f64cd0cf15992ade583ad7f3a2033eb72630",
       "modification": {
         "status": "modified",
         "reason": "Reconciled one lockfile for the merged ADTC evidence and Triage-0 application dependency contract."
@@ -96,7 +104,8 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "0bd1aa5b0837e4bd653f33579d41aff6fc51ad2f5922750d5577d3c1eaa2bc46",
+      "destinationStatus": "present",
+      "destinationSha256": "c66d55823ec7aaeed6f574129100dacbf315df5845230ee9b4ba8e87670837bd",
       "modification": {
         "status": "modified",
         "reason": "Preserved ADTC evidence commands while adding the pinned Triage-0 runtime, application, and corrected integration-test package contract."
@@ -110,10 +119,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "83525d76d24532c04225aec6628b4a5abbfe134c7471f003b20d244fdcdd4186",
+      "destinationStatus": "present",
+      "destinationSha256": "c325093ed8cbc8dee3afd71c236948e3ef0494b39e46aa096edd1171f63d3e64",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded speech and multilingual controls and added the accessible structured patient-age and seven-sign checklist for the English text workflow."
+        "reason": "Restored the approved supervised WHO assessment and ordinary-prompt modes, preserved structured respiratory authority, and kept the exact two submitted prompts available as unchanged examples."
       }
     },
     {
@@ -124,6 +134,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255"
     },
     {
@@ -134,10 +145,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "f5529dee9ab7070c4b269613940266933b3299ca0142aeac7405c7c5f6bfcd0b",
+      "destinationStatus": "present",
+      "destinationSha256": "1827ab2b0a204ea9417ee4ad188e6fe4637d30312ac7573612aed5402efacdf7",
       "modification": {
         "status": "modified",
-        "reason": "Added compact responsive checklist, native-control focus, age input, completion, and recorded-summary styling within the existing clinical visual system."
+        "reason": "Removed obsolete public classification, plan, and raw-retrieval-excerpt styling; added result-first respiratory assessment, input-authority, and provenance styles; and raised mobile controls and operational text to comfortable touch targets."
       }
     },
     {
@@ -148,6 +160,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "c4622777ee144687d57644e1fc76bba386ef37e417646973a34c4c1f776e35ec"
     },
     {
@@ -158,6 +171,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "8abff9c97d4997a6d0e9a9c9f7401cdf22c01ce6f7e00fc05e0cb7d96554dc85"
     },
     {
@@ -168,6 +182,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93"
     },
     {
@@ -178,6 +193,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "c3e7f7985c968f7aba8a8c240739ebf47d40ece09798cb4233ce11edb78268e2"
     },
     {
@@ -188,6 +204,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "a22c997a894377f36d81c904163e0c05fbbcd32f0ca2e7beedb86b39be1296a1"
     },
     {
@@ -198,6 +215,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "ea16948d4a91b77221f119ad27d4ac7a7581c98cf990712047f89a531a49ef28"
     },
     {
@@ -208,6 +226,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "4fd48b2c1ab27220e71f15f990550261b35245c3bdfd8d8025b4bdac0459ee2d"
     },
     {
@@ -218,6 +237,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "2f52020a90793104e4178b0ae3ccd30eea28cac27e0fea8fcf4f246151777f74"
     },
     {
@@ -228,6 +248,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "1f21c6eaa0000f3329cfcfac966b43d5bebf5aa610303e33294ac31bc6f4bb59"
     },
     {
@@ -238,6 +259,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "a1376a563717f1efa2f5286ab23da2b61ae8dec827a77b97adfa01cad4ec4ee2"
     },
     {
@@ -248,6 +270,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "2f467719b2167cc4778b5780a2fb42fadf5203b29d0fb5f1482bbab32b1b7999"
     },
     {
@@ -258,6 +281,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "24363e10e923032009519d545ba1fc70d11e91e5f6913588996395e4dfbb7255"
     },
     {
@@ -268,6 +292,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f"
     },
     {
@@ -278,6 +303,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e"
     },
     {
@@ -288,6 +314,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
@@ -298,6 +325,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
@@ -308,6 +336,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
       "destinationSha256": "764b4ab925308cdde53999b63f3b2a90e66ea9aff31e002e902404169c7f00b3",
       "modification": {
         "status": "modified",
@@ -322,10 +351,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "fa2c975ec1994703b930d248412da122c5771b884a7fdcb43a2abf2d98e9e290",
+      "destinationStatus": "present",
+      "destinationSha256": "768aa37b1d616a23beabfd7baba61ed9a2bb1994a4337f5e0b09bf54c2f128e5",
       "modification": {
         "status": "modified",
-        "reason": "Removed excluded audio and translation behavior, required a complete supported-age structured checklist, serialized its seven authoritative observations, and suppressed model-authored red-flag display."
+        "reason": "Made respiratory and broader WHO workflows reachable, rendered deterministic and provisional results through distinct result-first branches, enforced confirmation and dose-display gates, added the bounded ordinary-prompt path, and preserved truthful queue, cancellation, readiness, and provenance states."
       }
     },
     {
@@ -336,6 +366,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "0f899afd9f0fb17a329a7b9e8e3078dbd9177238b751d9b13500840bfd3b4111"
     },
     {
@@ -346,6 +377,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "3f522f8ed21aa86b4d68bd46aa1c333ca272862ee58d0d264a60285289c6085f"
     },
     {
@@ -356,6 +388,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "521cd1d988e4f4ee5b0d5e71ce37908075f4036f4920f36ef8a3331264c2a0cb"
     },
     {
@@ -366,6 +399,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "c0892b1b434d55bdd706b7f13016048e9efebda0ed235db22174128c655c0e5e"
     },
     {
@@ -376,6 +410,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
@@ -386,10 +421,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "3d252392555ea5f8719c65c897652faaf0b1f7603bfddb2836f97ca4e038e8bc",
+      "destinationStatus": "present",
+      "destinationSha256": "79b1b6c3d279605c254917629b44e66e0693d3d829962c3dfdce75ecf6ffa364",
       "modification": {
         "status": "modified",
-        "reason": "Replaced imported speech, treatment, performance, benchmark, and unconditional offline claims with claim-limited English-text and runtime-readiness copy."
+        "reason": "Replaced imported unsupported claims with claim-limited copy that truthfully introduces pediatric IMCI, adult mhGAP, ordinary prompts, and observed runtime readiness."
       }
     },
     {
@@ -398,9 +434,13 @@
       "sourceGitObject": "e9e178b52b497e39c44502543774732e7940cf8c",
       "sourceSha256": "bf8e70cedc19b6eba9457e470389e76185efff28be02b6f842f2dd86b772fb3e",
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "bf8e70cedc19b6eba9457e470389e76185efff28be02b6f842f2dd86b772fb3e"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "removed",
+      "modification": {
+        "status": "removed",
+        "reason": "Removed the redundant raster logo after the interface standardized on the imported SVG identity assets."
+      }
     },
     {
       "sourcePath": "public/logo.svg",
@@ -410,6 +450,7 @@
       "originalCreatedAt": "2026-06-23T12:18:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "d4ed935dce8842a7e15aa3bddf33fe70f3b61fb78c5dff7752c2963dfee40bf8"
     },
     {
@@ -420,6 +461,7 @@
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "1e1103531f46731aff8d9ee27fdbc1deb94706c4f3239276bda4ff8908585b49"
     },
     {
@@ -428,9 +470,14 @@
       "sourceGitObject": "844b970a7efbbe0ddd52240cbaf7806b0e13cb30",
       "sourceSha256": "fa2e8080a32be48eecd35b0c81f65d98bb03730d1a7476ed15584c4b43940b58",
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "fa2e8080a32be48eecd35b0c81f65d98bb03730d1a7476ed15584c4b43940b58"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "e5865b0dd10900cdd0957196165445951c485b55bbb9542aa604e0d6c8a71039",
+      "modification": {
+        "status": "modified",
+        "reason": "Kept clinical audit failures observable while preventing raw operational error content from entering console logs."
+      }
     },
     {
       "sourcePath": "scripts/ingest-protocols.ts",
@@ -438,9 +485,14 @@
       "sourceGitObject": "fc6f71b31523b9c3eea71ca68a421414435a4804",
       "sourceSha256": "a599cc690d51036b486b154ba32eb28657f791886450a029f2bbc08a674da1e8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "a599cc690d51036b486b154ba32eb28657f791886450a029f2bbc08a674da1e8"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "f0c801302fae55ae90424290f9eea18bc519c0fdb1606b5768269ad8dd326b42",
+      "modification": {
+        "status": "modified",
+        "reason": "Made ingestion failures use the shared bounded error-name policy without exposing raw paths or SDK messages."
+      }
     },
     {
       "sourcePath": "scripts/patch-sdk-zod.mjs",
@@ -448,9 +500,14 @@
       "sourceGitObject": "7a843cdfa5cd0f90f0e87bbd3a4e114186f45756",
       "sourceSha256": "c77e515a2ecaf81d65c5a6ab5eb23291e407bb7a9d75435483c1887ff9cc56da",
       "originalCreatedAt": "2026-07-12T21:31:17+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "c77e515a2ecaf81d65c5a6ab5eb23291e407bb7a9d75435483c1887ff9cc56da"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "770c472b3169df4960d833e9c035d77d358b54b3f2d1270ac5a86294c8cbfaff",
+      "modification": {
+        "status": "modified",
+        "reason": "Replaced vendor mutation with a read-only pinned QVAC/Zod compatibility gate and bounded failure output."
+      }
     },
     {
       "sourcePath": "src/config.ts",
@@ -460,7 +517,8 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "ad45c87baebc27e42790b441b28cc3fd15d1d10731aee395179d3716b10e7245",
+      "destinationStatus": "present",
+      "destinationSha256": "a140296f3082954a5c10c78f091dda96a845c8393b86a29ca915be3b0c4e4dd5",
       "modification": {
         "status": "modified",
         "reason": "Bound the QVAC MedPsy role to the verified canonical local GGUF and removed alternate remote model selection."
@@ -474,6 +532,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "0f9ca14c19055c397b362c52165e832b1802d118d3bf2a396616556afe7fe9fa"
     },
     {
@@ -484,10 +543,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "984f88e7809acb858a4fd4e049027b632e5a277b46d42fb9483e1690cdc588e2",
+      "destinationStatus": "present",
+      "destinationSha256": "f4211ba994efedc8e679d774e00d9999a9d57a3b8c40138b0c62d5814cb56651",
       "modification": {
         "status": "modified",
-        "reason": "Removed STT, TTS, and translation engine functions whose modules are excluded from the Task 3 baseline."
+        "reason": "Removed excluded modality functions and bound queue abort signals to exact QVAC completion request cancellation without releasing native ownership before settlement."
       }
     },
     {
@@ -496,9 +556,14 @@
       "sourceGitObject": "458f0b073087387c096d1c0b9023f118ae84dc7a",
       "sourceSha256": "fc7d026c53c462a6593ef2a9d0401c843a348d6242cdf5ec076a13f7393bcce8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "fc7d026c53c462a6593ef2a9d0401c843a348d6242cdf5ec076a13f7393bcce8"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "b1cecd9dcf3dba3a3c2e9830e8fb0fe7fb1c7f841cc9f04476ef0399575ae86d",
+      "modification": {
+        "status": "modified",
+        "reason": "Made unload and shutdown failures observable through bounded diagnostics while preserving safe stale-handle removal."
+      }
     },
     {
       "sourcePath": "src/qvac/perf-logger.ts",
@@ -506,9 +571,14 @@
       "sourceGitObject": "87e26499ccd47dba5031b6f38b7fdc805ccdcd38",
       "sourceSha256": "10266512457b969eb5b43e330a9fae97f045d700ecc58e0ce440e7cf0eec00e8",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "10266512457b969eb5b43e330a9fae97f045d700ecc58e0ce440e7cf0eec00e8"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "ba0cd7e5f98a3391934c7a83b22aa9faab6bc88bc7b8639ec770e692344af2c0",
+      "modification": {
+        "status": "modified",
+        "reason": "Exposed one canonical header-only CSV representation so an empty local telemetry dataset is truthful and stable without creating evidence rows."
+      }
     },
     {
       "sourcePath": "src/qvac/sdk.ts",
@@ -516,9 +586,14 @@
       "sourceGitObject": "c076044370e462acb428e64f6974cba2da20cd94",
       "sourceSha256": "0937c1f9a8974a3f76e2c9e982c007ecceff918673ea418596b805aa4cc80356",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "0937c1f9a8974a3f76e2c9e982c007ecceff918673ea418596b805aa4cc80356"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "fba4ade4eb02a370970bc9bd35e8319e881cc860a902deab2ae17aaa42642aeb",
+      "modification": {
+        "status": "modified",
+        "reason": "Added the typed QVAC 0.13.3 completion request identifier and exact request-cancellation shim used by bounded clinical and prompt jobs."
+      }
     },
     {
       "sourcePath": "src/rag/ingest.ts",
@@ -528,6 +603,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "3d64d38b6983c8c49c7d843adc348b463927750791cd46fe9b0262136e1adf1a"
     },
     {
@@ -536,9 +612,14 @@
       "sourceGitObject": "743aed3b1b2f896719a2661a543defebf3b7a3fb",
       "sourceSha256": "96d9d5adce596c2edbba8f166d41816acd27f8633c4a60a91e7a14d42ae77700",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "96d9d5adce596c2edbba8f166d41816acd27f8633c4a60a91e7a14d42ae77700"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "e460685b40d91bbb8e6cdfc6cc7e015f6c93a021e274951e10ba51639d7cc76f",
+      "modification": {
+        "status": "modified",
+        "reason": "Preserved native QVAC retrieval and citation mapping while bounding parse diagnostics and removing raw path/error logging."
+      }
     },
     {
       "sourcePath": "src/server.ts",
@@ -548,10 +629,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "bf7559eb34f42b52a3c0074eb1f3bb5db734e189df2e6e9a620cff31d93b65bf",
+      "destinationStatus": "present",
+      "destinationSha256": "1dda8eda540a1b46135ac0439fd5173d75c91114add433143dfac7ec2b31add0",
       "modification": {
         "status": "modified",
-        "reason": "Preserved English text triage while parsing structured age and danger observations before QVAC context, semantic routing, retrieval, or MedPsy; deterministic emergency, assessment-required, and age-scoped chest-indrawing branches now short-circuit before runtime work."
+        "reason": "Made deterministic respiratory policy the sole public result authority; exposed only neutral assessment fields plus model/runtime/retrieval provenance; kept raw retrieval and classifier output private; made model initialization sequential; rejected record conflicts; and preserved exact method/readiness contracts."
       }
     },
     {
@@ -560,9 +642,14 @@
       "sourceGitObject": "967e21b4a4db7a4ea15145e7c74e099800926267",
       "sourceSha256": "2b39340f981a539969d2e573561dd6a803cd4e5cca74bf8d4f8a250dd5028c0c",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "2b39340f981a539969d2e573561dd6a803cd4e5cca74bf8d4f8a250dd5028c0c"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "942f2910d73447e2fa33b09a7e1586f1e48bf1fca70d9d30b8be62e2eff055de",
+      "modification": {
+        "status": "modified",
+        "reason": "Made the off-domain routing threshold finite and range-bounded so invalid environment configuration fails closed."
+      }
     },
     {
       "sourcePath": "src/triage/protocol-table.ts",
@@ -572,6 +659,7 @@
       "originalCreatedAt": "2026-06-21T18:50:48+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "bddeeb4245dc9af2f247e6a46a1a0b17ce6f514b0815862fd093149b345bc5f7"
     },
     {
@@ -582,10 +670,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "9e1a3f19412a490dab3a51b1693fea82b82b51bbf55f860b326285494a5bb103",
+      "destinationStatus": "present",
+      "destinationSha256": "2564dcaa493f59f0d0c4760dc32cfbc6bf832bcb6b017f702b75a8aba421d5de",
       "modification": {
         "status": "modified",
-        "reason": "Added strict structured patient-age and seven-field danger-observation request schemas with missing observations normalized to NOT_ASSESSED and request-level CONFLICT rejected."
+        "reason": "Added strict structured patient-age, seven-field danger-observation, respiratory-concern, one-minute calm count-quality, and 1-200 respiratory-rate request schemas."
       }
     },
     {
@@ -596,6 +685,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
       "destinationSha256": "3c16311f4dbd9c472664d70e1faa0292b31792dde55989542c09da9d28f3dde0",
       "modification": {
         "status": "modified",
@@ -610,7 +700,8 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "96c8870d011d4414cece8861a9ee0676beab83cbf2e12d5ea652094be8817c9c",
+      "destinationStatus": "present",
+      "destinationSha256": "f7cd47a3142d0cd3dfd76bc0c6fd0500ecbd6939835a5895ea21d6c3e6ce144e",
       "modification": {
         "status": "modified",
         "reason": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags."
@@ -624,6 +715,7 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "caa64beeab5e9c9a18673898444f9d2af945c5decf1f33c70ec75a280412e1da"
     },
     {
@@ -634,6 +726,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "227d2822c64443b3c5ec1efc6dcdfa1be54550957dc1c8913eb56fc50b0eb066"
     },
     {
@@ -644,10 +737,11 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "21fd2bc85f8e471dc3e686b61c488cf84a815c24eed36197fd9e6f6be3fe862d",
+      "destinationStatus": "present",
+      "destinationSha256": "508836994a37b8b103d32be335ef885966a05d94c11d9580e449bbff9c2bcb81",
       "modification": {
         "status": "modified",
-        "reason": "Retained excluded-audio assertions and added invalid structured-age/value rejection proving requests reach neither triageContext nor runtime/download boundaries."
+        "reason": "Added exact JSON 405 and Allow-header coverage, truthful header-only empty telemetry CSV behavior, narrative/structured conflict rejection, and a regression proving a bare listener reports liveness but not product readiness."
       }
     },
     {
@@ -658,6 +752,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "ceb9dec45faaaefe328a7701fe253a218a41429b73f33c1be1abde0509429b3f"
     },
     {
@@ -668,6 +763,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "f318343ba94c2bf6afbfd293d7bc5e52c3b24982f3d0f7c268b21f06bdb10be5"
     },
     {
@@ -678,10 +774,11 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "6cb7b3d84f4d1b188eeb729fa13653b618e71f2c5b8973365068ac6b4aa9478d",
+      "destinationStatus": "present",
+      "destinationSha256": "a856dd2fa7cc0c9eabf14555824eee972e8ee04106d15fed82511fa09a36bb68",
       "modification": {
         "status": "modified",
-        "reason": "Kept model-free health coverage active and asserted canonical path, hash, and distinct QVAC/llama.cpp runtime identities."
+        "reason": "Kept canonical health identity coverage and changed the real model-backed hero loop to require a narrowed assessment payload with no public classification, plan, or clinical instructions."
       }
     },
     {
@@ -692,10 +789,11 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "28fce03de039d5ba90b051e628fe39ab83a904bb0699cb6cdcf314560a28184e",
+      "destinationStatus": "present",
+      "destinationSha256": "8383e5abd00459f68ec909fc32f51127a8d16e0e2e5f9855ba8dc470ccbf0333",
       "modification": {
         "status": "modified",
-        "reason": "Added model-free SSE coverage for omitted, partial, emergency, and chest-indrawing assessments with zero observed QVAC, semantic-routing, retrieval, or MedPsy calls; grounded model cases now send supported all-absent structured state."
+        "reason": "Defined deterministic respiratory API/SSE outcomes, exact no-QVAC boundaries, fixed versus retrieved citation provenance, real QVAC assistance with truthful retrieval mode, and the absence of classifier, plan, treatment, and raw retrieval text from public payloads."
       }
     },
     {
@@ -706,6 +804,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
       "destinationSha256": "4428a583fd2da765a94f7a868edfeb3d68c62851474265ed5c34340dc1d46ddb",
       "modification": {
         "status": "modified",
@@ -720,6 +819,7 @@
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "e48ada1e009dd3c7bdf759dbd7c76c42d443fd56e1b3f1954c37fe5b839fc52b"
     },
     {
@@ -730,6 +830,7 @@
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "a7d7840c348ebf028c15e4d05b7d88be3ce76899151bd2358f1f70875ce4e4b4"
     },
     {
@@ -740,6 +841,7 @@
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "e550ac0e9effb9179fb23016cbae335b5f71c9e5c2247b8f94719dc96d813575"
     },
     {
@@ -750,6 +852,7 @@
       "originalCreatedAt": "2026-07-14T06:52:44+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "e82d5b241c8d0b0c3545313964ec94f0b514c88c8994180eba598cebf368486e"
     },
     {
@@ -758,9 +861,14 @@
       "sourceGitObject": "f779b0364039f6e92a69277f3cfc8707f440f792",
       "sourceSha256": "92e17e01063d664da8d2c73424156e90af26923cf4c23e1ce887f73c4c18d3ef",
       "originalCreatedAt": "2026-07-18T20:28:25+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "92e17e01063d664da8d2c73424156e90af26923cf4c23e1ce887f73c4c18d3ef"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "d611238d84ff922969488b594870b80763bc0ffee62ed7f03346e221866a10f0",
+      "modification": {
+        "status": "modified",
+        "reason": "Added fail-closed boundary coverage for invalid off-domain router thresholds."
+      }
     },
     {
       "sourcePath": "tests/unit/config.test.ts",
@@ -770,7 +878,8 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "74ad9bb31b404379aa261616948a014fe12dd0ea9a1ae59b03b588cbca789420",
+      "destinationStatus": "present",
+      "destinationSha256": "d2ece14cfdf0bfc82b666a16de6455c251c0e9b5e66a0e3fb2f1fea6baea4a25",
       "modification": {
         "status": "modified",
         "reason": "Asserted the single canonical local MedPsy path, fail-closed missing bytes, and rejection of alternate model selection."
@@ -784,6 +893,7 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "e7ccd8b5007344a484be7a5d0c1812ef55d2e111dc016d2786fcada7d6a9198b"
     },
     {
@@ -794,10 +904,11 @@
       "originalCreatedAt": "2026-06-25T07:09:42+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
-      "destinationSha256": "bbb370491d85e4e8232bce3056a5b10bbf404613366fbef007504d448d526ccd",
+      "destinationStatus": "present",
+      "destinationSha256": "99385d415e4966382d2adc7733390d05b1c23f43e049936991b000a88fc8e572",
       "modification": {
         "status": "modified",
-        "reason": "Added DOM, accessibility, clinical-label, safe-default, age-boundary, completion, request-serialization, and recorded-summary regressions for the structured checklist."
+        "reason": "Defined the result-first respiratory form and card, toxic legacy excerpt suppression, distinct evidence provenance, truthful readiness, coherent examples, keyboard accessibility, cancellation behavior, and mobile touch-target regressions."
       }
     },
     {
@@ -806,9 +917,14 @@
       "sourceGitObject": "91ede7be7905aeedce50fe5661d52824eb506bfb",
       "sourceSha256": "7fa3318110e18d14d98e1c4c4606b8378eca7d82167719e808f8b991acbad9ff",
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "7fa3318110e18d14d98e1c4c4606b8378eca7d82167719e808f8b991acbad9ff"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "82b71654751d2069793baa940f91640e6131535c0fd9f382fe0818b3cd0b3eba",
+      "modification": {
+        "status": "modified",
+        "reason": "Added regression coverage for the canonical header-only empty telemetry dataset while preserving append and RFC-4180 escaping behavior."
+      }
     },
     {
       "sourcePath": "tests/unit/perf-logger.test.ts",
@@ -816,9 +932,14 @@
       "sourceGitObject": "db16c0dfe684f8eb2570278393268fd559bf2baf",
       "sourceSha256": "4ffd8fc84702726858fb456dc1d082c7f407c2a3461cec44cd08dcceff7366c5",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
-      "destinationSha256": "4ffd8fc84702726858fb456dc1d082c7f407c2a3461cec44cd08dcceff7366c5"
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
+      "destinationSha256": "67788d524ce07fddb7ed8c76c887203d0cfffc5e93a599efa945a14340d5f83c",
+      "modification": {
+        "status": "modified",
+        "reason": "Added bounded-tail telemetry and corrupt-row diagnostic coverage without exposing raw row content."
+      }
     },
     {
       "sourcePath": "tests/unit/protocol-table.test.ts",
@@ -828,6 +949,7 @@
       "originalCreatedAt": "2026-06-21T18:50:48+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "f07c9629a0c7f24db4ec36f49d9685ba58b032caf340b4b221f0fcdc3ada0dec"
     },
     {
@@ -838,6 +960,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
       "destinationSha256": "3a2b739d2631b90ed32ecee89978985125ead77c441caa3fb49cb44c5cdd4b3a",
       "modification": {
         "status": "modified",
@@ -852,6 +975,7 @@
       "originalCreatedAt": "2026-06-21T05:15:06+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "8f551fa093afbac838e006ca6fb2c5a1e9b76ebb482217d9e6c7b170ab17111f"
     },
     {
@@ -862,6 +986,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "c2608cc99f0e93c569802d491aa08c89ddc66940556bc3034fcde0009b673216"
     },
     {
@@ -872,6 +997,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "reused",
       "purpose": "Exact pinned baseline component",
+      "destinationStatus": "present",
       "destinationSha256": "030fb890d22bb880acf310ab71bc5f184611b784e4513257fa867530cc94cd09"
     },
     {
@@ -882,6 +1008,7 @@
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
+      "destinationStatus": "present",
       "destinationSha256": "1584dc7f45183a503b58509ecc4f2bdca1b5c50aee1b9970179301cc4f0fb0d9",
       "modification": {
         "status": "modified",
@@ -911,6 +1038,11 @@
       "purpose": "Frozen planned file ledger"
     },
     {
+      "path": "config/canonical-protocols.json",
+      "classification": "adtc-new",
+      "purpose": "Pinned WHO PDF origins, byte counts, and hashes"
+    },
+    {
       "path": "config/model-license-decision.json",
       "classification": "adtc-new",
       "purpose": "Disclosed-risk model license record"
@@ -921,14 +1053,34 @@
       "purpose": "Git-object manifest builder"
     },
     {
+      "path": "scripts/setup-local.sh",
+      "classification": "adtc-new",
+      "purpose": "Supported clean-machine dependency, corpus, store, and readiness setup"
+    },
+    {
       "path": "scripts/verify-import-manifest.ts",
       "classification": "adtc-new",
       "purpose": "Pinned-object verifier"
     },
     {
+      "path": "download_protocols.sh",
+      "classification": "adtc-new",
+      "purpose": "Fail-closed checksum-locked WHO protocol downloader"
+    },
+    {
+      "path": "src/logging.ts",
+      "classification": "adtc-new",
+      "purpose": "Bounded secret-safe operational diagnostic codes and counters"
+    },
+    {
       "path": "tests/import-provenance.test.ts",
       "classification": "adtc-new",
       "purpose": "Provenance regression contract"
+    },
+    {
+      "path": "tests/protocol-downloader.test.ts",
+      "classification": "adtc-new",
+      "purpose": "WHO downloader idempotence and fail-closed regression contract"
     }
   ],
   "thirdPartyDependencies": [

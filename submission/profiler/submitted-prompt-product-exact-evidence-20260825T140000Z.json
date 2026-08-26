@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "kind": "submitted-prompt-product-evidence",
+  "plane": "QVAC supported product /assist",
+  "status": "fail",
+  "officialProfilerEvidence": "separate-and-unchanged",
+  "historicalOneShotEvidence": "preserved-and-unchanged",
+  "promptContract": [
+    {
+      "promptId": "tp_001",
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "sha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29"
+    },
+    {
+      "promptId": "tp_002",
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "sha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74"
+    }
+  ],
+  "runtime": {
+    "sdkVersion": "0.13.3",
+    "workflowVersion": "prompt-policy-v1"
+  },
+  "model": {
+    "path": "model/medpsy-1.7b-q4_k_m-imat.gguf",
+    "bytes": 1282439360,
+    "sha256": "41ee947d9cce72ec657577219fd1798fabeabf0d832217fe23c9d6d3d18d5880"
+  },
+  "host": {
+    "label": "MacBook Pro MacBookPro17,1; Apple M1; 8 GB; macOS 26.0.1 (25A362); Apple development evidence",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.0.0"
+  },
+  "startedAt": "2026-08-25T16:17:16.189Z",
+  "finishedAt": "2026-08-25T16:21:05.306Z",
+  "listenerClosed": true,
+  "workerClosed": true,
+  "executions": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 1,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "4c16e989-ae1a-4c23-894a-1c60614c2dd1",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"4c16e989-ae1a-4c23-894a-1c60614c2dd1\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 30789
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 2,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "8ea6c6cb-c102-4077-87d0-f6eb8c9bbc96",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"8ea6c6cb-c102-4077-87d0-f6eb8c9bbc96\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 25660
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_001",
+      "repeat": 3,
+      "prompt": "Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.",
+      "promptSha256": "1bed4182fe62e46bbae10bd6aedf56a2d25fd977fbab1744b55f55d612f8ed29",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "674b1300416de3cc1c764da5ab9dc11fe44d916cba97f2f630d6c9b7b7dbf968"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "c118da4e-73ca-4def-9081-1ce08ac1c858",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "MISSING_REQUIRED_CONTENT"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"c118da4e-73ca-4def-9081-1ce08ac1c858\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"MISSING_REQUIRED_CONTENT\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 26271
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 1,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "048694a6-2782-4f5d-8230-a279a1a1ded0",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "TRUNCATED",
+            "MALFORMED"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"048694a6-2782-4f5d-8230-a279a1a1ded0\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"TRUNCATED\",\"MALFORMED\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 50994
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 2,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "4f18e8c0-f642-4743-a46f-f12890ed5ecf",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "TRUNCATED",
+            "MALFORMED"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"4f18e8c0-f642-4743-a46f-f12890ed5ecf\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"TRUNCATED\",\"MALFORMED\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 48498
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "caseKind": "submitted-exact",
+      "promptId": "tp_002",
+      "repeat": 3,
+      "prompt": "Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.",
+      "promptSha256": "322b4dcff729d2deae7d3662212b0152bb9d123ee6e63f1aed9d785252292d74",
+      "request": {
+        "method": "POST",
+        "endpoint": "/assist",
+        "bodySha256": "8e156d5546e4a426414005ce77f9fcb29d375c4e265694cf31286154d12bb03f"
+      },
+      "httpStatus": 200,
+      "responseContentType": "text/event-stream",
+      "cookie": "triage0_session=29a0224c-ea51-48f4-8482-c477fbba1902",
+      "jobId": "15a1e783-5fd4-4cbd-9021-b98073510e78",
+      "stageKeys": [
+        "reason"
+      ],
+      "terminalEvent": "rejected",
+      "result": {
+        "status": "REJECTED",
+        "answer": null,
+        "reason": "The generated answer did not pass validation.",
+        "validation": {
+          "passed": false,
+          "categories": [
+            "TRUNCATED",
+            "MALFORMED"
+          ]
+        }
+      },
+      "done": false,
+      "rawTranscript": "event: job\ndata: {\"id\":\"15a1e783-5fd4-4cbd-9021-b98073510e78\",\"position\":0}\n\nevent: stage\ndata: {\"key\":\"reason\",\"label\":\"Reasoning on-device\"}\n\nevent: rejected\ndata: {\"status\":\"REJECTED\",\"answer\":null,\"reason\":\"The generated answer did not pass validation.\",\"validation\":{\"passed\":false,\"categories\":[\"TRUNCATED\",\"MALFORMED\"]}}\n\nevent: done\ndata: {\"ok\":false}\n\n",
+      "durationMs": 46539
+    }
+  ],
+  "evaluations": [
+    {
+      "caseId": "tp_001-product-repeat-1",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_001-product-repeat-2",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_001-product-repeat-3",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-1",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-2",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    },
+    {
+      "caseId": "tp_002-product-repeat-3",
+      "status": "fail",
+      "failures": [
+        "submitted-prompt-not-completed"
+      ]
+    }
+  ],
+  "executionContract": {
+    "command": [
+      "/opt/homebrew/Cellar/node/24.10.0/bin/node",
+      "/Users/MAC/adtc-2026/scripts/submitted-prompt-evidence/run-product.ts",
+      "submission/profiler/submitted-prompt-product-exact-evidence-20260825T140000Z.json"
+    ],
+    "endpoint": "/assist",
+    "queue": "single-inference",
+    "reasonPredict": 1024,
+    "extractPredict": 512,
+    "maxExtractAttempts": 3,
+    "temperature": 0,
+    "rawReasoningPreserved": false
+  },
+  "runError": null
+}

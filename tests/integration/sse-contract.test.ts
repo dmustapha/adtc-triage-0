@@ -1,14 +1,13 @@
 // File: tests/integration/sse-contract.test.ts
 // MODEL-GATED. Pins the /triage SSE WIRE CONTRACT — the exact event order and per-event payload schema
 // the frontend (triage.js handleEvent) depends on. server.test.ts proves the hero loop end-to-end; this
-// proves the contract is STABLE: citation arrives before first-token telemetry, card, plan, and done,
-// every event carries its documented fields, and the abstain path emits exactly [abstain, done] with an
-// UNKNOWN card and no citation/card/plan.
+// proves the contract is STABLE: citation arrives before first-token telemetry, card/provisional, and
+// done; reference actions remain absent until confirmation, and abstention never invents a class.
 //
-// Self-skips when the store isn't ingested (chunkCount()===0). Loads MedPsy + GTE — SLOW.
+// Self-skips until both the store and exact canonical MedPsy file exist.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -17,10 +16,14 @@ process.env.TRIAGE0_PERF_DIR = mkdtempSync(join(tmpdir(), "triage0-test-perf-"))
 const { app } = await import("../../src/server.js");
 const { orchestrator } = await import("../../src/qvac/orchestrator.js");
 const { chunkCount } = await import("../../src/rag/store.js");
-const { ManagementPlanSchema } = await import("../../src/triage/schema.js");
 const { setTriageExecutionObserver } = await import("../../src/triage/triage.js");
 
-const skip = chunkCount() > 0 ? false : "store not ingested — run `npm run ingest` first";
+const modelPath = new URL("../../model/medpsy-1.7b-q4_k_m-imat.gguf", import.meta.url);
+const skip = chunkCount() === 0
+  ? "store not ingested — run `npm run ingest` first"
+  : existsSync(modelPath)
+    ? false
+    : "canonical MedPsy GGUF not downloaded";
 
 let server: { address(): { port: number } | string | null; close(): void };
 let base = "";
@@ -57,6 +60,28 @@ async function readSse(res: Response): Promise<Array<{ event: string; data: any 
   return out;
 }
 
+const FORBIDDEN_PRECONFIRMATION_KEYS = new Set(["plan", "referenceActions", "medicines", "dose", "bands"]);
+
+function assertPreconfirmationPublicValue(value: unknown, path = "payload"): void {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertPreconfirmationPublicValue(item, `${path}[${index}]`));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  for (const [key, child] of Object.entries(value)) {
+    assert.ok(!FORBIDDEN_PRECONFIRMATION_KEYS.has(key), `${path}.${key} is not public before confirmation`);
+    assertPreconfirmationPublicValue(child, `${path}.${key}`);
+  }
+}
+
+function assertNoUnsafeClinicalClaim(value: unknown): void {
+  const publicText = JSON.stringify(value).replace(/not a diagnosis/gi, "");
+  assert.doesNotMatch(
+    publicText,
+    /diagnos(?:e|is)|prescri(?:be|ption)|model-authored (?:plan|action)|chain.of.thought|<think>|raw reasoning/i,
+  );
+}
+
 const ABSENT = {
   cannotDrinkOrBreastfeed: "ABSENT",
   vomitsEverything: "ABSENT",
@@ -67,6 +92,12 @@ const ABSENT = {
   lowOxygenOrCentralCyanosis: "ABSENT",
 };
 
+const respiratoryAssessment = (respiratoryRatePerMinute: number) => ({
+  coughOrDifficultBreathing: "PRESENT",
+  respiratoryRatePerMinute,
+  rateCountQuality: "ONE_MINUTE_WHILE_CALM",
+});
+
 const triage = (caseText: string, extra: Record<string, unknown> = {}) =>
   fetch(`${base}/triage`, {
     method: "POST",
@@ -74,9 +105,12 @@ const triage = (caseText: string, extra: Record<string, unknown> = {}) =>
     body: JSON.stringify({ caseText, ...extra }),
   });
 
-async function observeRequest(body: Record<string, unknown>) {
+async function observeRequest(body: Record<string, unknown>, failOnBoundary = false) {
   const boundaries: string[] = [];
-  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  const restore = setTriageExecutionObserver((boundary: string) => {
+    boundaries.push(boundary);
+    if (failOnBoundary) throw new Error(`unexpected execution boundary: ${boundary}`);
+  });
   try {
     return { events: await readSse(await triage(String(body.caseText), body)), boundaries };
   } finally {
@@ -91,7 +125,9 @@ test("omitted and partial structured assessments fail closed before routing or M
   ]) {
     const { events, boundaries } = await observeRequest(body);
     assert.deepEqual(events.filter((event) => event.event !== "stage").map((event) => event.event), ["assessment_required", "done"]);
-    assert.equal(events.find((event) => event.event === "assessment_required")!.data.card.severity, "UNKNOWN");
+    const card = events.find((event) => event.event === "assessment_required")!.data.card;
+    assert.equal(card.outcome, "ASSESSMENT_REQUIRED");
+    assert.ok(!("severity" in card));
     assert.deepEqual(boundaries, [], "no QVAC context, semantic routing, retrieval, or MedPsy boundary ran");
   }
 });
@@ -102,20 +138,59 @@ test("known structured emergency precedes missing age and fields without routing
     dangerObservations: { cannotDrinkOrBreastfeed: "PRESENT" },
   });
   const cardEvent = events.find((event) => event.event === "card")!.data;
-  assert.equal(cardEvent.card.severity, "EMERGENCY");
-  assert.deepEqual(cardEvent.card.red_flags, ["cannotDrinkOrBreastfeed"]);
-  assert.match(cardEvent.card.protocol_citation.doc, /IMCI/i);
+  assert.equal(cardEvent.card.outcome, "EMERGENCY");
+  assert.deepEqual(cardEvent.card.emergencyObservations, ["cannotDrinkOrBreastfeed"]);
+  assert.equal(cardEvent.card.assistance.status, "NOT_RUN");
+  const citationEvent = events.find((event) => event.event === "citation")!.data;
+  assert.equal(citationEvent.provenance, "fixed-policy");
+  assert.match(cardEvent.card.finding, /emergency/i);
+  assert.match(cardEvent.card.sourceRule.doc, /IMCI/i);
+  assert.ok(!("severity" in cardEvent.card));
+  assert.ok(!("redFlags" in cardEvent.card));
   assert.ok(events.some((event) => event.event === "citation"));
+  events.forEach((event) => assertPreconfirmationPublicValue(event.data));
+  assertNoUnsafeClinicalClaim(events);
   assert.deepEqual(boundaries, []);
 });
 
-test("supported isolated chest indrawing is deterministic pneumonia; outside age fails closed", async () => {
+test("missing breathing rate fails closed with exact missing field before routing or MedPsy", async () => {
+  const { events, boundaries } = await observeRequest({
+    caseText: "18 month old with cough, alert and drinking",
+    patientAge: { value: 18, unit: "months" },
+    dangerObservations: ABSENT,
+    respiratoryAssessment: {
+      coughOrDifficultBreathing: "PRESENT",
+      rateCountQuality: "ONE_MINUTE_WHILE_CALM",
+    },
+  }, true);
+  const assessmentEvent = events.find((event) => event.event === "assessment_required");
+  assert.ok(assessmentEvent, "missing rate returns assessment_required before any execution boundary");
+  const card = assessmentEvent.data.card;
+
+  assert.equal(card.outcome, "ASSESSMENT_REQUIRED");
+  assert.deepEqual(card.missingFields, ["respiratoryAssessment.respiratoryRatePerMinute"]);
+  assert.match(card.finding, /breathing rate was not recorded/i);
+  assert.equal(card.assistance.status, "NOT_RUN");
+  assert.ok(!("severity" in card));
+  assert.ok(!("redFlags" in card));
+  assert.deepEqual(boundaries, []);
+});
+
+test("supported isolated chest indrawing remains a deterministic respiratory result", async () => {
   const chest = { ...ABSENT, chestIndrawing: "PRESENT" };
-  const supported = await observeRequest({ caseText: "model prose says severe", patientAge: { value: 2, unit: "months" }, dangerObservations: chest });
+  const supported = await observeRequest({
+    caseText: "2 month old with cough and chest indrawing",
+    patientAge: { value: 2, unit: "months" },
+    dangerObservations: chest,
+    respiratoryAssessment: { coughOrDifficultBreathing: "PRESENT", rateCountQuality: "NOT_CONFIRMED" },
+  });
   const card = supported.events.find((event) => event.event === "card")!.data;
-  assert.equal(card.classification, "PNEUMONIA");
-  assert.equal(card.card.severity, "URGENT");
-  assert.deepEqual(card.card.red_flags, ["chestIndrawing"]);
+  assert.equal(card.card.outcome, "PROMPT_SUPERVISED_REVIEW");
+  assert.deepEqual(card.card.emergencyObservations, []);
+  assert.ok(!("severity" in card.card));
+  assert.ok(!("redFlags" in card.card));
+  supported.events.forEach((event) => assertPreconfirmationPublicValue(event.data));
+  assertNoUnsafeClinicalClaim(supported.events);
   assert.deepEqual(supported.boundaries, []);
 
   const outside = await observeRequest({ caseText: "model prose says severe", patientAge: { value: 60, unit: "months" }, dangerObservations: chest });
@@ -123,9 +198,28 @@ test("supported isolated chest indrawing is deterministic pneumonia; outside age
   assert.deepEqual(outside.boundaries, []);
 });
 
-test("grounded /triage: full event ORDER citation<first_token<card<plan<done without chain-of-thought", { skip, timeout: 300_000 }, async () => {
-  const r = await triage("2-year-old, cough 3 days, breathing 52 a minute, alert and drinking, no chest indrawing or danger signs.", {
-    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+test("fast breathing is deterministic and never crosses a QVAC or retrieval boundary", async () => {
+  const { events, boundaries } = await observeRequest({
+    caseText: "2-year-old with cough; breathing counted at 40 per minute while calm",
+    patientAge: { value: 24, unit: "months" },
+    dangerObservations: ABSENT,
+    respiratoryAssessment: respiratoryAssessment(40),
+  }, true);
+  const card = events.find((event) => event.event === "card")!.data.card;
+  const citation = events.find((event) => event.event === "citation")!.data;
+
+  assert.equal(card.outcome, "PROMPT_SUPERVISED_REVIEW");
+  assert.equal(card.thresholdComparison.relation, "AT_OR_ABOVE");
+  assert.equal(card.assistance.status, "NOT_RUN");
+  assert.equal(citation.provenance, "fixed-policy");
+  assert.deepEqual(boundaries, []);
+  assert.ok(!events.some((event) => event.event === "first_token"));
+  assert.ok(!events.some((event) => event.event === "stage" && ["retrieve", "reason"].includes(event.data.key)));
+});
+
+test("grounded /triage keeps reasoning private and reference actions gated", { skip, timeout: 300_000 }, async () => {
+  const r = await triage("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT, respiratoryAssessment: respiratoryAssessment(32),
   });
   assert.match(r.headers.get("content-type") || "", /text\/event-stream/);
   const events = await readSse(r);
@@ -135,72 +229,89 @@ test("grounded /triage: full event ORDER citation<first_token<card<plan<done wit
   assert.ok(idx("citation") >= 0, "emits a citation");
   assert.ok(idx("first_token") > idx("citation"), "first_token after citation");
   assert.ok(idx("card") > idx("first_token"), "card after first-token telemetry");
-  assert.ok(idx("plan") > idx("card"), "plan after card (progressive enhancement, Task #22)");
   assert.equal(kinds[kinds.length - 1], "done", "done is the terminal event");
   assert.ok(!kinds.includes("reasoning"), "model chain-of-thought is never exposed");
+  assert.ok(!kinds.includes("plan"), "reference actions are absent before confirmation");
   assert.ok(!kinds.includes("error"), "a grounded case never emits an error event");
 
   // Representation: additive on-device pipeline readout. Each `stage` marks a REAL step; they are
   // ignorable by any existing consumer and never reorder the load-bearing citation/card/plan sequence.
   const stageKeys = events.filter((e) => e.event === "stage").map((e) => e.data.key);
-  for (const s of ["detect", "retrieve", "reason", "classify", "plan"]) {
+  for (const s of ["detect", "retrieve", "reason", "summarize"]) {
     assert.ok(stageKeys.includes(s), `stage readout covers the real "${s}" step`);
+  }
+  events.forEach((event) => assertPreconfirmationPublicValue(event.data));
+  assertNoUnsafeClinicalClaim(events);
+  const provisional = events.find((event) => event.event === "provisional")?.data;
+  if (provisional) {
+    assert.ok(provisional.token || provisional.confirmation?.token, "provisional classification carries an opaque confirmation token");
+    const provisionalCard = events.find((event) => event.event === "card")?.data.card;
+    assert.equal(provisionalCard?.reviewState, "PROVISIONAL");
+    assert.match(provisionalCard?.uncertainty ?? "", /provisional|not a diagnosis/i);
   }
   assert.ok(idx("stage") >= 0 && idx("stage") < idx("card"), "stages stream before the card they describe");
 });
 
-test("grounded /triage: per-event payload SCHEMA (citation / first_token / card / plan)", { skip, timeout: 300_000 }, async () => {
-  const events = await readSse(await triage("2-year-old, cough 3 days, breathing 52 a minute, alert and drinking, no chest indrawing or danger signs.", {
-    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+test("grounded /triage keeps the deterministic respiratory result authoritative", { skip, timeout: 300_000 }, async () => {
+  const events = await readSse(await triage("2-year-old, cough 3 days, breathing 32 a minute, alert and drinking, no chest indrawing or danger signs.", {
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT, respiratoryAssessment: respiratoryAssessment(32),
   }));
   const get = (k: string) => events.find((e) => e.event === k)?.data;
 
   // citation: protocol/doc/page/section/score/retrieval.
   const citation = get("citation");
   assert.ok(citation, "citation present");
-  for (const f of ["protocol", "doc", "page", "section", "score", "retrieval"]) {
+  for (const f of ["protocol", "doc", "page", "score", "retrieval"]) {
     assert.ok(f in citation, `citation carries ${f}`);
   }
   assert.equal(typeof citation.score, "number");
   assert.equal(citation.retrieval, "semantic");
+  assert.equal(citation.provenance, "retrieved-reference");
   assert.ok(String(citation.page).match(/\d/), "citation page is a real number");
 
   // first_token: ttftMs number.
   const ft = get("first_token");
   assert.ok(ft && typeof ft.ttftMs === "number" && ft.ttftMs >= 0, "first_token carries a numeric ttftMs");
 
-  // card: card / citationChunk / attempts / perf{ttftMs,tokensPerSec,totalTokens,backendDevice}.
+  // card: neutral result authority / attempts / perf{ttftMs,tokensPerSec,totalTokens,backendDevice}.
   const cardEv = get("card");
   assert.ok(cardEv, "card present");
-  for (const f of ["card", "citationChunk", "attempts", "perf"]) assert.ok(f in cardEv, `card event carries ${f}`);
+  for (const f of ["card", "attempts", "perf"]) assert.ok(f in cardEv, `card event carries ${f}`);
   assert.equal(typeof cardEv.attempts, "number");
   for (const k of ["ttftMs", "tokensPerSec", "totalTokens", "backendDevice"]) {
     assert.ok(k in cardEv.perf, `perf HUD carries ${k}`);
   }
-  assert.ok(cardEv.card.severity && cardEv.card.action, "card has severity + action");
-
-  // plan: must satisfy ManagementPlanSchema.
-  const planEv = get("plan");
-  assert.ok(planEv && planEv.plan, "plan present");
-  const parsed = ManagementPlanSchema.safeParse(planEv.plan);
-  assert.ok(parsed.success, `plan matches ManagementPlanSchema (${parsed.success ? "" : JSON.stringify(parsed.error?.issues)})`);
+  for (const f of ["outcome", "finding", "basis", "nextAssessmentStep", "matchedCriteria", "missingFields", "recorded", "thresholdComparison", "emergencyObservations", "sourceRule", "assistance", "uncertainty"]) {
+    assert.ok(f in cardEv.card, `public card carries ${f}`);
+  }
+  assert.equal(cardEv.card.outcome, "NO_ESCALATION_CRITERION_RECORDED");
+  assert.match(cardEv.card.finding, /no emergency observation.*fast-breathing criterion/i);
+  assert.deepEqual(cardEv.card.thresholdComparison, {
+    respiratoryRatePerMinute: 32,
+    thresholdPerMinute: 40,
+    relation: "BELOW",
+  });
+  assert.equal(cardEv.card.assistance.status, "COMPLETED");
+  assert.equal(cardEv.card.assistance.runtime, "QVAC SDK 0.13.3");
+  assert.match(cardEv.card.assistance.model, /MedPsy-1\.7B-GGUF/i);
+  assert.ok(!("supportingExcerpt" in cardEv.card.assistance), "raw retrieved text is never public");
+  assert.ok(!("severity" in cardEv.card), "classifier-derived severity is not public result authority");
+  assert.ok(!("redFlags" in cardEv.card), "only emergencyObservations is public");
+  events.forEach((event) => assertPreconfirmationPublicValue(event.data));
+  assertNoUnsafeClinicalClaim(events);
 });
 
-test("abstain /triage: [stage(detect), abstain, done], card.severity UNKNOWN, lang set, no citation/card/plan", { skip, timeout: 120_000 }, async () => {
+test("complete structured respiratory record remains authoritative over unrelated narrative", { skip, timeout: 120_000 }, async () => {
   const events = await readSse(await triage("What is the best recipe for chocolate cake?", {
-    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT,
+    patientAge: { value: 24, unit: "months" }, dangerObservations: ABSENT, respiratoryAssessment: respiratoryAssessment(32),
   }));
   const kinds = events.map((e) => e.event);
-  // A `detect` stage is emitted before the abstain gate so the readout shows and the abstain localizes;
-  // the load-bearing (non-stage) contract stays exactly [abstain, done].
-  const nonStage = kinds.filter((k) => k !== "stage");
-  assert.deepEqual(nonStage, ["abstain", "done"], "off-domain abstains with abstain then done (stages aside)");
-  assert.ok(events.some((e) => e.event === "stage" && e.data.key === "detect"), "detect stage precedes abstain");
-  const abstain = events.find((e) => e.event === "abstain")!.data;
-  assert.equal(abstain.card.severity, "UNKNOWN");
-  assert.equal(abstain.retrieval, "abstain");
-  assert.ok("lang" in abstain, "abstain carries lang so the card renders in the case's language");
-  assert.ok(!kinds.includes("citation"), "no citation on abstain (nothing matched)");
-  assert.ok(!kinds.includes("card"), "no grounded card on abstain");
+  const card = events.find((e) => e.event === "card")!.data.card;
+  assert.equal(card.outcome, "NO_ESCALATION_CRITERION_RECORDED");
+  assert.equal(card.thresholdComparison.relation, "BELOW");
+  assert.ok(!("severity" in card));
+  assert.ok(!("redFlags" in card));
+  assert.ok(kinds.includes("citation"), "the structured respiratory route retrieves supporting WHO evidence");
+  assert.ok(!kinds.includes("abstain"), "unrelated narrative cannot override the structured respiratory record");
   assert.ok(!kinds.includes("plan"), "no plan on abstain");
 });

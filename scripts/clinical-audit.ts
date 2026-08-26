@@ -6,6 +6,7 @@
  */
 import { setGlobalDispatcher, Agent } from "undici";
 import { type TestCase, textbookCases, failureCases } from "./audit-cases.js";
+import { safeErrorName } from "../src/logging.js";
 setGlobalDispatcher(new Agent({ bodyTimeout: 0, headersTimeout: 0, connectTimeout: 30_000 }));
 
 const BASE = process.env.TRIAGE0_BASE ?? "http://localhost:3010";
@@ -145,7 +146,7 @@ async function main() {
     const hj = await h.json();
     console.log(`Server: ${hj.medpsy} model, ${hj.chunks} chunks, ${hj.residentModels.join(", ")} loaded\n`);
   } catch {
-    console.error("ERROR: Server not reachable at", BASE);
+    console.error("ERROR: configured local audit server is not reachable");
     process.exit(1);
   }
 
@@ -190,7 +191,7 @@ async function main() {
     const elapsed = Date.now() - start;
 
     if (r.error) {
-      console.log(`ERROR (${r.error})`);
+      console.log("ERROR (bounded request failure; see the private audit result)");
       errors++;
       results.push({ name: c.name, classification: "ERROR", severity: "ERROR", medicines: [], planComponents: [], citation: "", ttftMs: elapsed, error: r.error, passed: false, failures: [r.error] });
       saveResults();
@@ -303,4 +304,4 @@ async function main() {
   console.log("\nResults written to tests/quality/results.json");
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => { console.error(`Clinical audit failed safely (${safeErrorName(e)}).`); process.exit(1); });

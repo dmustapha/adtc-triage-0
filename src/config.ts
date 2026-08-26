@@ -25,8 +25,32 @@ export const TTS_SAMPLE_RATE = 44100;
 
 const modelIdentity = readModelIdentity();
 
+function boundedNumber(name: string, fallback: number, minimum: number, maximum: number, integer = false): number {
+  const value = Number(process.env[name] ?? fallback);
+  if (!Number.isFinite(value) || value < minimum || value > maximum || (integer && !Number.isInteger(value))) {
+    throw new RangeError(`${name} must be ${integer ? "an integer" : "a number"} from ${minimum} through ${maximum}.`);
+  }
+  return value;
+}
+
+function residentMode(): ResidentMode {
+  const value = process.env.RESIDENT_MODE ?? "resident";
+  if (!["resident", "hybrid", "sequential", "fallback"].includes(value)) {
+    throw new RangeError("RESIDENT_MODE must be resident, hybrid, sequential, or fallback.");
+  }
+  return value as ResidentMode;
+}
+
+function booleanFlag(name: string, fallback = false): boolean {
+  const value = process.env[name];
+  if (value === undefined) return fallback;
+  if (["1", "true"].includes(value.toLowerCase())) return true;
+  if (["0", "false"].includes(value.toLowerCase())) return false;
+  throw new RangeError(`${name} must be true, false, 1, or 0.`);
+}
+
 export const config = {
-  port: Number(process.env.PORT ?? 3010),
+  port: boundedNumber("PORT", 3010, 1, 65_535, true),
   modelId: modelIdentity.candidateId,
   /** Optional — only used to authorize/speed the first-run model asset download. */
   hfToken: process.env.HF_TOKEN ?? undefined,
@@ -42,9 +66,13 @@ export const config = {
    * lower) top out ~0.673 — a narrow but real gap. 0.685 sits in it: psychosis grounds, off-domain
    * abstains. The model's UNKNOWN enum is the second-line backstop for anything that slips through.
    */
-  ragScoreThreshold: Number(process.env.RAG_THRESHOLD ?? 0.685),
+  ragScoreThreshold: boundedNumber("RAG_THRESHOLD", 0.685, 0, 1),
   /** Resident strategy. Phase-0 spike proved unload reclaims fully -> "resident" is safe. */
-  residentMode: (process.env.RESIDENT_MODE as ResidentMode) ?? "resident",
+  residentMode: residentMode(),
+  debugRoute: booleanFlag("TRIAGE0_DEBUG_ROUTE"),
+  debugPlan: booleanFlag("TRIAGE0_DEBUG_PLAN"),
+  prewarmEnabled: !booleanFlag("TRIAGE0_NO_PREWARM"),
+  egressStrict: !booleanFlag("TRIAGE0_EGRESS_NONSTRICT"),
 };
 
 function canonicalMedpsySpec(): ModelSpec {
@@ -56,8 +84,8 @@ function canonicalMedpsySpec(): ModelSpec {
 }
 
 export function medpsySpec(): ModelSpec {
-  loadModelContract();
-  return canonicalMedpsySpec();
+  const contract = loadModelContract();
+  return { ...canonicalMedpsySpec(), modelSrc: contract.absolutePath };
 }
 
 /** TTS voices supported end-to-end (STT/translation already cover fr+es). Supertonic2 is multilingual. */

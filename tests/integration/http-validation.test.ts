@@ -10,6 +10,12 @@
 // model. The excluded audio routes are asserted absent, and no inference is triggered.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const perfDir = mkdtempSync(join(tmpdir(), "triage0-http-perf-"));
+process.env.TRIAGE0_PERF_DIR = perfDir;
 
 // Import the app WITHOUT pre-warm: app.listen(0) below does not pre-warm (only startServer on a real
 // port does), so importing `app` directly keeps this suite model-free.
@@ -28,6 +34,7 @@ before(async () => {
 });
 after(() => {
   if (server) server.close();
+  rmSync(perfDir, { recursive: true, force: true });
 });
 
 const postJson = (path: string, body: unknown, raw = false) =>
@@ -86,6 +93,50 @@ test("POST /triage rejects invalid structured age and danger values before infer
   }
 });
 
+test("POST /triage rejects invalid respiratory assessment values before inference", async () => {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  const invalidRespiratoryAssessments = [
+    { coughOrDifficultBreathing: "YES", respiratoryRatePerMinute: 40, rateCountQuality: "ONE_MINUTE_WHILE_CALM" },
+    { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 0, rateCountQuality: "ONE_MINUTE_WHILE_CALM" },
+    { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 201, rateCountQuality: "ONE_MINUTE_WHILE_CALM" },
+    { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 40.5, rateCountQuality: "ONE_MINUTE_WHILE_CALM" },
+    { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 40, rateCountQuality: "CALM" },
+  ];
+  try {
+    for (const respiratoryAssessment of invalidRespiratoryAssessments) {
+      const response = await postJson("/triage", {
+        caseText: "18 month old with cough",
+        patientAge: { value: 18, unit: "months" },
+        dangerObservations: { convulsions: "ABSENT" },
+        respiratoryAssessment,
+      });
+      assert.equal(response.status, 400);
+      assert.deepEqual(await response.json(), { error: "Invalid structured respiratory assessment." });
+    }
+    assert.deepEqual(boundaries, [], "invalid respiratory input reaches no QVAC or retrieval boundary");
+  } finally {
+    restore();
+  }
+});
+
+test("POST /triage rejects contradictory narrative and structured observations", async () => {
+  const absent = Object.fromEntries([
+    "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
+    "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
+  ].map((key) => [key, "ABSENT"]));
+  const response = await postJson("/triage", {
+    caseText: "18 month old with cough, alert and drinking",
+    patientAge: { value: 7, unit: "months" },
+    dangerObservations: { ...absent, cannotDrinkOrBreastfeed: "PRESENT" },
+  });
+  assert.equal(response.status, 409);
+  assert.deepEqual(await response.json(), {
+    error: "The description conflicts with the structured assessment. Correct the patient record before continuing.",
+    conflicts: ["patientAge", "cannotDrinkOrBreastfeed"],
+  });
+});
+
 // ── excluded optional modalities ───────────────────────────────────────────────────
 test("POST /tts is not registered in the English text baseline", async () => {
   const r = await postJson("/tts", { text: "" });
@@ -124,9 +175,45 @@ test("GET /health returns 200 AFTER a malformed-JSON request (server survives ba
   assert.equal(r.status, 200);
   const h = await r.json();
   assert.equal(h.ok, true);
+  assert.equal(h.ready, false, "bare app.listen reports HTTP liveness, never product readiness");
+  assert.equal(h.readiness.modelContractVerified, false);
+  assert.equal(h.readiness.ragLive, false);
+  assert.equal(h.readiness.egressGuardArmed, false);
   assert.equal(typeof h.citationMapHealthy, "boolean", "health exposes citationMapHealthy boolean");
   assert.ok("chunks" in h, "health reports chunk count");
   assert.ok("residentModels" in h, "health reports resident models");
   assert.ok("residentMode" in h, "health reports resident mode");
   assert.ok("medpsy" in h, "health reports the medpsy variant");
+});
+
+test("known endpoints return JSON 405 with exact Allow headers", async () => {
+  const cases = [
+    ["/health", "POST", "GET, HEAD"],
+    ["/app", "POST", "GET, HEAD"],
+    ["/perf-log", "POST", "GET, HEAD"],
+    ["/perf-log.csv", "POST", "GET, HEAD"],
+    ["/triage", "GET", "POST"],
+  ] as const;
+
+  for (const [path, method, allow] of cases) {
+    const response = await fetch(`${base}${path}`, { method });
+    assert.equal(response.status, 405, `${method} ${path}`);
+    assert.equal(response.headers.get("allow"), allow);
+    assert.match(response.headers.get("content-type") || "", /application\/json/);
+    assert.deepEqual(await response.json(), { error: "Method Not Allowed" });
+  }
+});
+
+test("unknown routes remain 404", async () => {
+  assert.equal((await fetch(`${base}/not-a-real-endpoint`)).status, 404);
+});
+
+test("empty perf CSV is a truthful header-only dataset", async () => {
+  const response = await fetch(`${base}/perf-log.csv`);
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") || "", /^text\/csv/);
+  assert.equal(
+    await response.text(),
+    "ts,phase,event,modelId,promptTokens,ttftMs,tokensPerSec,totalTokens,backendDevice,durationMs\n",
+  );
 });

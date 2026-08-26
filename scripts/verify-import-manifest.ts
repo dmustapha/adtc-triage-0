@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 import {
@@ -50,6 +50,15 @@ function destinationBytes(destinationPath: string): Buffer {
 }
 
 function verifyCompletedEntry(entry: ImportEntry): void {
+  if (entry.destinationStatus === "removed") {
+    if (existsSync(entry.destinationPath)) throw new Error(`Removed destination still exists: ${entry.destinationPath}`);
+    if (entry.destinationSha256) throw new Error(`Removed destination cannot have a SHA-256: ${entry.destinationPath}`);
+    if (entry.classification !== "modified-for-adtc" || entry.modification?.status !== "removed" || !entry.modification.reason) {
+      throw new Error(`Removed destination requires a documented ADTC modification: ${entry.destinationPath}`);
+    }
+    return;
+  }
+  if (entry.destinationStatus !== "present") throw new Error(`Missing destination status for ${entry.destinationPath}`);
   const sha256 = createHash("sha256").update(destinationBytes(entry.destinationPath)).digest("hex");
   if (entry.destinationSha256 !== sha256) throw new Error(`Destination SHA-256 mismatch for ${entry.destinationPath}`);
   if (entry.classification === "reused") {

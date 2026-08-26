@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "protocols": [
+    {
+      "id": "WHO-IMCI-2014",
+      "url": "https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf",
+      "path": "data/protocols/imci-chart-booklet.pdf",
+      "bytes": 5304059,
+      "sha256": "d10fd1d040bdbdb6db4254b8095e1d1722d0a3d2f80c3651b3003301a8a6959f"
+    },
+    {
+      "id": "WHO-MHGAP-IG-2.0-2016",
+      "url": "https://iris.who.int/server/api/core/bitstreams/6ded7ffd-9d69-493a-b48a-0b3e6250c173/content",
+      "path": "data/protocols/mhgap-intervention-guide.pdf",
+      "bytes": 3633801,
+      "sha256": "3cbe88544386ab6ae55cd6d48d6c06484a5425f1e875e4359f87f4e44a5e1fd6"
+    }
+  ]
+}
