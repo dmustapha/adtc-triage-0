@@ -14,6 +14,7 @@ import type { RouteResult } from "./class-router.js";
 import type { ClinicalAssessmentRequest } from "./schema.js";
 import type { SearchHit } from "../rag/store.js";
 import type { TriageContext, TriageOptions, TriageResult } from "./triage.js";
+import { readModelIdentity } from "../model-contract.js";
 
 type GroundingResult = {
   groundedHits: SearchHit[];
@@ -35,7 +36,18 @@ type WorkflowDependencies = {
     release?(token: string, owner: string): boolean;
   };
   policyVersion: string;
+  publicAssistanceIdentity?: { runtime: string; model: string };
 };
+
+const verifiedModelIdentity = readModelIdentity();
+const DEFAULT_ASSISTANCE_IDENTITY = {
+  runtime: `${verifiedModelIdentity.productRuntime.name} ${verifiedModelIdentity.productRuntime.version}`,
+  model: verifiedModelIdentity.name,
+};
+
+function assistanceIdentity(dependencies: WorkflowDependencies) {
+  return dependencies.publicAssistanceIdentity ?? DEFAULT_ASSISTANCE_IDENTITY;
+}
 
 type AssessOptions = {
   owner: string;
@@ -90,6 +102,7 @@ function unavailable(uncertainty: string): SupervisedAssessmentResult {
 function unavailableWithPolicy(
   request: ClinicalAssessmentRequest,
   uncertainty: string,
+  identity = DEFAULT_ASSISTANCE_IDENTITY,
 ): SupervisedAssessmentResult {
   const respiratory = request.respiratoryAssessment
     ? evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment)
@@ -99,8 +112,7 @@ function unavailableWithPolicy(
     respiratory,
     {
       status: "UNAVAILABLE",
-      runtime: "QVAC SDK 0.13.3",
-      model: "qvac/MedPsy-1.7B-GGUF",
+      ...identity,
     },
     `${respiratory.uncertainty} ${uncertainty}`,
   );
@@ -329,13 +341,13 @@ async function assessWithModel(
   respiratoryContinuation?: RespiratoryDecision,
 ): Promise<SupervisedAssessmentResult> {
       try {
-        if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.");
+        if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.", assistanceIdentity(dependencies));
         const context = await dependencies.getContext();
         const modelContext = canonicalModelContext(request);
         options.onStage?.({ key: "detect", label: "Recorded assessment received", detail: "structured observations" });
         if (context.embedId) {
           const route = await dependencies.routeCase(routingContext(request), context.embedId);
-          if (route.offDomain) return unavailableWithPolicy(request, "No matching WHO protocol route was found; supporting evidence was unavailable.");
+          if (route.offDomain) return unavailableWithPolicy(request, "No matching WHO protocol route was found; supporting evidence was unavailable.", assistanceIdentity(dependencies));
           return await assessGrounded(
             dependencies,
             request,
@@ -361,6 +373,7 @@ async function assessWithModel(
         return unavailableWithPolicy(
           request,
           "Model-assisted assessment is unavailable; the recorded-observation result remains authoritative and no provisional classification was issued.",
+          assistanceIdentity(dependencies),
         );
       }
 }
@@ -375,7 +388,8 @@ async function assessGrounded(
   shortlist: RouteResult["shortlist"] | undefined,
   respiratoryContinuation?: RespiratoryDecision,
 ) {
-  if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.");
+  const identity = assistanceIdentity(dependencies);
+  if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.", identity);
   const grounding = await dependencies.retrieveGrounding(retrievalQuery, context);
   const candidates = grounding.groundedHits.length ? grounding.groundedHits : grounding.topHits;
   const allowedProtocols = new Set((shortlist ?? [])
@@ -384,7 +398,7 @@ async function assessGrounded(
   const hits = allowedProtocols.size
     ? candidates.filter((hit) => allowedProtocols.has(hit.protocol as "IMCI" | "mhGAP"))
     : candidates;
-  if (!hits.length) return unavailableWithPolicy(request, "Verified WHO source grounding is unavailable; no supporting evidence was issued.");
+  if (!hits.length) return unavailableWithPolicy(request, "Verified WHO source grounding is unavailable; no supporting evidence was issued.", identity);
   options.onStage?.({ key: "retrieve", label: "Checked local WHO passages", detail: `${grounding.retrieval} retrieval`, count: hits.length });
   const top = hits[0]!;
   options.onCitation?.({
@@ -402,7 +416,7 @@ async function assessGrounded(
       ? "PNEUMONIA"
       : "COUGH OR COLD"
     : null;
-  options.onStage?.({ key: "reason", label: "Reasoning on-device", detail: "QVAC SDK 0.13.3 · on-device" });
+  options.onStage?.({ key: "reason", label: "Reasoning on-device", detail: `${identity.runtime} · on-device` });
   let firstToken = false;
   const result = await dependencies.triageFromHits(modelContext, hits, context, {
     retrieval: grounding.retrieval,
@@ -421,7 +435,7 @@ async function assessGrounded(
   options.onStage?.({ key: "summarize", label: "Prepared assessment summary", detail: "bounded local review" });
   if (expectedRespiratoryClass && result.classification !== expectedRespiratoryClass) {
     return respiratoryWithAssistance(respiratoryContinuation!, {
-      status: "UNAVAILABLE", runtime: "QVAC SDK 0.13.3", model: "qvac/MedPsy-1.7B-GGUF",
+      status: "UNAVAILABLE", ...identity,
     }, `${respiratoryContinuation!.uncertainty} Model-assisted classification contradicted the structured respiratory record, so no provisional class was issued.`);
   }
   const reconciledResult = result;
@@ -433,14 +447,12 @@ async function assessGrounded(
     if (!entry) {
       return respiratoryWithAssistance(respiratory, {
         status: "UNAVAILABLE",
-        runtime: "QVAC SDK 0.13.3",
-        model: "qvac/MedPsy-1.7B-GGUF",
+        ...identity,
       }, `${respiratory.uncertainty} Model-assisted supporting evidence was unavailable.`);
     }
     const publicResult = respiratoryWithAssistance(respiratory, {
       status: "COMPLETED",
-      runtime: "QVAC SDK 0.13.3",
-      model: "qvac/MedPsy-1.7B-GGUF",
+      ...identity,
       retrievalMode: grounding.retrieval,
     });
     publicResult.attempts = reconciledResult.attempts;
@@ -452,8 +464,7 @@ async function assessGrounded(
   const publicResult = provisional(request, reconciledResult, grant, entry.protocol, respiratoryContinuation);
   publicResult.assistance = {
     status: "COMPLETED",
-    runtime: "QVAC SDK 0.13.3",
-    model: "qvac/MedPsy-1.7B-GGUF",
+    ...identity,
     retrievalMode: grounding.retrieval,
   };
   publicResult.attempts = reconciledResult.attempts;

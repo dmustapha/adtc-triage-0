@@ -53,7 +53,10 @@ type Dependencies = {
     }): Promise<any>;
   };
   promptRunner: { run(input: unknown, options: { modelId: string; signal?: AbortSignal }): Promise<any> };
-  confirmationStore: { consume(token: string, owner: string, decision: "CONFIRM" | "REJECT"): any };
+  confirmationStore: {
+    inspect?(token: string, owner: string): any;
+    consume(token: string, owner: string, decision: "CONFIRM" | "REJECT"): any;
+  };
   projectReferenceActions: (classification: string, severity: Severity, eligibility: any) => any;
   inferenceQueue: InferenceQueue;
   sessionOwner?: (request: Request, response: Response) => string;
@@ -345,31 +348,41 @@ function confirmationRoute(deps: Dependencies) {
     if (!parsed.success) { response.status(400).json({ error: "Invalid confirmation request." }); return; }
     const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
     response.setHeader("Cache-Control", "no-store");
-    const consumed = deps.confirmationStore.consume(parsed.data.token, owner, parsed.data.decision);
-    if (!consumed.ok) {
+    const inspected = parsed.data.decision === "CONFIRM" && deps.confirmationStore.inspect
+      ? deps.confirmationStore.inspect(parsed.data.token, owner)
+      : deps.confirmationStore.consume(parsed.data.token, owner, parsed.data.decision);
+    if (!inspected.ok) {
       const statuses: Record<string, number> = {
         NOT_FOUND: 404, EXPIRED: 410, USED: 409, OWNER_MISMATCH: 403, BINDING_MISMATCH: 409,
       };
-      const status = statuses[String(consumed.reason)] ?? 409;
-      response.status(status).json({ error: "Confirmation could not be applied.", reason: consumed.reason });
+      const status = statuses[String(inspected.reason)] ?? 409;
+      response.status(status).json({ error: "Confirmation could not be applied.", reason: inspected.reason });
       return;
     }
     if (parsed.data.decision === "REJECT") { response.json({ reviewState: "REJECTED" }); return; }
-    const entry = lookupProtocol(consumed.binding.classification);
-    const eligibility = consumed.payload?.eligibility ?? { confirmationState: "CONFIRMED" };
-    const projected = deps.projectReferenceActions(consumed.binding.classification, entry?.severity ?? "UNKNOWN", { ...eligibility, confirmationState: "CONFIRMED" });
-    const severity = consumed.binding.fixedSeverity ?? entry?.severity ?? "UNKNOWN";
+    const entry = lookupProtocol(inspected.binding.classification);
+    const eligibility = inspected.payload?.eligibility ?? { confirmationState: "CONFIRMED" };
+    const projected = deps.projectReferenceActions(inspected.binding.classification, entry?.severity ?? "UNKNOWN", { ...eligibility, confirmationState: "CONFIRMED" });
+    const severity = inspected.binding.fixedSeverity ?? entry?.severity ?? "UNKNOWN";
     const immediateAction = projected.referenceActions?.immediateAction;
     const candidate = {
       reviewState: "CONFIRMED" as const,
-      classification: consumed.binding.classification,
-      protocol: consumed.binding.protocol,
+      classification: inspected.binding.classification,
+      protocol: inspected.binding.protocol,
       severity,
       ...(immediateAction ? { immediateAction } : {}),
       ...projected,
     };
     const publicResult = ConfirmedReferenceResponseSchema.safeParse(candidate);
     if (!publicResult.success) { response.status(500).json({ error: "Confirmed source actions failed public validation." }); return; }
+    if (deps.confirmationStore.inspect) {
+      const consumed = deps.confirmationStore.consume(parsed.data.token, owner, "CONFIRM");
+      if (!consumed.ok) {
+        const status = consumed.reason === "OWNER_MISMATCH" ? 403 : consumed.reason === "EXPIRED" ? 410 : 409;
+        response.status(status).json({ error: "Confirmation could not be applied.", reason: consumed.reason });
+        return;
+      }
+    }
     response.json(publicResult.data);
   };
 }

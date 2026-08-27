@@ -86,6 +86,10 @@ function hasNonNegatedMatch(hay: string, pattern: RegExp): boolean {
     const boundary = Math.max(
       hay.lastIndexOf(",", idx - 1),
       hay.lastIndexOf(";", idx - 1),
+      hay.lastIndexOf(".", idx - 1),
+      hay.lastIndexOf("?", idx - 1),
+      hay.lastIndexOf("!", idx - 1),
+      hay.lastIndexOf("\n", idx - 1),
       hay.lastIndexOf(" but ", idx - 1),
       hay.lastIndexOf(" however ", idx - 1),
       hay.lastIndexOf(" though ", idx - 1),

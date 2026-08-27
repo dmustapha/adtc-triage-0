@@ -17,6 +17,9 @@ export type ConfirmationPayload = Readonly<Record<string, unknown>>;
 export type ConsumeResult =
   | { ok: true; decision: ConfirmationDecision; binding: ConfirmationBinding; payload?: ConfirmationPayload; replayed?: boolean }
   | { ok: false; reason: "NOT_FOUND" | "EXPIRED" | "USED" | "OWNER_MISMATCH" | "BINDING_MISMATCH" };
+export type InspectResult =
+  | { ok: true; binding: ConfirmationBinding; payload?: ConfirmationPayload }
+  | { ok: false; reason: "NOT_FOUND" | "EXPIRED" | "USED" | "OWNER_MISMATCH" };
 
 type StoredGrant = {
   binding: ConfirmationBinding;
@@ -72,13 +75,13 @@ export class ConfirmationStore {
   }
 
   get size(): number {
-    return this.records.size;
+    return this.activeCount();
   }
 
   issue(binding: ConfirmationBinding, payload?: ConfirmationPayload): ConfirmationGrant {
     const now = this.now();
     this.pruneExpired(now);
-    if (this.records.size >= this.capacity) throw new Error("Confirmation store capacity reached.");
+    if (this.activeCount() >= this.capacity) throw new Error("Confirmation store capacity reached.");
     const token = this.uniqueToken();
     const expiresAtMs = now + this.ttlMs;
     this.records.set(token, {
@@ -111,6 +114,22 @@ export class ConfirmationStore {
     };
   }
 
+  inspect(token: string, owner: string): InspectResult {
+    const record = this.records.get(token);
+    if (!record) return { ok: false, reason: "NOT_FOUND" };
+    if (this.now() >= record.expiresAtMs) {
+      this.records.delete(token);
+      return { ok: false, reason: "EXPIRED" };
+    }
+    if (record.binding.owner !== owner) return { ok: false, reason: "OWNER_MISMATCH" };
+    if (record.decision) return { ok: false, reason: "USED" };
+    return {
+      ok: true,
+      binding: copyBinding(record.binding),
+      ...(record.payload ? { payload: copyPayload(record.payload) } : {}),
+    };
+  }
+
   invalidate(token: string): void {
     this.records.delete(token);
   }
@@ -123,6 +142,12 @@ export class ConfirmationStore {
     for (const [token, record] of this.records) {
       if (now >= record.expiresAtMs) this.records.delete(token);
     }
+  }
+
+  private activeCount(): number {
+    let count = 0;
+    for (const record of this.records.values()) if (!record.decision) count += 1;
+    return count;
   }
 
   private uniqueToken(): string {
