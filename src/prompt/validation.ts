@@ -197,10 +197,12 @@ function contradictsPrompt(prompt: string, answer: string): boolean {
 function internallyContradictory(prompt: string, extract: PromptExtract): boolean {
   const fields = [extract.answer, ...extract.uncertainty, ...extract.limitations];
   const publicText = fields.join(" ");
-  const hasMissingFact = fields.some((field) =>
-    /\b(?:respiratory rate|fast[- ]breathing status|age|weight|observations?|details?|facts?|findings?|information)\b[^.!?]{0,50}\b(?:not recorded|not provided|unrecorded|missing|unknown|cannot be determined|not established)\b/i.test(field));
+  const hasMissingFact = fields.some((field) => {
+    const evidence = field.replace(/\bno (?:details?|facts?|findings?|information) (?:are|were) missing\b/gi, "");
+    return /\b(?:respiratory rate|fast[- ]breathing status|age|weight|observations?|details?|facts?|findings?|information)\b[^.!?]{0,50}\b(?:not recorded|not provided|unrecorded|missing|unknown|cannot be determined|not established)\b/i.test(evidence);
+  });
   const deniesMissingFacts = fields.some((field) =>
-    /\b(?:no missing (?:details?|facts?|findings?|information)(?: were identified)?|nothing (?:is )?(?:missing|unknown))\b/i.test(field));
+    /\b(?:no missing (?:details?|facts?|findings?|information)(?: were identified)?|no (?:details?|facts?|findings?|information) (?:are|were) missing|nothing (?:is )?(?:missing|unknown))\b/i.test(field));
   if (hasMissingFact && deniesMissingFacts) return true;
 
   const hasAgeContext = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)[- ](?:years?|months?)(?:[- ]old)?\b/i.test(`${prompt} ${publicText}`);
@@ -208,12 +210,16 @@ function internallyContradictory(prompt: string, extract: PromptExtract): boolea
   if (hasAgeContext && deniesAgeContext) return true;
 
   const fastUnknown = /fast[- ]breathing(?: status)?[^.!?]{0,60}\b(?:unknown|cannot be determined|not established)\b/i.test(publicText);
-  const assertionText = publicText.replace(/\b(?:no|without) (?:claim|assertion) that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "");
+  const assertionText = publicText
+    .replace(/\b(?:no|without) (?:claim|assertion) that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "")
+    .replace(/\b(?:it is )?not established that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "");
   const fastAsserted = /\b(?:has|had|shows?|is|was) fast[- ]breathing\b|\b(?:does not have|no) fast[- ]breathing\b/i.test(assertionText);
   if (fastUnknown && fastAsserted) return true;
 
   const allAbsent = /\ball (?:seven|7)[^.!?]{0,80}\bobservations?[^.!?]{0,30}\babsent\b/i.test(publicText);
-  const observationText = publicText.replace(/\bno (?:danger |breathing |structured )?observations? (?:was|were|is|are) present\b/gi, "");
+  const observationText = publicText
+    .replace(/\bno (?:danger |breathing |structured )?observations? (?:was|were|is|are) present\b/gi, "")
+    .replace(/\bno (?:chest indrawing|stridor|central cyanosis|low oxygen|convulsions?|vomiting everything|lethargy|unconsciousness) (?:was|is) present\b/gi, "");
   const anyPresent = /\b(?:chest indrawing|stridor|central cyanosis|low oxygen|convulsions?|vomits? everything|lethargic|unconscious|cannot drink|cannot breastfeed)(?:\s+(?:is|was))?\s+present\b/i.test(observationText)
     || /\b(?:danger|breathing|structured) observations?[^.!?]{0,30}\bpresent\b/i.test(observationText);
   return allAbsent && anyPresent;
