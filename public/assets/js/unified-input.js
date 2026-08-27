@@ -6,13 +6,13 @@
   "use strict";
 
   var OBSERVATIONS = [
-    ["cannotDrinkOrBreastfeed", /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b/i],
-    ["vomitsEverything", /\bvomits? everything\b/i, /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b/i],
-    ["convulsions", /\b(?:has|had|with)\s+(?:a\s+)?convulsions?\b/i, /\bno convulsions?\b/i],
-    ["lethargicOrUnconscious", /\b(?:lethargic|unconscious)\b/i, /\b(?:not lethargic|conscious and alert|alert and responsive)\b/i],
-    ["chestIndrawing", /\bchest indrawing\s+(?:is\s+)?present\b|\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b/i],
-    ["stridorWhenCalm", /\bstridor\s+(?:when|while)\s+calm\b/i, /\bno stridor\s+(?:when|while)\s+calm\b/i],
-    ["lowOxygenOrCentralCyanosis", /\b(?:low oxygen|central cyanosis)\b/i, /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b/i],
+    ["cannotDrinkOrBreastfeed", /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b|\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["vomitsEverything", /\bvomits? everything\b/i, /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b|\bvomits? everything\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["convulsions", /\b(?:has|had|with)\s+(?:a\s+)?convulsions?\b/i, /\bno convulsions?\b|\bconvulsions?\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["lethargicOrUnconscious", /\b(?:lethargic|unconscious)\b/i, /\b(?:not lethargic|conscious and alert|alert and responsive)\b|\b(?:lethargic(?:\s+or\s+unconscious)?|unconscious)\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["chestIndrawing", /\bchest indrawing\s+(?:is\s+)?present\b|\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b|\bchest indrawing\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["stridorWhenCalm", /\bstridor\s+(?:when|while)\s+calm\b/i, /\bno stridor\s+(?:when|while)\s+calm\b|\bstridor\s+(?:when|while)\s+calm\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["lowOxygenOrCentralCyanosis", /\b(?:low oxygen|central cyanosis)\b/i, /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b|\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\s+(?:(?:is|was|were)\s+)?absent\b/i],
   ];
   var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
