@@ -102,7 +102,10 @@ test("deterministic emergency, incomplete, outside-scope, chest, and fast-rate c
   const cases = [
     [child({ dangerObservations: { ...ABSENT, convulsions: "PRESENT" } }), "EMERGENCY"],
     [child({ patientAge: undefined }), "ASSESSMENT_REQUIRED"],
-    [child({ respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" } }), "OUTSIDE_SUPPORTED_SCOPE"],
+    [child({
+      caseText: "Two year old. Cough or difficult breathing absent. All seven observations absent.",
+      respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
+    }), "OUTSIDE_SUPPORTED_SCOPE"],
     [child({ dangerObservations: { ...ABSENT, chestIndrawing: "PRESENT" } }), "PROMPT_SUPERVISED_REVIEW"],
     [child({ respiratoryAssessment: { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 40, rateCountQuality: "ONE_MINUTE_WHILE_CALM" } }), "PROMPT_SUPERVISED_REVIEW"],
   ] as const;
