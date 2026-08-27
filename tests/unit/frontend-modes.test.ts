@@ -38,6 +38,29 @@ test("clinical confirmation and safety controls are explicitly labelled", () => 
   assert.match(script, /respiratoryRatePerMinute"\)\.setAttribute\("aria-invalid"/);
 });
 
+test("production frontend has no removed audio, language-switching, or translation residue", () => {
+  assert.doesNotMatch(script, /\b(?:speaker|rec):\s*['"]<svg|function (?:encodeWav16|blobTo16kWav|langName|setUiLang)\b/);
+  assert.doesNotMatch(css, /#rec\.is-recording|\.tr-banner\s*\{/);
+  assert.doesNotMatch(css, /machine-translation|FR\/ES/i);
+});
+
+test("reviewed frontend functions stay within the Phase 7 fifty-line threshold", () => {
+  const starts = [...script.matchAll(/^  (?:async )?function ([A-Za-z0-9_]+)\(/gm)];
+  const targets = new Set(["updateDangerChecklist", "refreshHealth", "sendContinuation", "handleEvent", "runAssess", "runPrompt"]);
+  for (let index = 0; index < starts.length; index++) {
+    const name = starts[index][1];
+    if (!targets.has(name)) continue;
+    const end = starts[index + 1]?.index ?? script.length;
+    const lines = script.slice(starts[index].index, end).trimEnd().split("\n").length;
+    assert.ok(lines <= 50, `${name} spans ${lines} lines`);
+  }
+});
+
+test("mobile landing navigation preserves the shared horizontal gutter", () => {
+  const landingCss = readFileSync(new URL("../../public/assets/css/landing.css", import.meta.url), "utf8");
+  assert.match(landingCss, /@media\s*\(max-width:\s*680px\)[^{]*\{[^}]*\.nav-in\s*\{[^}]*padding-inline:\s*var\(--s-5\)/s);
+});
+
 test("submitted-prompt shortcuts are absent while shared recovery regions remain", () => {
   assert.equal(page.querySelector("#promptExample1, #promptExample2, #runPrompt"), null);
   assert.ok(page.querySelector("#intentChoice[aria-live=polite]"));

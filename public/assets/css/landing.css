@@ -7,7 +7,10 @@
 .nav-links a:not(.btn){ font-size:14.5px; color:var(--mut); text-decoration:none; transition:color var(--t-ui) var(--ease); }
 @media (hover: hover){ .nav-links a:not(.btn):hover{ color:var(--ink); } }
 .btn--sm{ min-height:44px; padding:0 18px; font-size:15px; }
-@media (max-width:680px){ .nav-links a:not(.btn){ display:none; } }
+@media (max-width:680px){
+  .nav-in{ padding-inline:var(--s-5); }
+  .nav-links a:not(.btn){ display:none; }
+}
 
 /* hero */
 .hero{ padding:74px 0 48px; display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center; }

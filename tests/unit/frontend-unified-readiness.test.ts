@@ -36,7 +36,9 @@ const frontend = require("../../public/assets/js/triage.js") as {
   handleUnifiedInput(): void;
   unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null; presentationRevision: number | null };
   focusMissingField(field: string): void;
-  clinicalState: { confirmationToken: string | null; continuationToken: string | null };
+  renderProvisional(data: Record<string, unknown>): void;
+  promptState: { runId: number; abortController: AbortController | null };
+  clinicalState: { confirmationToken: string | null; continuationToken: string | null; phase: string };
 };
 
 function input(): HTMLTextAreaElement {
@@ -84,6 +86,66 @@ test("editing the narrative invalidates prior candidates and stale results", () 
   assert.ok(frontend.unifiedState.revision > priorRevision);
   assert.deepEqual(frontend.unifiedState.candidate?.patientAge, { value: 3, unit: "years" });
   assert.equal(result.classList.contains("hidden"), true);
+});
+
+test("the example chip owns a new revision and aborts stale prompt presentation", async () => {
+  requestResponder = async (url) => {
+    if (url === "/assist") return new Promise<Response>(() => {});
+    return new Response("event: done\ndata: {}\n\n", { status: 200 });
+  };
+  input().value = "Explain why a checklist must be completed.";
+  frontend.handleUnifiedInput();
+  const stalePrompt = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const oldRevision = frontend.unifiedState.revision;
+  const oldRunId = frontend.promptState.runId;
+  const oldSignal = frontend.promptState.abortController?.signal;
+  page.getElementById("result")!.classList.remove("hidden");
+  page.getElementById("card")!.textContent = "Old terminal card";
+
+  (page.querySelector(".seed") as HTMLButtonElement).click();
+
+  assert.equal(frontend.unifiedState.revision, oldRevision + 1);
+  assert.ok(frontend.promptState.runId > oldRunId);
+  assert.equal(oldSignal?.aborted, true);
+  assert.equal(page.getElementById("result")!.classList.contains("hidden"), true);
+  assert.equal(page.getElementById("card")!.textContent, "");
+  assert.match(input().value, /18 month old/i);
+  assert.equal((page.getElementById("patientAgeValue") as HTMLInputElement).value, "18");
+  void stalePrompt;
+});
+
+test("a rejected old confirmation cannot write into the next general revision", async () => {
+  let rejectConfirmation!: (error: Error) => void;
+  requestResponder = async (url) => {
+    if (url === "/triage/confirm") return new Promise<Response>((_resolve, reject) => { rejectConfirmation = reject; });
+    if (url === "/assist") return new Response('event: answer\ndata: {"answer":"Current answer.","uncertainty":[],"limitations":[]}\n\n');
+    return new Response("event: done\ndata: {}\n\n", { status: 200 });
+  };
+  frontend.renderProvisional({ token: "old-confirmation", classification: "MALARIA", protocol: "IMCI" });
+  (page.getElementById("confirmAssessment") as HTMLButtonElement).click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  input().value = "Explain why a checklist must be completed.";
+  frontend.handleUnifiedInput();
+  rejectConfirmation(new Error("old confirmation network failed"));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await frontend.runUnified();
+
+  assert.equal(page.getElementById("err")!.textContent, "");
+  assert.equal(page.getElementById("sharedAnswer")!.textContent.includes("Current answer."), true);
+});
+
+test("broader WHO recovery omits respiratory-only missing fields", async () => {
+  input().value = "Two year old with fever.";
+  frontend.handleUnifiedInput();
+  (page.getElementById("assessmentFocus") as HTMLSelectElement).value = "BROADER_WHO";
+  await frontend.runUnified();
+
+  const missing = page.getElementById("missingReview")!.textContent ?? "";
+  assert.match(missing, /Cannot drink or breastfeed/i);
+  assert.doesNotMatch(missing, /Cough or difficult breathing|Breaths per minute|Count quality/i);
+  (page.getElementById("assessmentFocus") as HTMLSelectElement).value = "RESPIRATORY";
 });
 
 test("tri-state radios fill their effective 44-pixel semantic labels", () => {

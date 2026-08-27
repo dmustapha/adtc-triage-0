@@ -8,11 +8,9 @@
   // Inline SVG icons (no emoji in a clinical tool). Decorative: aria-hidden so screen
   // readers skip the path noise; the surrounding text carries the meaning.
   var ICON = {
-    speaker: '<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>',
     guide: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h7M9 13h7M9 17h4"/></svg>',
     alert: '<svg aria-hidden="true" class="sev-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 8v5M12 16.5v.5"/><path d="M10.3 3.8 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/></svg>',
     check: '<svg aria-hidden="true" class="sev-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
-    rec: '<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>',
     stop: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
     checkSm: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
     shield: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
@@ -20,29 +18,22 @@
   };
 
   // English-only public assessment copy. Templates use {placeholder} substitution.
-  var I18N = {
-    en: {
-      langName: { en: "English" },
+  var COPY = {
       reason_search: "Checking supporting references", reason_read: "Supporting reference found", reason_think: "Preparing the assessment summary",
       st_detect: "Recorded assessment received", st_retrieve: "Checked {n} local reference passages",
       st_reason: "Local model-assisted review", st_summarize: "Prepared assessment summary",
-      d_langdetect: "structured observations", d_retrieval: "local reference lookup", d_medpsy: "QVAC SDK 0.13.3 · on-device", d_summary: "bounded local review",
+      d_langdetect: "structured observations", d_retrieval: "local reference lookup", d_medpsy: "local model · on-device", d_summary: "bounded local review",
       cite_from: "Supporting reference", cite_from_generic: "Supporting reference", cite_fixed: "Fixed policy reference", cite_retrieved: "Retrieved WHO reference", cite_src: "{doc}, page {page}.",
       outcome: "Assessment outcome", observations: "Recorded observations", uncertainty: "Uncertainty", reference: "Supporting reference",
       model_summary: "Model-assisted summary", source_excerpt: "Retrieved WHO excerpt", input_authority: "How this result was produced",
       abstain_msg: "This assessment is outside the supported scope. Escalate to a qualified clinician.",
       step2: "Assessment outcome",
-    },
   };
-  var uiLang = "en";
   function t(key, params) {
-    var dict = I18N[uiLang] || I18N.en;
-    var s = dict[key] != null ? dict[key] : (I18N.en[key] != null ? I18N.en[key] : key);
+    var s = COPY[key] != null ? COPY[key] : key;
     if (params) for (var k in params) s = s.split("{" + k + "}").join(params[k]);
     return s;
   }
-  function langName(code) { return (I18N[uiLang] && I18N[uiLang].langName[code]) || code; }
-  function setUiLang(code) { if (I18N[code]) uiLang = code; }
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -161,7 +152,7 @@
     return "unsupported";
   }
 
-  function updateDangerChecklist() {
+  function checklistState() {
     var structured = readStructuredDanger();
     var values = structured.dangerObservations;
     var assessed = DANGER_SIGNS.filter(function (sign) { return values[sign[0]] !== "NOT_ASSESSED"; }).length;
@@ -185,35 +176,51 @@
     var weightText = $("patientWeightKg") ? $("patientWeightKg").value.trim() : "";
     var weightReady = !weightText || (Number(weightText) >= 0.5 && Number(weightText) <= 300);
     var ready = policyReady && narrativeReady && weightReady;
-    if ($("patientAgeValue")) $("patientAgeValue").setAttribute("aria-invalid", String(Boolean($("patientAgeValue").value) && !ageReady));
-    if ($("patientWeightKg")) $("patientWeightKg").setAttribute("aria-invalid", String(!weightReady));
+    return { values: values, assessed: assessed, band: band, ageReady: ageReady, emergency: emergency,
+      respiratory: respiratory, broaderFocus: broaderFocus, rateReady: rateReady, chestReview: chestReview,
+      respiratoryReady: respiratoryReady, policyReady: policyReady, narrativeReady: narrativeReady,
+      weightReady: weightReady, ready: ready };
+  }
+
+  function renderChecklistValidity(state) {
+    if ($("patientAgeValue")) $("patientAgeValue").setAttribute("aria-invalid", String(Boolean($("patientAgeValue").value) && !state.ageReady));
+    if ($("patientWeightKg")) $("patientWeightKg").setAttribute("aria-invalid", String(!state.weightReady));
     document.querySelectorAll("[data-danger-key]").forEach(function (fieldset) {
-      var missing = values[fieldset.dataset.dangerKey] === "NOT_ASSESSED";
-      fieldset.setAttribute("aria-invalid", String(band === "young-child" && !emergency && missing));
+      var missing = state.values[fieldset.dataset.dangerKey] === "NOT_ASSESSED";
+      fieldset.setAttribute("aria-invalid", String(state.band === "young-child" && !state.emergency && missing));
     });
-    var breathingIncomplete = band === "young-child" && !broaderFocus && !emergency && !respiratoryReady;
+    var breathingIncomplete = state.band === "young-child" && !state.broaderFocus && !state.emergency && !state.respiratoryReady;
     if ($("respiratoryAssessment")) $("respiratoryAssessment").setAttribute("aria-invalid", String(breathingIncomplete));
-    var rateRequired = breathingIncomplete && respiratory.coughOrDifficultBreathing === "PRESENT" && !chestReview;
-    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").setAttribute("aria-invalid", String(rateRequired && !rateReady));
-    if ($("rateCountQuality")) $("rateCountQuality").setAttribute("aria-invalid", String(rateRequired && respiratory.rateCountQuality !== "ONE_MINUTE_WHILE_CALM"));
-    var status = assessed + " of " + DANGER_SIGNS.length + " signs assessed.";
-    if (emergency) status += " Emergency observation ready for assessment.";
-    else if (policyReady && !narrativeReady) status += " Describe the recorded case to continue.";
-    else if (policyReady && !weightReady) status += " Weight must be between 0.5 and 300 kg, or left blank.";
-    else if (adultReady) status += " Ready for adult WHO assessment.";
-    else if (ready && broaderFocus) status += " Ready for broader WHO assessment.";
-    else if (ready) status += " Ready for respiratory assessment.";
-    else if (!ageReady) status += " Supported age required: 2 months to under 5 years, or 18 years and older.";
-    else if (assessed === DANGER_SIGNS.length) status += " Complete the breathing assessment.";
-    if ($("dangerStatus")) $("dangerStatus").textContent = status;
+    var rateRequired = breathingIncomplete && state.respiratory.coughOrDifficultBreathing === "PRESENT" && !state.chestReview;
+    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").setAttribute("aria-invalid", String(rateRequired && !state.rateReady));
+    if ($("rateCountQuality")) $("rateCountQuality").setAttribute("aria-invalid", String(rateRequired && state.respiratory.rateCountQuality !== "ONE_MINUTE_WHILE_CALM"));
+  }
+
+  function checklistStatus(state) {
+    var status = state.assessed + " of " + DANGER_SIGNS.length + " signs assessed.";
+    if (state.emergency) return status + " Emergency observation ready for assessment.";
+    if (state.policyReady && !state.narrativeReady) return status + " Describe the recorded case to continue.";
+    if (state.policyReady && !state.weightReady) return status + " Weight must be between 0.5 and 300 kg, or left blank.";
+    if (state.band === "adult") return status + " Ready for adult WHO assessment.";
+    if (state.ready && state.broaderFocus) return status + " Ready for broader WHO assessment.";
+    if (state.ready) return status + " Ready for respiratory assessment.";
+    if (!state.ageReady) return status + " Supported age required: 2 months to under 5 years, or 18 years and older.";
+    if (state.assessed === DANGER_SIGNS.length) return status + " Complete the breathing assessment.";
+    return status;
+  }
+
+  function updateDangerChecklist() {
+    var state = checklistState();
+    renderChecklistValidity(state);
+    if ($("dangerStatus")) $("dangerStatus").textContent = checklistStatus(state);
     if ($("dangerSummary")) {
       $("dangerSummary").textContent = "Recorded checklist: " + DANGER_SIGNS.map(function (sign) {
-        var value = values[sign[0]].toLowerCase().replace("_", " ");
+        var value = state.values[sign[0]].toLowerCase().replace("_", " ");
         return sign[1] + ": " + value.charAt(0).toUpperCase() + value.slice(1);
       }).join("; ") + ".";
     }
     if ($("assess") && !assessCtl) $("assess").disabled = !Boolean(clinicalInput() && clinicalInput().value.trim());
-    return ready;
+    return state.ready;
   }
 
   function updateUnifiedReadiness() {
@@ -230,9 +237,11 @@
     DANGER_SIGNS.forEach(function (sign) {
       if (structured.dangerObservations[sign[0]] === "NOT_ASSESSED") missing.push(sign[0]);
     });
+    var broaderFocus = $("assessmentFocus") && $("assessmentFocus").value === "BROADER_WHO";
     var breathing = structured.respiratoryAssessment;
-    if (!breathing) missing.push("respiratoryConcern");
-    else if (breathing.coughOrDifficultBreathing === "PRESENT") {
+    if (!breathing) {
+      if (!broaderFocus) missing.push("respiratoryConcern");
+    } else if (breathing.coughOrDifficultBreathing === "PRESENT") {
       if (!Number.isInteger(breathing.respiratoryRatePerMinute)) missing.push("respiratoryRatePerMinute");
       if (breathing.rateCountQuality !== "ONE_MINUTE_WHILE_CALM") missing.push("rateCountQuality");
     }
@@ -412,120 +421,105 @@
     next.click();
   }
 
-  // ---- guidelines loaded count (for the live readout) + empty-store setup banner (H-7) ----
-  function refreshHealth() {
-  fetch("/health").then(function (r) { return r.json(); }).then(function (h) {
-    if ($("hChunks")) $("hChunks").textContent = h.chunks != null ? h.chunks : "·";
-
-    // Header badge: drive it from the SERVER's egress guard, not navigator.onLine. `navigator.onLine`
-    // reports network REACHABILITY (a judge on wifi sees "Online", which wrongly implies cloud use); the
-    // real guarantee is that the server's egress guard is armed + strict with 0 violations this session.
-    var eg = h.egress || {};
+  function clearHealthTruth() {
     var net = $("net");
-    if (net && eg.armed) {
-      var btxt = net.querySelector(".badge-txt");
-      if (btxt) btxt.textContent = "On-device";
-      net.classList.add("is-offline");   // accent styling = the confident, guaranteed state
-      net.classList.remove("is-online");
-      net.dataset.egress = "1";           // claim the badge so net.js won't repaint it (see net.js)
-      net.title = "On-device only. Egress guard armed" + (eg.strict ? " (strict)" : "") +
-        " — network calls this session: " + (eg.violations || 0) + " blocked.";
+    if (net) {
+      var text = net.querySelector(".badge-txt");
+      if (text) text.textContent = "Runtime proof unavailable";
+      net.classList.remove("is-offline", "is-online");
+      delete net.dataset.egress;
+      net.title = "Server egress status is unavailable.";
     }
-
-    // On-device proof chips: the egress guarantee + the resident model, both read from /health.
     var proof = $("odProof");
-    if (proof) {
-      var chips = [];
-      if (eg.armed) {
-        chips.push(
-          '<span class="od-chip od-chip--seal">' + ICON.shield +
-          "Network calls this session: " + (eg.violations || 0) +
-          (eg.strict ? " &middot; egress blocked (strict)" : "") + "</span>"
-        );
-      }
-      var residents = Array.isArray(h.residentModels) ? h.residentModels : [];
-      if (h.medpsy && residents.indexOf("medpsy") !== -1) {
-        chips.push('<span class="od-chip">' + ICON.chip + "MedPsy " + esc(String(h.medpsy).toUpperCase()) + " &middot; runs on this Mac</span>");
-      }
-      if (chips.length) { proof.innerHTML = chips.join(""); proof.hidden = false; }
-    }
+    if (proof) { proof.innerHTML = ""; proof.hidden = true; }
+  }
 
-    // The RAG store is not ready if no chunks are loaded (citation map missing) OR the native vector store
-    // returned no hits on the startup self-test (ragLive===false — store wiped). Either way every triage
-    // would abstain, so surface a loud, actionable banner instead of letting it look like intended behavior.
-    var banner = $("setupBanner");
-    if (banner && h.ready === false) {
-      if (h.inference && h.inference.recoveryRequired) {
-        banner.innerHTML = "<strong>Local inference restart required.</strong> Stop and restart the supported app server before retrying.";
-      } else if (h.chunks === 0 || h.citationMapHealthy === false || h.ragLive === false) {
-        banner.innerHTML = "<strong>WHO reference store not ready.</strong> Restore the verified protocol files, run <code>npm run ingest</code>, then restart the supported app server.";
-      } else {
-        banner.innerHTML = "<strong>Runtime loading.</strong> Keep this page open while the local model and WHO reference engine finish loading.";
-      }
-      banner.classList.remove("hidden");
-      setTimeout(refreshHealth, 2000);
-    } else if (banner && h.ready === true) {
-      banner.classList.add("hidden");
+  function renderHealthBadge(eg) {
+    var net = $("net");
+    if (!eg.armed) { clearHealthTruth(); return; }
+    if (!net) return;
+    var btxt = net.querySelector(".badge-txt");
+    if (btxt) btxt.textContent = "On-device";
+    net.classList.add("is-offline");
+    net.classList.remove("is-online");
+    net.dataset.egress = "1";
+    net.title = "On-device only. Egress guard armed" + (eg.strict ? " (strict)" : "") +
+      " — network calls this session: " + (eg.violations || 0) + " blocked.";
+  }
+
+  function renderHealthProof(h, eg) {
+    var proof = $("odProof");
+    if (!proof) return;
+    var chips = [];
+    if (eg.armed) {
+      chips.push('<span class="od-chip od-chip--seal">' + ICON.shield + "Network calls this session: " +
+        (eg.violations || 0) + (eg.strict ? " &middot; egress blocked (strict)" : "") + "</span>");
     }
-  }).catch(function () {
+    var residents = Array.isArray(h.residentModels) ? h.residentModels : [];
+    if (h.medpsy && residents.indexOf("medpsy") !== -1) {
+      chips.push('<span class="od-chip">' + ICON.chip + "MedPsy " + esc(String(h.medpsy).toUpperCase()) + " &middot; runs on this Mac</span>");
+    }
+    proof.innerHTML = chips.join("");
+    proof.hidden = chips.length === 0;
+  }
+
+  function renderSetupHealth(h) {
+    var banner = $("setupBanner");
+    if (!banner || h.ready == null) return;
+    if (h.ready === true) { banner.classList.add("hidden"); return; }
+    if (h.inference && h.inference.recoveryRequired) {
+      banner.innerHTML = "<strong>Local inference restart required.</strong> Stop and restart the supported app server before retrying.";
+    } else if (h.chunks === 0 || h.citationMapHealthy === false || h.ragLive === false) {
+      banner.innerHTML = "<strong>WHO reference store not ready.</strong> Restore the verified protocol files, run <code>npm run ingest</code>, then restart the supported app server.";
+    } else banner.innerHTML = "<strong>Runtime loading.</strong> Keep this page open while the local model and WHO reference engine finish loading.";
+    banner.classList.remove("hidden");
+  }
+
+  function observeRuntimeIdentity(h) {
+    var runtime = h.model && h.model.productRuntime;
+    if (!runtime || !runtime.name || !runtime.version) return;
+    COPY.d_medpsy = String(runtime.name) + " " + String(runtime.version) + " · on-device";
+  }
+
+  function scheduleHealthRefresh(delay) {
+    var timer = setTimeout(refreshHealth, delay);
+    if (timer && typeof timer.unref === "function") timer.unref();
+  }
+
+  // Keep proof current after readiness because queue recovery can change without a reload.
+  async function refreshHealth() {
+    try {
+      var response = await fetch("/health");
+      var h = await response.json();
+      if ($("hChunks")) $("hChunks").textContent = h.chunks != null ? h.chunks : "·";
+      var eg = h.egress || {};
+      renderHealthBadge(eg);
+      renderHealthProof(h, eg);
+      renderSetupHealth(h);
+      observeRuntimeIdentity(h);
+      if (h.ready != null) scheduleHealthRefresh(h.ready === true ? 10000 : 2000);
+    } catch (error) {
+    clearHealthTruth();
     var banner = $("setupBanner");
     if (banner) {
       banner.innerHTML = "<strong>Local runtime unreachable.</strong> Confirm the supported server is running, then retry this page.";
       banner.classList.remove("hidden");
     }
     if ($("hChunks")) $("hChunks").textContent = "Unavailable";
-    setTimeout(refreshHealth, 2000);
-  });
+    var timer = setTimeout(refreshHealth, 2000);
+    if (timer && typeof timer.unref === "function") timer.unref();
+    }
   }
   refreshHealth();
 
-  // ---- dormant baseline audio helpers: unreachable in the English text workflow ----
-  // Whisper (the STT model) expects 16 kHz mono; browsers capture at 44.1/48 kHz and the @qvac SDK does
-  // NOT resample, so a raw recording transcribes to garbage (or empty for webm/opus). Decode the blob with
-  // the browser's own audio stack and re-render at 16 kHz mono, then hand /transcribe a clean WAV it reads
-  // correctly. Portable: decodeAudioData handles Chrome's webm/opus AND Safari's mp4/aac, so this also
-  // normalises the container across browsers. No server dependency (no ffmpeg needed on the host).
-  function encodeWav16(float32, sampleRate) {
-    var len = float32.length;
-    var buf = new ArrayBuffer(44 + len * 2);
-    var view = new DataView(buf);
-    var ws = function (o, s) { for (var i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
-    ws(0, "RIFF"); view.setUint32(4, 36 + len * 2, true); ws(8, "WAVE");
-    ws(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
-    view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true); view.setUint16(34, 16, true);
-    ws(36, "data"); view.setUint32(40, len * 2, true);
-    var o = 44;
-    for (var i = 0; i < len; i++) { var s = Math.max(-1, Math.min(1, float32[i])); view.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7fff, true); o += 2; }
-    return new Blob([view], { type: "audio/wav" });
-  }
-  async function blobTo16kWav(blob) {
-    var AC = window.AudioContext || window["webkitAudioContext"];
-    var ctx = new AC();
-    try {
-      var decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
-      var rate = 16000;
-      var frames = Math.max(1, Math.ceil(decoded.duration * rate));
-      var off = new OfflineAudioContext(1, frames, rate);
-      var src = off.createBufferSource();
-      src.buffer = decoded;
-      src.connect(off.destination);
-      src.start();
-      var rendered = await off.startRendering();
-      return encodeWav16(rendered.getChannelData(0), rate);
-    } finally {
-      try { ctx.close(); } catch (e) {}
-    }
-  }
-
-  // ---- language example chips: one tap fills a real case (advertises the multilingual pipeline) ----
-  var seedRow = $("seeds");
-  if (seedRow) {
+  function wireExampleSeeds() {
+    var seedRow = $("seeds");
+    if (!seedRow) return;
     seedRow.querySelectorAll(".seed").forEach(function (b) {
       b.addEventListener("click", function () {
         var t = b.getAttribute("data-fill") || "";
         var ta = clinicalInput();
-        if (ta) { ta.value = t; ta.focus(); }
+        if (ta) { ta.value = t; handleUnifiedInput(); ta.focus(); }
         if (b.dataset.ageValue && $("patientAgeValue")) $("patientAgeValue").value = b.dataset.ageValue;
         if (b.dataset.ageUnit && $("patientAgeUnit")) $("patientAgeUnit").value = b.dataset.ageUnit;
         if (b.dataset.observations === "absent") {
@@ -542,11 +536,12 @@
           $("respiratoryRatePerMinute").value = b.dataset.respiratoryRate;
         }
         if ($("rateCountQuality")) $("rateCountQuality").value = "ONE_MINUTE_WHILE_CALM";
-        updateDangerChecklist();
+        handleStructuredEdit();
         if ($("status")) $("status").textContent = "";
       });
     });
   }
+  wireExampleSeeds();
 
   // ---- render ----
   function renderCitation(c) {
@@ -958,10 +953,7 @@
     }
   }
 
-  async function sendContinuation() {
-    if (!clinicalState.continuationToken || clinicalState.continuationPending || assessCtl) return;
-    var token = clinicalState.continuationToken;
-    var generation = clinicalState.generation;
+  function beginContinuation() {
     clinicalState.continuationPending = true;
     clinicalState.continuationToken = null;
     if ($("continueAssessment")) $("continueAssessment").disabled = true;
@@ -970,32 +962,41 @@
     gotTerminal = false;
     $("reasoningWrap").classList.remove("hidden");
     startReasonTimer();
+  }
+
+  async function consumeContinuation(response, generation) {
+    if (!response.ok || !response.body) {
+      var failure = { error: "Continuation was not accepted." };
+      try { failure = await response.json(); } catch (error) {}
+      throw new Error(failure.error);
+    }
     var buffer = "";
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    for (;;) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      var split;
+      while ((split = buffer.indexOf("\n\n")) >= 0) {
+        if (generation === clinicalState.generation) handleEvent(buffer.slice(0, split));
+        buffer = buffer.slice(split + 2);
+      }
+    }
+    if (generation === clinicalState.generation && !gotTerminal) throw new Error("No validated continuation result was received.");
+  }
+
+  async function sendContinuation() {
+    if (!clinicalState.continuationToken || clinicalState.continuationPending || assessCtl) return;
+    var token = clinicalState.continuationToken;
+    var generation = clinicalState.generation;
+    beginContinuation();
     try {
       var response = await fetch("/triage/continue", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: token }),
-        signal: assessCtl.signal,
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token }), signal: assessCtl.signal,
       });
-      if (!response.ok || !response.body) {
-        var failure = { error: "Continuation was not accepted." };
-        try { failure = await response.json(); } catch (e) {}
-        throw new Error(failure.error);
-      }
-      var reader = response.body.getReader();
-      var decoder = new TextDecoder();
-      for (;;) {
-        var chunk = await reader.read();
-        if (chunk.done) break;
-        buffer += decoder.decode(chunk.value, { stream: true });
-        var split;
-        while ((split = buffer.indexOf("\n\n")) >= 0) {
-          if (generation === clinicalState.generation) handleEvent(buffer.slice(0, split));
-          buffer = buffer.slice(split + 2);
-        }
-      }
-      if (generation === clinicalState.generation && !gotTerminal) throw new Error("No validated continuation result was received.");
+      await consumeContinuation(response, generation);
     } catch (error) {
       if (generation === clinicalState.generation) {
         $("err").textContent = error && error.name === "AbortError"
@@ -1066,6 +1067,9 @@
         transitionToRejected();
         if ($("confirmationPlan")) $("confirmationPlan").textContent = "The provisional classification was rejected. No reference actions were shown.";
       }
+    } catch (error) {
+      if (generation !== clinicalState.generation || token !== clinicalState.confirmationToken || clinicalState.phase !== "PROVISIONAL") return;
+      throw error;
     } finally {
       if (generation === clinicalState.generation) {
         clinicalState.confirmationPending = false;
@@ -1122,21 +1126,29 @@
   // On a terminal frame, close out the last spinning step so the readout never freezes mid-spin.
   function finishStages() { markActiveDone(); }
 
-  function handleEvent(block, owner) {
-    if (owner && !ownsClinicalRun(owner)) return;
-    // SSE comment frames (keep-alives) start with ":". Ignore them, they carry no event.
-    if (block.charAt(0) === ":") return;
+  function parseClinicalFrame(block) {
+    if (block.charAt(0) === ":") return null;
     var ev = (block.match(/^event: (.*)$/m) || [])[1];
     var dataLine = (block.match(/^data: (.*)$/m) || [])[1];
-    if (!ev || !dataLine) return;
-    var d;
-    // A malformed frame must be skipped, not kill the whole stream.
-    try { d = JSON.parse(dataLine); } catch (e) {
+    if (!ev || !dataLine) return null;
+    try { return { event: ev, data: JSON.parse(dataLine) }; }
+    catch (error) { return { malformed: true }; }
+  }
+
+  function handleEvent(block, owner) {
+    if (owner && !ownsClinicalRun(owner)) return;
+    var frame = parseClinicalFrame(block);
+    if (!frame) return;
+    if (frame.malformed) {
       markClinicalTerminal(owner);
       $("err").textContent = "The local assessment response was malformed. Restart the supported app before retrying.";
       $("reasoningWrap").classList.add("hidden");
       return;
     }
+    dispatchClinicalEvent(frame.event, frame.data, owner);
+  }
+
+  function dispatchClinicalEvent(ev, d, owner) {
     if (ev === "stage") {
       if (d.key === "detect") {
         var h2 = $("h-guideline"); if (h2) h2.textContent = t("step2");
@@ -1236,16 +1248,7 @@
     return request;
   }
 
-  async function runAssess() {
-    var request = reviewedClinicalRequest();
-    if (!request) return;
-    var caseText = request.caseText;
-    if (!caseText) { $("status").textContent = "Describe or record a case first."; clinicalInput().setAttribute("aria-invalid", "true"); clinicalInput().focus(); return; }
-    if (!updateDangerChecklist()) { $("status").textContent = $("dangerStatus").textContent || "Complete the recorded assessment first."; return; }
-    // Re-entrancy guard: a run is already in flight (assessCtl set). The keyboard path (Ctrl/Cmd+Enter)
-    // bypasses the button, so without this a second run would overwrite assessCtl + the shared timer
-    // interval (stopping the live one) and start a second /triage the single-job engine only queues.
-    if (assessCtl) return;
+  function beginAssessmentRun() {
     gotTerminal = false;
     invalidateConfirmation();
     clinicalState.recordChangedDuringRun = false;
@@ -1258,7 +1261,6 @@
       presentationRevision: unifiedState.presentationRevision,
       terminal: false,
     };
-    // Toggle the button into Stop mode (kept enabled so the worker can abort). Restored in `finally`.
     var assessLabel = $("assess").innerHTML;
     clinicalState.assessLabel = assessLabel;
     $("assess").innerHTML = ICON.stop + "Stop";
@@ -1274,75 +1276,83 @@
     $("reasoning").textContent = "";
     if ($("plSteps")) $("plSteps").innerHTML = "";
     lastCard = null;
-    uiLang = "en"; // reset until the detect stage sets the case's language
     $("reasonLabel").textContent = t("reason_search");
     $("hTtft").textContent = "·"; $("hTps").textContent = "·"; $("hDev").textContent = "·";
     startReasonTimer();
     $("result").scrollIntoView({ behavior: "smooth", block: "start" });
-    var buf = "";
-    try {
-      var r = await fetch("/triage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-        signal: controller.signal
-      });
-      if (!ownsClinicalRun(owner)) return;
-      // Guard before reading the stream: a non-2xx or bodyless response has no readable stream.
-      if (!r.ok || !r.body) {
-        var msg = "Could not run assessment (" + r.status + ").";
-        try {
-          var j = await r.json();
-          if (!ownsClinicalRun(owner)) return;
-          if (j && j.error) msg = j.error;
-          if (j && Array.isArray(j.conflicts)) renderMissingReview(j.conflicts);
-        } catch (e) {}
-        throw new Error(msg);
-      }
-      var reader = r.body.getReader();
-      var dec = new TextDecoder();
-      for (;;) {
-        var res = await reader.read();
+    return { owner: owner, controller: controller, assessLabel: assessLabel };
+  }
+
+  async function readAssessmentResponse(response, owner) {
+    if (!response.ok || !response.body) {
+      var message = "Could not run assessment (" + response.status + ").";
+      try {
+        var failure = await response.json();
         if (!ownsClinicalRun(owner)) return;
-        if (res.done) break;
-        buf += dec.decode(res.value, { stream: true });
-        var i;
-        while ((i = buf.indexOf("\n\n")) >= 0) { handleEvent(buf.slice(0, i), owner); buf = buf.slice(i + 2); }
-      }
-      // Stream closed cleanly but no card/abstain/error arrived: do not leave a silent blank card.
-      if (!owner.terminal) {
-        $("err").textContent = "The assessment did not finish. Try again.";
-        $("reasoningWrap").classList.add("hidden");
-      }
-    } catch (e) {
+        if (failure && failure.error) message = failure.error;
+        if (failure && Array.isArray(failure.conflicts)) renderMissingReview(failure.conflicts);
+      } catch (error) {}
+      throw new Error(message);
+    }
+    var buf = "";
+    var reader = response.body.getReader();
+    var dec = new TextDecoder();
+    for (;;) {
+      var res = await reader.read();
       if (!ownsClinicalRun(owner)) return;
-      // H-2: a worker-initiated Stop aborts the fetch → AbortError. That is not a failure; show a calm
-      // "Stopped." and clear the reasoning box rather than an error.
-      if (e && e.name === "AbortError") {
-        $("status").textContent = clinicalState.recordChangedDuringRun
-          ? "Recorded data changed. Run the assessment again."
-          : "Stopped.";
-        $("err").textContent = "";
-      } else {
-        $("err").textContent = "Could not run assessment. " + e.message;
-      }
-      $("reasoningWrap").classList.add("hidden");
-    } finally {
-      // Restore the button + timer in finally so a Stop or a mid-stream interruption never leaves the
-      // button stuck in Stop mode or the timer running.
-      if (ownsClinicalRun(owner)) {
-        stopReasonTimer();
-        $("assess").disabled = false;
-        $("assess").innerHTML = assessLabel;
-        $("assess").classList.remove("is-stopping");
-        $("assess").onclick = runUnified;
-        assessCtl = null;
-        clinicalState.assessLabel = null;
-        $("result").removeAttribute("aria-busy");
-      } else if (assessCtl === controller) {
-        assessCtl = null;
+      if (res.done) break;
+      buf += dec.decode(res.value, { stream: true });
+      var index;
+      while ((index = buf.indexOf("\n\n")) >= 0) {
+        handleEvent(buf.slice(0, index), owner);
+        buf = buf.slice(index + 2);
       }
     }
+    if (!owner.terminal) {
+      $("err").textContent = "The assessment did not finish. Try again.";
+      $("reasoningWrap").classList.add("hidden");
+    }
+  }
+
+  function renderAssessmentFailure(error, owner) {
+    if (!ownsClinicalRun(owner)) return;
+    if (error && error.name === "AbortError") {
+      $("status").textContent = clinicalState.recordChangedDuringRun
+        ? "Recorded data changed. Run the assessment again." : "Stopped.";
+      $("err").textContent = "";
+    } else $("err").textContent = "Could not run assessment. " + error.message;
+    $("reasoningWrap").classList.add("hidden");
+  }
+
+  function finishAssessmentRun(run) {
+    if (ownsClinicalRun(run.owner)) {
+      stopReasonTimer();
+      $("assess").disabled = false;
+      $("assess").innerHTML = run.assessLabel;
+      $("assess").classList.remove("is-stopping");
+      $("assess").onclick = runUnified;
+      assessCtl = null;
+      clinicalState.assessLabel = null;
+      $("result").removeAttribute("aria-busy");
+    } else if (assessCtl === run.controller) assessCtl = null;
+  }
+
+  async function runAssess() {
+    var request = reviewedClinicalRequest();
+    if (!request) return;
+    if (!request.caseText) { $("status").textContent = "Describe or record a case first."; clinicalInput().setAttribute("aria-invalid", "true"); clinicalInput().focus(); return; }
+    if (!updateDangerChecklist()) { $("status").textContent = $("dangerStatus").textContent || "Complete the recorded assessment first."; return; }
+    if (assessCtl) return;
+    var run = beginAssessmentRun();
+    try {
+      var response = await fetch("/triage", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request), signal: run.controller.signal,
+      });
+      if (!ownsClinicalRun(run.owner)) return;
+      await readAssessmentResponse(response, run.owner);
+    } catch (error) { renderAssessmentFailure(error, run.owner); }
+    finally { finishAssessmentRun(run); }
   }
   if ($("assess")) $("assess").onclick = runUnified;
   if ($("dangerChecklist")) {
@@ -1451,11 +1461,8 @@
     return buffer;
   }
 
-  async function runPrompt() {
-    var prompt = clinicalInput().value;
-    if (!prompt.trim()) { $("status").textContent = "Enter a request first."; clinicalInput().focus(); return; }
+  function beginPromptRun(prompt) {
     promptState.runId += 1;
-    var runId = promptState.runId;
     promptState.jobId = null;
     promptState.terminal = false;
     promptState.retryable = true;
@@ -1468,50 +1475,63 @@
     $("assess").disabled = true;
     $("cancelPrompt").hidden = false;
     $("retryPrompt").hidden = true;
+    return { runId: promptState.runId, controller: promptState.abortController };
+  }
+
+  async function readPromptResponse(response, runId) {
+    if (!response.ok) {
+      var failure = { error: "Local prompt request was not accepted.", code: "REQUEST_REJECTED", retryable: false };
+      try { failure = await response.json(); } catch (error) {}
+      promptState.retryable = failure.retryable !== false;
+      throw new Error(failure.error + (failure.code ? " (" + failure.code + ")" : ""));
+    }
+    if (!response.body) { promptState.retryable = true; throw new Error("The local prompt response had no readable stream."); }
     var buffer = "";
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    for (;;) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      buffer = consumePromptFrames(buffer, runId);
+    }
+    if (!promptState.terminal && runId === promptState.runId) {
+      promptState.terminal = true;
+      $("status").textContent = "Local assistance unavailable.";
+      promptMessage("unavailable", "Incomplete local response", { reason: "No validated terminal answer was received." });
+    }
+  }
+
+  function renderPromptFailure(error, runId) {
+    if (runId !== promptState.runId) return;
+    promptState.terminal = true;
+    if (error && error.name === "AbortError") $("status").textContent = promptState.cancelMessage || "Stopped locally.";
+    else {
+      $("status").textContent = "Local assistance unavailable.";
+      promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
+    }
+  }
+
+  function finishPromptRun(runId) {
+    if (runId !== promptState.runId) return;
+    promptState.abortController = null;
+    updatePromptReadiness();
+    $("cancelPrompt").hidden = true;
+    $("retryPrompt").hidden = !promptState.retryable;
+  }
+
+  async function runPrompt() {
+    var prompt = clinicalInput().value;
+    if (!prompt.trim()) { $("status").textContent = "Enter a request first."; clinicalInput().focus(); return; }
+    var run = beginPromptRun(prompt);
     try {
       var response = await fetch("/assist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt }),
-        signal: promptState.abortController.signal,
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt }), signal: run.controller.signal,
       });
-      if (!response.ok) {
-        var failure = { error: "Local prompt request was not accepted.", code: "REQUEST_REJECTED", retryable: false };
-        try { failure = await response.json(); } catch (e) {}
-        promptState.retryable = failure.retryable !== false;
-        throw new Error(failure.error + (failure.code ? " (" + failure.code + ")" : ""));
-      }
-      if (!response.body) { promptState.retryable = true; throw new Error("The local prompt response had no readable stream."); }
-      var reader = response.body.getReader();
-      var decoder = new TextDecoder();
-      for (;;) {
-        var chunk = await reader.read();
-        if (chunk.done) break;
-        buffer += decoder.decode(chunk.value, { stream: true });
-        buffer = consumePromptFrames(buffer, runId);
-      }
-      if (!promptState.terminal && runId === promptState.runId) {
-        promptState.terminal = true;
-        $("status").textContent = "Local assistance unavailable.";
-        promptMessage("unavailable", "Incomplete local response", { reason: "No validated terminal answer was received." });
-      }
-    } catch (error) {
-      if (runId !== promptState.runId) return;
-      promptState.terminal = true;
-      if (error && error.name === "AbortError") $("status").textContent = promptState.cancelMessage || "Stopped locally.";
-      else {
-        $("status").textContent = "Local assistance unavailable.";
-        promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
-      }
-    } finally {
-      if (runId === promptState.runId) {
-        promptState.abortController = null;
-        updatePromptReadiness();
-        $("cancelPrompt").hidden = true;
-        $("retryPrompt").hidden = !promptState.retryable;
-      }
-    }
+      await readPromptResponse(response, run.runId);
+    } catch (error) { renderPromptFailure(error, run.runId); }
+    finally { finishPromptRun(run.runId); }
   }
 
   async function cancelPrompt() {
@@ -1592,6 +1612,7 @@
       renderContinuation: renderContinuation,
       sendContinuation: sendContinuation,
       sendConfirmation: sendConfirmation,
+      refreshHealth: refreshHealth,
       clinicalState: clinicalState,
     };
   }

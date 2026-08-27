@@ -14,9 +14,9 @@ import { projectReferenceActions } from "../../src/triage/reference-actions.js";
 
 // Element IDs the app wiring + supervised assessment renderer touch.
 const IDS = [
-  "seeds", "rec", "status", "citationBox", "reasoning", "reasoningWrap", "reasonLabel", "reasonTimer",
+  "rec", "status", "citationBox", "reasoning", "reasoningWrap", "reasonLabel", "reasonTimer", "plSteps",
   "card", "err", "result", "continuationRegion", "continuationStatus",
-  "hTtft", "hTps", "hDev", "hChunks", "net", "assess",
+  "hTtft", "hTps", "hDev", "hChunks", "net", "assess", "setupBanner", "odProof",
 ];
 const DANGER_KEYS = [
   "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
@@ -29,7 +29,7 @@ const dangerControls = DANGER_KEYS.map((key) =>
     `<label><input type="radio" name="danger-${key}" value="${value}"${value === "NOT_ASSESSED" ? " checked" : ""}>${value}</label>`,
   ).join("") + "</fieldset>",
 ).join("");
-const body = `<textarea id="case"></textarea>` +
+const body = `<textarea id="case"></textarea><div id="seeds"><button class="seed" data-age-value="18" data-age-unit="months" data-observations="absent" data-respiratory-concern="PRESENT" data-respiratory-rate="32" data-fill="18 month old with cough for three days and difficult breathing; breathing counted at 32 per minute for one minute while calm; alert and drinking.">English example</button></div>` +
   `<input id="patientAgeValue" type="number"><select id="patientAgeUnit"><option value="months">Months</option><option value="years">Years</option></select>` +
   `<select id="assessmentFocus"><option value="RESPIRATORY">Respiratory</option><option value="BROADER_WHO">Broader WHO</option></select>` +
   `<input type="radio" name="respiratory-concern" value="PRESENT"><input type="radio" name="respiratory-concern" value="ABSENT"><input type="radio" name="respiratory-concern" value="NOT_ASSESSED" checked>` +
@@ -51,6 +51,7 @@ const require = createRequire(import.meta.url);
 const fe = require("../../public/assets/js/triage.js") as {
   esc: (s: string) => string;
   renderCard: (card: Record<string, unknown>) => void;
+  renderStage: (stage: Record<string, unknown>) => void;
   renderReferenceActions: (result: Record<string, unknown>) => void;
   handleEvent: (block: string) => void;
   runAssess: () => Promise<void>;
@@ -63,6 +64,7 @@ const fe = require("../../public/assets/js/triage.js") as {
   renderContinuation: (data: Record<string, unknown>) => void;
   sendContinuation: () => Promise<void>;
   sendConfirmation: (decision: "CONFIRM" | "REJECT") => Promise<void>;
+  refreshHealth: () => Promise<void>;
   clinicalState: { phase: string; confirmationToken: string | null; continuationToken: string | null };
 };
 const card = () => dom.window.document.getElementById("card")!.innerHTML;
@@ -109,6 +111,9 @@ test("breathing assessment records the WHO pathway, rate, and measurement qualit
   assert.ok(group, "a structured breathing assessment is present");
   assert.match(group?.textContent || "", /cough or difficult breathing/i);
   assert.equal(group?.querySelectorAll('input[name="respiratory-concern"]').length, 3);
+  const concernGroup = group?.querySelector("fieldset.respiratory-concern");
+  assert.ok(concernGroup, "respiratory tri-state has its own programmatic fieldset");
+  assert.match(concernGroup?.querySelector("legend")?.textContent || "", /cough or difficult breathing/i);
   assert.ok(group?.querySelector('label[for="respiratoryRatePerMinute"]'));
   assert.ok(group?.querySelector("#respiratoryRatePerMinute[type=number]"));
   assert.ok(group?.querySelector('label[for="rateCountQuality"]'));
@@ -674,6 +679,82 @@ test("runtime readiness banner rechecks until supported startup is ready", () =>
   const source = readFileSync(new URL("../../public/assets/js/triage.js", import.meta.url), "utf8");
   assert.match(source, /setTimeout\(refreshHealth,\s*2000\)/);
   assert.match(source, /h\.ready === true[\s\S]*banner\.classList\.add\("hidden"\)/);
+});
+
+test("ready health keeps truth refreshed and supplies the observed SDK identity", async () => {
+  const scheduled: number[] = [];
+  const originalTimeout = globalThis.setTimeout;
+  const originalFetch = g.fetch;
+  globalThis.setTimeout = ((unknownCallback: TimerHandler, delay?: number) => {
+    void unknownCallback;
+    scheduled.push(Number(delay));
+    return 0 as unknown as ReturnType<typeof setTimeout>;
+  }) as unknown as typeof setTimeout;
+  g.fetch = async () => ({
+    json: async () => ({
+      ready: true, chunks: 994, residentModels: ["medpsy"], medpsy: "1.7b",
+      model: { productRuntime: { name: "QVAC SDK", version: "9.8.7" } },
+      egress: { armed: true, strict: true, violations: 0 },
+    }),
+  });
+  try {
+    await fe.refreshHealth();
+    fe.renderStage({ key: "reason" });
+  } finally {
+    globalThis.setTimeout = originalTimeout;
+    g.fetch = originalFetch;
+  }
+  assert.ok(scheduled.some((delay) => delay >= 5000), "ready health schedules a bounded truth refresh");
+  assert.match(el("plSteps").textContent || "", /QVAC SDK 9\.8\.7.*on-device/i);
+});
+
+async function probeHealthTruth(responses: Array<Record<string, unknown> | Error>) {
+  const originalTimeout = globalThis.setTimeout;
+  const originalFetch = g.fetch;
+  globalThis.setTimeout = (() => 0 as unknown as ReturnType<typeof setTimeout>) as unknown as typeof setTimeout;
+  g.fetch = async () => {
+    const next = responses.shift();
+    if (next instanceof Error) throw next;
+    return { json: async () => next };
+  };
+  try {
+    await fe.refreshHealth();
+    await fe.refreshHealth();
+  } finally {
+    globalThis.setTimeout = originalTimeout;
+    g.fetch = originalFetch;
+  }
+}
+
+function resetHealthTruthDom() {
+  el("net").innerHTML = '<span class="badge-txt">Network status</span>';
+  el("net").className = "badge";
+  el("net").removeAttribute("data-egress");
+  el("net").removeAttribute("title");
+  el("odProof").hidden = true;
+  el("odProof").innerHTML = "";
+}
+
+test("health truth fails closed when an armed runtime becomes unarmed", async () => {
+  resetHealthTruthDom();
+  await probeHealthTruth([
+    { ready: true, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } },
+    { ready: false, residentModels: [], egress: { armed: false, strict: false, violations: 0 } },
+  ]);
+  assert.notEqual(el("net").dataset.egress, "1");
+  assert.match(el("net").textContent || "", /unavailable/i);
+  assert.equal(el("odProof").hidden, true);
+});
+
+test("health truth fails closed when an armed runtime becomes unreachable", async () => {
+  resetHealthTruthDom();
+  await probeHealthTruth([
+    { ready: true, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } },
+    new Error("runtime unreachable"),
+  ]);
+  assert.notEqual(el("net").dataset.egress, "1");
+  assert.match(el("net").textContent || "", /unavailable/i);
+  assert.equal(el("odProof").hidden, true);
 });
 
 test("handleEvent renders deterministic assessment-required outcomes", () => {

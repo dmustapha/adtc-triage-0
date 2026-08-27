@@ -14,7 +14,7 @@
 .step-label h2{ font-family:var(--font-display); font-size:20px; font-weight:600; margin:0; }
 .hint{ font-size:14px; color:var(--dim); margin:0 0 14px; }
 
-/* multilingual advert + example chips row */
+/* English workflow label + example chip row */
 .multiling{ font-size:13px; color:var(--dim); margin:12px 0 10px; }
 .multiling b{ color:var(--mut); font-weight:600; }
 .seeds{ display:flex; gap:9px; flex-wrap:wrap; margin-bottom:2px; }
@@ -59,7 +59,9 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .respiratory-assessment{ min-width:0; margin:0 0 12px; padding:10px 11px; border:1px solid var(--accent-line); border-radius:var(--r); }
 .respiratory-assessment>legend{ padding:0 4px; font-size:13px; font-weight:600; color:var(--ink); }
 .respiratory-grid{ display:grid; grid-template-columns:minmax(0,2fr) minmax(120px,1fr) minmax(170px,1.25fr); gap:10px; align-items:end; }
+.respiratory-grid fieldset{ min-width:0; margin:0; padding:0; border:0; }
 .respiratory-grid label,.respiratory-grid .field-label{ display:block; margin-bottom:5px; font-size:12.5px; font-weight:600; color:var(--mut); }
+.respiratory-concern>legend{ margin-bottom:5px; padding:0; font-size:12.5px; font-weight:600; color:var(--mut); }
 .respiratory-grid input[type=number],.respiratory-grid select{ width:100%; min-height:44px; padding:8px 11px; font:inherit; color:var(--ink);
   background:#0b0e0f; border:1px solid var(--line-2); border-radius:var(--r); }
 .respiratory-concern .tri-state label{ margin-bottom:0; }
@@ -79,7 +81,6 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 
 .actions{ display:flex; gap:11px; align-items:center; flex-wrap:wrap; margin-top:16px; }
 .actions .btn--primary{ font-size:17px; }
-#rec.is-recording{ background:var(--emerg); color:#fff; border-color:var(--emerg); }
 .status{ font-size:13.5px; color:var(--dim); }
 
 /* citation */
@@ -111,9 +112,6 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .verdict .tone-ROUTINE{ background:var(--routine); color:var(--accent-ink); }
 .verdict .tone-UNKNOWN{ background:var(--unknown); color:#0c0c0c; }
 .sev-note{ padding:13px 20px; background:var(--surf-2); font-size:15px; color:var(--mut); }
-/* Phase 4: machine-translation notice for FR/ES cases. The WHO citation stays English (shown below). */
-.tr-banner{ margin:0 0 12px; padding:8px 12px; font-size:13px; line-height:1.4; color:var(--accent);
-  background:var(--accent-wash); border:1px solid var(--accent-line); border-radius:6px; }
 /* H-7 empty-store setup banner: a prominent, actionable warning shown only when the RAG store is not
    ingested (otherwise every case silently abstains). Emergency-tinted so it reads as "fix this first". */
 .setup-banner{ margin:0 0 4px; padding:12px 15px; font-size:14px; line-height:1.5; color:var(--ink);

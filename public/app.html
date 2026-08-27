@@ -86,10 +86,10 @@
               <fieldset id="respiratoryAssessment" class="respiratory-assessment">
                 <legend>Breathing assessment <span>required for the cough or difficult-breathing focus</span></legend>
                 <div class="respiratory-grid">
-                  <div class="respiratory-concern">
-                    <span class="field-label">Cough or difficult breathing</span>
+                  <fieldset class="respiratory-concern">
+                    <legend>Cough or difficult breathing</legend>
                     <div class="tri-state"><label><input type="radio" name="respiratory-concern" value="PRESENT" />Present</label><label><input type="radio" name="respiratory-concern" value="ABSENT" />Absent</label><label><input type="radio" name="respiratory-concern" value="NOT_ASSESSED" checked />Not assessed</label></div>
-                  </div>
+                  </fieldset>
                   <div>
                     <label for="respiratoryRatePerMinute">Breaths per minute</label>
                     <input id="respiratoryRatePerMinute" type="number" min="1" max="200" step="1" inputmode="numeric" autocomplete="off" aria-describedby="dangerStatus" />
