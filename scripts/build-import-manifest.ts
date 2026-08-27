@@ -41,7 +41,7 @@ export const PLANNED_SOURCE_PATHS = [
 ] as const;
 
 const MODIFIED_FOR_ADTC = new Set<string>([
-  "data/protocols/README.md", "package-lock.json", "package.json", "public/app.html", "public/index.html", "public/logo.png", "public/assets/css/app.css", "public/assets/js/net.js", "public/assets/js/triage.js",
+  "data/protocols/README.md", "package-lock.json", "package.json", "public/app.html", "public/index.html", "public/logo.png", "public/assets/css/app.css", "public/assets/css/landing.css", "public/assets/js/net.js", "public/assets/js/triage.js",
   "scripts/clinical-audit.ts", "scripts/ingest-protocols.ts", "scripts/patch-sdk-zod.mjs",
   "src/config.ts", "src/qvac/engine.ts", "src/qvac/orchestrator.ts", "src/qvac/perf-logger.ts", "src/qvac/sdk.ts", "src/rag/store.ts", "src/server.ts",
   "src/triage/class-router.ts", "src/triage/schema.ts", "src/triage/severity.ts", "src/triage/triage.ts",
@@ -59,6 +59,7 @@ const MODIFICATION_REASONS: Record<string, string> = {
   "public/index.html": "Replaced imported unsupported claims with claim-limited copy that truthfully introduces pediatric IMCI, adult mhGAP, ordinary prompts, and observed runtime readiness.",
   "public/logo.png": "Removed the redundant raster logo after the interface standardized on the imported SVG identity assets.",
   "public/assets/css/app.css": "Removed obsolete public classification, plan, and raw-retrieval-excerpt styling; added result-first respiratory assessment, input-authority, and provenance styles; and raised mobile controls and operational text to comfortable touch targets.",
+  "public/assets/css/landing.css": "Restored the shared mobile navigation gutter so the imported landing shell remains aligned at narrow viewport widths.",
   "public/assets/js/net.js": "Distinguished browser network reachability from server-enforced on-device egress proof so UI badges cannot imply cloud inference or completed offline evidence.",
   "public/assets/js/triage.js": "Added semantic internal routing for general versus explicit clinical input, one-revision ambiguity clarification, structured review before /triage, shared /assist and clinical result ownership, and truthful cancellation, readiness, and provenance states without exact-prompt branching.",
   "scripts/clinical-audit.ts": "Kept clinical audit failures observable while preventing raw operational error content from entering console logs.",

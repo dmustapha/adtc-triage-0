@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { readModelIdentity } from "../../src/model-contract.js";
 
 process.env.TRIAGE0_PERF_DIR = mkdtempSync(join(tmpdir(), "triage0-test-perf-"));
 
@@ -17,6 +18,7 @@ const { app } = await import("../../src/server.js");
 const { orchestrator } = await import("../../src/qvac/orchestrator.js");
 const { chunkCount } = await import("../../src/rag/store.js");
 const { setTriageExecutionObserver } = await import("../../src/triage/triage.js");
+const expectedIdentity = readModelIdentity();
 
 const modelPath = new URL("../../model/medpsy-1.7b-q4_k_m-imat.gguf", import.meta.url);
 const skip = chunkCount() === 0
@@ -335,8 +337,8 @@ test("grounded respiratory continuation keeps the deterministic result authorita
     relation: "BELOW",
   });
   assert.equal(cardEv.card.assistance.status, "COMPLETED");
-  assert.equal(cardEv.card.assistance.runtime, "QVAC SDK 0.13.3");
-  assert.match(cardEv.card.assistance.model, /MedPsy-1\.7B-GGUF/i);
+  assert.equal(cardEv.card.assistance.runtime, `${expectedIdentity.productRuntime.name} ${expectedIdentity.productRuntime.version}`);
+  assert.equal(cardEv.card.assistance.model, expectedIdentity.name);
   assert.ok(!("supportingExcerpt" in cardEv.card.assistance), "raw retrieved text is never public");
   assert.ok(!("severity" in cardEv.card), "classifier-derived severity is not public result authority");
   assert.ok(!("redFlags" in cardEv.card), "only emergencyObservations is public");

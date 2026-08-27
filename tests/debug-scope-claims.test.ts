@@ -20,7 +20,8 @@ test("debug: visible pipeline labels state runtime identity and gate broad class
   ].join("\n");
 
   assert.doesNotMatch(surface, /MedPsy 1\.7B\s*[·-]\s*GPU/i);
-  assert.match(surface, /QVAC SDK 0\.13\.3\s*[·-]\s*on-device/i);
+  assert.match(surface, /observeRuntimeIdentity/);
+  assert.match(surface, /productRuntime/);
   if (/classification/i.test(surface)) {
     assert.match(surface, /provisional WHO protocol classification/i);
     assert.match(surface, /confirm/i);

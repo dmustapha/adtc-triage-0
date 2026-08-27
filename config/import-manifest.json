@@ -120,7 +120,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "475028a51b9c4f5a97d034e265f7f4947f5f2f99732ce590d19040eca1c2904c",
+      "destinationSha256": "51a4a55253db6bd38707d0798cf28bb7401a2db51094af7b3a1a96324f768bfc",
       "modification": {
         "status": "modified",
         "reason": "Restored one unified textarea, one Get guidance action, and one shared result region; removed visible assessment and model modes plus submitted-prompt shortcuts; preserved manual paste of the exact two Gate 1 prompts."
@@ -146,7 +146,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "1e0ef271494d3f64ef453733c5de70db5f1c0d00c39af5170de2746ccf1a1cfa",
+      "destinationSha256": "ac5ce9cccfe501b8818dcce1055fe94762c741b1629a82f00f3e5f80ef977a0a",
       "modification": {
         "status": "modified",
         "reason": "Removed obsolete public classification, plan, and raw-retrieval-excerpt styling; added result-first respiratory assessment, input-authority, and provenance styles; and raised mobile controls and operational text to comfortable touch targets."
@@ -180,10 +180,14 @@
       "sourceGitObject": "c07befc529471842aca638e3a68cfca5416230ce",
       "sourceSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93",
       "originalCreatedAt": "2026-06-20T22:46:36+01:00",
-      "classification": "reused",
-      "purpose": "Exact pinned baseline component",
+      "classification": "modified-for-adtc",
+      "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "0a214d30e2b71b30cef80d272979def3f2fa2b0a4d23576eac41ef42189cec93"
+      "destinationSha256": "fdb5a1c179e0066190638a991fa958bf5019f10a74b8a562d506fbe54e8028a3",
+      "modification": {
+        "status": "modified",
+        "reason": "Restored the shared mobile navigation gutter so the imported landing shell remains aligned at narrow viewport widths."
+      }
     },
     {
       "sourcePath": "public/assets/css/tokens.css",
@@ -352,7 +356,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "fc126e2486957bccaad9c434cd49ed4ef1a11b965b7361699c9584efcbfe2b89",
+      "destinationSha256": "c0fc0f8d1aca80c473e75d3b5dbb46f4d981cc229288e256237928fac3417f0a",
       "modification": {
         "status": "modified",
         "reason": "Added semantic internal routing for general versus explicit clinical input, one-revision ambiguity clarification, structured review before /triage, shared /assist and clinical result ownership, and truthful cancellation, readiness, and provenance states without exact-prompt branching."
@@ -630,7 +634,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "21788f94108ccaffcf34e119fea7a5ffa414fe275aa66b95b60b88d577cd9a90",
+      "destinationSha256": "7111086ab37b5d34082c16533043777ac4bf6ffd0dd8f663bf68c843b276da01",
       "modification": {
         "status": "modified",
         "reason": "Made deterministic respiratory policy the sole public result authority; exposed only neutral assessment fields plus model/runtime/retrieval provenance; kept raw retrieval and classifier output private; made model initialization sequential; rejected record conflicts; and preserved exact method/readiness contracts."
@@ -686,7 +690,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "3c16311f4dbd9c472664d70e1faa0292b31792dde55989542c09da9d28f3dde0",
+      "destinationSha256": "7ae979ae2f4fdbcf752c128773ca98a9aff5673ae087dd2f1d19d34aa1b4eee4",
       "modification": {
         "status": "modified",
         "reason": "Added authoritative structured danger state to severity entry points so free text and model red_flags cannot control the seven frozen atoms while non-respiratory and self-harm safeguards remain deterministic."
@@ -738,7 +742,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "0fa7bb4961f6e0bd5c7f4a0e303bf91f8e88e77d3368ad5206575c9ac574670f",
+      "destinationSha256": "4e422bdb3f5a79e461c77660d9110c81bd6ae09ad3de4c0580d7afe4bd5a04a6",
       "modification": {
         "status": "modified",
         "reason": "Added exact JSON 405 and Allow-header coverage, truthful header-only empty telemetry CSV behavior, narrative/structured conflict rejection, and a regression proving a bare listener reports liveness but not product readiness."
@@ -790,7 +794,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "585e00129aa24e74b0d0b88084185d172b42242df49ab98bdc1cd01bc06d4273",
+      "destinationSha256": "c11d0dea4692b8727312bdd944f713e41fac956f1a674b0aa257ab711419980f",
       "modification": {
         "status": "modified",
         "reason": "Defined deterministic respiratory API/SSE outcomes, exact no-QVAC boundaries, fixed versus retrieved citation provenance, real QVAC assistance with truthful retrieval mode, and the absence of classifier, plan, treatment, and raw retrieval text from public payloads."
@@ -905,7 +909,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "9d823cdd7336970bc04a7d1e6f859f4e4415a14b8ff3a70b686a5084b5b2613b",
+      "destinationSha256": "36f3142512f0ad82194b36ac0264025d7bb881430cae680e383d986d31b5615a",
       "modification": {
         "status": "modified",
         "reason": "Defined one-input and no-visible-mode shell, manual prompt paste, shared general and clinical result ownership, structured review, keyboard accessibility, cancellation behavior, evidence provenance, readiness, and mobile touch-target regressions."
