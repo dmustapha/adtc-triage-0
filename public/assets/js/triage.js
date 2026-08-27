@@ -640,8 +640,7 @@
   }
 
   function renderProvisional(data) {
-    clinicalState.phase = "PROVISIONAL";
-    clinicalState.confirmationToken = data.token;
+    transitionToProvisional(data);
     var card = $("card");
     if (card && !card.querySelector(".provisional-summary")) {
       var summary = document.createElement("section");
@@ -667,8 +666,7 @@
 
   function renderContinuation(data) {
     if (!data || !data.eligible || !data.token || !$('continuationRegion')) return;
-    clinicalState.continuationToken = data.token;
-    clinicalState.phase = "DETERMINISTIC";
+    transitionToDeterministic(data);
     if ($('continueAssessment')) $('continueAssessment').textContent = "Continue to supervised WHO classification";
     $('continuationRegion').classList.remove('hidden');
     $('continuationStatus').textContent = "Ready for optional local model-assisted review.";
@@ -692,6 +690,41 @@
     var target = $("confirmationPlan");
     var region = $("confirmationRegion");
     if (target && region && target.parentNode !== region) region.appendChild(target);
+  }
+
+  function clearReferenceActions() {
+    restoreConfirmationPlanHost();
+    if ($("confirmationPlan")) $("confirmationPlan").textContent = "";
+  }
+
+  function transitionClinicalPhase(phase) {
+    clinicalState.phase = phase;
+    if ($("result")) $("result").dataset.clinicalPhase = phase;
+  }
+
+  function transitionToDeterministic(data) {
+    clearReferenceActions();
+    clinicalState.confirmationToken = null;
+    clinicalState.continuationToken = data.token;
+    transitionClinicalPhase("DETERMINISTIC");
+  }
+
+  function transitionToProvisional(data) {
+    clearReferenceActions();
+    clinicalState.continuationToken = null;
+    clinicalState.confirmationToken = data.token;
+    transitionClinicalPhase("PROVISIONAL");
+  }
+
+  function transitionToConfirmed() {
+    clinicalState.confirmationToken = null;
+    transitionClinicalPhase("CONFIRMED");
+  }
+
+  function transitionToRejected() {
+    clinicalState.confirmationToken = null;
+    clearReferenceActions();
+    transitionClinicalPhase("REJECTED");
   }
 
   function planGroup(key, heading) {
@@ -785,6 +818,7 @@
 
   function renderReferenceActions(result) {
     if (!$("confirmationRegion") || !$("confirmationPlan")) return;
+    transitionToConfirmed();
     var target = $("confirmationPlan");
     target.textContent = "";
     target.className = "confirmed-plan plan";
@@ -834,7 +868,7 @@
   function invalidateConfirmation() {
     restoreConfirmationPlanHost();
     clinicalState.generation += 1;
-    clinicalState.phase = "RECORD";
+    transitionClinicalPhase("RECORD");
     clinicalState.confirmationToken = null;
     clinicalState.continuationToken = null;
     clinicalState.confirmationPending = false;
@@ -948,10 +982,9 @@
       var result = await response.json();
       if (!response.ok) throw new Error(result.error || "Confirmation could not be applied.");
       if (generation !== clinicalState.generation || token !== clinicalState.confirmationToken || clinicalState.phase !== "PROVISIONAL") return;
-      clinicalState.confirmationToken = null;
-      clinicalState.phase = result.reviewState;
       if (result.reviewState === "CONFIRMED") renderReferenceActions(result);
       else if ($("confirmationRegion")) {
+        transitionToRejected();
         if ($("confirmationPlan")) $("confirmationPlan").textContent = "The provisional classification was rejected. No reference actions were shown.";
       }
     } finally {

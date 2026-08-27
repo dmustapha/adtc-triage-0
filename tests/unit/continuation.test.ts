@@ -86,3 +86,19 @@ test("a reserved grant can be released after retryable admission failure", async
   assert.equal(store.commit(grant.token, binding.owner), true);
   assert.deepEqual(store.reserve(grant.token, binding.owner), { ok: false, reason: "USED" });
 });
+
+test("owner mismatch, expiry, replay, and unknown grants never expose the bound clinical snapshot", async () => {
+  const { ContinuationStore } = await import("../../src/triage/continuation.js");
+  let now = 1_000;
+  let sequence = 0;
+  const store = new ContinuationStore({ now: () => now, randomToken: () => `private-${++sequence}`, ttlMs: 10 });
+  const ownerBound = store.issue(binding, snapshot);
+  const mismatch = store.consume(ownerBound.token, "browser-b");
+  assert.equal("snapshot" in mismatch, false);
+  assert.equal(store.consume(ownerBound.token, binding.owner).ok, true);
+  assert.equal("snapshot" in store.consume(ownerBound.token, binding.owner), false);
+  const expiring = store.issue(binding, snapshot);
+  now = 1_010;
+  assert.equal("snapshot" in store.consume(expiring.token, binding.owner), false);
+  assert.equal("snapshot" in store.consume("unknown", binding.owner), false);
+});

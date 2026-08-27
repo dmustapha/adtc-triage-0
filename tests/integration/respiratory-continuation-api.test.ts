@@ -170,6 +170,26 @@ test("continuation validates token-only input before queue admission and fails c
   assert.equal((await post(`${f.base}/triage/continue`, { token: "continue-token" })).status, 409);
 });
 
+test("confirmation owner mismatch, rejection, and replay never expose source actions", async (t) => {
+  const f = await fixture();
+  t.after(() => f.server.close());
+  await post(`${f.base}/triage`, body);
+  await post(`${f.base}/triage/continue`, { token: "continue-token" });
+
+  f.setOwner("browser-b");
+  const mismatch = await post(`${f.base}/triage/confirm`, { token: "confirm-token", decision: "CONFIRM" });
+  assert.equal(mismatch.status, 403);
+  assert.equal("referenceActions" in await mismatch.json(), false);
+
+  f.setOwner("browser-a");
+  const rejected = await post(`${f.base}/triage/confirm`, { token: "confirm-token", decision: "REJECT" });
+  assert.equal(rejected.status, 200);
+  assert.deepEqual(await rejected.json(), { reviewState: "REJECTED" });
+  const replay = await post(`${f.base}/triage/confirm`, { token: "confirm-token", decision: "CONFIRM" });
+  assert.equal(replay.status, 409);
+  assert.equal("referenceActions" in await replay.json(), false);
+});
+
 test("retryable queue saturation releases the reservation so the same continuation grant can retry", async (t) => {
   let release!: () => void;
   let id = 0;

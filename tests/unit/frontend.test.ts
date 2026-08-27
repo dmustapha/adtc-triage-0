@@ -60,8 +60,10 @@ const fe = require("../../public/assets/js/triage.js") as {
   updateDangerChecklist: () => boolean;
   invalidateClinicalResult: () => void;
   renderProvisional: (data: Record<string, unknown>) => void;
+  renderContinuation: (data: Record<string, unknown>) => void;
+  sendContinuation: () => Promise<void>;
   sendConfirmation: (decision: "CONFIRM" | "REJECT") => Promise<void>;
-  clinicalState: { phase: string; confirmationToken: string | null };
+  clinicalState: { phase: string; confirmationToken: string | null; continuationToken: string | null };
 };
 const card = () => dom.window.document.getElementById("card")!.innerHTML;
 
@@ -241,6 +243,69 @@ test("every frozen confirmed plan restores the clinical-first cited Triage-0 hie
     if (provenance) assert.ok(plan.compareDocumentPosition(provenance) & 4, `${classification} plan precedes provenance`);
     assert.doesNotMatch(planText, /confidence|raw reasoning|diagnosis|red flags|model-authored action/i);
   }
+});
+
+test("one shared clinical region preserves deterministic through confirmed lifecycle and invalidates atomically", async () => {
+  el("result").classList.remove("hidden");
+  const deterministic = {
+    outcome: "NO_ESCALATION_CRITERION_RECORDED", finding: "No fast-breathing criterion was recorded.",
+    basis: "40 breaths per minute is below the age threshold.", nextAssessmentStep: "Continue supportive review.",
+    recorded: { observations: {} }, assistance: { status: "NOT_RUN" }, uncertainty: "Recorded observations only.",
+  };
+  fe.handleEvent("event: card\ndata: " + JSON.stringify({ card: deterministic }));
+  fe.renderContinuation({ eligible: true, token: "continue-lifecycle", expiresAt: new Date().toISOString() });
+  assert.equal(el("result").dataset.clinicalPhase, "DETERMINISTIC");
+  assert.match(el("card").textContent, /No fast-breathing criterion/i);
+  assert.equal(el("confirmationPlan").textContent, "");
+
+  const provisionalCard = { ...deterministic, reviewState: "PROVISIONAL", assistance: { status: "COMPLETED", runtime: "QVAC", model: "MedPsy", retrievalMode: "semantic" } };
+  g.fetch = async () => new Response([
+    "event: card\ndata: " + JSON.stringify({ card: provisionalCard }),
+    "event: provisional\ndata: " + JSON.stringify({ token: "confirm-lifecycle", classification: "COUGH OR COLD", protocol: "IMCI" }),
+    "event: done\ndata: {}",
+  ].join("\n\n") + "\n\n", { status: 200 });
+  await fe.sendContinuation();
+  assert.equal(el("result").dataset.clinicalPhase, "PROVISIONAL");
+  assert.match(el("card").textContent, /No fast-breathing criterion.*Provisional WHO protocol classification.*COUGH OR COLD/is);
+  assert.equal(el("confirmationPlan").textContent, "", "source actions remain locked before confirmation");
+
+  g.fetch = async () => new Response(JSON.stringify({
+    reviewState: "CONFIRMED", classification: "COUGH OR COLD", protocol: "IMCI", severity: "ROUTINE",
+    immediateAction: { text: "Soothe the throat", citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 6 } },
+    referenceActions: {
+      medicines: [], supportive: [], home_care: [{ advice: "Give Extra Fluid", citation: { doc: "WHO IMCI Chart Booklet (2014)", page: 23 } }],
+      return_now: [], follow_up: null, referral: null,
+    },
+    doseState: { status: "NOT_APPLICABLE", missingFields: [], medicineReferenceAvailable: false },
+  }), { status: 200, headers: { "Content-Type": "application/json" } });
+  await fe.sendConfirmation("CONFIRM");
+  assert.equal(el("result").dataset.clinicalPhase, "CONFIRMED");
+  assert.match(el("card").textContent, /No fast-breathing criterion.*Provisional WHO protocol classification.*Confirmed WHO management plan.*Give Extra Fluid/is);
+
+  fe.clinicalState.continuationToken = "stale-continuation";
+  fe.clinicalState.confirmationToken = "stale-confirmation";
+  fe.invalidateClinicalResult();
+  assert.equal(el("result").dataset.clinicalPhase, "RECORD");
+  assert.equal(fe.clinicalState.continuationToken, null);
+  assert.equal(fe.clinicalState.confirmationToken, null);
+  assert.equal(el("card").textContent, "");
+  assert.equal(el("confirmationPlan").textContent, "");
+});
+
+test("confirmation rejection and token failures never expose source actions", async () => {
+  fe.renderCard({ reviewState: "PROVISIONAL", recordedFacts: [], basis: "Frozen protocol match.", uncertainty: "Review required.", assistance: { status: "COMPLETED" } });
+  fe.renderProvisional({ token: "owner-mismatch", classification: "PNEUMONIA", protocol: "IMCI" });
+  g.fetch = async () => new Response(JSON.stringify({ error: "Confirmation could not be applied.", reason: "OWNER_MISMATCH" }),
+    { status: 403, headers: { "Content-Type": "application/json" } });
+  await assert.rejects(fe.sendConfirmation("CONFIRM"), /could not be applied/i);
+  assert.equal(el("confirmationPlan").textContent, "");
+
+  fe.renderProvisional({ token: "reject-token", classification: "PNEUMONIA", protocol: "IMCI" });
+  g.fetch = async () => new Response(JSON.stringify({ reviewState: "REJECTED" }),
+    { status: 200, headers: { "Content-Type": "application/json" } });
+  await fe.sendConfirmation("REJECT");
+  assert.equal(el("result").dataset.clinicalPhase, "REJECTED");
+  assert.doesNotMatch(el("confirmationPlan").textContent, /medicine|dose|source:/i);
 });
 
 test("structured form serializes the respiratory record without narrative inference", () => {
