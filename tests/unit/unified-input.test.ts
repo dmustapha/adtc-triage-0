@@ -440,6 +440,56 @@ test("explicit without, does-not-have, and ruled-out predicates negate all seven
   }
 });
 
+test("common negating introducers never become positive observation authority", () => {
+  const { api } = loadModule();
+  const cases = [
+    ["convulsions", "The child has never had convulsions."],
+    ["convulsions", "The child has not had convulsions."],
+    ["convulsions", "No reported convulsions."],
+    ["chestIndrawing", "No observed chest indrawing."],
+    ["chestIndrawing", "The child does not show chest indrawing."],
+    ["cannotDrinkOrBreastfeed", "The child has never been unable to drink or breastfeed."],
+  ];
+  for (const [key, narrative] of cases) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations[key], "ABSENT", narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value !== "PRESENT"), narrative);
+  }
+});
+
+test("observation-aware segments isolate uncertainty and meta context without losing independent facts", () => {
+  const { api } = loadModule();
+  const cases = [
+    "Possible convulsions, chest indrawing is present.",
+    "Possible convulsions and chest indrawing was documented as present.",
+    "Hypothetical convulsions are present, chest indrawing is present.",
+    "Convulsions are present for example, chest indrawing is present.",
+    "This example has convulsions, chest indrawing is present.",
+  ];
+  for (const narrative of cases) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations.convulsions, "NOT_ASSESSED", narrative);
+    assert.equal(draft.dangerObservations.chestIndrawing, "PRESENT", narrative);
+    assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+});
+
+test("structural segmentation preserves coordinated absence and explicit opposite-polarity conflicts", () => {
+  const { api } = loadModule();
+  const shared = api.extractClinicalCandidate(
+    "Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.",
+  );
+  assert.ok(Object.values(shared.dangerObservations).every((value) => value === "ABSENT"));
+  for (const narrative of [
+    "Has convulsions, convulsions were absent.",
+    "Convulsions were absent and the child has convulsions.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations.convulsions, "NOT_ASSESSED", narrative);
+    assert.ok(draft.conflicts.includes("dangerObservations.convulsions"), narrative);
+  }
+});
+
 test("keeps independently stated positive and negative evidence conflicting", () => {
   const { api } = loadModule();
   const draft = api.extractClinicalCandidate("Two year old has cough but now has no cough.");

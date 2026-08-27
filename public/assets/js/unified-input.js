@@ -20,9 +20,9 @@
     var input = assertedText(text).trim();
     if (!input) return "AMBIGUOUS";
     if (/^(?:please\s+)?(?:explain|summari[sz]e|compare|define|list|outline|state|describe|why\b|what\b|how\b)/i.test(input)) return "GENERAL";
-    var authorityInput = input.split(/[.!?;]+|\bbut\b|\bhowever\b/gi)
+    var authorityInput = observationSegments(input)
       .filter(function (clause) { return !clauseNonAuthority(clause); }).join(" ");
-    if (allObservationsAbsent(authorityInput)) return "CLINICAL";
+    if (allObservationsAbsent(input)) return "CLINICAL";
     var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(authorityInput);
     var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(authorityInput);
     var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(authorityInput);
@@ -117,6 +117,36 @@
     }, 0);
   }
 
+  function observationKeys(text) {
+    return OBSERVATIONS.filter(function (spec) { return patternMatches(text, spec[2]).length; })
+      .map(function (spec) { return spec[0]; });
+  }
+
+  function differentObservation(left, right) {
+    var leftKeys = observationKeys(left);
+    var rightKeys = observationKeys(right);
+    return leftKeys.some(function (key) { return rightKeys.some(function (other) { return other !== key; }); });
+  }
+
+  function splitObservationClause(clause) {
+    var parts = clause.split(/(\s*,\s*|\s+\b(?:and|or)\b\s+)/i);
+    var segments = [];
+    var current = parts[0] || "";
+    for (var index = 1; index < parts.length; index += 2) {
+      var next = parts[index + 1] || "";
+      if (differentObservation(current, next)) { segments.push(current); current = next; }
+      else current += parts[index] + next;
+    }
+    segments.push(current);
+    return segments;
+  }
+
+  function observationSegments(text) {
+    return text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).reduce(function (segments, clause) {
+      return segments.concat(splitObservationClause(clause));
+    }, []);
+  }
+
   function localPolarity(clause, occurrence, negativeRanges, inherentPresent) {
     var suffixText = clause.slice(occurrence.end);
     var prefix = clause.slice(0, occurrence.start);
@@ -132,6 +162,7 @@
     if (/^\s+(?:(?:is|was|were|are)\s+)?(?:absent(?![-\w])|ruled\s+out\b)/i.test(suffixText)) return "ABSENT";
     if (/^\s+(?:(?:is|was|were|are)\s+)?(?:present|observed|noted|reported)\b/i.test(suffixText)) return "PRESENT";
     if (/\b(?:denied|no\s+history\s+of|no\s+evidence\s+of|no\s+clear(?:\s+evidence\s+of)?)\s+$/i.test(prefix)) return "ABSENT";
+    if (/\b(?:has\s+(?:never|not)\s+(?:had|been)|no\s+(?:reported|observed|noted|documented|recorded)|(?:does|did)\s+not\s+(?:have|show))\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
     if (/\b(?:(?:does|did)\s+not\s+have|(?:is|was|are)\s+without|ruled\s+out)\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
     if (/\b(?:has|had|with|shows?|is|was|are|observed|noted|reported)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
     if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?present\b/i.test(suffixText)) return "PRESENT";
@@ -141,30 +172,32 @@
   }
 
   function clauseNonAuthority(clause) {
-    return /\b(?:training\s+example|the\s+(?:word|phrase)|says)\b|\bexample\s*:/i.test(clause) ||
+    return /\b(?:training\s+example|for\s+example|this\s+example|hypothetical|the\s+(?:word|phrase)|says)\b|\bexample\s*:/i.test(clause) ||
       /^\s*(?:check|screen)\b/i.test(clause) ||
       /\b(?:may|might|possible|possibly|suspected|uncertain|cannot\s+rule\s+out)\b/i.test(clause);
   }
 
   function observationEvidence(text, spec) {
     var evidence = { present: false, absent: false };
-    text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).forEach(function (clause) {
-      var negativeRanges = patternMatches(clause, spec[1]);
-      var occurrences = patternMatches(clause, spec[2]);
-      if (clauseNonAuthority(clause)) return;
-      var standaloneNegative = negativeRanges.some(function (range) {
-        return !occurrences.some(function (occurrence) { return rangesOverlap(range, occurrence); });
-      });
-      if (standaloneNegative) evidence.absent = true;
-      var sharedAbsent = observationCount(clause) > 1 &&
-        !/^\s*not\b/i.test(clause) &&
-        /\b(?:(?:is|was|were|are)\s+)?absent(?![-\w])\s*$/i.test(clause);
-      occurrences.forEach(function (occurrence) {
-        var polarity = localPolarity(clause, occurrence, negativeRanges, spec[3]);
-        if (polarity === "NONE") return;
-        if (polarity === "PRESENT") evidence.present = true;
-        else if (polarity === "ABSENT" || sharedAbsent) evidence.absent = true;
-        else if (polarity === "INHERENT") evidence.present = true;
+    text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).forEach(function (fullClause) {
+      var sharedAbsent = observationCount(fullClause) > 1 &&
+        !/^\s*not\b/i.test(fullClause) &&
+        /\b(?:(?:is|was|were|are)\s+)?absent(?![-\w])\s*$/i.test(fullClause);
+      splitObservationClause(fullClause).forEach(function (clause) {
+        var negativeRanges = patternMatches(clause, spec[1]);
+        var occurrences = patternMatches(clause, spec[2]);
+        if (clauseNonAuthority(clause)) return;
+        var standaloneNegative = negativeRanges.some(function (range) {
+          return !occurrences.some(function (occurrence) { return rangesOverlap(range, occurrence); });
+        });
+        if (standaloneNegative) evidence.absent = true;
+        occurrences.forEach(function (occurrence) {
+          var polarity = localPolarity(clause, occurrence, negativeRanges, spec[3]);
+          if (polarity === "NONE") return;
+          if (polarity === "PRESENT") evidence.present = true;
+          else if (polarity === "ABSENT" || sharedAbsent) evidence.absent = true;
+          else if (polarity === "INHERENT") evidence.present = true;
+        });
       });
     });
     return evidence;
