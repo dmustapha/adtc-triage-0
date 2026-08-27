@@ -385,6 +385,61 @@ test("quote masking supports internal apostrophes and aggregate absence requires
   }
 });
 
+test("uncertain and meta clauses suppress every observation polarity", () => {
+  const { api } = loadModule();
+  const narratives = [
+    "Possible chest indrawing was observed.",
+    "Chest indrawing is possibly present.",
+    "The child may have convulsions.",
+    "Low oxygen was suspected and recorded as present.",
+    "Cannot rule out stridor when calm was observed.",
+    "Training example: the child cannot drink or breastfeed.",
+    "Example: the child vomits everything.",
+    "The phrase chest indrawing is present.",
+    "The word convulsions was documented as present.",
+    "The note says the child is lethargic.",
+  ];
+  for (const narrative of narratives) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value === "NOT_ASSESSED"), narrative);
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+});
+
+test("recorded predicates and are copulas resolve before generic documentation status", () => {
+  const { api } = loadModule();
+  const cases = [
+    ["Chest indrawing was documented as present.", "chestIndrawing", "PRESENT"],
+    ["Chest indrawing was documented as absent.", "chestIndrawing", "ABSENT"],
+    ["Convulsions are recorded present.", "convulsions", "PRESENT"],
+    ["Convulsions are recorded as absent.", "convulsions", "ABSENT"],
+    ["Stridor when calm is noted.", "stridorWhenCalm", "PRESENT"],
+    ["Low oxygen or central cyanosis are absent.", "lowOxygenOrCentralCyanosis", "ABSENT"],
+  ];
+  for (const [narrative, key, expected] of cases) {
+    assert.equal(api.extractClinicalCandidate(narrative).dangerObservations[key], expected, narrative);
+  }
+});
+
+test("explicit without, does-not-have, and ruled-out predicates negate all seven observations", () => {
+  const { api } = loadModule();
+  const cases = [
+    ["cannotDrinkOrBreastfeed", "Cannot drink or breastfeed was ruled out."],
+    ["vomitsEverything", "The child does not vomit everything."],
+    ["convulsions", "The child does not have convulsions."],
+    ["lethargicOrUnconscious", "The child is without lethargy or unconsciousness."],
+    ["chestIndrawing", "The child was without chest indrawing."],
+    ["stridorWhenCalm", "The child is without stridor when calm."],
+    ["lowOxygenOrCentralCyanosis", "Low oxygen or central cyanosis was ruled out."],
+  ];
+  for (const [key, narrative] of cases) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations[key], "ABSENT", narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value !== "PRESENT"), narrative);
+    assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+});
+
 test("keeps independently stated positive and negative evidence conflicting", () => {
   const { api } = loadModule();
   const draft = api.extractClinicalCandidate("Two year old has cough but now has no cough.");
