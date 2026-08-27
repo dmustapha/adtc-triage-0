@@ -102,6 +102,29 @@ test("cross-field fast-breathing and observation-state contradictions are reject
   assert.ok(observationState.categories.includes("CONTRADICTION"));
 });
 
+test("generic unknown-value policy and negated claims do not create contradictions", () => {
+  const samples = [
+    {
+      answer: "The record is complete. Unknown values are never assumed.",
+      uncertainty: [],
+      limitations: ["No missing details were identified."],
+    },
+    {
+      answer: "No claim that the child has fast breathing is made.",
+      uncertainty: ["Fast-breathing status is unknown."],
+      limitations: [],
+    },
+    {
+      answer: "All seven structured observations were absent.",
+      uncertainty: [],
+      limitations: ["No structured observation was present."],
+    },
+  ];
+  for (const extract of samples) {
+    assert.deepEqual(validatePromptAnswer({ prompt: "Summarize the supplied record.", extract }), { passed: true, categories: [] });
+  }
+});
+
 test("generic expressed obligations must appear in the answer", () => {
   const result = validate({
     prompt: "Separate observed facts from uncertainty and state that respiratory rate was not recorded.",
