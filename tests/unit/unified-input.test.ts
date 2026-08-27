@@ -490,6 +490,42 @@ test("structural segmentation preserves coordinated absence and explicit opposit
   }
 });
 
+test("never-had and has-or-had-not-shown negate every recognized finding label", () => {
+  const { api } = loadModule();
+  const findings = [
+    ["cannotDrinkOrBreastfeed", "cannot drink or breastfeed"],
+    ["vomitsEverything", "vomit everything"],
+    ["convulsions", "convulsions"],
+    ["lethargicOrUnconscious", "lethargic or unconscious"],
+    ["chestIndrawing", "chest indrawing"],
+    ["stridorWhenCalm", "stridor when calm"],
+    ["lowOxygenOrCentralCyanosis", "low oxygen or central cyanosis"],
+  ];
+  for (const [key, finding] of findings) {
+    for (const narrative of [
+      `The child never had ${finding}.`,
+      `The child has not shown ${finding}.`,
+      `The child had not shown ${finding}.`,
+    ]) {
+      const draft = api.extractClinicalCandidate(narrative);
+      assert.equal(draft.dangerObservations[key], "ABSENT", narrative);
+      assert.ok(Object.values(draft.dangerObservations).every((value) => value !== "PRESENT"), narrative);
+    }
+  }
+});
+
+test("example-showing and example-patient clauses carry no observation authority", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "An example shows chest indrawing.",
+    "Example patient has convulsions.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value === "NOT_ASSESSED"), narrative);
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+});
+
 test("keeps independently stated positive and negative evidence conflicting", () => {
   const { api } = loadModule();
   const draft = api.extractClinicalCandidate("Two year old has cough but now has no cough.");

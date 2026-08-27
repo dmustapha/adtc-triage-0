@@ -162,7 +162,7 @@
     if (/^\s+(?:(?:is|was|were|are)\s+)?(?:absent(?![-\w])|ruled\s+out\b)/i.test(suffixText)) return "ABSENT";
     if (/^\s+(?:(?:is|was|were|are)\s+)?(?:present|observed|noted|reported)\b/i.test(suffixText)) return "PRESENT";
     if (/\b(?:denied|no\s+history\s+of|no\s+evidence\s+of|no\s+clear(?:\s+evidence\s+of)?)\s+$/i.test(prefix)) return "ABSENT";
-    if (/\b(?:has\s+(?:never|not)\s+(?:had|been)|no\s+(?:reported|observed|noted|documented|recorded)|(?:does|did)\s+not\s+(?:have|show))\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
+    if (/\b(?:has\s+(?:never|not)\s+(?:had|been)|never\s+had|(?:has|had)\s+not\s+shown|no\s+(?:reported|observed|noted|documented|recorded)|(?:does|did)\s+not\s+(?:have|show))\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
     if (/\b(?:(?:does|did)\s+not\s+have|(?:is|was|are)\s+without|ruled\s+out)\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
     if (/\b(?:has|had|with|shows?|is|was|are|observed|noted|reported)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
     if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?present\b/i.test(suffixText)) return "PRESENT";
@@ -172,7 +172,7 @@
   }
 
   function clauseNonAuthority(clause) {
-    return /\b(?:training\s+example|for\s+example|this\s+example|hypothetical|the\s+(?:word|phrase)|says)\b|\bexample\s*:/i.test(clause) ||
+    return /\b(?:training\s+example|for\s+example|this\s+example|(?:an\s+)?example\s+shows?|example\s+patient|hypothetical|the\s+(?:word|phrase)|says)\b|\bexample\s*:/i.test(clause) ||
       /^\s*(?:check|screen)\b/i.test(clause) ||
       /\b(?:may|might|possible|possibly|suspected|uncertain|cannot\s+rule\s+out)\b/i.test(clause);
   }
