@@ -80,6 +80,9 @@ test("ambiguous recovery is inline and applies to one input revision", async () 
   assert.equal(choice.classList.contains("hidden"), false);
   const actions = choice.querySelectorAll("button") as NodeListOf<HTMLButtonElement>;
   assert.deepEqual(Array.from(actions, (button) => button.textContent), ["Assess as a patient case", "Answer as a general question"]);
+  assert.ok(Array.from(actions, (button) => button.classList.contains("btn")).every(Boolean));
+  assert.ok(Array.from(actions, (button) => button.type === "button").every(Boolean));
+  assert.equal(page.activeElement, actions[0]);
   (actions[1] as HTMLButtonElement).click();
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(requests.at(-1)?.url, "/assist");
@@ -107,6 +110,29 @@ test("editing during assist aborts revision N before it can render over revision
   await running;
   assert.equal(wasAborted, true);
   assert.doesNotMatch(page.getElementById("sharedAnswer")?.textContent ?? "", /Stale revision answer/);
+  assistResponder = async () => sseAnswer();
+});
+
+test("repeated action and keyboard submission cannot orphan an active assist run", async () => {
+  const releases: Array<() => void> = [];
+  assistResponder = (init) => new Promise<Response>((resolve) => {
+    releases.push(() => resolve(sseAnswer("Owned terminal answer.")));
+    (init?.signal as AbortSignal).addEventListener("abort", () => resolve(sseAnswer("Aborted answer.")), { once: true });
+  });
+  requests.length = 0;
+  input.value = "Explain active request ownership.";
+  frontend.handleUnifiedInput();
+  const first = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const repeated = frontend.runUnified();
+  input.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Enter", ctrlKey: true, bubbles: true }));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const activeRequests = requests.filter((request) => request.url === "/assist");
+  const requestCount = activeRequests.length;
+  releases.forEach((release) => release());
+  await Promise.all([first, repeated]);
+  assert.equal(requestCount, 1);
+  assert.equal(new Set(activeRequests.map((request) => request.init?.signal)).size, 1);
   assistResponder = async () => sseAnswer();
 });
 
@@ -138,6 +164,25 @@ test("Cancel deletes and aborts the owned job, then Retry starts a fresh shared 
   }
   assert.equal(requests.filter((request) => request.url === "/assist").length, 2);
   assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Fresh retry answer/);
+});
+
+test("incomplete streams and HTTP or network failures replace progress with terminal shared status", async () => {
+  assistResponder = async () => new Response('event: stage\ndata: {"label":"Still working."}\n\n', { status: 200 });
+  await submit("Explain an incomplete response.");
+  assert.equal(page.getElementById("status")?.textContent, "Local assistance unavailable.");
+  assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /No validated terminal answer/);
+
+  const failures = [
+    async () => new Response(JSON.stringify({ error: "Unavailable", code: "DOWN", retryable: false }), { status: 503 }),
+    async () => { throw new Error("network unavailable"); },
+  ];
+  for (const failure of failures) {
+    assistResponder = failure;
+    await submit("Explain a failed response.");
+    assert.equal(page.getElementById("status")?.textContent, "Local assistance unavailable.");
+    assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Local assistance unavailable/);
+  }
+  assistResponder = async () => sseAnswer();
 });
 
 test("cancel, retry, safe rendering, and terminal recovery remain bound to shared state", () => {

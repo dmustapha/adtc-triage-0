@@ -299,10 +299,12 @@
     region.textContent = "";
     var clinical = document.createElement("button");
     clinical.type = "button";
+    clinical.className = "btn";
     clinical.textContent = "Assess as a patient case";
     clinical.onclick = function () { chooseRoute("CLINICAL", revision); };
     var general = document.createElement("button");
     general.type = "button";
+    general.className = "btn";
     general.textContent = "Answer as a general question";
     general.onclick = function () { chooseRoute("GENERAL", revision); };
     region.append(clinical, general);
@@ -312,6 +314,7 @@
   }
 
   async function runUnified() {
+    if (promptState && promptState.abortController) return;
     var readiness = updateUnifiedReadiness();
     if (!readiness.ready) { clinicalInput().focus(); return; }
     var route = unifiedState.choiceRevision === unifiedState.revision ? unifiedState.routeOverride : readiness.route;
@@ -1128,6 +1131,7 @@
   if ($("dangerChecklist")) {
     $("dangerChecklist").addEventListener("change", handleStructuredEdit);
     $("patientAgeValue").addEventListener("input", handleStructuredEdit);
+    if ($("patientWeightKg")) $("patientWeightKg").addEventListener("input", handleStructuredEdit);
     if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").addEventListener("input", handleStructuredEdit);
     document.querySelectorAll(".tri-state input").forEach(function (input) { input.addEventListener("keydown", handleTriStateKey); });
     updateDangerChecklist();
@@ -1272,13 +1276,17 @@
       }
       if (!promptState.terminal && runId === promptState.runId) {
         promptState.terminal = true;
+        $("status").textContent = "Local assistance unavailable.";
         promptMessage("unavailable", "Incomplete local response", { reason: "No validated terminal answer was received." });
       }
     } catch (error) {
       if (runId !== promptState.runId) return;
       promptState.terminal = true;
       if (error && error.name === "AbortError") $("status").textContent = promptState.cancelMessage || "Stopped locally.";
-      else promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
+      else {
+        $("status").textContent = "Local assistance unavailable.";
+        promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
+      }
     } finally {
       if (runId === promptState.runId) {
         promptState.abortController = null;

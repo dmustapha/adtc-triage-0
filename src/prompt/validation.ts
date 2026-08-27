@@ -212,13 +212,16 @@ function internallyContradictory(prompt: string, extract: PromptExtract): boolea
   const fastUnknown = /fast[- ]breathing(?: status)?[^.!?]{0,60}\b(?:unknown|cannot be determined|not established)\b/i.test(publicText);
   const assertionText = publicText
     .replace(/\b(?:no|without) (?:claim|assertion) that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "")
-    .replace(/\b(?:it is )?not established that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "");
+    .replace(/\b(?:it is )?not established that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "")
+    .replace(/\bit is false that[^.!?]{0,100}\bfast[- ]breathing\b[^.!?]*/gi, "");
   const fastAsserted = /\b(?:has|had|shows?|is|was) fast[- ]breathing\b|\b(?:does not have|no) fast[- ]breathing\b/i.test(assertionText);
   if (fastUnknown && fastAsserted) return true;
 
   const allAbsent = /\ball (?:seven|7)[^.!?]{0,80}\bobservations?[^.!?]{0,30}\babsent\b/i.test(publicText);
   const observationText = publicText
     .replace(/\bno (?:danger |breathing |structured )?observations? (?:was|were|is|are) present\b/gi, "")
+    .replace(/\bnone of the (?:danger |breathing |structured )?observations? (?:was|were) present\b/gi, "")
+    .replace(/\bthere (?:was|were|is|are) no (?:danger |breathing |structured )?observations? present\b/gi, "")
     .replace(/\bno (?:chest indrawing|stridor|central cyanosis|low oxygen|convulsions?|vomiting everything|lethargy|unconsciousness) (?:was|is) present\b/gi, "");
   const anyPresent = /\b(?:chest indrawing|stridor|central cyanosis|low oxygen|convulsions?|vomits? everything|lethargic|unconscious|cannot drink|cannot breastfeed)(?:\s+(?:is|was))?\s+present\b/i.test(observationText)
     || /\b(?:danger|breathing|structured) observations?[^.!?]{0,30}\bpresent\b/i.test(observationText);

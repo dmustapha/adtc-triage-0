@@ -134,6 +134,21 @@ test("generic unknown-value policy and negated claims do not create contradictio
       uncertainty: [],
       limitations: ["No missing details were identified."],
     },
+    {
+      answer: "All seven structured observations were absent.",
+      uncertainty: [],
+      limitations: ["None of the danger observations were present."],
+    },
+    {
+      answer: "All seven structured observations were absent.",
+      uncertainty: [],
+      limitations: ["There were no danger observations present."],
+    },
+    {
+      answer: "It is false that the child has fast breathing.",
+      uncertainty: ["Fast-breathing status is unknown."],
+      limitations: [],
+    },
   ];
   for (const extract of samples) {
     assert.deepEqual(validatePromptAnswer({ prompt: "Summarize the supplied record.", extract }), { passed: true, categories: [] });

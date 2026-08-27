@@ -105,15 +105,17 @@ test("tri-state labels, Space, and Arrow keys operate the semantic radios", () =
 test("every structured authority edit invalidates stale result and review tokens", () => {
   const result = page.getElementById("result")!;
   const card = page.getElementById("card")!;
-  for (const [id, event] of [["patientAgeValue", "input"], ["respiratoryRatePerMinute", "input"], ["rateCountQuality", "change"]]) {
+  for (const [id, event] of [["patientAgeValue", "input"], ["patientWeightKg", "input"], ["respiratoryRatePerMinute", "input"], ["rateCountQuality", "change"]]) {
     result.classList.remove("hidden");
     card.textContent = "stale";
+    page.getElementById("confirmationPlan")!.textContent = "stale dose plan";
     frontend.clinicalState.confirmationToken = "confirm-token";
     frontend.clinicalState.continuationToken = "continue-token";
     page.getElementById(id)!.dispatchEvent(new dom.window.Event(event, { bubbles: true }));
     assert.equal(result.classList.contains("hidden"), true, `${id} hides stale result`);
     assert.equal(frontend.clinicalState.confirmationToken, null, `${id} clears confirmation`);
     assert.equal(frontend.clinicalState.continuationToken, null, `${id} clears continuation`);
+    assert.equal(page.getElementById("confirmationPlan")!.textContent, "", `${id} clears dose plan`);
   }
   result.classList.remove("hidden");
   card.textContent = "stale";
