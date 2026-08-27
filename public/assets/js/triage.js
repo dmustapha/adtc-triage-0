@@ -739,6 +739,7 @@
       if ($(id)) $(id).disabled = true;
     });
     if ($("confirmationStatus")) {
+      $("confirmationStatus").textContent = "Provisional classification rejected. No reference actions were shown.";
       $("confirmationStatus").tabIndex = -1;
       $("confirmationStatus").focus();
     }

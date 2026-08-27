@@ -309,6 +309,7 @@ test("confirmation rejection and token failures never expose source actions", as
   await fe.sendConfirmation("REJECT");
   assert.equal(el("result").dataset.clinicalPhase, "REJECTED");
   assert.doesNotMatch(el("confirmationPlan").textContent, /medicine|dose|source:/i);
+  assert.equal(el("confirmationStatus").textContent, "Provisional classification rejected. No reference actions were shown.");
   assert.match(el("confirmationRegion").querySelector(".confirmation-instructions")?.className ?? "", /hidden/);
   assert.match(el("confirmationRegion").querySelector(".confirmation-actions")?.className ?? "", /hidden/);
   for (const id of ["confirmAssessment", "correctAssessment", "rejectAssessment"]) {
