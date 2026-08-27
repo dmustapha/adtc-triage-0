@@ -661,6 +661,9 @@
       var actions = $("confirmationRegion").querySelector(".confirmation-actions");
       if (instructions) instructions.classList.remove("hidden");
       if (actions) actions.classList.remove("hidden");
+      ["confirmAssessment", "correctAssessment", "rejectAssessment"].forEach(function (id) {
+        if ($(id)) $(id).disabled = false;
+      });
     }
   }
 
@@ -725,6 +728,20 @@
     clinicalState.confirmationToken = null;
     clearReferenceActions();
     transitionClinicalPhase("REJECTED");
+    var region = $("confirmationRegion");
+    if (region) {
+      var instructions = region.querySelector(".confirmation-instructions");
+      var actions = region.querySelector(".confirmation-actions");
+      if (instructions) instructions.classList.add("hidden");
+      if (actions) actions.classList.add("hidden");
+    }
+    ["confirmAssessment", "correctAssessment", "rejectAssessment"].forEach(function (id) {
+      if ($(id)) $(id).disabled = true;
+    });
+    if ($("confirmationStatus")) {
+      $("confirmationStatus").tabIndex = -1;
+      $("confirmationStatus").focus();
+    }
   }
 
   function planGroup(key, heading) {
@@ -822,7 +839,7 @@
     var target = $("confirmationPlan");
     target.textContent = "";
     target.className = "confirmed-plan plan";
-    var heading = document.createElement("div"); heading.className = "plan-head";
+    var heading = document.createElement("h3"); heading.className = "plan-head";
     heading.textContent = "Confirmed WHO management plan"; target.appendChild(heading);
     var actions = result.referenceActions || {};
     var summary = planGroup("summary", "Assessment outcome");
@@ -873,7 +890,7 @@
     clinicalState.continuationToken = null;
     clinicalState.confirmationPending = false;
     clinicalState.continuationPending = false;
-    ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
+    ["confirmAssessment", "correctAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
     if ($("confirmationRegion")) {
       if ($("confirmationPlan")) $("confirmationPlan").textContent = "";
       var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
@@ -994,7 +1011,9 @@
         if (clinicalState.phase === "PROVISIONAL" && $("confirmationStatus")) {
           $("confirmationStatus").textContent = "Confirmation was not applied. Review the error and retry.";
         }
-        ["confirmAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
+        if (clinicalState.phase === "PROVISIONAL") {
+          ["confirmAssessment", "correctAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
+        }
       }
     }
   }

@@ -184,6 +184,7 @@ test("confirmed plan DOM renders cited dose rows and separately cited follow-up 
     doseState: { status: "AVAILABLE_REFERENCE_BAND", missingFields: [], medicineReferenceAvailable: true },
   });
   const plan = el("confirmationPlan");
+  assert.equal(plan.querySelector(".plan-head")?.tagName, "H3", "the confirmed plan has a semantic section heading");
   assert.match(plan.textContent, /12 months up to 3 years.*5 ml.*WHO IMCI Chart Booklet \(2014\), page 7/s);
   assert.match(plan.textContent, /Assess at follow-up.*Assess breathing rate again.*page 32/s);
   assert.equal(plan.querySelectorAll("tbody tr.is-selected").length, 1);
@@ -301,11 +302,25 @@ test("confirmation rejection and token failures never expose source actions", as
   assert.equal(el("confirmationPlan").textContent, "");
 
   fe.renderProvisional({ token: "reject-token", classification: "PNEUMONIA", protocol: "IMCI" });
+  const confirm = el("confirmAssessment") as HTMLButtonElement;
+  confirm.focus();
   g.fetch = async () => new Response(JSON.stringify({ reviewState: "REJECTED" }),
     { status: 200, headers: { "Content-Type": "application/json" } });
   await fe.sendConfirmation("REJECT");
   assert.equal(el("result").dataset.clinicalPhase, "REJECTED");
   assert.doesNotMatch(el("confirmationPlan").textContent, /medicine|dose|source:/i);
+  assert.match(el("confirmationRegion").querySelector(".confirmation-instructions")?.className ?? "", /hidden/);
+  assert.match(el("confirmationRegion").querySelector(".confirmation-actions")?.className ?? "", /hidden/);
+  for (const id of ["confirmAssessment", "correctAssessment", "rejectAssessment"]) {
+    assert.equal((el(id) as HTMLButtonElement).disabled, true, `${id} remains terminally disabled`);
+  }
+  assert.equal(doc.activeElement, el("confirmationStatus"), "focus moves to the terminal rejection status");
+  let terminalCalls = 0;
+  g.fetch = async () => { terminalCalls += 1; return new Response("{}"); };
+  confirm.click();
+  (el("rejectAssessment") as HTMLButtonElement).click();
+  await Promise.resolve();
+  assert.equal(terminalCalls, 0, "keyboard/click activation cannot replay terminal controls");
 });
 
 test("structured form serializes the respiratory record without narrative inference", () => {
