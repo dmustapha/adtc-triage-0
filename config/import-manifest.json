@@ -120,7 +120,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "c6f7ecc9d617612d5294ca830cb452c9e03b3a39173929e36bb8f970827e64ae",
+      "destinationSha256": "475028a51b9c4f5a97d034e265f7f4947f5f2f99732ce590d19040eca1c2904c",
       "modification": {
         "status": "modified",
         "reason": "Restored the approved supervised WHO assessment and ordinary-prompt modes, preserved structured respiratory authority, and kept the exact two submitted prompts available as unchanged examples."
@@ -146,7 +146,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "e2c2782897b2b23652c7b8eac7d8bcdecd84d0e0887ea3d3d2332874f96a1e79",
+      "destinationSha256": "1e0ef271494d3f64ef453733c5de70db5f1c0d00c39af5170de2746ccf1a1cfa",
       "modification": {
         "status": "modified",
         "reason": "Removed obsolete public classification, plan, and raw-retrieval-excerpt styling; added result-first respiratory assessment, input-authority, and provenance styles; and raised mobile controls and operational text to comfortable touch targets."
@@ -352,7 +352,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "cb90e155d766f22c68f2286db25ef9fca2e5ad4a215e383a47fc3b69e8bb8b49",
+      "destinationSha256": "fc126e2486957bccaad9c434cd49ed4ef1a11b965b7361699c9584efcbfe2b89",
       "modification": {
         "status": "modified",
         "reason": "Made respiratory and broader WHO workflows reachable, rendered deterministic and provisional results through distinct result-first branches, enforced confirmation and dose-display gates, added the bounded ordinary-prompt path, and preserved truthful queue, cancellation, readiness, and provenance states."
@@ -790,7 +790,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "674b3d468505e215f6f2a4bb2aaca699769cd11fcf02e45ed2bae65999a2a676",
+      "destinationSha256": "585e00129aa24e74b0d0b88084185d172b42242df49ab98bdc1cd01bc06d4273",
       "modification": {
         "status": "modified",
         "reason": "Defined deterministic respiratory API/SSE outcomes, exact no-QVAC boundaries, fixed versus retrieved citation provenance, real QVAC assistance with truthful retrieval mode, and the absence of classifier, plan, treatment, and raw retrieval text from public payloads."
@@ -905,7 +905,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "0593668f09bae200156c7fb71363aa06dcdbe9e6397eb0d53625986a44dd8aed",
+      "destinationSha256": "9d823cdd7336970bc04a7d1e6f859f4e4415a14b8ff3a70b686a5084b5b2613b",
       "modification": {
         "status": "modified",
         "reason": "Defined the result-first respiratory form and card, toxic legacy excerpt suppression, distinct evidence provenance, truthful readiness, coherent examples, keyboard accessibility, cancellation behavior, and mobile touch-target regressions."
