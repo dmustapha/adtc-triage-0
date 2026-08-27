@@ -163,7 +163,7 @@ test("independent present and field-value absent statements conflict in either o
     ["convulsions", "Has convulsions.", "Convulsions absent."],
     ["lethargicOrUnconscious", "The child is lethargic.", "Lethargic or unconscious absent."],
     ["chestIndrawing", "Chest indrawing is present.", "Chest indrawing absent."],
-    ["stridorWhenCalm", "Stridor when calm.", "Stridor when calm absent."],
+    ["stridorWhenCalm", "Stridor when calm was observed.", "Stridor when calm absent."],
     ["lowOxygenOrCentralCyanosis", "Low oxygen is present.", "Low oxygen or central cyanosis absent."],
   ];
   for (const [key, present, absent] of fields) {
@@ -183,7 +183,7 @@ test("true present findings remain present while unrelated observations remain u
     ["convulsions", "Has convulsions."],
     ["lethargicOrUnconscious", "The child is lethargic."],
     ["chestIndrawing", "Chest indrawing is present."],
-    ["stridorWhenCalm", "Stridor when calm."],
+    ["stridorWhenCalm", "Stridor when calm was observed."],
     ["lowOxygenOrCentralCyanosis", "Low oxygen is present."],
   ];
   for (const [key, statement] of fields) {
@@ -193,14 +193,19 @@ test("true present findings remain present while unrelated observations remain u
   }
 });
 
-test("natural structured observation descriptions and value forms route clinically", () => {
+test("explicit structured observation predicates and value forms route clinically", () => {
   const { api } = loadModule();
-  const labels = [
-    "Cannot drink or breastfeed", "Vomits everything", "Convulsions", "Lethargic or unconscious",
-    "Chest indrawing", "Stridor when calm", "Low oxygen or central cyanosis",
+  const fields = [
+    ["Cannot drink or breastfeed", "Cannot drink or breastfeed"],
+    ["Vomits everything", "Vomits everything"],
+    ["Convulsions", "Has convulsions"],
+    ["Lethargic or unconscious", "The child is lethargic"],
+    ["Chest indrawing", "Chest indrawing is present"],
+    ["Stridor when calm", "Stridor when calm was observed"],
+    ["Low oxygen or central cyanosis", "Low oxygen is present"],
   ];
-  for (const label of labels) {
-    assert.equal(api.routeInput(`${label}.`), "CLINICAL", label);
+  for (const [label, positive] of fields) {
+    assert.equal(api.routeInput(`${positive}.`), "CLINICAL", positive);
     assert.equal(api.routeInput(`${label} was absent.`), "CLINICAL", `${label} absent`);
   }
 });
@@ -273,7 +278,7 @@ test("explicit absence statuses remain negative while asserted positives and con
     assert.equal(draft.dangerObservations.convulsions, "ABSENT", narrative);
     assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
   }
-  for (const narrative of ["Has convulsions.", "Convulsions present.", "Convulsions."]) {
+  for (const narrative of ["Has convulsions.", "Convulsions present.", "Convulsions were observed."]) {
     assert.equal(api.extractClinicalCandidate(narrative).dangerObservations.convulsions, "PRESENT", narrative);
   }
   const conflict = api.extractClinicalCandidate("Has convulsions. No history of convulsions.");
@@ -306,6 +311,77 @@ test("the exact all-seven absent aggregate routes clinically with or without age
   ]) {
     assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
     assert.ok(Object.values(api.extractClinicalCandidate(narrative).dangerObservations).every((value) => value === "ABSENT"));
+  }
+});
+
+test("bare noun mentions and uncertain predicates remain unassessed", () => {
+  const { api } = loadModule();
+  const narratives = [
+    "Convulsions.",
+    "Chest indrawing.",
+    "Stridor when calm.",
+    "Low oxygen or central cyanosis.",
+    "Convulsions may be present.",
+    "Convulsions might occur.",
+    "Possible convulsions.",
+    "Suspected convulsions.",
+    "Convulsions uncertain.",
+    "Cannot rule out convulsions.",
+  ];
+  for (const narrative of narratives) {
+    assert.ok(Object.values(api.extractClinicalCandidate(narrative).dangerObservations)
+      .every((value) => value === "NOT_ASSESSED"), narrative);
+  }
+});
+
+test("recognized positive predicates prove every observation without bare-label fallback", () => {
+  const { api } = loadModule();
+  const cases = [
+    ["cannotDrinkOrBreastfeed", "The child cannot breastfeed."],
+    ["vomitsEverything", "The child vomits everything."],
+    ["convulsions", "The caregiver reported convulsions."],
+    ["lethargicOrUnconscious", "The child is unconscious."],
+    ["chestIndrawing", "The worker observed chest indrawing."],
+    ["stridorWhenCalm", "Stridor when calm was noted."],
+    ["lowOxygenOrCentralCyanosis", "Low oxygen was recorded as present."],
+  ];
+  for (const [key, narrative] of cases) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations[key], "PRESENT", narrative);
+    assert.deepEqual(draft.conflicts, [], narrative);
+  }
+});
+
+test("recognized negative predicates include observation and documentation absence", () => {
+  const { api } = loadModule();
+  const narratives = [
+    "Convulsions were not observed.",
+    "Convulsions were not documented.",
+    "No evidence of convulsions.",
+    "No clear convulsions.",
+    "No clear evidence of convulsions.",
+    "The worker documented convulsions as absent.",
+    "Convulsions were recorded as absent.",
+  ];
+  for (const narrative of narratives) {
+    assert.equal(api.extractClinicalCandidate(narrative).dangerObservations.convulsions, "ABSENT", narrative);
+  }
+});
+
+test("quote masking supports internal apostrophes and aggregate absence requires a declarative clause", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "The phrase 'the child's convulsions were absent' appears in the note.",
+    'The phrase "the caregiver\'s chest indrawing was present" appears in the note.',
+    "The phrase ‘the child’s stridor when calm was present’ appears in the note.",
+  ]) {
+    assert.ok(Object.values(api.extractClinicalCandidate(narrative).dangerObservations)
+      .every((value) => value === "NOT_ASSESSED"), narrative);
+  }
+  for (const narrative of ["Not all seven observations absent.", "All seven observations absent?"]) {
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
+    assert.ok(Object.values(api.extractClinicalCandidate(narrative).dangerObservations)
+      .every((value) => value === "NOT_ASSESSED"), narrative);
   }
 });
 
