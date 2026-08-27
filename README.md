@@ -31,7 +31,7 @@ Both internal routes share one serialized QVAC inference queue. Ambiguous text g
 
 ## Screenshots
 
-The current unified desktop, 375-by-812 and 320-pixel UAT screenshots and traces are retained locally under `output/playwright/task11-unified-parity/`. They are not promoted as submission media because publication remains a separate explicit action. The older tracked split-mode screenshots are no longer presented as current proof.
+Task 11 Playwright passed 58/58 behavioral assertions across desktop, 375-by-812 and 320-pixel viewports. Retained current PNGs cover desktop provisional and confirmed pneumonia, desktop broad mhGAP provisional, two desktop lifecycle-regression states, and confirmed pneumonia at 375 by 812. The 320-pixel viewport has browser measurement and trace coverage, not a retained PNG. These ignored local artifacts are not linked or presented as release proof because publication remains a separate explicit action. The older tracked split-mode screenshots are no longer presented as current proof.
 
 ## How it works
 

@@ -61,3 +61,16 @@ test("debug: current report keeps any classification explicitly provisional and 
     assert.match(report, /supervised|human confirm/i);
   }
 });
+
+test("debug: browser assertions and retained screenshots have separate evidence claims", () => {
+  const readme = read("README.md");
+  const report = read("REPORT.md");
+
+  assert.match(report, /Playwright assertions[^.]*58\/58[^.]*desktop[^.]*375[^.]*320/i);
+  assert.match(readme, /confirmed pneumonia at 375 by 812/i);
+  assert.match(readme, /320-pixel[^.]*not a retained PNG/i);
+  assert.doesNotMatch(
+    `${readme}\n${report}`,
+    /(?:screenshots?|PNGs?)[^.\n]*(?:exact[- ]prompt|queue|cancel|retry|320-pixel UAT)/i,
+  );
+});
