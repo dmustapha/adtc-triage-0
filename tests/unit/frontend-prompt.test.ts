@@ -93,6 +93,30 @@ test("ambiguous recovery is inline and applies to one input revision", async () 
   assert.equal(choice.classList.contains("hidden"), true);
 });
 
+test("ambiguous clinical activation focuses the current revision's first missing control after activation", async () => {
+  await submit("Help with breathing.");
+  const choice = page.getElementById("intentChoice")!;
+  const clinical = choice.querySelector("button") as HTMLButtonElement;
+
+  clinical.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  clinical.focus(); // Match the browser's pointer activation focus after the click handler returns.
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(page.activeElement?.id, "patientAgeValue");
+
+  input.value = "Help with another breathing question.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  const nextClinical = page.getElementById("intentChoice")!.querySelector("button") as HTMLButtonElement;
+  nextClinical.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  nextClinical.click();
+  nextClinical.focus();
+  input.value = "Explain breathing observations generally.";
+  frontend.handleUnifiedInput();
+  input.focus();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(page.activeElement, input, "a late prior-review callback must not steal focus after revision transfer");
+});
+
 test("editing during assist aborts revision N before it can render over revision N plus one", async () => {
   let release!: () => void;
   let signal!: AbortSignal;

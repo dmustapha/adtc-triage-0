@@ -77,6 +77,7 @@
   var unifiedState = {
     candidate: null, route: "AMBIGUOUS", revision: 0, choiceRevision: null, routeOverride: null,
     reviewPresentedRevision: null, reviewedRevision: null, presentationRevision: null,
+    focusGeneration: 0, deferMissingFocusRevision: null,
   };
 
   function clinicalInput() { return $("case"); }
@@ -242,11 +243,28 @@
     field = field.replace(/^dangerObservations\./, "").replace(/^respiratoryAssessment\./, "");
     var danger = DANGER_SIGNS.some(function (sign) { return sign[0] === field; });
     var target = danger ? document.querySelector('input[name="danger-' + field + '"]') :
-      field === "respiratoryConcern" ? document.querySelector('input[name="respiratory-concern"]') : $(field);
+      field === "respiratoryConcern" ? document.querySelector('input[name="respiratory-concern"]') :
+      field === "patientAge" ? $("patientAgeValue") : $(field);
     if (target) target.focus();
   }
 
-  function renderMissingReview(fields) {
+  function scheduleMissingFieldFocus(field) {
+    var owner = {
+      revision: unifiedState.revision,
+      reviewRevision: unifiedState.reviewPresentedRevision,
+      generation: unifiedState.focusGeneration,
+    };
+    setTimeout(function () {
+      if (owner.revision !== unifiedState.revision ||
+          owner.reviewRevision !== unifiedState.reviewPresentedRevision ||
+          owner.generation !== unifiedState.focusGeneration) return;
+      if ($("missingReview") && $("missingReview").classList.contains("hidden")) return;
+      if (missingClinicalFields()[0] !== field) return;
+      focusMissingField(field);
+    }, 0);
+  }
+
+  function renderMissingReview(fields, deferFocus) {
     var labels = Object.fromEntries(DANGER_SIGNS);
     labels.patientAge = "Patient age";
     labels.respiratoryConcern = "Cough or difficult breathing";
@@ -260,7 +278,10 @@
       }).join(", ") + ".";
       $("missingReview").classList.remove("hidden");
     }
-    if (fields.length) focusMissingField(fields[0]);
+    if (fields.length) {
+      if (deferFocus) scheduleMissingFieldFocus(fields[0]);
+      else focusMissingField(fields[0]);
+    }
   }
 
   function invalidatePromptRun() {
@@ -291,8 +312,10 @@
 
   function handleUnifiedInput() {
     unifiedState.revision += 1;
+    unifiedState.focusGeneration += 1;
     unifiedState.choiceRevision = null;
     unifiedState.routeOverride = null;
+    unifiedState.deferMissingFocusRevision = null;
     unifiedState.reviewPresentedRevision = null;
     unifiedState.reviewedRevision = null;
     invalidatePromptRun();
@@ -312,6 +335,7 @@
     if (revision !== unifiedState.revision) return;
     unifiedState.choiceRevision = revision;
     unifiedState.routeOverride = route;
+    unifiedState.deferMissingFocusRevision = route === "CLINICAL" ? revision : null;
     $("intentChoice").classList.add("hidden");
     runUnified();
   }
@@ -343,11 +367,13 @@
     var route = unifiedState.choiceRevision === unifiedState.revision ? unifiedState.routeOverride : readiness.route;
     if (route === "AMBIGUOUS") { renderIntentChoice(); return; }
     if (route === "GENERAL") { await runPrompt(); return; }
+    var deferMissingFocus = unifiedState.deferMissingFocusRevision === unifiedState.revision;
+    unifiedState.deferMissingFocusRevision = null;
     var complete = updateDangerChecklist();
     if (unifiedState.reviewPresentedRevision !== unifiedState.revision) {
       unifiedState.reviewPresentedRevision = unifiedState.revision;
       var missing = complete ? [] : missingClinicalFields();
-      if (missing.length) renderMissingReview(missing);
+      if (missing.length) renderMissingReview(missing, deferMissingFocus);
       else {
         if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = false; $("dangerDisclosure").open = true; }
         if ($("missingReview")) {
@@ -363,6 +389,7 @@
   }
 
   function handleStructuredEdit() {
+    unifiedState.focusGeneration += 1;
     unifiedState.reviewedRevision = null;
     invalidateClinicalResult();
     updateDangerChecklist();
