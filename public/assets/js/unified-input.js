@@ -6,13 +6,13 @@
   "use strict";
 
   var OBSERVATIONS = [
-    ["cannotDrinkOrBreastfeed", /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b/i, /\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\b/i],
-    ["vomitsEverything", /\bvomits? everything\b/i, /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b/i, /\bvomits? everything\b/i],
-    ["convulsions", /\b(?:has|had|with)\s+(?:a\s+)?convulsions?\b|\bconvulsions?\s+(?:(?:is|was)\s+)?present\b/i, /\bno convulsions?\b/i, /\bconvulsions?\b/i],
-    ["lethargicOrUnconscious", /\b(?:lethargic|unconscious)\b/i, /\b(?:not lethargic|conscious and alert|alert and responsive)\b/i, /\b(?:lethargic(?:\s+or\s+unconscious)?|unconscious)\b/i],
-    ["chestIndrawing", /\bchest indrawing\s+(?:is\s+)?present\b|\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b/i, /\bchest indrawing\b/i],
-    ["stridorWhenCalm", /\bstridor\s+(?:when|while)\s+calm\b/i, /\bno stridor\s+(?:when|while)\s+calm\b/i, /\bstridor\s+(?:when|while)\s+calm\b/i],
-    ["lowOxygenOrCentralCyanosis", /\b(?:low oxygen|central cyanosis)\b/i, /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b/i, /\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\b/i],
+    ["cannotDrinkOrBreastfeed", /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b/i, /\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\b/i],
+    ["vomitsEverything", /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b/i, /\bvomits? everything\b/i],
+    ["convulsions", /\bno convulsions?\b/i, /\bconvulsions?\b/i],
+    ["lethargicOrUnconscious", /\b(?:not lethargic|conscious and alert|alert and responsive)\b/i, /\b(?:lethargic(?:\s+or\s+unconscious)?|unconscious)\b/i],
+    ["chestIndrawing", /\b(?:no|without)\s+chest indrawing\b/i, /\bchest indrawing\b/i],
+    ["stridorWhenCalm", /\bno stridor\s+(?:when|while)\s+calm\b/i, /\bstridor\s+(?:when|while)\s+calm\b/i],
+    ["lowOxygenOrCentralCyanosis", /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b/i, /\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\b/i],
   ];
   var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
@@ -23,7 +23,10 @@
     var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(input);
     var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(input);
     var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(input);
-    if (OBSERVATIONS.some(function (spec) { return spec[3].test(input); })) return "CLINICAL";
+    if (OBSERVATIONS.some(function (spec) {
+      var evidence = observationEvidence(input, spec);
+      return evidence.present || evidence.absent;
+    })) return "CLINICAL";
     return (finding && (age || person)) ? "CLINICAL" : "AMBIGUOUS";
   }
 
@@ -58,38 +61,65 @@
   }
 
   function assertedText(text) {
-    var asserted = String(text || "").replace(/"[^"]*"|'[^']*'/g, " ");
-    asserted = asserted.replace(/(?:^|[.!?;])\s*(?:if|whether|assuming|suppose)\b[^.!?;]*/gi, " ");
+    var asserted = String(text || "").replace(/"[^"]*"|“[^”]*”/g, " ");
+    asserted = asserted.replace(/\b(?:asked|asks?|wondered|wonders?)\s+whether\b[^.!?;]*/gi, " ");
+    asserted = asserted.replace(/\b(?:if|whether|assuming|suppose(?:\s+that)?)\b[^.!?;]*/gi, " ");
     OBSERVATIONS.forEach(function (spec) {
-      asserted = asserted.replace(new RegExp("(?:" + spec[3].source + ")\\s+absent-minded\\b", "gi"), " ");
+      asserted = asserted.replace(new RegExp("(?:" + spec[2].source + ")\\s+absent-minded\\b", "gi"), " ");
     });
     return asserted;
   }
 
-  function absentClausePattern() {
-    return /(^|[.!?;]|\bbut\b|\bhowever\b)((?:(?!\bbut\b|\bhowever\b)[^.!?;])*?)\b(?:(?:is|was|were)\s+)?absent(?![-\w])/gi;
+  function patternMatches(text, pattern) {
+    var flags = pattern.flags.replace("g", "") + "g";
+    var matcher = new RegExp(pattern.source, flags);
+    var matches = [];
+    var match;
+    while ((match = matcher.exec(text))) matches.push({ start: match.index, end: match.index + match[0].length });
+    return matches;
   }
 
-  function hasClauseAbsence(text, labelPattern) {
-    var found = false;
-    text.replace(absentClausePattern(), function (_match, _boundary, body) {
-      if (labelPattern.test(body)) found = true;
-      return _match;
-    });
-    return found;
+  function rangesOverlap(left, right) {
+    return left.start < right.end && right.start < left.end;
   }
 
-  function stripClauseAbsence(text, labelPattern) {
-    return text.replace(absentClausePattern(), function (match, boundary, body) {
-      if (!labelPattern.test(body)) return match;
-      return boundary + body.replace(labelPattern, " ");
+  function observationCount(clause) {
+    return OBSERVATIONS.reduce(function (count, spec) {
+      return count + patternMatches(clause, spec[2]).length;
+    }, 0);
+  }
+
+  function localPolarity(clause, occurrence, negativeRanges) {
+    if (negativeRanges.some(function (range) { return rangesOverlap(range, occurrence); })) return "ABSENT";
+    var suffix = clause.slice(occurrence.end).match(/^\s+(?:(?:is|was|were)\s+)?(present|absent)(?![-\w])/i);
+    if (suffix) return suffix[1].toUpperCase();
+    var prefix = clause.slice(0, occurrence.start);
+    if (/\b(?:has|had|with|shows?|is|was)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
+    return null;
+  }
+
+  function observationEvidence(text, spec) {
+    var evidence = { present: false, absent: false };
+    text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).forEach(function (clause) {
+      var negativeRanges = patternMatches(clause, spec[1]);
+      var occurrences = patternMatches(clause, spec[2]);
+      if (negativeRanges.length) evidence.absent = true;
+      var sharedAbsent = observationCount(clause) > 1 &&
+        /\b(?:(?:is|was|were)\s+)?absent(?![-\w])\s*$/i.test(clause);
+      occurrences.forEach(function (occurrence) {
+        var polarity = localPolarity(clause, occurrence, negativeRanges);
+        if (polarity === "PRESENT") evidence.present = true;
+        else if (polarity === "ABSENT" || sharedAbsent) evidence.absent = true;
+        else evidence.present = true;
+      });
     });
+    return evidence;
   }
 
   function observationValue(text, spec, allAbsent, conflicts) {
-    var absent = allAbsent || spec[2].test(text) || hasClauseAbsence(text, spec[3]);
-    var positiveText = absent && !allAbsent ? stripClauseAbsence(withoutPattern(text, spec[2]), spec[3]) : text;
-    var present = spec[1].test(positiveText);
+    var evidence = observationEvidence(text, spec);
+    var absent = allAbsent || evidence.absent;
+    var present = evidence.present;
     if (present && absent) {
       conflicts.push("dangerObservations." + spec[0]);
       return "NOT_ASSESSED";

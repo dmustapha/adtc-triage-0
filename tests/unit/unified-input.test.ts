@@ -129,6 +129,32 @@ test("mixed factual clauses keep present and absent observations separate", () =
   assert.deepEqual(draft.conflicts, []);
 });
 
+test("a trailing absent predicate never overrides another observation's local present predicate", () => {
+  const { api } = loadModule();
+  for (const separator of [" and ", ", "]) {
+    const draft = api.extractClinicalCandidate(`Vomits everything present${separator}chest indrawing absent.`);
+    assert.equal(draft.dangerObservations.vomitsEverything, "PRESENT", separator);
+    assert.equal(draft.dangerObservations.chestIndrawing, "ABSENT", separator);
+    assert.deepEqual(draft.conflicts, [], separator);
+  }
+});
+
+test("repeated observation evidence accumulates conflict in either order", () => {
+  const { api } = loadModule();
+  const cases = [
+    ["convulsions", "Has convulsions", "convulsions absent"],
+    ["chestIndrawing", "Chest indrawing present", "chest indrawing absent"],
+    ["lowOxygenOrCentralCyanosis", "Low oxygen present", "oxygen is normal"],
+  ];
+  for (const [key, present, absent] of cases) {
+    for (const narrative of [`${present} and ${absent}.`, `${absent} and ${present}.`]) {
+      const draft = api.extractClinicalCandidate(narrative);
+      assert.equal(draft.dangerObservations[key], "NOT_ASSESSED", narrative);
+      assert.ok(draft.conflicts.includes(`dangerObservations.${key}`), narrative);
+    }
+  }
+});
+
 test("independent present and field-value absent statements conflict in either order", () => {
   const { api } = loadModule();
   const fields = [
@@ -191,6 +217,26 @@ test("lexical, quoted, and hypothetical observation phrases do not become author
     assert.ok(Object.values(draft.dangerObservations).every((value) => value === "NOT_ASSESSED"), narrative);
     assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
   }
+});
+
+test("embedded non-assertions are masked without treating apostrophes as quote delimiters", () => {
+  const { api } = loadModule();
+  const nonAssertions = [
+    "The caregiver asked whether convulsions were absent.",
+    "The child has a cough, if convulsions were absent the form would change.",
+    "The phrase “convulsions absent” appears in the note.",
+    'The phrase "convulsions absent" appears in the note.',
+  ];
+  for (const narrative of nonAssertions) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations.convulsions, "NOT_ASSESSED", narrative);
+  }
+
+  const asserted = api.extractClinicalCandidate(
+    "The child's chest indrawing was absent. The caregiver's child can't drink or breastfeed.",
+  );
+  assert.equal(asserted.dangerObservations.chestIndrawing, "ABSENT");
+  assert.equal(asserted.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
 });
 
 test("keeps independently stated positive and negative evidence conflicting", () => {
