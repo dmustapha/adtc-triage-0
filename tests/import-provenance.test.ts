@@ -176,7 +176,12 @@ test("completed import ledger proves destination parity or records ADTC modifica
   }
 
   for (const candidate of [manifest, regenerated]) {
-    const reasons = new Map(candidate.imports.map((entry: { destinationPath: string; modification?: { reason?: string } }) => [entry.destinationPath, entry.modification?.reason]));
+    const reasons = new Map<string, string | undefined>(
+      candidate.imports.map((entry: { destinationPath: string; modification?: { reason?: string } }) => [
+        entry.destinationPath,
+        entry.modification?.reason,
+      ]),
+    );
     const ledgerPurpose = candidate.adtcNewFiles.find((entry: { path: string }) => entry.path === "config/import-manifest.json")?.purpose;
 
     assert.match(reasons.get("public/app.html") ?? "", /one unified textarea.*one Get guidance action.*one shared result region/i);
