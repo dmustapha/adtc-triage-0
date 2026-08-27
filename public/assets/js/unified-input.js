@@ -156,7 +156,11 @@
     var current = parts[0] || "";
     for (var index = 1; index < parts.length; index += 2) {
       var next = parts[index + 1] || "";
-      if (patternMatches(current, pattern).length && patternMatches(next, pattern).length) {
+      var joined = current + parts[index] + next;
+      var crossesBoundary = patternMatches(joined, pattern).some(function (range) {
+        return range.start < current.length + parts[index].length && range.end > current.length;
+      });
+      if (!crossesBoundary && patternMatches(current, pattern).length && patternMatches(next, pattern).length) {
         segments.push(current); current = next;
       } else current += parts[index] + next;
     }

@@ -160,6 +160,27 @@ test("POST /triage accepts coordinated explicit absence as deterministic outside
   }
 });
 
+test("POST /triage rejects explicit facts discarded as structured not-assessed", async () => {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  try {
+    const response = await postJson("/triage", {
+      caseText: "Two year old. Convulsions were absent. Cough is present.",
+      patientAge: { value: 2, unit: "years" },
+      dangerObservations: { convulsions: "NOT_ASSESSED" },
+      respiratoryAssessment: { coughOrDifficultBreathing: "NOT_ASSESSED", rateCountQuality: "NOT_CONFIRMED" },
+    });
+    assert.equal(response.status, 409);
+    assert.deepEqual((await response.json()).conflicts, [
+      "convulsions",
+      "respiratoryAssessment.coughOrDifficultBreathing",
+    ]);
+    assert.deepEqual(boundaries, []);
+  } finally {
+    restore();
+  }
+});
+
 // ── excluded optional modalities ───────────────────────────────────────────────────
 test("POST /tts is not registered in the English text baseline", async () => {
   const r = await postJson("/tts", { text: "" });

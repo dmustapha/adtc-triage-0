@@ -81,6 +81,9 @@ function localPolarity(clause: string, occurrence: { start: number; end: number 
   if (/\b(?:has\s+(?:never|not)\s+(?:had|been)|never\s+had|(?:has|had)\s+not\s+shown|no\s+(?:reported|observed|noted|documented|recorded)|(?:does|did)\s+not\s+(?:have|show))\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
   if (/\b(?:(?:does|did)\s+not\s+have|(?:is|was|are)\s+without|ruled\s+out)\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
   if (/\b(?:has|had|with|shows?|is|was|are|observed|noted|reports?|reported)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
+  if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?present\b/i.test(suffix)) return "PRESENT";
+  if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?absent\b/i.test(suffix)) return "ABSENT";
+  if (/\b(?:documented|recorded)\s+$/i.test(prefix)) return "NONE";
   return inherent ? "INHERENT" : null;
 }
 
@@ -90,7 +93,10 @@ function splitPatternClause(clause: string, pattern: RegExp) {
   let current = parts[0] ?? "";
   for (let index = 1; index < parts.length; index += 2) {
     const next = parts[index + 1] ?? "";
-    if (matches(current, pattern).length && matches(next, pattern).length) { segments.push(current); current = next; }
+    const delimiter = parts[index] ?? "";
+    const crossesBoundary = matches(current + delimiter + next, pattern)
+      .some((range) => range.start < current.length + delimiter.length && range.end > current.length);
+    if (!crossesBoundary && matches(current, pattern).length && matches(next, pattern).length) { segments.push(current); current = next; }
     else current += (parts[index] ?? "") + next;
   }
   segments.push(current);
@@ -151,7 +157,8 @@ export function extractNarrativeAuthority(raw: string) {
   const aggregateAbsent = allAbsent(text);
   const dangerObservations = Object.fromEntries(DANGER_OBSERVATION_KEYS.map((key) => {
     const value = resolve(collect(text, SPECS[key], true));
-    return [key, aggregateAbsent && value === "NOT_ASSESSED" ? "ABSENT" : value];
+    if (!aggregateAbsent) return [key, value];
+    return [key, value === "PRESENT" || value === "CONFLICT" ? "CONFLICT" : "ABSENT"];
   })) as Record<DangerObservationKey, NarrativePolarity>;
   return { dangerObservations, respiratoryConcern: resolve(collect(text, RESPIRATORY, false)) };
 }

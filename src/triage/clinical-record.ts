@@ -65,7 +65,7 @@ export function findNarrativeConflicts(record: CanonicalClinicalRecord): string[
   DANGER_OBSERVATION_KEYS.forEach((key) => {
     const narrative = authority.dangerObservations[key];
     const structured = record.dangerObservations[key];
-    if (narrative === "CONFLICT" || (narrative !== "NOT_ASSESSED" && structured !== "NOT_ASSESSED" && narrative !== structured)) {
+    if (narrative === "CONFLICT" || (narrative !== "NOT_ASSESSED" && narrative !== structured)) {
       conflicts.push(`dangerObservations.${key}`);
     }
   });
