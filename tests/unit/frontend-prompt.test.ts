@@ -117,6 +117,21 @@ test("ambiguous clinical activation focuses the current revision's first missing
   assert.equal(page.activeElement, input, "a late prior-review callback must not steal focus after revision transfer");
 });
 
+test("switching an ambiguous revision from clinical to general invalidates deferred clinical focus", async () => {
+  requests.length = 0;
+  await submit("Help with breathing.");
+  const actions = page.getElementById("intentChoice")!.querySelectorAll("button") as NodeListOf<HTMLButtonElement>;
+  actions[0].click();
+  actions[1].click();
+  input.focus();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(requests.at(-1)?.url, "/assist");
+  assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Safe local answer/);
+  assert.equal(page.activeElement, input, "the superseded clinical timer must not reclaim general-route focus");
+});
+
 test("editing during assist aborts revision N before it can render over revision N plus one", async () => {
   let release!: () => void;
   let signal!: AbortSignal;

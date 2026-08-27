@@ -333,6 +333,7 @@
 
   function chooseRoute(route, revision) {
     if (revision !== unifiedState.revision) return;
+    unifiedState.focusGeneration += 1;
     unifiedState.choiceRevision = revision;
     unifiedState.routeOverride = route;
     unifiedState.deferMissingFocusRevision = route === "CLINICAL" ? revision : null;
