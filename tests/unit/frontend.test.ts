@@ -163,6 +163,39 @@ test("record invalidation and provisional rendering preserve usable confirmation
   assert.doesNotMatch(el("confirmationRegion").className, /hidden/);
 });
 
+test("a new provisional lifecycle replaces prior confirmation progress and terminal presentation", async () => {
+  fe.renderProvisional({ token: "old-confirm-token", classification: "MALARIA", protocol: "IMCI" });
+  g.fetch = async () => new Response(JSON.stringify({
+    reviewState: "CONFIRMED", classification: "MALARIA", protocol: "IMCI", severity: "URGENT",
+    referenceActions: { medicines: [], supportive: [], home_care: [], return_now: [], follow_up: null, referral: null },
+  }), { status: 200, headers: { "Content-Type": "application/json" } });
+  await fe.sendConfirmation("CONFIRM");
+  assert.equal(el("confirmationStatus").textContent, "Reviewed classification confirmed. Cited reference actions are shown.");
+
+  fe.invalidateClinicalResult();
+  assert.equal(el("confirmationStatus").textContent, "", "record invalidation clears prior terminal presentation");
+  assert.equal(el("confirmationRegion").hasAttribute("aria-busy"), false);
+  fe.renderProvisional({ token: "new-confirm-token", classification: "COUGH OR COLD", protocol: "IMCI" });
+  assert.equal(fe.clinicalState.confirmationToken, "new-confirm-token");
+  assert.equal(el("confirmationStatus").textContent, "Ready for human review. Confirm, correct, or reject this provisional classification.");
+  assert.doesNotMatch(el("confirmationStatus").textContent, /Applying|MALARIA/i);
+  assert.equal(el("confirmationPlan").textContent, "");
+  assert.doesNotMatch(el("confirmationRegion").querySelector(".confirmation-instructions")?.className ?? "", /hidden/);
+
+  let resolveCurrent!: (response: Response) => void;
+  g.fetch = () => new Promise((resolve) => { resolveCurrent = resolve; });
+  const pending = fe.sendConfirmation("CONFIRM");
+  assert.equal(el("confirmationStatus").textContent, "Applying the reviewed confirmation.");
+  assert.equal(el("confirmationRegion").getAttribute("aria-busy"), "true");
+  resolveCurrent(new Response(JSON.stringify({
+    reviewState: "CONFIRMED", classification: "COUGH OR COLD", protocol: "IMCI", severity: "ROUTINE",
+    referenceActions: { medicines: [], supportive: [], home_care: [], return_now: [], follow_up: null, referral: null },
+  }), { status: 200, headers: { "Content-Type": "application/json" } }));
+  await pending;
+  assert.equal(el("confirmationStatus").textContent, "Reviewed classification confirmed. Cited reference actions are shown.");
+  assert.equal(el("confirmationRegion").hasAttribute("aria-busy"), false);
+});
+
 test("confirmed plan DOM renders cited dose rows and separately cited follow-up detail", () => {
   fe.renderReferenceActions({
     classification: "PNEUMONIA", severity: "URGENT",
@@ -322,6 +355,9 @@ test("confirmation rejection and token failures never expose source actions", as
   (el("rejectAssessment") as HTMLButtonElement).click();
   await Promise.resolve();
   assert.equal(terminalCalls, 0, "keyboard/click activation cannot replay terminal controls");
+  fe.invalidateClinicalResult();
+  assert.equal(el("confirmationStatus").textContent, "", "record invalidation clears rejected terminal presentation");
+  assert.equal(el("confirmationStatus").hasAttribute("tabindex"), false);
 });
 
 test("structured form serializes the respiratory record without narrative inference", () => {

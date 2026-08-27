@@ -715,20 +715,29 @@
     if ($("confirmationPlan")) $("confirmationPlan").textContent = "";
   }
 
+  function resetConfirmationPresentation(status) {
+    clearReferenceActions();
+    if ($("confirmationRegion")) $("confirmationRegion").removeAttribute("aria-busy");
+    if ($("confirmationStatus")) {
+      $("confirmationStatus").textContent = status || "";
+      $("confirmationStatus").removeAttribute("tabindex");
+    }
+  }
+
   function transitionClinicalPhase(phase) {
     clinicalState.phase = phase;
     if ($("result")) $("result").dataset.clinicalPhase = phase;
   }
 
   function transitionToDeterministic(data) {
-    clearReferenceActions();
+    resetConfirmationPresentation("");
     clinicalState.confirmationToken = null;
     clinicalState.continuationToken = data.token;
     transitionClinicalPhase("DETERMINISTIC");
   }
 
   function transitionToProvisional(data) {
-    clearReferenceActions();
+    resetConfirmationPresentation("Ready for human review. Confirm, correct, or reject this provisional classification.");
     clinicalState.continuationToken = null;
     clinicalState.confirmationToken = data.token;
     transitionClinicalPhase("PROVISIONAL");
@@ -736,12 +745,13 @@
 
   function transitionToConfirmed() {
     clinicalState.confirmationToken = null;
+    resetConfirmationPresentation("Reviewed classification confirmed. Cited reference actions are shown.");
     transitionClinicalPhase("CONFIRMED");
   }
 
   function transitionToRejected() {
     clinicalState.confirmationToken = null;
-    clearReferenceActions();
+    resetConfirmationPresentation("");
     transitionClinicalPhase("REJECTED");
     var region = $("confirmationRegion");
     if (region) {
@@ -899,7 +909,7 @@
   }
 
   function invalidateConfirmation() {
-    restoreConfirmationPlanHost();
+    resetConfirmationPresentation("");
     clinicalState.generation += 1;
     transitionClinicalPhase("RECORD");
     clinicalState.confirmationToken = null;
@@ -908,7 +918,6 @@
     clinicalState.continuationPending = false;
     ["confirmAssessment", "correctAssessment", "rejectAssessment"].forEach(function (id) { if ($(id)) $(id).disabled = false; });
     if ($("confirmationRegion")) {
-      if ($("confirmationPlan")) $("confirmationPlan").textContent = "";
       var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
       var actions = $("confirmationRegion").querySelector(".confirmation-actions");
       if (instructions) instructions.classList.remove("hidden");
