@@ -73,7 +73,7 @@
   };
 
   var unifiedInput = typeof window !== "undefined" ? window.TriageUnifiedInput : null;
-  var unifiedState = { candidate: null, route: "AMBIGUOUS", revision: 0 };
+  var unifiedState = { candidate: null, route: "AMBIGUOUS", revision: 0, choiceRevision: null, routeOverride: null };
 
   function clinicalInput() { return $("case"); }
 
@@ -214,7 +214,7 @@
   function updateUnifiedReadiness() {
     var text = clinicalInput() ? clinicalInput().value.trim() : "";
     unifiedState.route = unifiedInput && unifiedInput.routeInput ? unifiedInput.routeInput(text) : "AMBIGUOUS";
-    if ($("assess") && !assessCtl) $("assess").disabled = !text;
+    if ($("assess") && !assessCtl && !(promptState && promptState.abortController)) $("assess").disabled = !text;
     return { ready: Boolean(text), route: unifiedState.route };
   }
 
@@ -258,20 +258,51 @@
 
   function handleUnifiedInput() {
     unifiedState.revision += 1;
+    unifiedState.choiceRevision = null;
+    unifiedState.routeOverride = null;
     invalidateClinicalResult();
     unifiedState.candidate = unifiedInput && unifiedInput.extractClinicalCandidate
       ? unifiedInput.extractClinicalCandidate(clinicalInput().value) : null;
     applyClinicalCandidate(unifiedState.candidate);
     if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = true; $("dangerDisclosure").open = false; }
     if ($("missingReview")) $("missingReview").classList.add("hidden");
+    if ($("intentChoice")) { $("intentChoice").textContent = ""; $("intentChoice").classList.add("hidden"); }
     updateDangerChecklist();
     updateUnifiedReadiness();
+  }
+
+  function chooseRoute(route, revision) {
+    if (revision !== unifiedState.revision) return;
+    unifiedState.choiceRevision = revision;
+    unifiedState.routeOverride = route;
+    $("intentChoice").classList.add("hidden");
+    runUnified();
+  }
+
+  function renderIntentChoice() {
+    var region = $("intentChoice");
+    var revision = unifiedState.revision;
+    region.textContent = "";
+    var clinical = document.createElement("button");
+    clinical.type = "button";
+    clinical.textContent = "Assess as a patient case";
+    clinical.onclick = function () { chooseRoute("CLINICAL", revision); };
+    var general = document.createElement("button");
+    general.type = "button";
+    general.textContent = "Answer as a general question";
+    general.onclick = function () { chooseRoute("GENERAL", revision); };
+    region.append(clinical, general);
+    region.classList.remove("hidden");
+    $("result").classList.remove("hidden");
+    clinical.focus();
   }
 
   async function runUnified() {
     var readiness = updateUnifiedReadiness();
     if (!readiness.ready) { clinicalInput().focus(); return; }
-    if (readiness.route !== "CLINICAL") return;
+    var route = unifiedState.choiceRevision === unifiedState.revision ? unifiedState.routeOverride : readiness.route;
+    if (route === "AMBIGUOUS") { renderIntentChoice(); return; }
+    if (route === "GENERAL") { await runPrompt(); return; }
     if (!updateDangerChecklist()) { renderMissingReview(missingClinicalFields()); return; }
     await runAssess();
   }
@@ -1097,29 +1128,6 @@
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runUnified(); }
   });
 
-  function setMode(mode) {
-    var clinical = mode === "clinical";
-    if ($("clinicalModePanel")) $("clinicalModePanel").hidden = !clinical;
-    if ($("promptModePanel")) $("promptModePanel").hidden = clinical;
-    document.querySelectorAll(".mode-tab").forEach(function (button) {
-      var selected = button.dataset.mode === mode;
-      button.classList.toggle("is-active", selected);
-      button.setAttribute("aria-selected", String(selected));
-      button.tabIndex = selected ? 0 : -1;
-    });
-  }
-
-  document.querySelectorAll(".mode-tab").forEach(function (button) {
-    button.addEventListener("click", function () { setMode(button.dataset.mode); });
-  });
-  ["promptExample1", "promptExample2"].forEach(function (id) {
-    if ($(id)) $(id).addEventListener("click", function () {
-      $("ordinaryPrompt").value = $(id).dataset.prompt;
-      updatePromptReadiness();
-      $("ordinaryPrompt").focus();
-    });
-  });
-
   var promptState = {
     jobId: null,
     abortController: null,
@@ -1131,24 +1139,21 @@
   };
 
   function updatePromptReadiness() {
-    if (!$("ordinaryPrompt") || !$("runPrompt")) return;
-    var ready = Boolean($("ordinaryPrompt").value.trim());
-    $("ordinaryPrompt").setAttribute("aria-invalid", String(Boolean($("ordinaryPrompt").value) && !ready));
-    if (!promptState.abortController) $("runPrompt").disabled = !ready;
+    updateUnifiedReadiness();
   }
 
   function promptMessage(kind, title, data) {
-    var promptResult = $("promptResult");
-    if (!promptResult) return;
-    promptResult.textContent = "";
-    promptResult.hidden = false;
-    promptResult.dataset.state = kind;
+    var sharedAnswer = $("sharedAnswer");
+    if (!sharedAnswer) return;
+    sharedAnswer.textContent = "";
+    sharedAnswer.classList.remove("hidden");
+    sharedAnswer.dataset.state = kind;
     var heading = document.createElement("h3");
     heading.textContent = title;
     var answer = document.createElement("p");
     var message = data.answer || data.reason || data.error || "No public answer was produced.";
     answer.textContent = data.code ? message + " (" + data.code + ")" : message;
-    promptResult.append(heading, answer);
+    sharedAnswer.append(heading, answer);
     ["uncertainty", "limitations"].forEach(function (key) {
       if (!data[key] || !data[key].length) return;
       var label = document.createElement("h4");
@@ -1159,35 +1164,35 @@
         item.textContent = line;
         list.appendChild(item);
       });
-      promptResult.append(label, list);
+      sharedAnswer.append(label, list);
     });
   }
 
   function handlePromptEvent(event, data, runId) {
     if (runId !== promptState.runId || promptState.terminal) return;
     if (event === "job") promptState.jobId = data.id;
-    else if (event === "stage") $("promptStatus").textContent = data.label || "Running locally.";
+    else if (event === "stage") $("status").textContent = data.label || "Running locally.";
     else if (event === "answer") {
       promptState.terminal = true;
-      $("promptStatus").textContent = "Complete.";
+      $("status").textContent = "Complete.";
       promptMessage("completed", "Local answer", data);
     } else if (event === "rejected") {
       promptState.terminal = true;
       promptState.retryable = data.retryable !== false;
       if (data.status === "UNAVAILABLE") {
-        $("promptStatus").textContent = "Local assistance unavailable.";
+        $("status").textContent = "Local assistance unavailable.";
         promptMessage("unavailable", "Local assistance unavailable", data);
       } else if (data.status === "CANCELLED") {
-        $("promptStatus").textContent = "Cancelled.";
+        $("status").textContent = "Cancelled.";
         promptMessage("cancelled", "Local run cancelled", data);
       } else {
-        $("promptStatus").textContent = "Answer withheld.";
+        $("status").textContent = "Answer withheld.";
         promptMessage("rejected", "Answer withheld", data);
       }
     } else if (event === "error") {
       promptState.terminal = true;
       promptState.retryable = data.retryable !== false;
-      $("promptStatus").textContent = "Local assistance unavailable.";
+      $("status").textContent = "Local assistance unavailable.";
       promptMessage("unavailable", "Local assistance unavailable", data);
     }
   }
@@ -1212,8 +1217,8 @@
   }
 
   async function runPrompt() {
-    var prompt = $("ordinaryPrompt").value;
-    if (!prompt.trim()) { $("promptStatus").textContent = "Enter a prompt first."; $("ordinaryPrompt").setAttribute("aria-invalid", "true"); $("ordinaryPrompt").focus(); return; }
+    var prompt = clinicalInput().value;
+    if (!prompt.trim()) { $("status").textContent = "Enter a request first."; clinicalInput().focus(); return; }
     promptState.runId += 1;
     var runId = promptState.runId;
     promptState.jobId = null;
@@ -1222,9 +1227,10 @@
     promptState.cancelMessage = null;
     promptState.lastPrompt = prompt;
     promptState.abortController = new AbortController();
-    $("promptResult").hidden = true;
-    $("promptStatus").textContent = "Starting local two-pass review.";
-    $("runPrompt").disabled = true;
+    $("sharedAnswer").classList.add("hidden");
+    $("result").classList.remove("hidden");
+    $("status").textContent = "Starting local two-pass review.";
+    $("assess").disabled = true;
     $("cancelPrompt").hidden = false;
     $("retryPrompt").hidden = true;
     var buffer = "";
@@ -1257,7 +1263,7 @@
     } catch (error) {
       if (runId !== promptState.runId) return;
       promptState.terminal = true;
-      if (error && error.name === "AbortError") $("promptStatus").textContent = promptState.cancelMessage || "Stopped locally.";
+      if (error && error.name === "AbortError") $("status").textContent = promptState.cancelMessage || "Stopped locally.";
       else promptMessage("unavailable", "Local assistance unavailable", { reason: error.message || "The local prompt run could not finish." });
     } finally {
       if (runId === promptState.runId) {
@@ -1275,16 +1281,16 @@
       try {
         var response = await fetch("/jobs/" + encodeURIComponent(promptState.jobId), { method: "DELETE" });
         if (response.status === 409) {
-          $("promptStatus").textContent = "The local job had already finished; waiting for its terminal result.";
+          $("status").textContent = "The local job had already finished; waiting for its terminal result.";
           return;
         }
         if (!response.ok) {
-          $("promptStatus").textContent = "Cancellation could not be confirmed; the local run is still active.";
+          $("status").textContent = "Cancellation could not be confirmed; the local run is still active.";
           return;
         }
         promptState.cancelMessage = "Cancelled by user.";
       } catch (error) {
-        $("promptStatus").textContent = "Cancellation could not be confirmed; the local run is still active.";
+        $("status").textContent = "Cancellation could not be confirmed; the local run is still active.";
         return;
       }
     } else {
@@ -1296,17 +1302,13 @@
   function retryPrompt() {
     promptState.jobId = null;
     promptState.terminal = false;
-    if (promptState.lastPrompt) $("ordinaryPrompt").value = promptState.lastPrompt;
+    if (promptState.lastPrompt) clinicalInput().value = promptState.lastPrompt;
     runPrompt();
   }
 
-  if ($("runPrompt")) $("runPrompt").onclick = runPrompt;
   if ($("cancelPrompt")) $("cancelPrompt").onclick = cancelPrompt;
   if ($("retryPrompt")) $("retryPrompt").onclick = retryPrompt;
-  if ($("ordinaryPrompt")) {
-    $("ordinaryPrompt").addEventListener("input", updatePromptReadiness);
-    updatePromptReadiness();
-  }
+  updatePromptReadiness();
 
   var lastCard = null;
   // Test hook (browser-safe: `module` is undefined in the browser, so this is a no-op there and the
@@ -1331,6 +1333,7 @@
       runUnified: runUnified,
       unifiedState: unifiedState,
       focusMissingField: focusMissingField,
+      promptState: promptState,
       invalidateClinicalResult: invalidateClinicalResult,
       renderProvisional: renderProvisional,
       renderContinuation: renderContinuation,

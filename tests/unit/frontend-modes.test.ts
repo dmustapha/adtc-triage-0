@@ -45,9 +45,9 @@ test("submitted-prompt shortcuts are absent while shared recovery regions remain
 });
 
 test("ordinary prompt terminal events replace the in-progress status truthfully", () => {
-  assert.match(script, /event === "answer"[\s\S]{0,180}promptStatus"\)\.textContent = "Complete\."/);
-  assert.match(script, /event === "rejected"[\s\S]{0,700}promptStatus"\)\.textContent = "Answer withheld\."/);
-  assert.match(script, /event === "error"[\s\S]{0,180}promptStatus"\)\.textContent = "Local assistance unavailable\."/);
+  assert.match(script, /event === "answer"[\s\S]{0,180}"status"\)\.textContent = "Complete\."/);
+  assert.match(script, /event === "rejected"[\s\S]{0,700}"status"\)\.textContent = "Answer withheld\."/);
+  assert.match(script, /event === "error"[\s\S]{0,180}"status"\)\.textContent = "Local assistance unavailable\."/);
 });
 
 test("new interactive controls retain 44-pixel targets and mobile wrapping", () => {
