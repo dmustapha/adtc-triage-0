@@ -9,7 +9,7 @@ test("clinical confirmation has explicit token-bound client state", () => {
   assert.match(source, /var clinicalState\s*=\s*\{[\s\S]*phase:\s*"RECORD"[\s\S]*confirmationToken:\s*null[\s\S]*terminal:\s*false/);
   assert.match(source, /function invalidateConfirmation/);
   assert.match(source, /function invalidateClinicalResult[\s\S]*invalidateConfirmation\(\)/);
-  assert.match(source, /clinicalModePanel[\s\S]*(?:input|change)[\s\S]*invalidateClinicalResult/);
+  assert.match(source, /clinicalInput\(\)[\s\S]*addEventListener\("input"[\s\S]*invalidateClinicalResult/);
 });
 
 test("respiratory continuation is explicit and token-only", () => {
@@ -49,7 +49,7 @@ test("confirmed source actions use text nodes instead of model-authored HTML", (
 });
 
 test("confirmed dose tables are contained by a shrinkable mobile plan region", () => {
-  assert.match(css, /#clinicalModePanel\s*,\s*#result\s*,\s*\.panel[^{}]*\{[^}]*min-width:\s*0/s);
+  assert.match(css, /#result\s*,\s*\.panel\s*,\s*\.record-review[^{}]*\{[^}]*min-width:\s*0/s);
   assert.match(css, /#confirmationPlan[^{}]*\{[^}]*min-width:\s*0/s);
   assert.match(css, /\.medicine-card[^{}]*\{[^}]*min-width:\s*0/s);
   assert.match(css, /\.dose-table-wrap[^{}]*\{[^}]*width:\s*100%[^}]*overflow-x:\s*auto/s);

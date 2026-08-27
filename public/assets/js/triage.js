@@ -72,7 +72,38 @@
     continuationPending: false,
   };
 
-  function clinicalInput() { return $("clinicalCase") || $("case"); }
+  var unifiedInput = typeof window !== "undefined" ? window.TriageUnifiedInput : null;
+  var unifiedState = { candidate: null, route: "AMBIGUOUS", revision: 0 };
+
+  function clinicalInput() { return $("case"); }
+
+  function setChoice(name, value) {
+    var input = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if (input) input.checked = true;
+  }
+
+  function clearCandidateFields() {
+    if ($("patientAgeValue")) $("patientAgeValue").value = "";
+    if ($("patientWeightKg")) $("patientWeightKg").value = "";
+    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").value = "";
+    if ($("rateCountQuality")) $("rateCountQuality").value = "NOT_CONFIRMED";
+    setChoice("respiratory-concern", "NOT_ASSESSED");
+    DANGER_SIGNS.forEach(function (sign) { setChoice("danger-" + sign[0], "NOT_ASSESSED"); });
+  }
+
+  function applyClinicalCandidate(candidate) {
+    clearCandidateFields();
+    if (!candidate) return;
+    if (candidate.patientAge) {
+      $("patientAgeValue").value = String(candidate.patientAge.value);
+      $("patientAgeUnit").value = candidate.patientAge.unit;
+    }
+    if (candidate.patientWeightKg != null) $("patientWeightKg").value = String(candidate.patientWeightKg);
+    if (candidate.respiratoryRatePerMinute != null) $("respiratoryRatePerMinute").value = String(candidate.respiratoryRatePerMinute);
+    if (candidate.rateCountQuality) $("rateCountQuality").value = candidate.rateCountQuality;
+    setChoice("respiratory-concern", candidate.respiratoryConcern);
+    DANGER_SIGNS.forEach(function (sign) { setChoice("danger-" + sign[0], candidate.dangerObservations[sign[0]]); });
+  }
 
   function selectedDangerValue(key) {
     var selected = document.querySelector('input[name="danger-' + key + '"]:checked');
@@ -176,8 +207,72 @@
         return sign[1] + ": " + value.charAt(0).toUpperCase() + value.slice(1);
       }).join("; ") + ".";
     }
-    if ($("assess") && !assessCtl) $("assess").disabled = !ready;
+    if ($("assess") && !assessCtl) $("assess").disabled = !Boolean(clinicalInput() && clinicalInput().value.trim());
     return ready;
+  }
+
+  function updateUnifiedReadiness() {
+    var text = clinicalInput() ? clinicalInput().value.trim() : "";
+    unifiedState.route = unifiedInput && unifiedInput.routeInput ? unifiedInput.routeInput(text) : "AMBIGUOUS";
+    if ($("assess") && !assessCtl) $("assess").disabled = !text;
+    return { ready: Boolean(text), route: unifiedState.route };
+  }
+
+  function missingClinicalFields() {
+    var structured = readStructuredDanger();
+    var missing = [];
+    if (ageBand(structured.patientAge) === "unsupported") missing.push("patientAge");
+    DANGER_SIGNS.forEach(function (sign) {
+      if (structured.dangerObservations[sign[0]] === "NOT_ASSESSED") missing.push(sign[0]);
+    });
+    var breathing = structured.respiratoryAssessment;
+    if (!breathing) missing.push("respiratoryConcern");
+    else if (breathing.coughOrDifficultBreathing === "PRESENT") {
+      if (!Number.isInteger(breathing.respiratoryRatePerMinute)) missing.push("respiratoryRatePerMinute");
+      if (breathing.rateCountQuality !== "ONE_MINUTE_WHILE_CALM") missing.push("rateCountQuality");
+    }
+    return missing.concat(unifiedState.candidate ? unifiedState.candidate.conflicts : []);
+  }
+
+  function focusMissingField(field) {
+    var danger = DANGER_SIGNS.some(function (sign) { return sign[0] === field; });
+    var target = danger ? document.querySelector('input[name="danger-' + field + '"]') :
+      field === "respiratoryConcern" ? document.querySelector('input[name="respiratory-concern"]') : $(field);
+    if (target) target.focus();
+  }
+
+  function renderMissingReview(fields) {
+    var labels = Object.fromEntries(DANGER_SIGNS);
+    labels.patientAge = "Patient age";
+    labels.respiratoryConcern = "Cough or difficult breathing";
+    labels.respiratoryRatePerMinute = "Breaths per minute";
+    labels.rateCountQuality = "Count quality";
+    if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = false; $("dangerDisclosure").open = true; }
+    if ($("missingReview")) {
+      $("missingReview").textContent = "Review required: " + fields.map(function (field) { return labels[field] || field; }).join(", ") + ".";
+      $("missingReview").classList.remove("hidden");
+    }
+    if (fields.length) focusMissingField(fields[0]);
+  }
+
+  function handleUnifiedInput() {
+    unifiedState.revision += 1;
+    invalidateClinicalResult();
+    unifiedState.candidate = unifiedInput && unifiedInput.extractClinicalCandidate
+      ? unifiedInput.extractClinicalCandidate(clinicalInput().value) : null;
+    applyClinicalCandidate(unifiedState.candidate);
+    if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = true; $("dangerDisclosure").open = false; }
+    if ($("missingReview")) $("missingReview").classList.add("hidden");
+    updateDangerChecklist();
+    updateUnifiedReadiness();
+  }
+
+  async function runUnified() {
+    var readiness = updateUnifiedReadiness();
+    if (!readiness.ready) { clinicalInput().focus(); return; }
+    if (readiness.route !== "CLINICAL") return;
+    if (!updateDangerChecklist()) { renderMissingReview(missingClinicalFields()); return; }
+    await runAssess();
   }
 
   // ---- guidelines loaded count (for the live readout) + empty-store setup banner (H-7) ----
@@ -696,7 +791,7 @@
 
   function invalidateClinicalResult() {
     var result = $("result");
-    var hadResult = result && !result.classList.contains("hidden") && $("card") && $("card").textContent.trim();
+    var hadResult = result && !result.classList.contains("hidden");
     var interrupted = Boolean(assessCtl);
     invalidateConfirmation();
     if (interrupted) {
@@ -962,24 +1057,21 @@
       $("result").removeAttribute("aria-busy");
     }
   }
-  if ($("assess")) $("assess").onclick = runAssess;
+  if ($("assess")) $("assess").onclick = runUnified;
   if ($("dangerChecklist")) {
     $("dangerChecklist").addEventListener("change", updateDangerChecklist);
     $("patientAgeValue").addEventListener("input", updateDangerChecklist);
     if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").addEventListener("input", updateDangerChecklist);
     updateDangerChecklist();
   }
-  if ($("clinicalModePanel")) {
-    $("clinicalModePanel").addEventListener("input", function () { invalidateClinicalResult(); updateDangerChecklist(); });
-    $("clinicalModePanel").addEventListener("change", function () { invalidateClinicalResult(); updateDangerChecklist(); });
-  }
+  if (clinicalInput()) clinicalInput().addEventListener("input", function () { handleUnifiedInput(); });
   if ($("confirmAssessment")) $("confirmAssessment").onclick = function () { sendConfirmation("CONFIRM").catch(function (e) { $("err").textContent = e.message; }); };
   if ($("continueAssessment")) $("continueAssessment").onclick = function () { sendContinuation().catch(function (e) { $("err").textContent = e.message; }); };
   if ($("rejectAssessment")) $("rejectAssessment").onclick = function () { sendConfirmation("REJECT").catch(function (e) { $("err").textContent = e.message; }); };
   if ($("correctAssessment")) $("correctAssessment").onclick = function () { invalidateClinicalResult(); clinicalInput().focus(); };
   // Ctrl/Cmd+Enter from the case box submits, the way a clinician expects.
   if (clinicalInput()) clinicalInput().addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runAssess(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runUnified(); }
   });
 
   function setMode(mode) {
@@ -1211,6 +1303,10 @@
       stopReasonTimer: stopReasonTimer,
       readStructuredDanger: readStructuredDanger,
       updateDangerChecklist: updateDangerChecklist,
+      updateUnifiedReadiness: updateUnifiedReadiness,
+      handleUnifiedInput: handleUnifiedInput,
+      runUnified: runUnified,
+      unifiedState: unifiedState,
       invalidateClinicalResult: invalidateClinicalResult,
       renderProvisional: renderProvisional,
       renderContinuation: renderContinuation,

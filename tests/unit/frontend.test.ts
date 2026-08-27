@@ -89,7 +89,7 @@ test("judge-facing copy describes the restored clinical and prompt workflows", (
   const appHtml = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
   const landingHtml = readFileSync(new URL("../../public/index.html", import.meta.url), "utf8");
 
-  assert.match(appHtml, /supervised WHO assessment and local prompt review/i);
+  assert.match(appHtml, /offline clinical guidance/i);
   assert.doesNotMatch(appHtml, /<title>[^<]*respiratory assessment|<h1[^>]*>[^<]*pediatric respiratory assessment/i);
   assert.match(landingHtml, /supervised WHO review/i);
   assert.match(landingHtml, /pediatric IMCI and adult mhGAP/i);
@@ -203,7 +203,7 @@ test("structured assessment preserves the pinned compact patient-panel rhythm", 
   const css = readFileSync(new URL("../../public/assets/css/app.css", import.meta.url), "utf8");
   const page = new JSDOM(html).window.document;
   const disclosure = page.querySelector("details#dangerDisclosure");
-  const patientPanel = page.querySelector("#clinicalCase")?.closest(".panel");
+  const patientPanel = page.querySelector("#case")?.closest(".panel");
 
   assert.ok(disclosure, "required observations use native progressive disclosure");
   assert.equal(disclosure?.hasAttribute("open"), false, "assessment is compact on first view");
@@ -222,7 +222,7 @@ test("structured assessment preserves the pinned compact patient-panel rhythm", 
   assert.doesNotMatch(css, /\.danger-checklist\s*\{[^}]*margin:\s*18px 0 0/s);
 });
 
-test("structured checklist serializes exact values and enables submission only when complete and age-supported", () => {
+test("structured checklist reports completeness without disabling non-empty unified input", () => {
   const assess = el("assess") as HTMLButtonElement;
   (el("case") as HTMLTextAreaElement).value = "18-month-old with cough, alert and drinking.";
   (el("patientAgeValue") as HTMLInputElement).value = "18";
@@ -230,7 +230,7 @@ test("structured checklist serializes exact values and enables submission only w
   (el("respiratoryRatePerMinute") as HTMLInputElement).value = "";
   (el("rateCountQuality") as HTMLSelectElement).value = "NOT_CONFIRMED";
   assert.equal(fe.updateDangerChecklist(), false);
-  assert.equal(assess.disabled, true);
+  assert.equal(assess.disabled, false);
   assert.equal(el("dangerStatus").textContent, "0 of 7 signs assessed.");
 
   DANGER_KEYS.forEach((key, index) => {
@@ -258,7 +258,7 @@ test("structured checklist serializes exact values and enables submission only w
 
   (el("patientAgeValue") as HTMLInputElement).value = "60";
   assert.equal(fe.updateDangerChecklist(), false, "60 months is outside the supported age band");
-  assert.equal(assess.disabled, true);
+  assert.equal(assess.disabled, false);
   assert.equal(el("dangerStatus").textContent, "7 of 7 signs assessed. Supported age required: 2 months to under 5 years, or 18 years and older.");
 
   (el("patientAgeValue") as HTMLInputElement).value = "18";
@@ -482,7 +482,7 @@ test("the form truthfully explains structured versus free-text authority before 
   const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
   assert.match(
     html,
-    /structured age and observations control escalation[\s\S]*description is used for WHO reference lookup and model-assisted summarization/i,
+    /reviewed observations and deterministic policy control escalation[\s\S]*general healthcare questions use bounded local assistance/i,
   );
 });
 
