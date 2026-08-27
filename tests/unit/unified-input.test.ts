@@ -533,6 +533,57 @@ test("keeps independently stated positive and negative evidence conflicting", ()
   assert.ok(draft.conflicts.includes("respiratoryConcern"));
 });
 
+test("respiratory concern uses explicit positive and negative predicates", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "Cough or difficult breathing absent.",
+    "Cough is absent.",
+    "Difficult breathing was absent.",
+    "No cough or difficult breathing.",
+    "Without cough or difficult breathing.",
+    "Cough and difficult breathing were absent.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.respiratoryConcern, "ABSENT", narrative);
+    assert.ok(!draft.conflicts.includes("respiratoryConcern"), narrative);
+    assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+  for (const narrative of [
+    "The child has a cough.",
+    "The child is with difficult breathing.",
+    "Cough is present.",
+    "Difficult breathing was observed.",
+  ]) {
+    assert.equal(api.extractClinicalCandidate(narrative).respiratoryConcern, "PRESENT", narrative);
+  }
+});
+
+test("respiratory concern rejects uncertain, meta, quoted, and unmentioned text as authority", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "Possible cough.",
+    "Cough may be present.",
+    "The phrase 'cough is absent' appears here.",
+    "Example patient has cough.",
+    "No respiratory finding was provided.",
+  ]) {
+    assert.equal(api.extractClinicalCandidate(narrative).respiratoryConcern, "NOT_ASSESSED", narrative);
+  }
+});
+
+test("inconsistent combined respiratory authority is a conflict", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "Cough is present. Cough is absent.",
+    "Cough absent but difficult breathing present.",
+    "No cough and the child has difficult breathing.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.respiratoryConcern, "NOT_ASSESSED", narrative);
+    assert.ok(draft.conflicts.includes("respiratoryConcern"), narrative);
+  }
+});
+
 test("routes explicit authority-bearing danger observations as clinical", () => {
   const { api } = loadModule();
   assert.equal(api.routeInput("Chest indrawing is present."), "CLINICAL");

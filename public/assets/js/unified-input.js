@@ -14,6 +14,12 @@
     ["stridorWhenCalm", /\bno stridor\s+(?:when|while)\s+calm\b/i, /\bstridor\s+(?:when|while)\s+calm\b/i, false],
     ["lowOxygenOrCentralCyanosis", /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b/i, /\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\b/i, false],
   ];
+  var RESPIRATORY = [
+    "respiratoryConcern",
+    /\b(?:no|without)\s+(?:cough\s+or\s+difficult breathing|difficult breathing|cough)\b/i,
+    /\b(?:cough\s+or\s+difficult breathing|difficult breathing|cough)\b/i,
+    false,
+  ];
   var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
   function routeInput(text) {
@@ -30,6 +36,8 @@
       var evidence = observationEvidence(authorityInput, spec);
       return evidence.present || evidence.absent;
     })) return "CLINICAL";
+    var respiratory = respiratoryEvidence(authorityInput);
+    if (respiratory.present || respiratory.absent) return "CLINICAL";
     return (finding && (age || person)) ? "CLINICAL" : "AMBIGUOUS";
   }
 
@@ -56,11 +64,6 @@
     var match;
     while ((match = pattern.exec(text))) rates.push(Number(match[1]));
     return uniqueValues(rates);
-  }
-
-  function withoutPattern(text, pattern) {
-    var flags = pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g";
-    return text.replace(new RegExp(pattern.source, flags), " ");
   }
 
   function assertedText(text) {
@@ -147,6 +150,20 @@
     }, []);
   }
 
+  function splitPatternClause(clause, pattern) {
+    var parts = clause.split(/(\s*,\s*|\s+\b(?:and|or)\b\s+)/i);
+    var segments = [];
+    var current = parts[0] || "";
+    for (var index = 1; index < parts.length; index += 2) {
+      var next = parts[index + 1] || "";
+      if (patternMatches(current, pattern).length && patternMatches(next, pattern).length) {
+        segments.push(current); current = next;
+      } else current += parts[index] + next;
+    }
+    segments.push(current);
+    return segments;
+  }
+
   function localPolarity(clause, occurrence, negativeRanges, inherentPresent) {
     var suffixText = clause.slice(occurrence.end);
     var prefix = clause.slice(0, occurrence.start);
@@ -164,7 +181,7 @@
     if (/\b(?:denied|no\s+history\s+of|no\s+evidence\s+of|no\s+clear(?:\s+evidence\s+of)?)\s+$/i.test(prefix)) return "ABSENT";
     if (/\b(?:has\s+(?:never|not)\s+(?:had|been)|never\s+had|(?:has|had)\s+not\s+shown|no\s+(?:reported|observed|noted|documented|recorded)|(?:does|did)\s+not\s+(?:have|show))\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
     if (/\b(?:(?:does|did)\s+not\s+have|(?:is|was|are)\s+without|ruled\s+out)\s+(?:a\s+)?$/i.test(prefix)) return "ABSENT";
-    if (/\b(?:has|had|with|shows?|is|was|are|observed|noted|reported)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
+    if (/\b(?:has|had|with|shows?|is|was|are|observed|noted|reports?|reported)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
     if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?present\b/i.test(suffixText)) return "PRESENT";
     if (/\b(?:documented|recorded)\s+$/i.test(prefix) && /^\s+(?:as\s+)?absent\b/i.test(suffixText)) return "ABSENT";
     if (/\b(?:documented|recorded)\s+$/i.test(prefix)) return "NONE";
@@ -214,6 +231,26 @@
     return present ? "PRESENT" : absent ? "ABSENT" : "NOT_ASSESSED";
   }
 
+  function respiratoryEvidence(text) {
+    var evidence = { present: false, absent: false };
+    text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).forEach(function (fullClause) {
+      var sharedAbsent = patternMatches(fullClause, RESPIRATORY[2]).length > 1 &&
+        /\b(?:(?:is|was|were|are)\s+)?absent(?![-\w])\s*$/i.test(fullClause);
+      splitPatternClause(fullClause, RESPIRATORY[2]).forEach(function (clause) {
+        if (clauseNonAuthority(clause)) return;
+        var negativeRanges = patternMatches(clause, RESPIRATORY[1]);
+        var occurrences = patternMatches(clause, RESPIRATORY[2]);
+        if (negativeRanges.length && !occurrences.length) evidence.absent = true;
+        occurrences.forEach(function (occurrence) {
+          var polarity = localPolarity(clause, occurrence, negativeRanges, false);
+          if (polarity === "PRESENT") evidence.present = true;
+          else if (polarity === "ABSENT" || (sharedAbsent && polarity !== "PRESENT")) evidence.absent = true;
+        });
+      });
+    });
+    return evidence;
+  }
+
   function extractObservations(text, conflicts) {
     var allAbsent = allObservationsAbsent(text);
     var values = {};
@@ -228,11 +265,9 @@
   }
 
   function respiratoryConcern(text, conflicts) {
-    var absentPattern = /\b(?:no|without)\s+(?:cough|difficult breathing)\b/i;
-    var absent = absentPattern.test(text);
-    var present = /\b(?:has|with|reports?|presenting with)?\s*(?:a\s+)?cough\b|\bdifficult breathing\b/i.test(absent ? withoutPattern(text, absentPattern) : text);
-    if (present && absent) { conflicts.push("respiratoryConcern"); return "NOT_ASSESSED"; }
-    return present ? "PRESENT" : absent ? "ABSENT" : "NOT_ASSESSED";
+    var evidence = respiratoryEvidence(text);
+    if (evidence.present && evidence.absent) { conflicts.push("respiratoryConcern"); return "NOT_ASSESSED"; }
+    return evidence.present ? "PRESENT" : evidence.absent ? "ABSENT" : "NOT_ASSESSED";
   }
 
   function extractWeight(text) {

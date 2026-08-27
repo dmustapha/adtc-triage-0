@@ -189,6 +189,25 @@ test("reviewed emergency serialization preserves every unobserved sign as NOT_AS
   assert.equal(body.respiratoryAssessment, undefined);
 });
 
+test("complete explicit respiratory absence reaches outside-scope review without rate requirements", async () => {
+  triageRequests.length = 0;
+  input().value = "Two year old. Cough or difficult breathing absent. Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  assert.equal((page.querySelector('input[name="respiratory-concern"][value="ABSENT"]') as HTMLInputElement).checked, true);
+  assert.match(page.getElementById("missingReview")?.textContent ?? "", /review the extracted observations/i);
+  assert.doesNotMatch(page.getElementById("missingReview")?.textContent ?? "", /breaths per minute|count quality/i);
+  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
+
+  await frontend.runUnified();
+  const request = triageRequests.find(({ url }) => url === "/triage");
+  assert.ok(request);
+  const body = JSON.parse(String(request.init?.body));
+  assert.equal(body.respiratoryAssessment.coughOrDifficultBreathing, "ABSENT");
+  assert.equal("respiratoryRatePerMinute" in body.respiratoryAssessment, false);
+  assert.equal(body.respiratoryAssessment.rateCountQuality, "NOT_CONFIRMED");
+});
+
 test("a new input revision atomically clears every stale shared-route terminal presentation", () => {
   const shared = page.getElementById("sharedAnswer")!;
   const result = page.getElementById("result")!;
