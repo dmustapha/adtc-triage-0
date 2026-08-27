@@ -31,7 +31,7 @@ const frontend = require("../../public/assets/js/triage.js") as {
   updateUnifiedReadiness(): Record<string, unknown>;
   runUnified(): Promise<void>;
   handleUnifiedInput(): void;
-  unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null };
+  unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null; presentationRevision: number | null };
   focusMissingField(field: string): void;
   clinicalState: { confirmationToken: string | null; continuationToken: string | null };
 };
@@ -184,4 +184,36 @@ test("reviewed emergency serialization preserves every unobserved sign as NOT_AS
   assert.equal(body.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
   assert.deepEqual(Object.values(body.dangerObservations).filter((value) => value === "NOT_ASSESSED").length, 6);
   assert.equal(body.respiratoryAssessment, undefined);
+});
+
+test("a new input revision atomically clears every stale shared-route terminal presentation", () => {
+  const shared = page.getElementById("sharedAnswer")!;
+  const result = page.getElementById("result")!;
+  const status = page.getElementById("status")!;
+  for (const state of ["completed", "rejected", "unavailable"]) {
+    result.classList.remove("hidden");
+    shared.classList.remove("hidden");
+    shared.dataset.state = state;
+    shared.textContent = state === "rejected" ? "Answer withheld" : `Stale ${state} answer`;
+    status.textContent = `Stale ${state} terminal status`;
+    input().value = "Two year old child cannot drink or breastfeed.";
+    frontend.handleUnifiedInput();
+    assert.equal(shared.textContent, "", `${state} answer text cleared`);
+    assert.equal(shared.classList.contains("hidden"), true, `${state} answer hidden`);
+    assert.equal(shared.hasAttribute("data-state"), false, `${state} terminal state released`);
+    assert.equal(status.textContent, "", `${state} terminal status cleared`);
+    assert.equal(frontend.unifiedState.presentationRevision, frontend.unifiedState.revision);
+  }
+
+  result.classList.remove("hidden");
+  page.getElementById("card")!.textContent = "Stale emergency card";
+  frontend.clinicalState.confirmationToken = "stale-confirmation";
+  frontend.clinicalState.continuationToken = "stale-continuation";
+  input().value = "What information should I collect before referral?";
+  frontend.handleUnifiedInput();
+  assert.equal(page.getElementById("card")!.textContent, "", "clinical card clears before a general revision");
+  assert.equal(frontend.clinicalState.confirmationToken, null);
+  assert.equal(frontend.clinicalState.continuationToken, null);
+  assert.equal(shared.textContent, "");
+  assert.equal(status.textContent, "");
 });

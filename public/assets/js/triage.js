@@ -75,7 +75,7 @@
   var unifiedInput = typeof window !== "undefined" ? window.TriageUnifiedInput : null;
   var unifiedState = {
     candidate: null, route: "AMBIGUOUS", revision: 0, choiceRevision: null, routeOverride: null,
-    reviewPresentedRevision: null, reviewedRevision: null,
+    reviewPresentedRevision: null, reviewedRevision: null, presentationRevision: null,
   };
 
   function clinicalInput() { return $("case"); }
@@ -275,6 +275,19 @@
     if ($("sharedAnswer")) { $("sharedAnswer").textContent = ""; $("sharedAnswer").classList.add("hidden"); }
   }
 
+  function beginSharedPresentationRevision() {
+    unifiedState.presentationRevision = unifiedState.revision;
+    if ($("sharedAnswer")) {
+      $("sharedAnswer").textContent = "";
+      $("sharedAnswer").classList.add("hidden");
+      $("sharedAnswer").removeAttribute("data-state");
+    }
+    if ($("status")) $("status").textContent = "";
+    if ($("err")) $("err").textContent = "";
+    if ($("cancelPrompt")) $("cancelPrompt").hidden = true;
+    if ($("retryPrompt")) $("retryPrompt").hidden = true;
+  }
+
   function handleUnifiedInput() {
     unifiedState.revision += 1;
     unifiedState.choiceRevision = null;
@@ -283,6 +296,7 @@
     unifiedState.reviewedRevision = null;
     invalidatePromptRun();
     invalidateClinicalResult();
+    beginSharedPresentationRevision();
     unifiedState.candidate = unifiedInput && unifiedInput.extractClinicalCandidate
       ? unifiedInput.extractClinicalCandidate(clinicalInput().value) : null;
     applyClinicalCandidate(unifiedState.candidate);
