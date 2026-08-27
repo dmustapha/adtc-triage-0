@@ -107,13 +107,20 @@ test("assessment surfaces gate provisional classification and never claim diagno
   }
 });
 
-test("active assessment UI uses assessment language instead of guideline-first guidance copy", () => {
+test("active unified UI uses one Get guidance action without legacy assessment-mode copy", () => {
   const html = readFileSync(new URL("../public/app.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../public/assets/js/triage.js", import.meta.url), "utf8");
   const surface = `${html}\n${script}`;
+  const page = new JSDOM(html).window.document;
+  const actions = page.querySelectorAll("[data-unified-submit]");
 
-  assert.match(html, />Run assessment</);
+  assert.equal(actions.length, 1);
+  assert.equal(actions[0]?.textContent?.trim(), "Get guidance");
+  assert.equal(
+    [...page.querySelectorAll("button")].some((button) => button.textContent?.trim() === "Run assessment"),
+    false,
+  );
   assert.match(script, /Ready for respiratory assessment/);
   assert.match(script, /WHO reference engine/);
-  assert.doesNotMatch(surface, /Get guidance|Ready for guidance|Could not get guidance|guidance did not finish|WHO guideline store/i);
+  assert.doesNotMatch(surface, /Ready for guidance|Could not get guidance|guidance did not finish|WHO guideline store/i);
 });
