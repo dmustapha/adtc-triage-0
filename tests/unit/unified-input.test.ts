@@ -107,6 +107,28 @@ test("field-value absent forms preserve negative polarity for every structured o
   }
 });
 
+test("one shared absent suffix applies to every observation in its factual clause", () => {
+  const { api } = loadModule();
+  const shared = api.extractClinicalCandidate(
+    "Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.",
+  );
+  assert.ok(Object.values(shared.dangerObservations).every((value) => value === "ABSENT"));
+  assert.deepEqual(shared.conflicts, []);
+
+  const singular = api.extractClinicalCandidate("Chest indrawing and stridor when calm was absent.");
+  assert.equal(singular.dangerObservations.chestIndrawing, "ABSENT");
+  assert.equal(singular.dangerObservations.stridorWhenCalm, "ABSENT");
+  assert.deepEqual(singular.conflicts, []);
+});
+
+test("mixed factual clauses keep present and absent observations separate", () => {
+  const { api } = loadModule();
+  const draft = api.extractClinicalCandidate("Vomits everything was present, but chest indrawing was absent.");
+  assert.equal(draft.dangerObservations.vomitsEverything, "PRESENT");
+  assert.equal(draft.dangerObservations.chestIndrawing, "ABSENT");
+  assert.deepEqual(draft.conflicts, []);
+});
+
 test("independent present and field-value absent statements conflict in either order", () => {
   const { api } = loadModule();
   const fields = [
@@ -142,6 +164,32 @@ test("true present findings remain present while unrelated observations remain u
     const observations = api.extractClinicalCandidate(statement).dangerObservations;
     assert.equal(observations[key], "PRESENT", statement);
     assert.ok(Object.entries(observations).every(([field, value]) => field === key || value === "NOT_ASSESSED"), statement);
+  }
+});
+
+test("natural structured observation descriptions and value forms route clinically", () => {
+  const { api } = loadModule();
+  const labels = [
+    "Cannot drink or breastfeed", "Vomits everything", "Convulsions", "Lethargic or unconscious",
+    "Chest indrawing", "Stridor when calm", "Low oxygen or central cyanosis",
+  ];
+  for (const label of labels) {
+    assert.equal(api.routeInput(`${label}.`), "CLINICAL", label);
+    assert.equal(api.routeInput(`${label} was absent.`), "CLINICAL", `${label} absent`);
+  }
+});
+
+test("lexical, quoted, and hypothetical observation phrases do not become authority", () => {
+  const { api } = loadModule();
+  const narratives = [
+    "Convulsions absent-minded.",
+    "If convulsions were absent, the form would look different.",
+    'The phrase "convulsions absent" appears in the training note.',
+  ];
+  for (const narrative of narratives) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value === "NOT_ASSESSED"), narrative);
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
   }
 });
 

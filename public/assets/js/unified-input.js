@@ -6,25 +6,24 @@
   "use strict";
 
   var OBSERVATIONS = [
-    ["cannotDrinkOrBreastfeed", /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b|\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["vomitsEverything", /\bvomits? everything\b/i, /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b|\bvomits? everything\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["convulsions", /\b(?:has|had|with)\s+(?:a\s+)?convulsions?\b/i, /\bno convulsions?\b|\bconvulsions?\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["lethargicOrUnconscious", /\b(?:lethargic|unconscious)\b/i, /\b(?:not lethargic|conscious and alert|alert and responsive)\b|\b(?:lethargic(?:\s+or\s+unconscious)?|unconscious)\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["chestIndrawing", /\bchest indrawing\s+(?:is\s+)?present\b|\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b|\bchest indrawing\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["stridorWhenCalm", /\bstridor\s+(?:when|while)\s+calm\b/i, /\bno stridor\s+(?:when|while)\s+calm\b|\bstridor\s+(?:when|while)\s+calm\s+(?:(?:is|was|were)\s+)?absent\b/i],
-    ["lowOxygenOrCentralCyanosis", /\b(?:low oxygen|central cyanosis)\b/i, /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b|\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\s+(?:(?:is|was|were)\s+)?absent\b/i],
+    ["cannotDrinkOrBreastfeed", /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b/i, /\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\b/i],
+    ["vomitsEverything", /\bvomits? everything\b/i, /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b/i, /\bvomits? everything\b/i],
+    ["convulsions", /\b(?:has|had|with)\s+(?:a\s+)?convulsions?\b|\bconvulsions?\s+(?:(?:is|was)\s+)?present\b/i, /\bno convulsions?\b/i, /\bconvulsions?\b/i],
+    ["lethargicOrUnconscious", /\b(?:lethargic|unconscious)\b/i, /\b(?:not lethargic|conscious and alert|alert and responsive)\b/i, /\b(?:lethargic(?:\s+or\s+unconscious)?|unconscious)\b/i],
+    ["chestIndrawing", /\bchest indrawing\s+(?:is\s+)?present\b|\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b/i, /\bchest indrawing\b/i],
+    ["stridorWhenCalm", /\bstridor\s+(?:when|while)\s+calm\b/i, /\bno stridor\s+(?:when|while)\s+calm\b/i, /\bstridor\s+(?:when|while)\s+calm\b/i],
+    ["lowOxygenOrCentralCyanosis", /\b(?:low oxygen|central cyanosis)\b/i, /\b(?:no low oxygen|no central cyanosis|oxygen (?:is )?normal)\b/i, /\b(?:low oxygen(?:\s+or\s+central cyanosis)?|central cyanosis)\b/i],
   ];
   var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
   function routeInput(text) {
-    var input = String(text || "").trim();
+    var input = assertedText(text).trim();
     if (!input) return "AMBIGUOUS";
     if (/^(?:please\s+)?(?:explain|summari[sz]e|compare|define|list|outline|state|describe|why\b|what\b|how\b)/i.test(input)) return "GENERAL";
     var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(input);
     var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(input);
     var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(input);
-    var danger = /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b|\b(?:chest indrawing|stridor\s+(?:when|while)\s+calm|low oxygen|central cyanosis)\b/i.test(input);
-    if (danger) return "CLINICAL";
+    if (OBSERVATIONS.some(function (spec) { return spec[3].test(input); })) return "CLINICAL";
     return (finding && (age || person)) ? "CLINICAL" : "AMBIGUOUS";
   }
 
@@ -58,9 +57,38 @@
     return text.replace(new RegExp(pattern.source, flags), " ");
   }
 
+  function assertedText(text) {
+    var asserted = String(text || "").replace(/"[^"]*"|'[^']*'/g, " ");
+    asserted = asserted.replace(/(?:^|[.!?;])\s*(?:if|whether|assuming|suppose)\b[^.!?;]*/gi, " ");
+    OBSERVATIONS.forEach(function (spec) {
+      asserted = asserted.replace(new RegExp("(?:" + spec[3].source + ")\\s+absent-minded\\b", "gi"), " ");
+    });
+    return asserted;
+  }
+
+  function absentClausePattern() {
+    return /(^|[.!?;]|\bbut\b|\bhowever\b)((?:(?!\bbut\b|\bhowever\b)[^.!?;])*?)\b(?:(?:is|was|were)\s+)?absent(?![-\w])/gi;
+  }
+
+  function hasClauseAbsence(text, labelPattern) {
+    var found = false;
+    text.replace(absentClausePattern(), function (_match, _boundary, body) {
+      if (labelPattern.test(body)) found = true;
+      return _match;
+    });
+    return found;
+  }
+
+  function stripClauseAbsence(text, labelPattern) {
+    return text.replace(absentClausePattern(), function (match, boundary, body) {
+      if (!labelPattern.test(body)) return match;
+      return boundary + body.replace(labelPattern, " ");
+    });
+  }
+
   function observationValue(text, spec, allAbsent, conflicts) {
-    var absent = allAbsent || spec[2].test(text);
-    var positiveText = absent && !allAbsent ? withoutPattern(text, spec[2]) : text;
+    var absent = allAbsent || spec[2].test(text) || hasClauseAbsence(text, spec[3]);
+    var positiveText = absent && !allAbsent ? stripClauseAbsence(withoutPattern(text, spec[2]), spec[3]) : text;
     var present = spec[1].test(positiveText);
     if (present && absent) {
       conflicts.push("dangerObservations." + spec[0]);
@@ -90,7 +118,7 @@
   }
 
   function extractClinicalCandidate(text) {
-    var input = String(text || "");
+    var input = assertedText(text);
     var conflicts = [];
     var ages = ageCandidates(input);
     var rates = rateCandidates(input);
