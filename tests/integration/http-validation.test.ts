@@ -136,6 +136,30 @@ test("POST /triage lets a structured emergency observation win before narrative 
   assert.doesNotMatch(stream, /event: continuation|event: first_token/);
 });
 
+test("POST /triage accepts coordinated explicit absence as deterministic outside scope", async () => {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
+  const absent = Object.fromEntries([
+    "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
+    "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
+  ].map((key) => [key, "ABSENT"]));
+  try {
+    const response = await postJson("/triage", {
+      caseText: "Two year old. Cough or difficult breathing absent. Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.",
+      patientAge: { value: 2, unit: "years" },
+      dangerObservations: absent,
+      respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
+    });
+    assert.equal(response.status, 200);
+    const stream = await response.text();
+    assert.match(stream, /"outcome":"OUTSIDE_SUPPORTED_SCOPE"/);
+    assert.doesNotMatch(stream, /event: continuation|event: first_token/);
+    assert.deepEqual(boundaries, []);
+  } finally {
+    restore();
+  }
+});
+
 // ── excluded optional modalities ───────────────────────────────────────────────────
 test("POST /tts is not registered in the English text baseline", async () => {
   const r = await postJson("/tts", { text: "" });

@@ -102,6 +102,70 @@ test("explicit narrative contradictions identify exact structured fields", async
   ]);
 });
 
+test("backend narrative authority matches coordinated absence and explicit polarity", async () => {
+  const { parseClinicalRequest, canonicalClinicalRecord, findNarrativeConflicts } = await import("../../src/triage/clinical-record.js");
+  const shared = parseClinicalRequest({
+    ...completeRequest(),
+    caseText: "Two year old. Cough or difficult breathing absent. Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.",
+    respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
+  });
+  assert.equal(shared.success, true);
+  if (shared.success) assert.deepEqual(findNarrativeConflicts(canonicalClinicalRecord(shared.data)), []);
+
+  const fields = [
+    ["cannotDrinkOrBreastfeed", "The child cannot drink or breastfeed.", "Cannot drink or breastfeed was absent."],
+    ["vomitsEverything", "The child vomits everything.", "Vomits everything was absent."],
+    ["convulsions", "The child has convulsions.", "Convulsions were absent."],
+    ["lethargicOrUnconscious", "The child is lethargic.", "Lethargic or unconscious was absent."],
+    ["chestIndrawing", "Chest indrawing is present.", "Chest indrawing was absent."],
+    ["stridorWhenCalm", "Stridor when calm was observed.", "Stridor when calm was absent."],
+    ["lowOxygenOrCentralCyanosis", "Low oxygen was recorded as present.", "Low oxygen or central cyanosis was absent."],
+  ] as const;
+  for (const [key, positive, negative] of fields) {
+    for (const [narrative, structured] of [[positive, "ABSENT"], [negative, "PRESENT"]] as const) {
+      const parsed = parseClinicalRequest({
+        ...completeRequest(), caseText: `Two year old. ${narrative}`,
+        dangerObservations: { ...completeRequest().dangerObservations, [key]: structured },
+      });
+      assert.equal(parsed.success, true, narrative);
+      if (parsed.success) assert.deepEqual(findNarrativeConflicts(canonicalClinicalRecord(parsed.data)), [`dangerObservations.${key}`], narrative);
+    }
+  }
+  for (const [narrative, structured] of [
+    ["Cough is present.", "ABSENT"],
+    ["Cough or difficult breathing was absent.", "PRESENT"],
+  ] as const) {
+    const parsed = parseClinicalRequest({
+      ...completeRequest(), caseText: `Two year old. ${narrative}`,
+      respiratoryAssessment: { coughOrDifficultBreathing: structured, rateCountQuality: "NOT_CONFIRMED" },
+    });
+    assert.equal(parsed.success, true, narrative);
+    if (parsed.success) assert.deepEqual(findNarrativeConflicts(canonicalClinicalRecord(parsed.data)), ["respiratoryAssessment.coughOrDifficultBreathing"], narrative);
+  }
+});
+
+test("backend narrative authority ignores non-assertions and reports internal conflicts", async () => {
+  const { parseClinicalRequest, canonicalClinicalRecord, findNarrativeConflicts } = await import("../../src/triage/clinical-record.js");
+  for (const narrative of [
+    "Two year old. Possible convulsions.",
+    "Two year old. Example patient has chest indrawing.",
+    "Two year old. The phrase 'stridor when calm was present' appears here.",
+    "Two year old. Cough may be present.",
+  ]) {
+    const parsed = parseClinicalRequest({ ...completeRequest(), caseText: narrative });
+    assert.equal(parsed.success, true, narrative);
+    if (parsed.success) assert.deepEqual(findNarrativeConflicts(canonicalClinicalRecord(parsed.data)), [], narrative);
+  }
+  for (const [narrative, field] of [
+    ["Two year old. Convulsions are present. Convulsions are absent.", "dangerObservations.convulsions"],
+    ["Two year old. Cough absent but difficult breathing present.", "respiratoryAssessment.coughOrDifficultBreathing"],
+  ]) {
+    const parsed = parseClinicalRequest({ ...completeRequest(), caseText: narrative });
+    assert.equal(parsed.success, true, narrative);
+    if (parsed.success) assert.deepEqual(findNarrativeConflicts(canonicalClinicalRecord(parsed.data)), [field], narrative);
+  }
+});
+
 test("request parsing fails closed on unknown fields and preserves prompt-like narrative bytes", async () => {
   assert.equal(existsSync(modulePath), true, `${modulePath} must exist`);
   if (!existsSync(modulePath)) return;

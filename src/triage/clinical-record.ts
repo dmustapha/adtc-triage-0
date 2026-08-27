@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { DANGER_OBSERVATION_KEYS, normalizePatientAge } from "./danger-observations.js";
+import { extractNarrativeAuthority } from "./narrative-authority.js";
 import { ClinicalAssessmentRequestSchema, type ClinicalAssessmentRequest } from "./schema.js";
 
 export type CanonicalClinicalRecord = ReturnType<typeof canonicalClinicalRecord>;
@@ -54,23 +55,24 @@ function narrativeRate(text: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
-function conflictsWithPresence(text: string, present: RegExp, absent: RegExp, value: unknown): boolean {
-  if (present.test(text)) return value !== "PRESENT";
-  if (absent.test(text)) return value !== "ABSENT";
-  return false;
-}
-
 export function findNarrativeConflicts(record: CanonicalClinicalRecord): string[] {
   const text = record.narrative.text;
   const conflicts: string[] = [];
   const age = narrativeAgeMonths(text);
   if (age !== null && record.ageMonths !== null && age !== record.ageMonths) conflicts.push("patientAge");
 
-  if (conflictsWithPresence(text, /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b/i, /\b(?:(?:can|able to)\s+(?:drink|breastfeed)|alert and drinking|still drinking|drinking well)\b/i, record.dangerObservations.cannotDrinkOrBreastfeed)) {
-    conflicts.push("dangerObservations.cannotDrinkOrBreastfeed");
-  }
-  if (conflictsWithPresence(text, /\b(?:has|with|shows?)\s+chest indrawing\b/i, /\b(?:no|without)\s+chest indrawing\b/i, record.dangerObservations.chestIndrawing)) {
-    conflicts.push("dangerObservations.chestIndrawing");
+  const authority = extractNarrativeAuthority(text);
+  DANGER_OBSERVATION_KEYS.forEach((key) => {
+    const narrative = authority.dangerObservations[key];
+    const structured = record.dangerObservations[key];
+    if (narrative === "CONFLICT" || (narrative !== "NOT_ASSESSED" && structured !== "NOT_ASSESSED" && narrative !== structured)) {
+      conflicts.push(`dangerObservations.${key}`);
+    }
+  });
+  const respiratory = authority.respiratoryConcern;
+  const structuredRespiratory = record.respiratoryAssessment?.coughOrDifficultBreathing;
+  if (respiratory === "CONFLICT" || (structuredRespiratory && respiratory !== "NOT_ASSESSED" && respiratory !== structuredRespiratory)) {
+    conflicts.push("respiratoryAssessment.coughOrDifficultBreathing");
   }
 
   const rate = narrativeRate(text);
