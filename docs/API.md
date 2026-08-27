@@ -4,6 +4,8 @@
 
 All JSON objects are strict and request bodies are capped at 256 KiB. Clinical narrative is 1–2,000 characters; ordinary prompts are 1–4,000 characters. NUL, bidi overrides, and unsafe invisible controls are rejected.
 
+The browser exposes one textarea, one **Get guidance** action and one shared result region. Its semantic input router sends general requests to `/assist`; explicit clinical narratives first open current-revision structured review and are serialized to `/triage` only after that review. An ambiguous input gets one inline route choice for that revision. The router does not use exact prompt strings, prompt IDs or hashes.
+
 ## Ownership
 
 The first inference or confirmation request sets `triage0_session=<UUID>; HttpOnly; SameSite=Strict; Path=/`. This cookie owns jobs and confirmation grants. Non-browser clients must retain and resend it. A foreign owner cannot cancel a job or consume a grant.

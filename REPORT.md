@@ -8,7 +8,7 @@
 
 ## Current authoritative gate policy
 
-The current product restores the original useful workflow behind stricter authority gates. It provides a supervised WHO clinical-review mode for pediatric IMCI and adult mhGAP cases plus a separate ordinary-prompt mode. Structured emergency and respiratory policy remains authoritative; model output may select only a supervised provisional WHO class, and a one-use confirmation can reveal only frozen source actions. The product does not diagnose, prescribe, convert model prose into treatment, or claim clinical validation.
+The current product restores the original useful workflow behind stricter authority gates. It presents one textarea, one **Get guidance** action and one shared result region, then routes internally to supervised WHO clinical review or bounded ordinary-prompt assistance. Structured emergency and respiratory policy remains authoritative; model output may select only a supervised provisional WHO class, and a one-use confirmation can reveal only frozen source actions. The product does not diagnose, prescribe, convert model prose into treatment, or claim clinical validation.
 
 Official submission requirements still include a current public official-template repository and report, completed team metadata and exactly two prompts, a credential-free checksum-verified downloader, no committed model weights, direct CPU-only `llama.cpp` with no inference-time egress and credible 8 GB viability, a full participant profiler run labeled with the actual development host, provenance and license disclosure, accessibility, claim consistency, final screenshots, and a video no longer than 120 seconds.
 
@@ -20,7 +20,7 @@ Physical target-laptop ownership, three cold boots, thermal soaks, hosted applic
 
 Triage-0 ADTC explores offline, supervised WHO assessment support for community health workers operating where connectivity, privacy, and compute are constrained. Pediatric respiratory cases add age, seven explicit observations, respiratory rate, and count quality so deterministic policy owns emergency escalation and threshold findings. Broader pediatric IMCI and adult mhGAP cases use local retrieval and MedPsy for supervised provisional review. The system is not a diagnostic tool, prescription system, or replacement for clinical judgment.
 
-The current local build proves deterministic respiratory surfaces, explicit eligible respiratory continuation through real local QVAC/WHO/MedPsy, broader IMCI and mhGAP review, gated complete source plans after confirmation, off-domain abstention, and a separate two-pass ordinary-prompt workflow. It does not claim validated clinical behavior, named clinical review, organizer-audited performance, or that the already-submitted Devpost entry and existing video were updated.
+The current local build proves one visible workflow with internal general/clinical routing, explicit-fact review and structured completion, deterministic respiratory surfaces, explicit eligible respiratory continuation through real local QVAC/WHO/MedPsy, broader IMCI and mhGAP review, provisional human confirmation, complete cited source plans, off-domain abstention, and bounded two-pass ordinary assistance in the shared result. It does not claim validated clinical behavior, named clinical review, organizer-audited performance, or that the already-submitted Devpost entry and existing video were updated.
 
 ## Design decisions
 
@@ -56,15 +56,15 @@ The later structured-danger revision moved respiratory danger ownership into exp
 
 ## Local verification at this checkpoint
 
-Local verification completed across 2026-08-25 and 2026-08-26 produced:
+Local verification completed across 2026-08-25 through 2026-08-27 produced:
 
 - `npm run typecheck`: pass.
-- Fresh deploy-to-GitHub release regression after the Interrogate documentation correction: `npm test` 533 total, 533 pass, 0 fail, 0 skips, 0 cancelled, 0 todo (exclusive serialized local run).
+- Fresh Task 12 release regression: `npm test` 574 total, 574 pass, 0 fail, 0 skips, 0 cancelled, 0 todo (exclusive serialized local run with every locally applicable QVAC/WHO/MedPsy test executed).
 - Import provenance: 76 imported objects verified against public Triage-0 commit `74424721bc75f564808eacce42d7f7f42676ae0f`.
 - Deterministic emergency, incomplete, outside-scope, chest-indrawing, and fast-rate HTTP/SSE paths pass with fixed source binding and zero QVAC/retrieval/model boundaries.
 - Complete supported below-threshold records execute real local WHO retrieval and MedPsy assistance through QVAC SDK 0.13.3 without changing the deterministic public finding.
 - Exact 49/50 and 39/40 respiratory threshold boundary tests pass.
-- Chrome desktop and mobile: deterministic emergency and below-threshold respiratory results; explicit respiratory continuation; provisional pneumonia and cough/cold review; complete confirmed plans; broad IMCI and adult mhGAP review; off-domain abstention; both exact submitted prompts; cancellation/retry; two-tab queueing; no horizontal overflow; zero console errors/warnings; and effective visible controls at least 44px.
+- Chrome desktop, 375-by-812 and 320-pixel UAT: one textarea/action/result; deterministic emergency and below-threshold respiratory results; explicit respiratory continuation; provisional pneumonia and cough/cold review; complete confirmed plans; broad IMCI and adult mhGAP review; off-domain abstention; both exact submitted prompts pasted manually; cancellation/retry; shared-queue ownership; no horizontal overflow; zero console errors/warnings; and effective visible controls at least 44px.
 - The exact GGUF, 80-page WHO PDF, and 994-entry citation map match their frozen hashes. The GGUF remains ignored and untracked.
 - Downloader idempotence, checksum, byte-count, resume, wrong-hash, wrong-size, and partial-preservation paths pass.
 
@@ -81,7 +81,7 @@ No repository test is skipped. Historical skip evidence remains historical and i
 | No-egress and 8 GB viability | Direct CPU-only runtime used four threads and zero GPU layers; model-backed no-egress and full test gates pass locally |
 | QVAC product plane | QVAC SDK 0.13.3 executed real local WHO retrieval and MedPsy assistance; reported separately from official profiler evidence |
 
-The generated profiler values are Apple development evidence, not organizer-audited scores. Participant identity is complete and consistent across `metadata.json` and `submission.json`.
+The generated profiler values are Apple development evidence, not organizer-audited scores. Participant identity is complete and consistent across `metadata.json` and `submission.json`. Task 12 also reran the official participant profiler without altering the release artifact: Apple M1, 8 GB, 50 ARC-Easy samples, `acc_norm` 0.70, 20.09 generated tok/s, 4,757.28 ms first-token latency and 1,082.92 MB peak RSS. The rerun preserved both prompt byte strings exactly.
 
 ## Submitted-prompt release gate
 
@@ -100,7 +100,7 @@ Prompt 1 separates recorded facts from uncertainty and does not invent a respira
 - The full participant profiler completed and generated `submission.json`; the verified Devpost project slug and participant-confirmed submitter identity are present in both required JSON artifacts.
 - Respiratory remediation is locally complete: the first respiratory result remains deterministic, plan-free and model-free. Eligible respiratory records may enter QVAC/WHO/MedPsy only through explicit continuation; the reconciled class stays provisional until one-use human confirmation reveals the complete deterministic, cited management plan. Model prose cannot author or alter classification authority, severity, action, medicine, dose, referral or follow-up content.
 - Known routes called with unsupported methods return explicit JSON 405 responses with exact `Allow` headers, and an empty `/perf-log.csv` returns a truthful 200 header-only CSV.
-- Current desktop and mobile screenshots prove deterministic respiratory, broad provisional/confirmed WHO, off-domain, exact-prompt, queue/cancel/retry, and responsive states. Final submission media remain separate artifacts.
+- Current desktop, 375-by-812 and 320-pixel local screenshots prove the unified workflow, deterministic respiratory, broad provisional/confirmed WHO, off-domain, exact-prompt, queue/cancel/retry, and responsive states. They remain local verification artifacts; final submission media and publication remain separate actions.
 - The restored repository and report are the authorized GitHub release surface. Devpost and video publication remain separate and unchanged.
 
 ## Reproducibility boundary

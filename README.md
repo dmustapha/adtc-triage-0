@@ -5,21 +5,19 @@ Triage-0 is a local healthcare review tool for trained or supervised community h
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![QVAC SDK](https://img.shields.io/badge/QVAC_SDK-0.13.3-111827)](https://docs.qvac.tether.io/reference/release-notes/v0.13.x/)
-[![Tests](https://img.shields.io/badge/latest_full_gate-533%2F533-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/latest_full_gate-574%2F574-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 This is an offline localhost product. There is no hosted inference service.
 
-![Triage-0 respiratory assessment result](docs/images/landing.png)
-
 ## What is Triage-0?
 
-Frontline health workers often operate with weak connectivity, limited hardware and strict privacy constraints. Triage-0 provides two local workflows:
+Frontline health workers often operate with weak connectivity, limited hardware and strict privacy constraints. Triage-0 presents one visible local workflow: one textarea, one **Get guidance** action and one shared result region. It routes internally without exposing assessment/model modes:
 
-1. A supervised WHO review that keeps emergency and respiratory decisions in deterministic code, then lets an eligible worker explicitly continue to provisional WHO classification and a human-confirmed source plan.
-2. An ordinary prompt runner that restores the original two-pass MedPsy workflow for bounded local questions.
+1. Explicit clinical narratives open a compact structured review. Emergency and respiratory decisions remain deterministic; eligible records may explicitly continue to provisional WHO classification and a human-confirmed, complete cited source plan.
+2. General questions use the original bounded two-pass MedPsy path and render their validated answer in the same result region.
 
-Both workflows share one serialized QVAC inference queue. The product uses one checksum-locked GGUF and makes no inference-time network calls after startup prewarming.
+Both internal routes share one serialized QVAC inference queue. Ambiguous text gets one inline route choice for that input revision only. The product uses one checksum-locked GGUF and makes no inference-time network calls after startup prewarming.
 
 ## Why it is different
 
@@ -27,33 +25,29 @@ Both workflows share one serialized QVAC inference queue. The product uses one c
 - **Respiratory thresholds are computed, not generated:** 2 to 11 months uses 50 breaths/minute or more; 12 to 59 months uses 40 breaths/minute or more.
 - **Model assistance is subordinate:** MedPsy may support a supervised review but cannot change a deterministic public finding.
 - **Source actions require confirmation:** eligible respiratory records require an explicit continuation first; provisional WHO classes do not unlock the complete frozen, cited management plan until the same browser owner confirms the exact record.
-- **Ordinary prompts are genuine:** the Prompt Review tab runs a 1,024-token reasoning pass, then a 512-token schema-constrained extraction and deterministic validation.
+- **Ordinary prompts are genuine:** general input runs a 1,024-token reasoning pass, then a 512-token schema-constrained extraction and deterministic validation.
 - **Everything runs locally:** QVAC SDK 0.13.3 loads MedPsy and performs semantic WHO retrieval on the development machine.
 - **The official evidence path stays separate:** pinned direct `llama.cpp` uses the identical model bytes for participant profiling and prompt evidence.
 
 ## Screenshots
 
-| Respiratory result | Deterministic emergency |
-|---|---|
-| ![Below-threshold result](docs/images/assessment-result.png) | ![Emergency result](docs/images/emergency-result.png) |
-
-| Ordinary prompt review | Mobile result |
-|---|---|
-| ![Submitted prompt result](docs/images/prompt-review.png) | ![Mobile respiratory result](docs/images/mobile-assessment.png) |
+The current unified desktop, 375-by-812 and 320-pixel UAT screenshots and traces are retained locally under `output/playwright/task11-unified-parity/`. They are not promoted as submission media because publication remains a separate explicit action. The older tracked split-mode screenshots are no longer presented as current proof.
 
 ## How it works
 
 ```text
 Browser on 127.0.0.1
   |
-  +--> Structured clinical record
-  |      |
-  |      +--> Emergency and respiratory policy --> Public result
-  |      |
-  |      +--> Eligible explicit continuation
-  |              |
-  |              v
-  +--> Ordinary prompt --> Shared bounded FIFO queue
+  +--> One textarea + Get guidance --> Input router
+         |
+         +--> Explicit clinical facts --> Structured review
+         |      |
+         |      +--> Emergency and respiratory policy --> Public result
+         |      |
+         |      +--> Eligible explicit continuation
+         |              |
+         |              v
+         +--> General prompt --> Shared bounded FIFO queue
                               |
                               v
                        QVAC SDK 0.13.3
@@ -74,7 +68,7 @@ Same GGUF bytes --> pinned direct llama.cpp --> official profiler evidence
 
 ### Authority order
 
-The server validates the structured record before allocating QVAC work. Any recorded emergency observation returns an emergency result immediately. Missing, conflicting or unsupported inputs fail closed. Complete supported respiratory records use the exact age threshold and return that deterministic result before any inference. Eligible fast-breathing, chest-indrawing and complete below-threshold records enter the native queue only after the worker explicitly continues. MedPsy may then propose a reconciled WHO class; only one-use human confirmation reveals the complete deterministic source plan. Ordinary prompts use their separate queue path.
+The browser routes text by general semantic rules, never by exact prompt strings, IDs or hashes. Explicit facts are reviewed before the browser serializes the strict clinical API record. The server validates that record before allocating QVAC work. Any recorded emergency observation returns an emergency result immediately. Missing, conflicting or unsupported inputs fail closed. Complete supported respiratory records use the exact age threshold and return that deterministic result before any inference. Eligible fast-breathing, chest-indrawing and complete below-threshold records enter the native queue only after the worker explicitly continues. MedPsy may then propose a reconciled WHO class; only one-use human confirmation reveals the complete deterministic cited source plan. General prompts use `/assist` internally and render in the same shared region.
 
 ### Model and source identity
 
@@ -113,12 +107,12 @@ npm run typecheck
 npm test
 npm run verify-import-manifest
 
-# Fresh deploy-to-GitHub release gate after the Interrogate documentation correction:
-# 533 tests passed, 0 failed, 0 skipped
+# Fresh Task 12 release gate:
+# 574 tests passed, 0 failed, 0 skipped
 # 76 imported files verified against Triage-0 commit 74424721bc75f564808eacce42d7f7f42676ae0f
 ```
 
-Fresh headed-Chrome acceptance also covered desktop and 375px mobile layouts. It recorded zero console errors, zero warnings, no horizontal overflow and no visible interaction target below 44 pixels.
+Fresh headed-Chrome acceptance also covered desktop, 375-by-812 and 320-pixel layouts. It recorded zero console errors, zero warnings, no horizontal overflow and no visible interaction target below 44 pixels.
 
 ## Try it locally (15 to 30 minutes)
 
@@ -139,10 +133,10 @@ curl http://127.0.0.1:3010/health
 
 ### Suggested review cases
 
-1. Click **English example**, run the assessment and verify `32/min is below 40/min`; then explicitly continue, review the provisional class and confirm it to inspect the complete cited plan.
+1. Select **English example**, choose **Get guidance**, review the extracted record, then choose **Get guidance** again. Verify `32/min is below 40/min`; explicitly continue, review the provisional class and confirm it to inspect the complete cited plan.
 2. Mark **Cannot drink or breastfeed** present and verify the deterministic emergency route completes without model assistance.
-3. Open **Ask the local model**, select submitted Prompt 1 and verify it does not invent a respiratory rate.
-4. Run submitted Prompt 2 and verify it says the checklist must be completed before model-assisted review.
+3. Paste submitted Prompt 1 manually into the same textarea and verify it does not invent a respiratory rate.
+4. Paste submitted Prompt 2 manually into the same textarea and verify it says the checklist must be completed before model-assisted review.
 5. Cancel an active job, edit the input and retry.
 
 Do not start a second server or ingest worker. The native WHO store has single-writer ownership.
