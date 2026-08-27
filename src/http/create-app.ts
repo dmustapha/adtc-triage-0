@@ -18,6 +18,7 @@ import {
   RespiratoryAssessmentRequestSchema,
   StructuredDangerRequestSchema,
   ConfirmedReferenceResponseSchema,
+  type ClinicalAssessmentRequest,
   type Severity,
 } from "../triage/schema.js";
 import { browserSessionOwner } from "./session.js";
@@ -180,68 +181,90 @@ function clinicalValidationError(body: any): string | null {
   return structured.success ? null : "Invalid structured danger assessment.";
 }
 
+type DeferredStream = {
+  effects: Array<(target: SseStream) => void>;
+  publish: (effect: (target: SseStream) => void) => void;
+  attach: (stream: SseStream) => void;
+};
+
+function deferredStream(): DeferredStream {
+  let target: SseStream | null = null;
+  const effects: Array<(stream: SseStream) => void> = [];
+  return {
+    effects,
+    publish: (effect) => { if (target) effect(target); else effects.push(effect); },
+    attach: (stream) => { target = stream; effects.splice(0).forEach((effect) => effect(stream)); },
+  };
+}
+
+function triageInput(deps: Dependencies, request: Request, response: Response): { data: ClinicalAssessmentRequest; owner: string } | null {
+  const validationError = clinicalValidationError(request.body);
+  if (validationError) { response.status(400).json({ error: validationError }); return null; }
+  const parsed = parseClinicalRequest(request.body);
+  if (!parsed.success) { response.status(400).json({ error: "Invalid clinical assessment." }); return null; }
+  const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
+  const observations = normalizeDangerObservations(parsed.data.dangerObservations);
+  const hasEmergency = EMERGENCY_OBSERVATION_KEYS.some((key) => observations[key] === "PRESENT");
+  const emergency = hasEmergency ? deps.supervisedWorkflow.deterministic?.(parsed.data, { owner }) : null;
+  if (emergency?.outcome === "EMERGENCY") {
+    response.setHeader("Cache-Control", "no-store");
+    sendDeterministic(openSse(response, () => undefined), emergency);
+    return null;
+  }
+  const conflicts = findNarrativeConflicts(canonicalClinicalRecord(parsed.data));
+  if (conflicts.length) {
+    response.status(409).json({
+      error: "The description conflicts with the structured assessment. Correct the patient record before continuing.",
+      conflicts: conflicts.map((field) => field.replace(/^dangerObservations\./, "")),
+    });
+    return null;
+  }
+  const deterministic = deps.supervisedWorkflow.deterministic?.(parsed.data, { owner });
+  if (!deterministic) return { data: parsed.data, owner };
+  response.setHeader("Cache-Control", "no-store");
+  sendDeterministic(openSse(response, () => undefined), deterministic);
+  return null;
+}
+
+function submitAssessment(deps: Dependencies, data: ClinicalAssessmentRequest, owner: string, deferred: DeferredStream) {
+  const startedAt = Date.now();
+  return deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.assess(data, {
+    owner,
+    signal: context.signal,
+    onStage: (stage: unknown) => context.publish(() => deferred.publish((stream) => stream.send("stage", stage))),
+    onCitation: (citation: unknown) => context.publish(() => deferred.publish((stream) => stream.send("citation", citation))),
+    onFirstToken: () => context.publish(() => deferred.publish((stream) => stream.send("first_token", { ttftMs: Date.now() - startedAt }))),
+  }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Clinical assessment" });
+}
+
+async function streamAssessment(response: Response, deps: Dependencies, job: ReturnType<Dependencies["inferenceQueue"]["submit"]>, deferred: DeferredStream) {
+  const stream = openSse(response, () => job.disconnect());
+  stream.send("job", { id: job.id, position: job.position });
+  stream.send("stage", { key: job.position ? "queued" : "assess", label: job.position ? "Queued for local inference" : "Reviewing recorded assessment" });
+  deferred.attach(stream);
+  try {
+    const result = await job.promise;
+    if (stream.isOpen()) sendAssessment(stream, result, deps);
+    stream.send("done", { ok: true });
+    stream.finish();
+  } catch (error) { if (stream.isOpen()) safeError(stream, error); }
+}
+
 function triageRoute(deps: Dependencies) {
   return async (request: Request, response: Response): Promise<void> => {
-    const validationError = clinicalValidationError(request.body);
-    if (validationError) { response.status(400).json({ error: validationError }); return; }
-    const parsed = parseClinicalRequest(request.body);
-    if (!parsed.success) { response.status(400).json({ error: "Invalid clinical assessment." }); return; }
-    const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
-    const observations = normalizeDangerObservations(parsed.data.dangerObservations);
-    const hasEmergency = EMERGENCY_OBSERVATION_KEYS.some((key) => observations[key] === "PRESENT");
-    const emergency = hasEmergency ? deps.supervisedWorkflow.deterministic?.(parsed.data, { owner }) : null;
-    if (emergency?.outcome === "EMERGENCY") {
-      response.setHeader("Cache-Control", "no-store");
-      sendDeterministic(openSse(response, () => undefined), emergency);
-      return;
-    }
-    const conflicts = findNarrativeConflicts(canonicalClinicalRecord(parsed.data));
-    if (conflicts.length) {
-      response.status(409).json({
-        error: "The description conflicts with the structured assessment. Correct the patient record before continuing.",
-        conflicts: conflicts.map((field) => field.replace(/^dangerObservations\./, "")),
-      });
-      return;
-    }
-    const deterministic = deps.supervisedWorkflow.deterministic?.(parsed.data, { owner });
-    if (deterministic) {
-      response.setHeader("Cache-Control", "no-store");
-      const stream = openSse(response, () => undefined);
-      sendDeterministic(stream, deterministic);
-      return;
-    }
-    const pendingEffects: Array<(target: SseStream) => void> = [];
-    let stream: SseStream | null = null;
-    const publish = (effect: (target: SseStream) => void) => {
-      if (stream) effect(stream); else pendingEffects.push(effect);
-    };
-    const reasonStartedAt = Date.now();
-    let submitted;
+    const input = triageInput(deps, request, response);
+    if (!input) return;
+    const deferred = deferredStream();
+    let job;
     try {
-      submitted = deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.assess(parsed.data, {
-        owner,
-        signal: context.signal,
-        onStage: (stage: unknown) => context.publish(() => publish((target) => target.send("stage", stage))),
-        onCitation: (citation: unknown) => context.publish(() => publish((target) => target.send("citation", citation))),
-        onFirstToken: () => context.publish(() => publish((target) => target.send("first_token", { ttftMs: Date.now() - reasonStartedAt }))),
-      }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Clinical assessment" });
+      job = submitAssessment(deps, input.data, input.owner, deferred);
     } catch (error) {
       if (!queueFailure(response, error)) response.status(503).json({
         error: "Local assessment could not be admitted.", code: "INFERENCE_FAILED", retryable: false,
       });
       return;
     }
-    const job = submitted;
-    stream = openSse(response, () => job.disconnect());
-    stream.send("job", { id: job.id, position: job.position });
-    stream.send("stage", { key: job.position ? "queued" : "assess", label: job.position ? "Queued for local inference" : "Reviewing recorded assessment" });
-    pendingEffects.splice(0).forEach((effect) => effect(stream!));
-    try {
-      const result = await job.promise;
-      if (stream.isOpen()) sendAssessment(stream, result, deps);
-      stream.send("done", { ok: true });
-      stream.finish();
-    } catch (error) { if (stream.isOpen()) safeError(stream, error); }
+    await streamAssessment(response, deps, job, deferred);
   };
 }
 
@@ -254,60 +277,73 @@ function continuationFailure(response: Response, reason: string): void {
   });
 }
 
+function continuationClaim(deps: Dependencies, request: Request, response: Response) {
+  const parsed = ContinuationRequest.safeParse(request.body);
+  if (!parsed.success) { response.status(400).json({ error: "Invalid continuation request." }); return null; }
+  const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
+  const claim = deps.supervisedWorkflow.claimContinuation?.(parsed.data.token, owner);
+  if (!claim?.ok) { continuationFailure(response, String(claim?.reason ?? "NOT_FOUND")); return null; }
+  if (deps.supervisedWorkflow.continueClaim) return { claim, owner, token: parsed.data.token };
+  deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
+  continuationFailure(response, "NOT_FOUND");
+  return null;
+}
+
+function submitContinuation(deps: Dependencies, input: NonNullable<ReturnType<typeof continuationClaim>>, deferred: DeferredStream) {
+  const startedAt = Date.now();
+  return deps.inferenceQueue.submit(input.owner, "triage", (context) => deps.supervisedWorkflow.continueClaim!(input.claim, {
+    owner: input.owner,
+    signal: context.signal,
+    onStage: (stage: unknown) => context.publish(() => deferred.publish((stream) => stream.send("stage", stage))),
+    onCitation: (citation: unknown) => context.publish(() => deferred.publish((stream) => stream.send("citation", citation))),
+    onFirstToken: () => context.publish(() => deferred.publish((stream) => stream.send("first_token", { ttftMs: Date.now() - startedAt }))),
+  }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Supervised respiratory continuation" });
+}
+
+async function streamContinuation(
+  response: Response,
+  deps: Dependencies,
+  input: NonNullable<ReturnType<typeof continuationClaim>>,
+  job: ReturnType<Dependencies["inferenceQueue"]["submit"]>,
+  deferred: DeferredStream,
+): Promise<void> {
+  response.setHeader("Cache-Control", "no-store");
+  const stream = openSse(response, () => job.disconnect());
+  stream.send("job", { id: job.id, position: job.position });
+  stream.send("stage", {
+    key: job.position ? "queued" : "assess",
+    label: job.position ? "Queued for local inference" : "Continuing supervised WHO review",
+  });
+  deferred.attach(stream);
+  try {
+    const result = await job.promise;
+    const committed = deps.supervisedWorkflow.commitContinuation?.(input.token, input.owner);
+    if (committed === false) throw new Error("Continuation reservation could not be committed.");
+    if (stream.isOpen()) sendAssessment(stream, result, deps);
+    stream.send("done", { ok: true });
+    stream.finish();
+  } catch (error) {
+    deps.supervisedWorkflow.releaseContinuation?.(input.token, input.owner);
+    if (stream.isOpen()) safeError(stream, error);
+  }
+}
+
 function continuationRoute(deps: Dependencies) {
   return async (request: Request, response: Response): Promise<void> => {
-    const parsed = ContinuationRequest.safeParse(request.body);
-    if (!parsed.success) { response.status(400).json({ error: "Invalid continuation request." }); return; }
-    const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
-    const claim = deps.supervisedWorkflow.claimContinuation?.(parsed.data.token, owner);
-    if (!claim?.ok) { continuationFailure(response, String(claim?.reason ?? "NOT_FOUND")); return; }
-    if (!deps.supervisedWorkflow.continueClaim) {
-      deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
-      continuationFailure(response, "NOT_FOUND"); return;
-    }
-
-    const pendingEffects: Array<(target: SseStream) => void> = [];
-    let stream: SseStream | null = null;
-    const publish = (effect: (target: SseStream) => void) => {
-      if (stream) effect(stream); else pendingEffects.push(effect);
-    };
-    const reasonStartedAt = Date.now();
-    let submitted;
+    const input = continuationClaim(deps, request, response);
+    if (!input) return;
+    const deferred = deferredStream();
+    let job;
     try {
-      submitted = deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.continueClaim!(claim, {
-        owner,
-        signal: context.signal,
-        onStage: (stage: unknown) => context.publish(() => publish((target) => target.send("stage", stage))),
-        onCitation: (citation: unknown) => context.publish(() => publish((target) => target.send("citation", citation))),
-        onFirstToken: () => context.publish(() => publish((target) => target.send("first_token", { ttftMs: Date.now() - reasonStartedAt }))),
-      }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Supervised respiratory continuation" });
+      job = submitContinuation(deps, input, deferred);
     } catch (error) {
-      deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
+      deps.supervisedWorkflow.releaseContinuation?.(input.token, input.owner);
       if (!queueFailure(response, error)) response.status(503).json({
         error: "Local continuation could not be admitted.", code: "INFERENCE_FAILED", retryable: false,
       });
       return;
     }
-    const job = submitted;
-    response.setHeader("Cache-Control", "no-store");
-    stream = openSse(response, () => job.disconnect());
-    stream.send("job", { id: job.id, position: job.position });
-    stream.send("stage", {
-      key: job.position ? "queued" : "assess",
-      label: job.position ? "Queued for local inference" : "Continuing supervised WHO review",
-    });
-    pendingEffects.splice(0).forEach((effect) => effect(stream!));
-    try {
-      const result = await job.promise;
-      const committed = deps.supervisedWorkflow.commitContinuation?.(parsed.data.token, owner);
-      if (committed === false) throw new Error("Continuation reservation could not be committed.");
-      if (stream.isOpen()) sendAssessment(stream, result, deps);
-      stream.send("done", { ok: true });
-      stream.finish();
-    } catch (error) {
-      deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
-      if (stream.isOpen()) safeError(stream, error);
-    }
+    await streamContinuation(response, deps, input, job, deferred);
   };
 }
 

@@ -705,7 +705,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "c236f047385481e0948e7c4982c6354e17e797b50cbbef5f8da46797d21ecb35",
+      "destinationSha256": "59a002ab151a642d8f52c256799079e8013755b8afbc29fb7b1d71dd12baf233",
       "modification": {
         "status": "modified",
         "reason": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags."

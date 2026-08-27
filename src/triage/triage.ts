@@ -17,6 +17,7 @@ import {
   TriageExtractSchema,
   buildExtractJsonSchema,
   type TriageCard,
+  type TriageExtract,
   type ManagementPlan,
   type PlanCitation,
 } from "./schema.js";
@@ -205,6 +206,8 @@ export interface TriageOptions {
   structuredDanger?: DangerDecision;
 }
 
+type ExtractAttempt = { extract: TriageExtract; attempt: number };
+
 function stripThink(s: string): string {
   return s.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/<think>[\s\S]*$/g, "").trim();
 }
@@ -299,28 +302,14 @@ export function makeStructuredDangerResult(
  * without polluting the real RAG store. Reason → extract(safeParse+retry) → deterministic severity →
  * injected citation. Throws only after MAX_EXTRACT_ATTEMPTS invalid extracts.
  */
-export async function triageFromHits(
+async function reasonAssessment(
   caseText: string,
   groundedHits: SearchHit[],
   ctx: TriageContext,
   opts?: TriageOptions,
-): Promise<TriageResult> {
-  const grounded = groundedHits[0];
-  const retrieval = opts?.retrieval ?? "semantic";
-  // CONTEXT BUDGET (1.7B ctx = 3072 tokens). The EXTRACT pass stacks system + excerpts + case + reason
-  // assessment + shortlist, which overflowed on a long assessment (CB3: 3608 > 3072). So bound each part:
-  // the REASON pass gets fuller grounding (4 excerpts, ~700 chars each — it has no assessment on top); the
-  // EXTRACT pass gets a leaner excerpt (the model has already reasoned over the full set) + a length-capped
-  // assessment tail (the CONCLUSION line lives at the end). Encoded classes don't need the excerpts at all
-  // (the frozen table drives the card), so trimming them costs nothing there.
-  // E-1: the patient case is UNTRUSTED data too — fence it so an adversarial case cannot issue orders.
+): Promise<string> {
   const caseBlock = `PATIENT CASE:\n${fence("CASE", caseText)}`;
-  // The REASON pass gets fuller grounding (no assessment stacked on top, so it does not overflow); the
-  // EXTRACT pass gets a leaner excerpt + a capped assessment (that stack is what overflowed on CB3).
   const reasonUserBody = `${excerptBlock(groundedHits, 5, 800)}\n\n${caseBlock}`;
-  const extractUserBody = `${excerptBlock(groundedHits, 3, 500)}\n\n${caseBlock}`;
-
-  // REASON pass — let the model think; it concludes the classification + action correctly in prose.
   observeTriageExecution("medpsy");
   const reasonRun = await completionTimed({
     modelId: ctx.medpsyId,
@@ -338,42 +327,41 @@ export async function triageFromHits(
     generationParams: { predict: opts?.reasonPredict ?? DEFAULT_REASON_PREDICT, temp: 0, repeat_penalty: 1.1 },
     onDelta: opts?.onReasonDelta,
   });
-  // If the reason pass was token-capped mid-<think> (the E-5 demo path caps predict), stripThink
-  // yields "" — fall back to the raw text (tags removed) so the extract pass still has the model's
-  // reasoning to work from, rather than feeding it an empty assessment and failing the retry loop.
   const assessmentFull =
     stripThink(reasonRun.text) || reasonRun.text.replace(/<\/?think>/g, "").trim() || reasonRun.text.trim();
-  // Cap the assessment fed to the extract pass (keep the TAIL — the "CONCLUSION: <class>" line is last) so
-  // a verbose reasoner cannot overflow the extract prefill. ~1400 chars ≈ well under the ctx budget.
   const ASSESS_MAX_CHARS = 1400;
-  const assessment =
-    assessmentFull.length > ASSESS_MAX_CHARS ? "… " + assessmentFull.slice(-ASSESS_MAX_CHARS) : assessmentFull;
+  return assessmentFull.length > ASSESS_MAX_CHARS
+    ? "… " + assessmentFull.slice(-ASSESS_MAX_CHARS)
+    : assessmentFull;
+}
 
-  // PHASE 2 ROUTING: the extract grammar allows the FULL 27-class enum (retired the keyword sieve, which
-  // hard-locked the model out of the right class on a vocab-miss). The semantic router's shortlist is a
-  // PROMPT bias (below), not a grammar restriction — so the model still can, and usually does, pick a
-  // shortlisted class, but a lay/abbreviated case is never grammar-forced to UNKNOWN. The deterministic
-  // reconcilers + danger-sign severity gate are the backstop against a cross-symptom slip.
+function extractPrompt(assessment: string, caseText: string, hits: SearchHit[], opts?: TriageOptions): string {
+  const caseBlock = `PATIENT CASE:\n${fence("CASE", caseText)}`;
+  const extractUserBody = `${excerptBlock(hits, 3, 500)}\n\n${caseBlock}`;
+  const shortlist = opts?.shortlist?.length
+    ? `SEMANTIC SHORTLIST — the classes whose defining WHO signs are closest to THIS case, ranked most-likely first: ${opts.shortlist.map((s) => s.cls).join(", ")}. Prefer one of these unless the case's signs clearly match a different classification; you may still choose any class from the full list, or UNKNOWN.\n\n`
+    : "";
+  const required = opts?.requiredClassification
+    ? `STRUCTURED POLICY BOUNDARY — the recorded respiratory facts are compatible only with ${opts.requiredClassification}. Select that class if the evidence supports it; otherwise select UNKNOWN. No other class is allowed.\n\n`
+    : "";
+  return `${extractUserBody}\n\nCLINICAL ASSESSMENT:\n${assessment}\n\n${required}${shortlist}Emit the JSON now.`;
+}
+
+async function extractAssessment(
+  prompt: string,
+  ctx: TriageContext,
+  opts?: TriageOptions,
+): Promise<ExtractAttempt> {
   const allowedExtractClasses = opts?.requiredClassification
     ? [opts.requiredClassification, "UNKNOWN"]
     : CLASSIFICATION_ENUM;
   const extractSchema = buildExtractJsonSchema(allowedExtractClasses);
-  // Rank-ordered shortlist injected into the extract prompt (soft bias). Empty on the degraded/no-embed
-  // path (no router), where the model classifies from the decision rules alone.
-  const shortlistBlock = opts?.shortlist?.length
-    ? `SEMANTIC SHORTLIST — the classes whose defining WHO signs are closest to THIS case, ranked most-likely first: ${opts.shortlist.map((s) => s.cls).join(", ")}. Prefer one of these unless the case's signs clearly match a different classification; you may still choose any class from the full list, or UNKNOWN.\n\n`
-    : "";
-  const requiredClassBlock = opts?.requiredClassification
-    ? `STRUCTURED POLICY BOUNDARY — the recorded respiratory facts are compatible only with ${opts.requiredClassification}. Select that class if the evidence supports it; otherwise select UNKNOWN. No other class is allowed.\n\n`
-    : "";
-
-  // EXTRACT pass — GBNF-constrained json_schema → guaranteed shape; safeParse + retry.
   let lastErr = "";
   const maxExtractAttempts = opts?.maxExtractAttempts ?? MAX_EXTRACT_ATTEMPTS;
   for (let attempt = 1; attempt <= maxExtractAttempts; attempt++) {
     const history: ChatMessage[] = [
       { role: "system", content: SYS_EXTRACT },
-      { role: "user", content: `${extractUserBody}\n\nCLINICAL ASSESSMENT:\n${assessment}\n\n${requiredClassBlock}${shortlistBlock}Emit the JSON now.` },
+      { role: "user", content: prompt },
     ];
     if (attempt > 1) {
       history.push({
@@ -387,99 +375,78 @@ export async function triageFromHits(
       history,
       phase: "triage",
       responseFormat: { type: "json_schema", json_schema: { name: "triage_extract", schema: extractSchema } },
-      // Greedy decoding (temp 0) — the classification pick must be STABLE run-to-run, like the reason pass.
-      // Without it the extract sampled DEPRESSION for a purely-physical case on some runs (MS2). The GBNF
-      // enum grammar still constrains the output; temp 0 just removes the sampling noise on the boundary.
-      // `predict` caps a runaway (see DEFAULT_EXTRACT_PREDICT) so a degenerate assessment can never overflow ctx.
       generationParams: { temp: 0, predict: opts?.extractPredict ?? DEFAULT_EXTRACT_PREDICT },
     });
     const parsed = TriageExtractSchema.safeParse(parseExtract(extractRun.text));
-    if (parsed.success) {
-      const ex = parsed.data;
-      // REDESIGN (Tier B): the model has done its one job — emit ONE enum classification. Routing now
-      // belongs to the frozen WHO table, not to the model's prose or to RAG.
-      // (a) UNKNOWN → the case grounded a chunk but fits no listed class; abstain rather than force a
-      //     wrong class onto a clinical card.
-      // Blood in the stool is an unambiguous WHO red flag → DYSENTERY, even when the model abstains
-      // (it misses blood on terse phrasings and can be talked out of it by an injected instruction).
-      // This guard runs BEFORE the UNKNOWN abstain so a bloody-diarrhoea case never escalates to a
-      // clinician-with-no-plan when WHO has a clear answer (ciprofloxacin).
-      // Bilateral pitting oedema = complicated SEVERE ACUTE MALNUTRITION (WHO), likewise unambiguous — so
-      // it also bypasses the UNKNOWN abstain (the model intermittently abstains on it).
-      const bloodStool = hasBloodInStool(caseText);
-      const oedemaSam = hasBilateralOedema(caseText);
-      // Self-harm/suicide language is a mhGAP emergency that must NEVER abstain (the model intermittently
-      // returns UNKNOWN on it) — bypass the abstain gate like blood/oedema; reconcileSelfHarm then forces it.
-      const selfHarm = hasSelfHarmLanguage(caseText);
-      if (normalizeClassification(ex.classification) === "UNKNOWN" && !bloodStool && !oedemaSam && !selfHarm) {
-        return {
-          card: abstainCard("This case does not match an encoded WHO IMCI or mhGAP classification, so Triage-0 escalates to a clinician rather than guess."),
-          citationChunk: grounded, attempts: attempt, retrieval, classification: "UNKNOWN",
-        };
-      }
-      // Deterministic WHO corrections (stable where the model is boundary-flaky): no-test malaria, then
-      // blood→DYSENTERY + SEVERE-DEHYDRATION over-call guard, then bilateral-oedema→SAM.
-      let cls = reconcileMalaria(ex.classification, caseText);
-      cls = reconcileDiarrhoea(cls, caseText, hasEmergencySign(caseText, ex.red_flags));
-      if (bloodStool) cls = "DYSENTERY";
-      if (oedemaSam) cls = "SEVERE ACUTE MALNUTRITION"; // bilateral pitting oedema = complicated SAM, refer
-      cls = reconcileEar(cls, caseText); // an ear problem stays an ear problem even with fever
-      cls = reconcileFebrile(cls, caseText); // "very severe FEBRILE disease" with no fever → severe pneumonia
-      // Multi-symptom precedence: if the model named a dehydration/ear co-problem but the case also has a
-      // pneumonia sign (→ respiratory leads) or is a fever+malaria case (→ malaria leads), restore the
-      // WHO antibiotic-lead PRIMARY. Runs after the ear/blood guards so DYSENTERY/MASTOIDITIS win first.
-      cls = reconcileMultiSymptom(cls, caseText);
-      cls = reconcileJaundice(cls, caseText); // yellow palms/soles or <24h → SEVERE JAUNDICE
-      cls = reconcileSubstance(cls, caseText); // alcohol/drug + dependence marker → substance use
-      // Physical-over-mental veto: the model named a mhGAP mental class for a case with NO mental-health
-      // language but a clear IMCI physical sign → re-point to the physical class (WHO rules out a physical
-      // cause before a mental one). Never touches SELF-HARM / SUICIDE.
-      cls = reconcilePhysicalOverMental(cls, caseText);
-      // SAFETY (last): non-negated self-harm/suicide language forces SELF-HARM / SUICIDE (yields only to a
-      // physical IMCI EMERGENCY), so the emergency "do not leave alone / remove means" plan is never missed.
-      cls = reconcileSelfHarm(cls, caseText);
-      let entry = lookupProtocol(cls);
-      const severity = entry
-        ? finalizeSeverityV2(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger)
-        : finalizeSeverity(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger);
-      // RECONCILE the classification with the danger-sign gate (the 2014 IMCI pneumonia merge): when the
-      // model over-names a pure chest-indrawing case "SEVERE PNEUMONIA" but the gate downgraded severity
-      // below EMERGENCY, route to the home-treatment sibling so the plan + action agree with the band
-      // (oral amoxicillin, not refer). Driven by the table's `downgradeTo`, not a hardcoded condition.
-      if (entry?.downgradeTo && severity !== "EMERGENCY") {
-        cls = entry.downgradeTo;
-        entry = lookupProtocol(cls);
-      }
-      // (b) ENCODED → severity, action, and citation come from the table (deterministic, verbatim,
-      //     page-correct). This is what fixes the off-seed failure: no positional citation slice, no
-      //     model-authored severity. (c) UNENCODED → legacy behaviour (heuristic severity, model action,
-      //     grounded-chunk citation) for the not-yet-encoded classes (malnutrition, etc.).
-      const card: TriageCard = entry
-        ? {
-            severity,
-            action: entry.action.text,
-            protocol_citation: { doc: docFor(entry.protocol), page: entry.citation.page, section: entry.citation.text },
-            reasoning: deterministicReasoning(cls, entry),
-            red_flags: visibleStructuredFlags(opts?.structuredDanger, ex.red_flags),
-            confidence: ex.confidence,
-          }
-        : {
-            severity,
-            action: ex.action,
-            protocol_citation: {
-              doc: grounded.citation.title,
-              page: grounded.citation.page || grounded.source_ref.match(/p\.(\d+)/)?.[1] || "—",
-              section: (grounded.citation.section || grounded.text.slice(0, 160)).replace(/\s+/g, " ").trim(),
-            },
-            reasoning: ex.reasoning,
-            red_flags: visibleStructuredFlags(opts?.structuredDanger, ex.red_flags),
-            confidence: ex.confidence,
-          };
-      return { card, citationChunk: grounded, attempts: attempt, retrieval, classification: cls };
-    }
+    if (parsed.success) return { extract: parsed.data, attempt };
     lastErr = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
   }
   throw new Error(`Triage extract failed after ${maxExtractAttempts} attempts: ${lastErr}`);
+}
+
+function reconciledClassification(ex: TriageExtract, caseText: string): string {
+  let cls = reconcileMalaria(ex.classification, caseText);
+  cls = reconcileDiarrhoea(cls, caseText, hasEmergencySign(caseText, ex.red_flags));
+  if (hasBloodInStool(caseText)) cls = "DYSENTERY";
+  if (hasBilateralOedema(caseText)) cls = "SEVERE ACUTE MALNUTRITION";
+  cls = reconcileEar(cls, caseText);
+  cls = reconcileFebrile(cls, caseText);
+  cls = reconcileMultiSymptom(cls, caseText);
+  cls = reconcileJaundice(cls, caseText);
+  cls = reconcileSubstance(cls, caseText);
+  cls = reconcilePhysicalOverMental(cls, caseText);
+  return reconcileSelfHarm(cls, caseText);
+}
+
+function projectedCard(ex: TriageExtract, cls: string, caseText: string, grounded: SearchHit, opts?: TriageOptions): TriageCard {
+  let entry = lookupProtocol(cls);
+  const severity = entry
+    ? finalizeSeverityV2(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger)
+    : finalizeSeverity(cls, ex.action, caseText, ex.red_flags, opts?.structuredDanger);
+  let projectedClass = cls;
+  if (entry?.downgradeTo && severity !== "EMERGENCY") {
+    projectedClass = entry.downgradeTo;
+    entry = lookupProtocol(projectedClass);
+  }
+  const flags = visibleStructuredFlags(opts?.structuredDanger, ex.red_flags);
+  if (entry) return {
+    severity, action: entry.action.text,
+    protocol_citation: { doc: docFor(entry.protocol), page: entry.citation.page, section: entry.citation.text },
+    reasoning: deterministicReasoning(projectedClass, entry), red_flags: flags, confidence: ex.confidence,
+  };
+  return {
+    severity, action: ex.action,
+    protocol_citation: {
+      doc: grounded.citation.title,
+      page: grounded.citation.page || grounded.source_ref.match(/p\.(\d+)/)?.[1] || "—",
+      section: (grounded.citation.section || grounded.text.slice(0, 160)).replace(/\s+/g, " ").trim(),
+    },
+    reasoning: ex.reasoning, red_flags: flags, confidence: ex.confidence,
+  };
+}
+
+export async function triageFromHits(
+  caseText: string,
+  groundedHits: SearchHit[],
+  ctx: TriageContext,
+  opts?: TriageOptions,
+): Promise<TriageResult> {
+  const grounded = groundedHits[0];
+  const retrieval = opts?.retrieval ?? "semantic";
+  const assessment = await reasonAssessment(caseText, groundedHits, ctx, opts);
+  const { extract, attempt } = await extractAssessment(extractPrompt(assessment, caseText, groundedHits, opts), ctx, opts);
+  const explicitOverride = hasBloodInStool(caseText) || hasBilateralOedema(caseText) || hasSelfHarmLanguage(caseText);
+  if (normalizeClassification(extract.classification) === "UNKNOWN" && !explicitOverride) {
+    return {
+      card: abstainCard("This case does not match an encoded WHO IMCI or mhGAP classification, so Triage-0 escalates to a clinician rather than guess."),
+      citationChunk: grounded, attempts: attempt, retrieval, classification: "UNKNOWN",
+    };
+  }
+  let classification = reconciledClassification(extract, caseText);
+  const card = projectedCard(extract, classification, caseText, grounded, opts);
+  const entry = lookupProtocol(classification);
+  if (entry?.downgradeTo && card.severity !== "EMERGENCY") classification = entry.downgradeTo;
+  return { card, citationChunk: grounded, attempts: attempt, retrieval, classification };
 }
 
 /**
@@ -790,6 +757,79 @@ function buildPlanFromTable(entry: ProtocolEntry, severity: string): ManagementP
   return plan;
 }
 
+type RetrievedPlanParts = Record<string, SearchHit[]>;
+
+async function retrievePlanParts(classification: string, proto: string | undefined, ctx: TriageContext) {
+  const rules = rulesFor(proto);
+  const queries = rules.queries(classification);
+  const components: RetrievedPlanParts = {};
+  for (const key of Object.keys(queries)) components[key] = await retrieveComponent(queries[key], ctx);
+  return { rules, components };
+}
+
+function uniqueHits(hits: SearchHit[]): SearchHit[] {
+  const unique = new Map<string, SearchHit>();
+  for (const hit of hits) if (!unique.has(hit.id)) unique.set(hit.id, hit);
+  return [...unique.values()];
+}
+
+function projectMedicines(
+  plan: ManagementPlan,
+  primary: SearchHit[],
+  components: RetrievedPlanParts,
+  sameProto: (hits: SearchHit[]) => SearchHit[],
+): void {
+  const seen = new Set<string>();
+  const allChunks = uniqueHits([...primary, ...sameProto(Object.values(components).flat())]);
+  for (const [name, pattern] of DRUG_LEXICON) {
+    const nameHit = primary.find((hit) => pattern.test(hit.text));
+    if (!nameHit || seen.has(name)) continue;
+    seen.add(name);
+    const doseChunk = allChunks.find((hit) => pattern.test(hit.text) && DOSE_MARKERS.test(hit.text));
+    const span = `${drugWindow(doseChunk, pattern)} ${drugWindow(nameHit, pattern)}`;
+    plan.medicines.push({
+      name, dose: doseChunk ? "By weight band" : undefined,
+      frequency: findFrequency(span), duration: findDuration(span), citation: citationOf(doseChunk ?? nameHit),
+    });
+  }
+}
+
+function projectPlanLists(
+  plan: ManagementPlan,
+  primary: SearchHit[],
+  components: RetrievedPlanParts,
+  rules: PlanRuleset,
+  sameProto: (hits: SearchHit[]) => SearchHit[],
+): void {
+  const hits = (key: string) => uniqueHits([...primary, ...sameProto(components[key])]);
+  plan.supportive = matchVerbatim(hits("supportive"), rules.supportive)
+    .map((group) => ({ item: group.text, citation: citationOf(group.hit) }));
+  plan.home_care = matchVerbatim(hits("home_care"), rules.home_care)
+    .map((group) => ({ advice: group.text, citation: citationOf(group.hit) }));
+  plan.return_now = matchVerbatim(hits("return_now"), rules.return_now)
+    .map((group) => ({ sign: group.text, citation: citationOf(group.hit) }));
+}
+
+function projectFollowUpAndReferral(
+  plan: ManagementPlan,
+  primary: SearchHit[],
+  components: RetrievedPlanParts,
+  rules: PlanRuleset,
+  sameProto: (hits: SearchHit[]) => SearchHit[],
+  classificationPattern: RegExp,
+  severity: string,
+): void {
+  const hits = (key: string) => uniqueHits([...primary, ...sameProto(components[key])]);
+  const followUps = matchVerbatim(hits("follow_up"), rules.follow_up, 5, classificationPattern);
+  const followUp = [...followUps].sort((a, b) =>
+    parseInt(a.text.match(/\d+/)?.[0] ?? "999", 10) - parseInt(b.text.match(/\d+/)?.[0] ?? "999", 10))[0];
+  if (followUp) plan.follow_up = { when: followUp.text, citation: citationOf(followUp.hit) };
+  const referral = matchVerbatim(hits("referral"), rules.referral, 1, classificationPattern)[0];
+  if (referral && (severity === "EMERGENCY" || referral.hit.protocol === "mhGAP")) {
+    plan.referral = { criterion: referral.text, citation: citationOf(referral.hit) };
+  }
+}
+
 /**
  * Build the grounded ManagementPlan deterministically from retrieved chunks. Never throws — the plan is
  * a progressive enhancement on the already-correct card, so any failure yields an empty (valid) plan.
@@ -810,70 +850,15 @@ export async function assemblePlan(
   if (entry) return buildPlanFromTable(entry, severity);
 
   try {
-    // Per-component retrieval, kept grouped (precision: medicines never read from the supportive/return
-    // chunks). Sequential, NEVER Promise.all — the @qvac embed engine has an exclusive run queue and
-    // concurrent embeds throw "Cannot set new job" and corrupt the engine.
-    // PROTOCOL FENCE: a plan is built ONLY from the protocol that classified the case (IMCI vs mhGAP),
-    // with that protocol's own retrieval vocabulary + phrasing patterns. Without this, an adult mhGAP
-    // depression case leaks IMCI paediatric advice ("continue breastfeeding") and misses its own
-    // mental-health plan. Same-protocol only.
-    // Fence keyed on the CONCLUDED classification, not just the top hit: pick the protocol of the chunk
-    // that names the conclusion, so an mhGAP "DEPRESSION" that retrieved an IMCI chunk at rank 0 still
-    // builds an mhGAP plan (right vocabulary + referral), not an IMCI one.
     const clsRe = new RegExp(classification.trim().split(/\s+/)[0].replace(/[^a-z0-9]/gi, "") || ".", "i");
     const proto = (primaryHits.find((h) => clsRe.test(h.text)) ?? primaryHits[0])?.protocol;
-    const rules = rulesFor(proto);
-    const q = rules.queries(classification);
-    const comp: Record<string, SearchHit[]> = {};
-    for (const key of Object.keys(q)) comp[key] = await retrieveComponent(q[key], ctx);
-
-    if (config.debugPlan) console.error("[plan] protocol/components:", proto, Object.fromEntries(Object.entries(comp).map(([key, hits]) => [key, hits.length])));
-    // Same-protocol fence (see PROTOCOL FENCE above).
+    const { rules, components } = await retrievePlanParts(classification, proto, ctx);
+    if (config.debugPlan) console.error("[plan] protocol/components:", proto, Object.fromEntries(Object.entries(components).map(([key, hits]) => [key, hits.length])));
     const sameProto = (arr: SearchHit[]) => (proto ? arr.filter((c) => c.protocol === proto) : arr);
     const primary = sameProto(primaryHits);
-    const dedupe = (arr: SearchHit[]) => { const m = new Map<string, SearchHit>(); for (const h of arr) if (!m.has(h.id)) m.set(h.id, h); return [...m.values()]; };
-
-    // Medicines: NAMES only from the primary classification row; dosing page only supplies the
-    // by-weight-band pointer + citation + the frequency/duration windowed to THIS drug.
-    const seenMed = new Set<string>();
-    for (const [name, re] of DRUG_LEXICON) {
-      const nameHit = primary.find((c) => re.test(c.text));
-      if (!nameHit || seenMed.has(name)) continue;
-      seenMed.add(name);
-      const allChunks = dedupe([...primary, ...sameProto(Object.values(comp).flat())]);
-      const doseChunk = allChunks.find((c) => re.test(c.text) && DOSE_MARKERS.test(c.text));
-      const span = `${drugWindow(doseChunk, re)} ${drugWindow(nameHit, re)}`;
-      plan.medicines.push({
-        name,
-        dose: doseChunk ? "By weight band" : undefined,
-        frequency: findFrequency(span),
-        duration: findDuration(span),
-        citation: citationOf(doseChunk ?? nameHit),
-      });
-    }
-
-    plan.supportive = matchVerbatim(dedupe([...primary, ...sameProto(comp.supportive)]), rules.supportive)
-      .map((g) => ({ item: g.text, citation: citationOf(g.hit) }));
-    plan.home_care = matchVerbatim(dedupe([...primary, ...sameProto(comp.home_care)]), rules.home_care)
-      .map((g) => ({ advice: g.text, citation: citationOf(g.hit) }));
-    plan.return_now = matchVerbatim(dedupe([...primary, ...sameProto(comp.return_now)]), rules.return_now)
-      .map((g) => ({ sign: g.text, citation: citationOf(g.hit) }));
-
-    // Single-value fields: prefer the line from a chunk naming this classification (clsRe, defined above),
-    // so follow-up/referral come from the right row. Follow-up additionally prefers the SMALLEST interval
-    // (earliest review) among matches — deterministic and clinically safest.
-    const fus = matchVerbatim(dedupe([...primary, ...sameProto(comp.follow_up)]), rules.follow_up, 5, clsRe);
-    const fu = [...fus].sort((a, b) =>
-      parseInt(a.text.match(/\d+/)?.[0] ?? "999", 10) - parseInt(b.text.match(/\d+/)?.[0] ?? "999", 10))[0];
-    if (fu) plan.follow_up = { when: fu.text, citation: citationOf(fu.hit) };
-
-    // Referral is shown only when it is the actual disposition: an EMERGENCY (IMCI "refer urgently") or
-    // an mhGAP "consult a specialist" line. This stops a home-treatment PNEUMONIA from showing a referral
-    // just because a severe row was retrieved.
-    const rf = matchVerbatim(dedupe([...primary, ...sameProto(comp.referral)]), rules.referral, 1, clsRe)[0];
-    if (rf && (severity === "EMERGENCY" || rf.hit.protocol === "mhGAP")) {
-      plan.referral = { criterion: rf.text, citation: citationOf(rf.hit) };
-    }
+    projectMedicines(plan, primary, components, sameProto);
+    projectPlanLists(plan, primary, components, rules, sameProto);
+    projectFollowUpAndReferral(plan, primary, components, rules, sameProto, clsRe, severity);
 
     if (config.debugPlan) console.error("[plan] projected action counts:", plan.medicines.length, plan.supportive.length, plan.home_care.length, plan.return_now.length);
     return plan;

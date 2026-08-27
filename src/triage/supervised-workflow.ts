@@ -378,6 +378,97 @@ async function assessWithModel(
       }
 }
 
+function groundedProtocolHits(grounding: GroundingResult, shortlist?: RouteResult["shortlist"]): SearchHit[] {
+  const candidates = grounding.groundedHits.length ? grounding.groundedHits : grounding.topHits;
+  const protocols = new Set((shortlist ?? [])
+    .map((candidate) => lookupProtocol(candidate.cls)?.protocol)
+    .filter(Boolean));
+  return protocols.size
+    ? candidates.filter((hit) => protocols.has(hit.protocol as "IMCI" | "mhGAP"))
+    : candidates;
+}
+
+function publishGrounding(options: AssessOptions, grounding: GroundingResult, hits: SearchHit[]): void {
+  options.onStage?.({ key: "retrieve", label: "Checked local WHO passages", detail: `${grounding.retrieval} retrieval`, count: hits.length });
+  const top = hits[0]!;
+  options.onCitation?.({
+    protocol: top.protocol, doc: top.citation.title, page: top.citation.page,
+    score: Number(top.score.toFixed(3)), retrieval: grounding.retrieval, provenance: "retrieved-reference",
+  });
+}
+
+function expectedRespiratoryClassification(decision?: RespiratoryDecision): string | null {
+  if (!decision) return null;
+  return decision.matchedCriteria.includes("FAST_BREATHING")
+    || decision.matchedCriteria.includes("CHEST_INDRAWING")
+    ? "PNEUMONIA"
+    : "COUGH OR COLD";
+}
+
+async function runGroundedTriage(
+  dependencies: WorkflowDependencies,
+  request: ClinicalAssessmentRequest,
+  modelContext: string,
+  options: AssessOptions,
+  context: TriageContext,
+  grounding: GroundingResult,
+  hits: SearchHit[],
+  shortlist?: RouteResult["shortlist"],
+  expectedClass?: string | null,
+): Promise<TriageResult> {
+  let firstToken = false;
+  return dependencies.triageFromHits(modelContext, hits, context, {
+    retrieval: grounding.retrieval, shortlist,
+    ...(expectedClass ? { requiredClassification: expectedClass } : {}),
+    structuredDanger: evaluateDangerPolicy(request.patientAge, request.dangerObservations),
+    reasonPredict: 1024, extractPredict: 512, maxExtractAttempts: 3,
+    onReasonDelta: () => {
+      if (firstToken) return;
+      firstToken = true;
+      options.onFirstToken?.();
+    },
+  });
+}
+
+function completedRespiratoryAssistance(
+  request: ClinicalAssessmentRequest,
+  result: TriageResult,
+  grounding: GroundingResult,
+  identity: { runtime: string; model: string },
+): SupervisedAssessmentResult | null {
+  const respiratory = request.respiratoryAssessment
+    ? evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment)
+    : undefined;
+  if (!respiratory?.modelInvoked) return null;
+  if (!lookupProtocol(result.classification)) return respiratoryWithAssistance(respiratory, {
+    status: "UNAVAILABLE", ...identity,
+  }, `${respiratory.uncertainty} Model-assisted supporting evidence was unavailable.`);
+  const publicResult = respiratoryWithAssistance(respiratory, {
+    status: "COMPLETED", ...identity, retrievalMode: grounding.retrieval,
+  });
+  publicResult.attempts = result.attempts;
+  return publicResult;
+}
+
+function provisionalAssessment(
+  dependencies: WorkflowDependencies,
+  request: ClinicalAssessmentRequest,
+  result: TriageResult,
+  options: AssessOptions,
+  grounding: GroundingResult,
+  identity: { runtime: string; model: string },
+  respiratoryContinuation?: RespiratoryDecision,
+): SupervisedAssessmentResult {
+  const entry = lookupProtocol(result.classification);
+  if (!entry) return unavailable("The provisional class has no verified deterministic public action mapping.");
+  const binding = issueBinding(request, result, entry, dependencies.policyVersion, options.owner);
+  const grant = dependencies.confirmationStore.issue(binding, confirmationPayload(request));
+  const publicResult = provisional(request, result, grant, entry.protocol, respiratoryContinuation);
+  publicResult.assistance = { status: "COMPLETED", ...identity, retrievalMode: grounding.retrieval };
+  publicResult.attempts = result.attempts;
+  return publicResult;
+}
+
 async function assessGrounded(
   dependencies: WorkflowDependencies,
   request: ClinicalAssessmentRequest,
@@ -391,82 +482,22 @@ async function assessGrounded(
   const identity = assistanceIdentity(dependencies);
   if (options.signal?.aborted) return unavailableWithPolicy(request, "Model-assisted supporting evidence was cancelled.", identity);
   const grounding = await dependencies.retrieveGrounding(retrievalQuery, context);
-  const candidates = grounding.groundedHits.length ? grounding.groundedHits : grounding.topHits;
-  const allowedProtocols = new Set((shortlist ?? [])
-    .map((candidate) => lookupProtocol(candidate.cls)?.protocol)
-    .filter(Boolean));
-  const hits = allowedProtocols.size
-    ? candidates.filter((hit) => allowedProtocols.has(hit.protocol as "IMCI" | "mhGAP"))
-    : candidates;
+  const hits = groundedProtocolHits(grounding, shortlist);
   if (!hits.length) return unavailableWithPolicy(request, "Verified WHO source grounding is unavailable; no supporting evidence was issued.", identity);
-  options.onStage?.({ key: "retrieve", label: "Checked local WHO passages", detail: `${grounding.retrieval} retrieval`, count: hits.length });
-  const top = hits[0]!;
-  options.onCitation?.({
-    protocol: top.protocol,
-    doc: top.citation.title,
-    page: top.citation.page,
-    score: Number(top.score.toFixed(3)),
-    retrieval: grounding.retrieval,
-    provenance: "retrieved-reference",
-  });
-  const structuredDanger = evaluateDangerPolicy(request.patientAge, request.dangerObservations);
-  const expectedRespiratoryClass = respiratoryContinuation
-    ? respiratoryContinuation.matchedCriteria.includes("FAST_BREATHING")
-      || respiratoryContinuation.matchedCriteria.includes("CHEST_INDRAWING")
-      ? "PNEUMONIA"
-      : "COUGH OR COLD"
-    : null;
+  publishGrounding(options, grounding, hits);
+  const expectedClass = expectedRespiratoryClassification(respiratoryContinuation);
   options.onStage?.({ key: "reason", label: "Reasoning on-device", detail: `${identity.runtime} · on-device` });
-  let firstToken = false;
-  const result = await dependencies.triageFromHits(modelContext, hits, context, {
-    retrieval: grounding.retrieval,
-    shortlist,
-    ...(expectedRespiratoryClass ? { requiredClassification: expectedRespiratoryClass } : {}),
-    structuredDanger,
-    reasonPredict: 1024,
-    extractPredict: 512,
-    maxExtractAttempts: 3,
-    onReasonDelta: () => {
-      if (firstToken) return;
-      firstToken = true;
-      options.onFirstToken?.();
-    },
-  });
+  const result = await runGroundedTriage(dependencies, request, modelContext, options, context, grounding, hits, shortlist, expectedClass);
   options.onStage?.({ key: "summarize", label: "Prepared assessment summary", detail: "bounded local review" });
-  if (expectedRespiratoryClass && result.classification !== expectedRespiratoryClass) {
+  if (expectedClass && result.classification !== expectedClass) {
     return respiratoryWithAssistance(respiratoryContinuation!, {
       status: "UNAVAILABLE", ...identity,
     }, `${respiratoryContinuation!.uncertainty} Model-assisted classification contradicted the structured respiratory record, so no provisional class was issued.`);
   }
-  const reconciledResult = result;
-  const entry = lookupProtocol(reconciledResult.classification);
-  const respiratory = request.respiratoryAssessment
-    ? evaluateRespiratoryAssessment(request.patientAge, request.dangerObservations, request.respiratoryAssessment)
-    : undefined;
-  if (respiratory?.modelInvoked && !respiratoryContinuation) {
-    if (!entry) {
-      return respiratoryWithAssistance(respiratory, {
-        status: "UNAVAILABLE",
-        ...identity,
-      }, `${respiratory.uncertainty} Model-assisted supporting evidence was unavailable.`);
-    }
-    const publicResult = respiratoryWithAssistance(respiratory, {
-      status: "COMPLETED",
-      ...identity,
-      retrievalMode: grounding.retrieval,
-    });
-    publicResult.attempts = reconciledResult.attempts;
-    return publicResult;
-  }
-  if (!entry) return unavailable("The provisional class has no verified deterministic public action mapping.");
-  const binding = issueBinding(request, reconciledResult, entry, dependencies.policyVersion, options.owner);
-  const grant = dependencies.confirmationStore.issue(binding, confirmationPayload(request));
-  const publicResult = provisional(request, reconciledResult, grant, entry.protocol, respiratoryContinuation);
-  publicResult.assistance = {
-    status: "COMPLETED",
-    ...identity,
-    retrievalMode: grounding.retrieval,
-  };
-  publicResult.attempts = reconciledResult.attempts;
-  return publicResult;
+  const respiratory = !respiratoryContinuation
+    ? completedRespiratoryAssistance(request, result, grounding, identity)
+    : null;
+  return respiratory ?? provisionalAssessment(
+    dependencies, request, result, options, grounding, identity, respiratoryContinuation,
+  );
 }
