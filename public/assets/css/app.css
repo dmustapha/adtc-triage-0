@@ -4,15 +4,6 @@
 .app-main{ padding-bottom:var(--s-8); display:grid; gap:18px; }
 [hidden]{ display:none !important; }
 
-/* Two workflows, one local runtime. The segmented rail reads like an instrument selector, not app chrome. */
-.mode-switch{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; padding:4px;
-  background:#090c0d; border:1px solid var(--line-2); border-radius:calc(var(--r) + 2px); }
-.mode-tab{ min-height:44px; padding:9px 14px; font:600 14px var(--font-body); color:var(--dim);
-  background:transparent; border:1px solid transparent; border-radius:calc(var(--r) - 2px); cursor:pointer; }
-.mode-tab.is-active{ color:var(--accent); background:var(--accent-wash); border-color:var(--accent-line); }
-.mode-tab:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-#clinicalModePanel{ display:grid; gap:18px; }
-
 /* numbered steps */
 .step-label{ display:flex; align-items:center; gap:11px; margin:0 0 14px; }
 .step-num{
@@ -34,12 +25,12 @@
 .seed:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
 /* case input */
-textarea#case,textarea#clinicalCase,textarea#ordinaryPrompt{
+textarea#case{
   width:100%; min-height:104px; resize:vertical; font-family:var(--font-body); font-size:18px; line-height:1.55;
   color:var(--ink); background:#0b0e0f; border:1px solid var(--line-2); border-radius:var(--r); padding:16px 17px;
 }
-textarea#case::placeholder,textarea#clinicalCase::placeholder,textarea#ordinaryPrompt::placeholder{ color:var(--dim); }
-textarea#case:focus,textarea#clinicalCase:focus,textarea#ordinaryPrompt:focus{ outline:2px solid var(--accent); outline-offset:2px; border-color:transparent; }
+textarea#case::placeholder{ color:var(--dim); }
+textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border-color:transparent; }
 
 /* Required observations sit behind native disclosure so the pinned patient-panel rhythm stays intact. */
 .assessment-disclosure{ margin:14px 0 2px; background:#0b0e0f; border:1px solid var(--line-2); border-radius:var(--r); }
@@ -167,7 +158,12 @@ textarea#case:focus,textarea#clinicalCase:focus,textarea#ordinaryPrompt:focus{ o
 .uncertainty span,.supporting-reference span,.assistance>span{ display:block; color:var(--dim); font-size:12px; }
 .supporting-reference strong{ overflow-wrap:anywhere; }
 .input-authority-note{ color:var(--dim); font-size:13px; line-height:1.5; margin:8px 0 0; }
-#clinicalModePanel,#result,.panel{ min-width:0; }
+#result,.panel,.record-review,.shared-answer,.confirmed-plan{ min-width:0; }
+.missing-review,.intent-choice,.shared-answer{ margin-top:14px; padding:14px; border:1px solid var(--accent-line);
+  border-radius:var(--r); background:var(--accent-wash); color:var(--mut); line-height:1.55; }
+.intent-choice .btn{ min-height:44px; margin:8px 8px 0 0; }
+.shared-answer{ border-left:3px solid var(--accent); overflow-wrap:anywhere; }
+.shared-answer[data-state="rejected"],.shared-answer[data-state="unavailable"]{ border-left-color:var(--urgent); }
 .confirmation-region,.continuation-region{ min-width:0; margin-top:14px; padding:14px; border:1px solid var(--accent-line); border-radius:var(--r); background:var(--accent-wash); }
 #confirmationPlan{ min-width:0; width:100%; }
 .continuation-region p{ margin:0 0 10px; color:var(--mut); font-size:13.5px; line-height:1.5; }
@@ -191,18 +187,8 @@ textarea#case:focus,textarea#clinicalCase:focus,textarea#ordinaryPrompt:focus{ o
 .dose-table-wrap th,.dose-table-wrap td{ padding:8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
 .dose-table-wrap tr.is-selected{ background:var(--accent-wash); font-weight:600; }
 .dose-state{ margin-top:12px!important; padding-top:12px; border-top:1px solid var(--accent-line); }
-.confirmation-actions,.workflow-actions{ display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-top:12px; }
-.confirmation-actions .btn,.workflow-actions .btn{ min-height:44px; }
-.prompt-workspace{ position:relative; overflow:hidden; }
-.prompt-workspace::before{ content:"LOCAL / TWO-PASS / VALIDATED"; display:block; margin-bottom:12px;
-  color:var(--accent); font:600 11px/1 var(--font-body); letter-spacing:.11em; }
-textarea#ordinaryPrompt{ min-height:180px; }
-.prompt-examples{ display:flex; flex-wrap:wrap; gap:9px; margin-top:12px; }
-.prompt-result{ border-left:3px solid var(--accent); overflow-wrap:anywhere; }
-.prompt-result[data-state="rejected"],.prompt-result[data-state="unavailable"]{ border-left-color:var(--urgent); }
-.prompt-result h3,.prompt-result h4{ margin:0 0 8px; }
-.prompt-result h4{ margin-top:14px; color:var(--dim); font-size:12px; }
-.prompt-result p,.prompt-result li{ color:var(--mut); line-height:1.6; }
+.confirmation-actions{ display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-top:12px; }
+.confirmation-actions .btn{ min-height:44px; }
 
 /* live performance readout */
 .perf-lead{ font-size:14px; color:var(--mut); margin:0 0 12px; }
@@ -236,9 +222,8 @@ textarea#ordinaryPrompt{ min-height:180px; }
   .actions .btn--primary{ flex:1; }
   .reason{ max-height:150px; }
   .age-fields{ grid-template-columns:1fr; }
-  .mode-switch{ grid-template-columns:1fr; }
   .safety-grid{ grid-template-columns:1fr; }
-  .workflow-actions .btn,.confirmation-actions .btn{ flex:1 1 140px; }
+  .confirmation-actions .btn{ flex:1 1 140px; }
   .respiratory-grid{ grid-template-columns:1fr; }
   .danger-signs{ grid-template-columns:1fr; }
   .danger-signs legend span,.danger-status,.danger-summary{ font-size:12.5px; }

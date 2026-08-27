@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Triage-0 supervised assessment. Logic lives in assets/js/triage.js. -->
+<!-- Triage-0 unified offline guidance. Logic lives in assets/js/triage.js. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triage-0: supervised WHO assessment and local prompt review</title>
+  <title>Triage-0: offline clinical guidance</title>
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
@@ -21,34 +21,29 @@
         <span class="mark"><img src="/assets/img/logo.svg" alt="" width="36" height="36" /></span>
         <span>
           <span class="wordmark">Triage<span>-0</span></span>
-          <span class="tag" style="display:block">supervised WHO assessment and local prompt review</span>
+          <span class="tag" style="display:block">offline clinical guidance</span>
         </span>
       </a>
       <span id="net" class="badge"><span class="pip pip--ring"></span><span class="badge-txt">Network status</span></span>
     </header>
 
     <main class="app-main">
-      <h1 class="sr-only">Triage-0 supervised WHO assessment and local prompt review</h1>
+      <h1 class="sr-only">Triage-0 offline clinical guidance</h1>
       <!-- H-7: shown only when the RAG store is empty (citation map missing OR native store wiped), so a
            fresh setup that skipped `npm run ingest` is obvious instead of silently abstaining on every case -->
       <div id="setupBanner" class="setup-banner hidden" role="alert"></div>
-      <nav class="mode-switch" role="tablist" aria-label="Workflow mode">
-        <button class="mode-tab is-active" type="button" role="tab" data-mode="clinical" aria-selected="true" aria-controls="clinicalModePanel">Assess a case</button>
-        <button class="mode-tab" type="button" role="tab" data-mode="prompt" aria-selected="false" aria-controls="promptModePanel">Ask the local model</button>
-      </nav>
-      <div id="clinicalModePanel" role="tabpanel" data-testid="clinical-mode">
       <!-- step 1 -->
       <section aria-labelledby="h-describe">
         <div class="step-label"><span class="step-num">1</span><h2 id="h-describe" class="display">Describe the patient</h2></div>
         <div class="panel">
           <p class="hint">Type the age and what you see.</p>
-          <textarea id="clinicalCase" name="clinicalCase" aria-label="Patient case" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
-          <p class="input-authority-note">Structured age and observations control escalation. The description is used for WHO reference lookup and model-assisted summarization.</p>
+          <textarea id="case" name="case" data-unified-input maxlength="4000" aria-label="Patient case or healthcare question" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
+          <p class="input-authority-note">For patient cases, reviewed observations and deterministic policy control escalation. General healthcare questions use bounded local assistance.</p>
           <p class="multiling">English text workflow.</p>
           <div class="seeds" id="seeds" aria-label="Fill an example case">
             <button class="seed" type="button" data-age-value="18" data-age-unit="months" data-observations="absent" data-respiratory-concern="PRESENT" data-respiratory-rate="32" data-fill="18 month old with cough for three days and difficult breathing; breathing counted at 32 per minute for one minute while calm; alert and drinking.">English example</button>
           </div>
-          <details id="dangerDisclosure" class="assessment-disclosure">
+          <details id="dangerDisclosure" class="assessment-disclosure record-review" hidden>
             <summary>
               <span>Complete clinical observations</span>
               <span id="dangerStatus" class="danger-status" role="status">0 of 7 signs assessed.</span>
@@ -121,8 +116,9 @@
               <p id="dangerSummary" class="danger-summary" aria-live="polite"></p>
             </fieldset>
           </details>
+          <div id="missingReview" class="missing-review hidden" role="status" aria-live="polite"></div>
           <div class="actions">
-            <button class="btn btn--primary" id="assess" type="button" disabled aria-describedby="dangerStatus">Run assessment<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+            <button class="btn btn--primary" id="assess" data-unified-submit type="button" disabled aria-describedby="status">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             <span id="status" class="status" role="status"></span>
           </div>
         </div>
@@ -130,8 +126,10 @@
 
       <!-- step 2 -->
       <section id="result" class="hidden" aria-labelledby="h-guideline">
-        <div class="step-label"><span class="step-num">2</span><h2 id="h-guideline" class="display">Assessment outcome</h2></div>
+        <div class="step-label"><span class="step-num">2</span><h2 id="h-guideline" class="display">What the guideline says</h2></div>
         <div class="panel">
+          <div id="intentChoice" class="intent-choice hidden" aria-live="polite"></div>
+          <div id="sharedAnswer" class="shared-answer hidden" aria-live="polite" aria-atomic="false"></div>
           <div id="reasoningWrap" class="hidden" aria-live="polite" aria-atomic="false">
             <div class="muted" style="display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:13.5px"><span class="spin" aria-hidden="true"></span><span id="reasonLabel">Checking supporting references</span><span id="reasonTimer" class="rtimer" aria-hidden="true"></span></div>
             <!-- Each row is emitted by an executed local assessment stage. -->
@@ -152,32 +150,11 @@
               <button id="rejectAssessment" class="btn" type="button">Reject</button>
             </div>
             <p id="confirmationStatus" class="status" role="status"></p>
-            <div id="confirmationPlan"></div>
+            <div id="confirmationPlan" class="confirmed-plan"></div>
           </div>
           <div id="citationBox" class="hidden"></div>
           <div id="err" class="err" role="alert" aria-live="assertive"></div>
         </div>
-      </section>
-      </div>
-
-      <section id="promptModePanel" role="tabpanel" data-testid="prompt-mode" hidden aria-labelledby="h-prompt">
-        <div class="step-label"><span class="step-num">A</span><h2 id="h-prompt" class="display">Ask the local model</h2></div>
-        <div class="panel prompt-workspace">
-          <p class="hint">Run a bounded two-pass local answer. The internal reasoning draft is never displayed.</p>
-          <label class="field-label" for="ordinaryPrompt">Prompt</label>
-          <textarea id="ordinaryPrompt" name="ordinaryPrompt" maxlength="4000" aria-describedby="promptStatus" placeholder="Ask for a plain-language summary or explanation."></textarea>
-          <div class="prompt-examples" aria-label="Submitted prompt examples">
-            <button id="promptExample1" class="seed" type="button" data-prompt="Summarize, in plain English, the recorded facts in this supervised pediatric respiratory case: a two-year-old has cough for three days; all seven structured danger and breathing observations were recorded absent. Separate observed facts from uncertainty. Do not diagnose, prescribe, or invent missing findings.">Use submitted Prompt 1</button>
-            <button id="promptExample2" class="seed" type="button" data-prompt="Explain, in plain English for a supervised community health worker, why an incomplete pediatric respiratory danger-sign checklist must be completed before model-assisted assessment review. State that recorded danger observations and deterministic policy, not model output, control escalation. Do not diagnose or prescribe.">Use submitted Prompt 2</button>
-          </div>
-          <div class="workflow-actions">
-            <button id="runPrompt" class="btn btn--primary" type="button" disabled>Run local prompt</button>
-            <button id="cancelPrompt" class="btn" type="button" hidden>Cancel</button>
-            <button id="retryPrompt" class="btn" type="button" hidden>Retry</button>
-            <span id="promptStatus" class="status" role="status" aria-live="polite"></span>
-          </div>
-        </div>
-        <div id="promptResult" class="panel prompt-result" aria-live="polite" aria-atomic="false" hidden></div>
       </section>
 
       <!-- live performance -->
@@ -200,6 +177,7 @@
   </div>
 
   <script src="/assets/js/net.js"></script>
+  <script src="/assets/js/unified-input.js"></script>
   <script src="/assets/js/triage.js"></script>
 </body>
 </html>
