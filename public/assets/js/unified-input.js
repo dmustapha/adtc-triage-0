@@ -20,6 +20,7 @@
     var input = assertedText(text).trim();
     if (!input) return "AMBIGUOUS";
     if (/^(?:please\s+)?(?:explain|summari[sz]e|compare|define|list|outline|state|describe|why\b|what\b|how\b)/i.test(input)) return "GENERAL";
+    if (allObservationsAbsent(input)) return "CLINICAL";
     var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(input);
     var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(input);
     var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(input);
@@ -62,6 +63,8 @@
 
   function assertedText(text) {
     var asserted = String(text || "").replace(/"[^"]*"|“[^”]*”/g, " ");
+    asserted = asserted.replace(/(^|[\s([{:;,])'[^'\r\n]+'(?=$|[\s)\]}:;,.!?])/g, "$1 ");
+    asserted = asserted.replace(/‘[^’]*’/g, " ");
     asserted = asserted.replace(/\b(?:asked|asks?|wondered|wonders?)\s+whether\b[^.!?;]*/gi, " ");
     asserted = asserted.replace(/\b(?:if|whether|assuming|suppose(?:\s+that)?)\b[^.!?;]*/gi, " ");
     OBSERVATIONS.forEach(function (spec) {
@@ -91,9 +94,15 @@
 
   function localPolarity(clause, occurrence, negativeRanges) {
     if (negativeRanges.some(function (range) { return rangesOverlap(range, occurrence); })) return "ABSENT";
-    var suffix = clause.slice(occurrence.end).match(/^\s+(?:(?:is|was|were)\s+)?(present|absent)(?![-\w])/i);
+    var suffixText = clause.slice(occurrence.end);
+    if (/^\s+(?:(?:is|was|were)\s+)?(?:not\s+(?:assessed|recorded|provided|established)|unknown|documented)(?![-\w])/i.test(suffixText)) return "NONE";
+    if (/^\s+(?:(?:is|was|were)\s+)?not\s+present\b/i.test(suffixText) || /^\s+denied\b/i.test(suffixText)) return "ABSENT";
+    var suffix = suffixText.match(/^\s+(?:(?:is|was|were)\s+)?(present|absent)(?![-\w])/i);
     if (suffix) return suffix[1].toUpperCase();
     var prefix = clause.slice(0, occurrence.start);
+    if (/\b(?:check|screen)(?:ed|ing)?\s+for\s+$/i.test(prefix) ||
+        /\b(?:documented|used\s+the\s+(?:word|phrase))\s+$/i.test(prefix)) return "NONE";
+    if (/\b(?:denied|no\s+history\s+of)\s+$/i.test(prefix)) return "ABSENT";
     if (/\b(?:has|had|with|shows?|is|was)\s+(?:a\s+)?$/i.test(prefix)) return "PRESENT";
     return null;
   }
@@ -108,6 +117,7 @@
         /\b(?:(?:is|was|were)\s+)?absent(?![-\w])\s*$/i.test(clause);
       occurrences.forEach(function (occurrence) {
         var polarity = localPolarity(clause, occurrence, negativeRanges);
+        if (polarity === "NONE") return;
         if (polarity === "PRESENT") evidence.present = true;
         else if (polarity === "ABSENT" || sharedAbsent) evidence.absent = true;
         else evidence.present = true;
@@ -128,10 +138,14 @@
   }
 
   function extractObservations(text, conflicts) {
-    var allAbsent = /\ball\s+(?:seven|7)\s+(?:structured\s+)?(?:danger and breathing\s+)?observations?\s+(?:were\s+|are\s+)?(?:recorded\s+)?absent\b/i.test(text);
+    var allAbsent = allObservationsAbsent(text);
     var values = {};
     OBSERVATIONS.forEach(function (spec) { values[spec[0]] = observationValue(text, spec, allAbsent, conflicts); });
     return values;
+  }
+
+  function allObservationsAbsent(text) {
+    return /\ball\s+(?:seven|7)\s+(?:structured\s+)?(?:danger and breathing\s+)?observations?\s+(?:were\s+|are\s+)?(?:recorded\s+)?absent\b/i.test(text);
   }
 
   function respiratoryConcern(text, conflicts) {

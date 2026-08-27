@@ -239,6 +239,76 @@ test("embedded non-assertions are masked without treating apostrophes as quote d
   assert.equal(asserted.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
 });
 
+test("local non-assessment and documentation statuses never become present authority", () => {
+  const { api } = loadModule();
+  const narratives = [
+    "Convulsions not assessed.",
+    "Convulsions unknown.",
+    "Convulsions were unknown.",
+    "Convulsions not recorded.",
+    "Convulsions were not provided.",
+    "Convulsions not established.",
+    "Check for convulsions.",
+    "Screen for convulsions.",
+    "The note documented convulsions.",
+    "The note used the word convulsions.",
+    "The note used the phrase convulsions.",
+  ];
+  for (const narrative of narratives) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations.convulsions, "NOT_ASSESSED", narrative);
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+});
+
+test("explicit absence statuses remain negative while asserted positives and conflicts remain intact", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "Convulsions not present.",
+    "Convulsions were not present.",
+    "The caregiver denied convulsions.",
+    "No history of convulsions.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.equal(draft.dangerObservations.convulsions, "ABSENT", narrative);
+    assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+  for (const narrative of ["Has convulsions.", "Convulsions present.", "Convulsions."]) {
+    assert.equal(api.extractClinicalCandidate(narrative).dangerObservations.convulsions, "PRESENT", narrative);
+  }
+  const conflict = api.extractClinicalCandidate("Has convulsions. No history of convulsions.");
+  assert.equal(conflict.dangerObservations.convulsions, "NOT_ASSESSED");
+  assert.ok(conflict.conflicts.includes("dangerObservations.convulsions"));
+});
+
+test("paired single quotes are non-authority while prose apostrophes preserve asserted facts", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "The phrase 'convulsions absent' appears in the note.",
+    "The phrase ‘chest indrawing present’ appears in the note.",
+  ]) {
+    const draft = api.extractClinicalCandidate(narrative);
+    assert.ok(Object.values(draft.dangerObservations).every((value) => value === "NOT_ASSESSED"), narrative);
+    assert.notEqual(api.routeInput(narrative), "CLINICAL", narrative);
+  }
+  const asserted = api.extractClinicalCandidate(
+    "The child's chest indrawing was absent. The caregiver's child can't drink or breastfeed.",
+  );
+  assert.equal(asserted.dangerObservations.chestIndrawing, "ABSENT");
+  assert.equal(asserted.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
+});
+
+test("the exact all-seven absent aggregate routes clinically with or without age", () => {
+  const { api } = loadModule();
+  for (const narrative of [
+    "All seven observations absent.",
+    "Two year old child; all seven structured danger and breathing observations were recorded absent.",
+  ]) {
+    assert.equal(api.routeInput(narrative), "CLINICAL", narrative);
+    assert.ok(Object.values(api.extractClinicalCandidate(narrative).dangerObservations).every((value) => value === "ABSENT"));
+  }
+});
+
 test("keeps independently stated positive and negative evidence conflicting", () => {
   const { api } = loadModule();
   const draft = api.extractClinicalCandidate("Two year old has cough but now has no cough.");
