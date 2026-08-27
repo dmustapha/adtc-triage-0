@@ -604,6 +604,7 @@
   }
 
   function renderCard(card) {
+    restoreConfirmationPlanHost();
     finishStages();
     $("reasoningWrap").classList.add("hidden");
     $("card").classList.remove("hidden");
@@ -687,79 +688,61 @@
     parent.appendChild(cite);
   }
 
-  function appendActionList(parent, heading, items, valueKey) {
-    if (!items || !items.length) return;
+  function restoreConfirmationPlanHost() {
+    var target = $("confirmationPlan");
+    var region = $("confirmationRegion");
+    if (target && region && target.parentNode !== region) region.appendChild(target);
+  }
+
+  function planGroup(key, heading) {
     var section = document.createElement("section");
+    section.className = "pgroup";
+    section.dataset.planGroup = key;
     var title = document.createElement("h4");
     title.textContent = heading;
-    var list = document.createElement("ul");
+    section.appendChild(title);
+    return section;
+  }
+
+  function sourceLine(value, citation, label) {
+    var row = document.createElement("div");
+    row.className = "prow";
+    row.dataset.sourceLine = "";
+    var text = document.createElement("span");
+    text.className = "ptext";
+    text.textContent = label ? label + ": " + value : value;
+    row.appendChild(text);
+    appendCitation(row, citation);
+    return row;
+  }
+
+  function appendActionGroup(parent, key, heading, items, valueKey) {
+    if (!items || !items.length) return;
+    var section = planGroup(key, heading);
     items.forEach(function (item) {
-      var row = document.createElement("li");
       var value = item && (item[valueKey] || item.name);
-      var text = document.createElement("span");
-      text.textContent = value || "Source action";
-      row.appendChild(text);
-      appendCitation(row, item && item.citation);
-      list.appendChild(row);
+      section.appendChild(sourceLine(value || "Source action", item && item.citation));
     });
-    section.append(title, list);
     parent.appendChild(section);
   }
 
-  function renderReferenceActions(result) {
-    if (!$("confirmationRegion") || !$("confirmationPlan")) return;
-    $("confirmationRegion").classList.remove("hidden");
-    var target = $("confirmationPlan");
-    target.textContent = "";
-    var instructions = $("confirmationRegion").querySelector(".confirmation-instructions");
-    var controls = $("confirmationRegion").querySelector(".confirmation-actions");
-    if (instructions) instructions.classList.add("hidden");
-    if (controls) controls.classList.add("hidden");
-    var title = document.createElement("h3");
-    title.textContent = "Confirmed WHO management plan";
-    target.appendChild(title);
-    var actions = result.referenceActions || {};
-    var summary = document.createElement("section");
-    summary.className = "confirmed-summary";
-    var identity = document.createElement("p");
-    identity.textContent = "Classification: " + (result.classification || "Not available") + ". Severity: " + formatEnum(result.severity || "UNKNOWN") + ".";
-    summary.appendChild(identity);
-    var immediate = result.immediateAction || actions.immediateAction;
-    if (immediate && immediate.text) {
-      var immediateTitle = document.createElement("h4");
-      immediateTitle.textContent = "Immediate action";
-      var immediateText = document.createElement("p");
-      immediateText.textContent = immediate.text;
-      summary.append(immediateTitle, immediateText);
-      appendCitation(summary, immediate.citation);
-    }
-    target.appendChild(summary);
-    appendActionList(target, "Referral", actions.referral ? [actions.referral] : [], "criterion");
-    if (actions.medicines && actions.medicines.length) {
-      var medicines = document.createElement("section");
-      var medicineTitle = document.createElement("h4");
-      medicineTitle.textContent = "Medicines and source dose table";
-      medicines.appendChild(medicineTitle);
-      actions.medicines.forEach(function (medicine) {
+  function appendMedicines(parent, medicines) {
+    if (!medicines || !medicines.length) return;
+    var section = planGroup("medicines", "Medicines and source dose table");
+    medicines.forEach(function (medicine) {
         var article = document.createElement("article");
         article.className = "medicine-card";
-        var name = document.createElement("h5");
-        name.textContent = medicine.name || "Source medicine";
-        article.appendChild(name);
-        [["Medicine strength", medicine.strength], ["Frequency", medicine.frequency], ["Source dose instruction", medicine.dose]].forEach(function (row) {
-          if (!row[1]) return;
-          var detail = document.createElement("p");
-          detail.textContent = row[0] + ": " + row[1];
-          article.appendChild(detail);
+        article.appendChild(sourceLine(medicine.name || "Source medicine", medicine.citation));
+        [["Medicine strength", medicine.strength], ["Frequency", medicine.frequency], ["Duration", medicine.duration], ["Source dose instruction", medicine.dose]].forEach(function (detail) {
+          if (detail[1]) article.appendChild(sourceLine(detail[1], medicine.citation, detail[0]));
         });
-        appendCitation(article, medicine.citation);
         if (medicine.bands && medicine.bands.length) {
           var tableWrap = document.createElement("div");
           tableWrap.className = "dose-table-wrap";
-          var table = document.createElement("table");
+          var table = document.createElement("table"); table.className = "dose";
           var head = document.createElement("thead");
           var headRow = document.createElement("tr");
-          ["Source band", "Source amount", "Selection"].forEach(function (label) {
+          ["Age / weight", "Dose", "Selection and source"].forEach(function (label) {
             var th = document.createElement("th"); th.scope = "col"; th.textContent = label; headRow.appendChild(th);
           });
           head.appendChild(headRow); table.appendChild(head);
@@ -767,9 +750,10 @@
           medicine.bands.forEach(function (band) {
             var selected = medicine.selectedBand && medicine.selectedBand.band === band.band && medicine.selectedBand.dose === band.dose;
             var tr = document.createElement("tr");
+            tr.dataset.sourceLine = "";
             if (selected) tr.className = "is-selected";
             var cells = [];
-            [band.band, band.dose, selected ? "Selected source band" : "Reference row"].forEach(function (value) {
+            [band.band + " ", band.dose, selected ? "Selected source band" : "Reference row"].forEach(function (value) {
               var td = document.createElement("td"); td.textContent = value; tr.appendChild(td);
               cells.push(td);
             });
@@ -778,17 +762,54 @@
           });
           table.appendChild(body); tableWrap.appendChild(table); article.appendChild(tableWrap);
         }
-        medicines.appendChild(article);
-      });
-      target.appendChild(medicines);
+      section.appendChild(article);
+    });
+    parent.appendChild(section);
+  }
+
+  function appendFollowUp(parent, followUp) {
+    if (!followUp) return;
+    var section = planGroup("follow-up", "Follow-up timing and assessment");
+    section.appendChild(sourceLine(followUp.when, followUp.citation, "Timing"));
+    if (followUp.detail) section.appendChild(sourceLine(followUp.detail, followUp.detailCitation, "Assess at follow-up"));
+    parent.appendChild(section);
+  }
+
+  function mountPlanBeforeProvenance(target) {
+    var card = $("card");
+    if (!card) return;
+    var provenance = card.querySelector(".supporting-reference, .assistance, .uncertainty");
+    card.insertBefore(target, provenance || null);
+    if ($("confirmationRegion")) $("confirmationRegion").classList.add("hidden");
+  }
+
+  function renderReferenceActions(result) {
+    if (!$("confirmationRegion") || !$("confirmationPlan")) return;
+    var target = $("confirmationPlan");
+    target.textContent = "";
+    target.className = "confirmed-plan plan";
+    var heading = document.createElement("div"); heading.className = "plan-head";
+    heading.textContent = "Confirmed WHO management plan"; target.appendChild(heading);
+    var actions = result.referenceActions || {};
+    var summary = planGroup("summary", "Assessment outcome");
+    var identity = document.createElement("p");
+    identity.textContent = "Severity: " + (result.severity || "UNKNOWN") + ". Classification: " + (result.classification || "Not available") + ".";
+    summary.appendChild(identity);
+    var why = document.createElement("p");
+    why.textContent = "Why it matched: " + (lastCard && lastCard.basis
+      ? lastCard.basis : "The reviewed classification maps to the frozen WHO protocol entry.");
+    summary.appendChild(why); target.appendChild(summary);
+    var immediate = result.immediateAction || actions.immediateAction;
+    if (immediate && immediate.text) {
+      var immediateGroup = planGroup("immediate", "Immediate action");
+      immediateGroup.appendChild(sourceLine(immediate.text, immediate.citation)); target.appendChild(immediateGroup);
     }
-    appendActionList(target, "Supportive care", actions.supportive, "item");
-    appendActionList(target, "Home care", actions.home_care, "advice");
-    appendActionList(target, "Return immediately", actions.return_now, "sign");
-    if (actions.follow_up) {
-      appendActionList(target, "Follow-up timing", [{ item: actions.follow_up.when, citation: actions.follow_up.citation }], "item");
-      if (actions.follow_up.detail) appendActionList(target, "Assess at follow-up", [{ item: actions.follow_up.detail, citation: actions.follow_up.detailCitation }], "item");
-    }
+    appendMedicines(target, actions.medicines);
+    appendActionGroup(target, "supportive", "Supportive care", actions.supportive, "item");
+    appendActionGroup(target, "home", "Home care", actions.home_care, "advice");
+    appendActionGroup(target, "return", "Return immediately", actions.return_now, "sign");
+    appendFollowUp(target, actions.follow_up);
+    appendActionGroup(target, "referral", "Referral", actions.referral ? [actions.referral] : [], "criterion");
     if ((actions.medicines && actions.medicines.length) || (result.doseState && result.doseState.medicineReferenceAvailable)) {
       var dose = document.createElement("p");
       dose.className = "dose-state";
@@ -804,9 +825,14 @@
       }
       target.appendChild(dose);
     }
+    var foot = document.createElement("p"); foot.className = "plan-foot";
+    foot.textContent = "Use the cited WHO source and clinical judgment before applying any action.";
+    target.appendChild(foot);
+    mountPlanBeforeProvenance(target);
   }
 
   function invalidateConfirmation() {
+    restoreConfirmationPlanHost();
     clinicalState.generation += 1;
     clinicalState.phase = "RECORD";
     clinicalState.confirmationToken = null;

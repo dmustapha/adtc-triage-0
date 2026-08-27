@@ -42,6 +42,19 @@ test("every confirmed projection preserves the complete frozen plan and citation
         assert.ok(medicine.bands.some((row) => row.band === medicine.selectedBand?.band));
       }
     }
+    assert.deepEqual(plan.supportive.map((line) => ({ text: line.item, page: line.citation.page })),
+      entry.supportive.map((line) => ({ text: line.text, page: line.page })), `${classification} supportive`);
+    assert.deepEqual(plan.home_care.map((line) => ({ text: line.advice, page: line.citation.page })),
+      entry.home_care.map((line) => ({ text: line.text, page: line.page })), `${classification} home care`);
+    assert.deepEqual(plan.return_now.map((line) => ({ text: line.sign, page: line.citation.page })),
+      entry.return_now.map((line) => ({ text: line.text, page: line.page })), `${classification} return signs`);
+    assert.deepEqual(plan.follow_up && { text: plan.follow_up.when, page: plan.follow_up.citation.page },
+      entry.follow_up && { text: entry.follow_up.text, page: entry.follow_up.page }, `${classification} follow-up`);
+    assert.deepEqual(plan.referral && { text: plan.referral.criterion, page: plan.referral.citation.page },
+      entry.referral && { text: entry.referral.text, page: entry.referral.page }, `${classification} referral`);
+    for (const line of [...plan.supportive, ...plan.home_care, ...plan.return_now]) assert.equal(line.citation.doc, doc);
+    if (plan.follow_up) assert.equal(plan.follow_up.citation.doc, doc);
+    if (plan.referral) assert.equal(plan.referral.citation.doc, doc);
     if (entry.follow_up_detail) {
       assert.deepEqual(plan.follow_up?.detailCitation, { doc, page: entry.follow_up_detail.page });
     }

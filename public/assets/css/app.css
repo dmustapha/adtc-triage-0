@@ -166,6 +166,13 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .shared-answer[data-state="rejected"],.shared-answer[data-state="unavailable"]{ border-left-color:var(--urgent); }
 .confirmation-region,.continuation-region{ min-width:0; margin-top:14px; padding:14px; border:1px solid var(--accent-line); border-radius:var(--r); background:var(--accent-wash); }
 #confirmationPlan{ min-width:0; width:100%; }
+.confirmed-plan.plan{ margin-top:16px; border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--surf); }
+.plan-head{ display:flex; align-items:center; padding:13px 17px; background:var(--surf-2); color:var(--ink); font-weight:700; }
+.pgroup{ padding:14px 17px; border-bottom:1px solid var(--line); }
+.pgroup h4{ margin:0 0 10px; color:var(--accent); font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.pgroup>p{ margin:5px 0; color:var(--ink); font-size:15px; line-height:1.5; }
+.prow{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:5px 0; }
+.prow .ptext{ min-width:0; color:var(--ink); font-size:15px; line-height:1.5; overflow-wrap:anywhere; }
 .continuation-region p{ margin:0 0 10px; color:var(--mut); font-size:13.5px; line-height:1.5; }
 .continuation-region .btn{ min-height:44px; }
 .confirmation-region p{ margin:0; color:var(--mut); font-size:13.5px; line-height:1.5; }
@@ -177,7 +184,7 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .confirmation-region section+section{ margin-top:12px; }
 .confirmation-region ul{ margin:0; padding-left:18px; color:var(--mut); }
 .confirmation-region li{ margin-bottom:8px; }
-.plan-citation{ display:block; margin-top:3px; color:var(--dim); overflow-wrap:anywhere; }
+.plan-citation{ display:block; flex:none; margin-top:3px; color:var(--dim); font-size:11.5px; overflow-wrap:anywhere; }
 .confirmed-summary{ padding:12px; background:var(--surf-2); border-radius:var(--r); }
 .medicine-card{ min-width:0; margin-top:10px; padding:12px; background:var(--surf-2); border-radius:var(--r); }
 .medicine-card h5{ margin:0 0 8px; font-size:15px; }
@@ -187,6 +194,7 @@ textarea#case:focus{ outline:2px solid var(--accent); outline-offset:2px; border
 .dose-table-wrap th,.dose-table-wrap td{ padding:8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
 .dose-table-wrap tr.is-selected{ background:var(--accent-wash); font-weight:600; }
 .dose-state{ margin-top:12px!important; padding-top:12px; border-top:1px solid var(--accent-line); }
+.plan-foot{ margin:0!important; padding:13px 17px; background:var(--surf-2); color:var(--dim)!important; font-size:12.5px!important; line-height:1.5; }
 .confirmation-actions{ display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-top:12px; }
 .confirmation-actions .btn{ min-height:44px; }
 

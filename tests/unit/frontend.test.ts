@@ -9,6 +9,8 @@ import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
+import { PROTOCOL_TABLE, docFor } from "../../src/triage/protocol-table.js";
+import { projectReferenceActions } from "../../src/triage/reference-actions.js";
 
 // Element IDs the app wiring + supervised assessment renderer touch.
 const IDS = [
@@ -179,10 +181,66 @@ test("confirmed plan DOM renders cited dose rows and separately cited follow-up 
     },
     doseState: { status: "AVAILABLE_REFERENCE_BAND", missingFields: [], medicineReferenceAvailable: true },
   });
-  const region = el("confirmationRegion");
-  assert.match(region.textContent, /12 months up to 3 years.*5 ml.*WHO IMCI Chart Booklet \(2014\), page 7/s);
-  assert.match(region.textContent, /Assess at follow-up.*Assess breathing rate again.*page 32/s);
-  assert.equal(region.querySelectorAll("tbody tr.is-selected").length, 1);
+  const plan = el("confirmationPlan");
+  assert.match(plan.textContent, /12 months up to 3 years.*5 ml.*WHO IMCI Chart Booklet \(2014\), page 7/s);
+  assert.match(plan.textContent, /Assess at follow-up.*Assess breathing rate again.*page 32/s);
+  assert.equal(plan.querySelectorAll("tbody tr.is-selected").length, 1);
+});
+
+test("every frozen confirmed plan restores the clinical-first cited Triage-0 hierarchy", () => {
+  const eligibility = {
+    confirmationState: "CONFIRMED" as const, patientAgeMonths: 24, patientWeightKg: 12,
+    allergiesReviewed: "CONFIRMED_NONE" as const, contraindicationsReviewed: "CONFIRMED_NONE" as const,
+    protocolApplicability: "CONFIRMED_APPLICABLE" as const,
+  };
+  for (const [classification, entry] of Object.entries(PROTOCOL_TABLE)) {
+    fe.renderCard({
+      reviewState: "PROVISIONAL", recordedFacts: [], inferredFacts: [],
+      basis: `Matched the reviewed ${entry.protocol} criteria for ${classification}.`,
+      uncertainty: "Human confirmation required.",
+      assistance: { status: "COMPLETED", runtime: "QVAC", model: "MedPsy", retrievalMode: "semantic" },
+    });
+    const projected = projectReferenceActions(classification, entry.severity, eligibility);
+    fe.renderReferenceActions({
+      classification, protocol: entry.protocol, severity: entry.severity,
+      immediateAction: projected.referenceActions?.immediateAction,
+      ...projected,
+    });
+    const plan = el("confirmationPlan");
+    const planText = plan.textContent ?? "";
+    assert.match(planText, new RegExp(`Severity: ${entry.severity}`, "i"), `${classification} severity`);
+    assert.ok(planText.includes(`Classification: ${classification}`), `${classification} classification`);
+    assert.match(planText, /Why it matched/i, `${classification} why`);
+
+    const docName = docFor(entry.protocol);
+    const assertCited = (value: string, page: number, label: string) => {
+      const citation = new RegExp(`${docName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}, page ${page}\\.`);
+      const row = [...plan.querySelectorAll("[data-source-line]")].find((candidate) =>
+        candidate.textContent?.includes(value) && citation.test(candidate.textContent));
+      assert.ok(row, `${classification} ${label} has its own ${docName}, page ${page} citation`);
+    };
+    assertCited(entry.action.text, entry.action.page, "immediate action");
+    for (const medicine of entry.medicines) {
+      assertCited(medicine.name, medicine.page, `${medicine.name} name`);
+      if (medicine.strength) assertCited(medicine.strength, medicine.page, `${medicine.name} strength`);
+      if (medicine.frequency) assertCited(medicine.frequency, medicine.page, `${medicine.name} frequency`);
+      if (medicine.dose) assertCited(medicine.dose, medicine.page, `${medicine.name} source instruction`);
+      for (const band of medicine.bands ?? []) assertCited(`${band.band} ${band.dose}`, medicine.page, `${medicine.name} band`);
+    }
+    for (const line of entry.supportive) assertCited(line.text, line.page, "supportive care");
+    for (const line of entry.home_care) assertCited(line.text, line.page, "home care");
+    for (const line of entry.return_now) assertCited(line.text, line.page, "return sign");
+    if (entry.follow_up) assertCited(entry.follow_up.text, entry.follow_up.page, "follow-up timing");
+    if (entry.follow_up_detail) assertCited(entry.follow_up_detail.text, entry.follow_up_detail.page, "follow-up assessment");
+    if (entry.referral) assertCited(entry.referral.text, entry.referral.page, "referral");
+
+    const groups = [...plan.querySelectorAll("[data-plan-group]")].map((node) => node.getAttribute("data-plan-group"));
+    assert.deepEqual(groups, ["summary", "immediate", "medicines", "supportive", "home", "return", "follow-up", "referral"]
+      .filter((group) => plan.querySelector(`[data-plan-group="${group}"]`)), `${classification} clinical order`);
+    const provenance = el("card").querySelector(".assistance, .supporting-reference, .uncertainty");
+    if (provenance) assert.ok(plan.compareDocumentPosition(provenance) & 4, `${classification} plan precedes provenance`);
+    assert.doesNotMatch(planText, /confidence|raw reasoning|diagnosis|red flags|model-authored action/i);
+  }
 });
 
 test("structured form serializes the respiratory record without narrative inference", () => {
@@ -412,12 +470,12 @@ test("confirmed reference actions show dose state only when medicine rows exist"
     doseState: { status: "LOCKED_MISSING_INPUTS", missingFields: ["patientWeightKg"] },
   };
   fe.renderReferenceActions(result);
-  assert.match(el("confirmationRegion").textContent, /CONSULT A SPECIALIST|Strengthen support/i);
-  assert.doesNotMatch(el("confirmationRegion").textContent, /Dose-band state/i);
+  assert.match(el("confirmationPlan").textContent, /CONSULT A SPECIALIST|Strengthen support/i);
+  assert.doesNotMatch(el("confirmationPlan").textContent, /Dose-band state/i);
 
   result.referenceActions.medicines = [{ name: "Source medicine row" }];
   fe.renderReferenceActions(result);
-  assert.match(el("confirmationRegion").textContent, /Dose-band state: Locked Missing Inputs/i);
+  assert.match(el("confirmationPlan").textContent, /Dose-band state: Locked Missing Inputs/i);
 });
 
 test("handleEvent dispatches supporting reference then deterministic respiratory card", () => {
