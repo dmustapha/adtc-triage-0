@@ -146,6 +146,7 @@ test("English text baseline has no runtime dependency on excluded modalities", (
 
 test("completed import ledger proves destination parity or records ADTC modification", () => {
   const manifest = JSON.parse(readFileSync("config/import-manifest.json", "utf8"));
+  const regenerated = completeImportManifest(TRIAGE_REPOSITORY);
 
   assert.equal(manifest.applicationImported, true, "application import must be recorded complete");
   for (const entry of manifest.imports) {
@@ -173,20 +174,19 @@ test("completed import ledger proves destination parity or records ADTC modifica
       `${entry.destinationPath} requires a valid modification status`,
     );
   }
-});
 
-test("completed provenance describes the current unified workflow and manual Gate 1 evaluation", () => {
-  const manifest = completeImportManifest(TRIAGE_REPOSITORY);
-  const reasons = new Map(manifest.imports.map((entry) => [entry.destinationPath, entry.modification?.reason]));
-  const ledgerPurpose = manifest.adtcNewFiles.find((entry) => entry.path === "config/import-manifest.json")?.purpose;
+  for (const candidate of [manifest, regenerated]) {
+    const reasons = new Map(candidate.imports.map((entry: { destinationPath: string; modification?: { reason?: string } }) => [entry.destinationPath, entry.modification?.reason]));
+    const ledgerPurpose = candidate.adtcNewFiles.find((entry: { path: string }) => entry.path === "config/import-manifest.json")?.purpose;
 
-  assert.match(reasons.get("public/app.html") ?? "", /one unified textarea.*one Get guidance action.*one shared result region/i);
-  assert.match(reasons.get("public/app.html") ?? "", /no visible modes|removed visible.*modes/i);
-  assert.match(reasons.get("public/app.html") ?? "", /manual(?:ly)? past(?:e|ed).*Gate 1 prompts/i);
-  assert.doesNotMatch(reasons.get("public/app.html") ?? "", /submitted prompts available as unchanged examples/i);
-  assert.match(reasons.get("public/assets/js/triage.js") ?? "", /semantic internal routing/i);
-  assert.match(reasons.get("tests/unit/frontend.test.ts") ?? "", /one-input.*no-visible-mode/i);
-  assert.equal(ledgerPurpose, "Completed current import ledger");
+    assert.match(reasons.get("public/app.html") ?? "", /one unified textarea.*one Get guidance action.*one shared result region/i);
+    assert.match(reasons.get("public/app.html") ?? "", /no visible modes|removed visible.*modes/i);
+    assert.match(reasons.get("public/app.html") ?? "", /manual(?:ly)? past(?:e|ed).*Gate 1 prompts/i);
+    assert.doesNotMatch(reasons.get("public/app.html") ?? "", /submitted prompts available as unchanged examples/i);
+    assert.match(reasons.get("public/assets/js/triage.js") ?? "", /semantic internal routing/i);
+    assert.match(reasons.get("tests/unit/frontend.test.ts") ?? "", /one-input.*no-visible-mode/i);
+    assert.equal(ledgerPurpose, "Completed current import ledger");
+  }
 });
 
 test("verifier rejects a path absent from the pinned source tree", () => {
