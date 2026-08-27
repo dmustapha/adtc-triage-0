@@ -82,6 +82,7 @@ export class ConfirmationStore {
     const now = this.now();
     this.pruneExpired(now);
     if (this.activeCount() >= this.capacity) throw new Error("Confirmation store capacity reached.");
+    this.pruneTerminalForCapacity();
     const token = this.uniqueToken();
     const expiresAtMs = now + this.ttlMs;
     this.records.set(token, {
@@ -148,6 +149,13 @@ export class ConfirmationStore {
     let count = 0;
     for (const record of this.records.values()) if (!record.decision) count += 1;
     return count;
+  }
+
+  private pruneTerminalForCapacity(): void {
+    for (const [token, record] of this.records) {
+      if (this.records.size < this.capacity) return;
+      if (record.decision) this.records.delete(token);
+    }
   }
 
   private uniqueToken(): string {
