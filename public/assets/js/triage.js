@@ -235,6 +235,7 @@
   }
 
   function focusMissingField(field) {
+    field = field.replace(/^dangerObservations\./, "");
     var danger = DANGER_SIGNS.some(function (sign) { return sign[0] === field; });
     var target = danger ? document.querySelector('input[name="danger-' + field + '"]') :
       field === "respiratoryConcern" ? document.querySelector('input[name="respiratory-concern"]') : $(field);
@@ -273,6 +274,27 @@
     if (readiness.route !== "CLINICAL") return;
     if (!updateDangerChecklist()) { renderMissingReview(missingClinicalFields()); return; }
     await runAssess();
+  }
+
+  function handleStructuredEdit() {
+    invalidateClinicalResult();
+    updateDangerChecklist();
+  }
+
+  function handleTriStateKey(event) {
+    if (event.key === " " || event.key === "Spacebar") {
+      event.preventDefault();
+      event.currentTarget.click();
+      return;
+    }
+    var offset = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 :
+      event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 0;
+    if (!offset) return;
+    event.preventDefault();
+    var radios = Array.from(document.querySelectorAll('input[name="' + event.currentTarget.name + '"]'));
+    var next = radios[(radios.indexOf(event.currentTarget) + offset + radios.length) % radios.length];
+    next.focus();
+    next.click();
   }
 
   // ---- guidelines loaded count (for the live readout) + empty-store setup banner (H-7) ----
@@ -1052,16 +1074,17 @@
       $("assess").disabled = false;
       $("assess").innerHTML = assessLabel;
       $("assess").classList.remove("is-stopping");
-      $("assess").onclick = runAssess;
+      $("assess").onclick = runUnified;
       assessCtl = null;
       $("result").removeAttribute("aria-busy");
     }
   }
   if ($("assess")) $("assess").onclick = runUnified;
   if ($("dangerChecklist")) {
-    $("dangerChecklist").addEventListener("change", updateDangerChecklist);
-    $("patientAgeValue").addEventListener("input", updateDangerChecklist);
-    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").addEventListener("input", updateDangerChecklist);
+    $("dangerChecklist").addEventListener("change", handleStructuredEdit);
+    $("patientAgeValue").addEventListener("input", handleStructuredEdit);
+    if ($("respiratoryRatePerMinute")) $("respiratoryRatePerMinute").addEventListener("input", handleStructuredEdit);
+    document.querySelectorAll(".tri-state input").forEach(function (input) { input.addEventListener("keydown", handleTriStateKey); });
     updateDangerChecklist();
   }
   if (clinicalInput()) clinicalInput().addEventListener("input", function () { handleUnifiedInput(); });
@@ -1307,6 +1330,7 @@
       handleUnifiedInput: handleUnifiedInput,
       runUnified: runUnified,
       unifiedState: unifiedState,
+      focusMissingField: focusMissingField,
       invalidateClinicalResult: invalidateClinicalResult,
       renderProvisional: renderProvisional,
       renderContinuation: renderContinuation,

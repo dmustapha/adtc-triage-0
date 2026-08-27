@@ -8,6 +8,7 @@ import { JSDOM } from "jsdom";
 const root = new URL("../../", import.meta.url);
 const html = readFileSync(new URL("public/app.html", root), "utf8");
 const css = readFileSync(new URL("public/assets/css/app.css", root), "utf8");
+const source = readFileSync(new URL("public/assets/js/triage.js", root), "utf8");
 const dom = new JSDOM(html, { url: "http://localhost:3010/app" });
 const page = dom.window.document;
 const globals = globalThis as Record<string, unknown>;
@@ -26,6 +27,8 @@ const frontend = require("../../public/assets/js/triage.js") as {
   runUnified(): Promise<void>;
   handleUnifiedInput(): void;
   unifiedState: { candidate: Record<string, any> | null; revision: number };
+  focusMissingField(field: string): void;
+  clinicalState: { confirmationToken: string | null; continuationToken: string | null };
 };
 
 function input(): HTMLTextAreaElement {
@@ -80,4 +83,47 @@ test("tri-state radios fill their effective 44-pixel semantic labels", () => {
   assert.match(css, /\.tri-state input[^}]*inset:\s*0[^}]*width:\s*100%[^}]*height:\s*100%/s);
   assert.doesNotMatch(css, /\.tri-state input[^}]*width:\s*1px[^}]*height:\s*1px/s);
   assert.doesNotMatch(css, /\.tri-state input[^}]*clip:\s*rect/s);
+});
+
+test("tri-state labels, Space, and Arrow keys operate the semantic radios", () => {
+  const group = page.querySelector('[data-danger-key="cannotDrinkOrBreastfeed"]')!;
+  const present = group.querySelector('input[value="PRESENT"]') as HTMLInputElement;
+  const absent = group.querySelector('input[value="ABSENT"]') as HTMLInputElement;
+  let changes = 0;
+  group.addEventListener("change", () => { changes += 1; });
+  (present.closest("label") as HTMLLabelElement).click();
+  assert.equal(present.checked, true);
+  assert.equal(changes, 1);
+  present.focus();
+  present.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  assert.equal(absent.checked, true);
+  absent.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: " ", bubbles: true }));
+  assert.equal(absent.checked, true);
+  assert.ok(changes >= 2);
+});
+
+test("every structured authority edit invalidates stale result and review tokens", () => {
+  const result = page.getElementById("result")!;
+  const card = page.getElementById("card")!;
+  for (const [id, event] of [["patientAgeValue", "input"], ["respiratoryRatePerMinute", "input"], ["rateCountQuality", "change"]]) {
+    result.classList.remove("hidden");
+    card.textContent = "stale";
+    frontend.clinicalState.confirmationToken = "confirm-token";
+    frontend.clinicalState.continuationToken = "continue-token";
+    page.getElementById(id)!.dispatchEvent(new dom.window.Event(event, { bubbles: true }));
+    assert.equal(result.classList.contains("hidden"), true, `${id} hides stale result`);
+    assert.equal(frontend.clinicalState.confirmationToken, null, `${id} clears confirmation`);
+    assert.equal(frontend.clinicalState.continuationToken, null, `${id} clears continuation`);
+  }
+  result.classList.remove("hidden");
+  card.textContent = "stale";
+  page.querySelector('input[name="danger-vomitsEverything"][value="ABSENT"]')!
+    .dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+  assert.equal(result.classList.contains("hidden"), true);
+});
+
+test("assessment completion restores the unified handler and dotted conflicts focus their radio", () => {
+  assert.match(source, /finally\s*\{[\s\S]*?\$\("assess"\)\.onclick\s*=\s*runUnified/);
+  frontend.focusMissingField("dangerObservations.chestIndrawing");
+  assert.equal(page.activeElement?.getAttribute("name"), "danger-chestIndrawing");
 });
