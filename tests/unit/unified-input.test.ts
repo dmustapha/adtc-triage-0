@@ -75,6 +75,31 @@ test("keeps explicit negation absent rather than present", () => {
   assert.deepEqual(draft.conflicts, []);
 });
 
+test("negated findings win without creating false positive conflicts", () => {
+  const { api } = loadModule();
+  const draft = api.extractClinicalCandidate(
+    "Two year old with no cough, no stridor when calm, not lethargic, and no low oxygen.",
+  );
+  assert.equal(draft.respiratoryConcern, "ABSENT");
+  assert.equal(draft.dangerObservations.stridorWhenCalm, "ABSENT");
+  assert.equal(draft.dangerObservations.lethargicOrUnconscious, "ABSENT");
+  assert.equal(draft.dangerObservations.lowOxygenOrCentralCyanosis, "ABSENT");
+  assert.deepEqual(draft.conflicts, []);
+});
+
+test("keeps independently stated positive and negative evidence conflicting", () => {
+  const { api } = loadModule();
+  const draft = api.extractClinicalCandidate("Two year old has cough but now has no cough.");
+  assert.equal(draft.respiratoryConcern, "NOT_ASSESSED");
+  assert.ok(draft.conflicts.includes("respiratoryConcern"));
+});
+
+test("routes explicit authority-bearing danger observations as clinical", () => {
+  const { api } = loadModule();
+  assert.equal(api.routeInput("Chest indrawing is present."), "CLINICAL");
+  assert.equal(api.routeInput("Cannot drink or breastfeed."), "CLINICAL");
+});
+
 test("surfaces conflicting explicit age, rate, and observation facts", () => {
   const { api } = loadModule();
   const draft = api.extractClinicalCandidate(

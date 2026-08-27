@@ -23,6 +23,8 @@
     var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(input);
     var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(input);
     var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(input);
+    var danger = /\b(?:cannot|can't|unable to)\s+(?:drink|breastfeed)\b|\b(?:chest indrawing|stridor\s+(?:when|while)\s+calm|low oxygen|central cyanosis)\b/i.test(input);
+    if (danger) return "CLINICAL";
     return (finding && (age || person)) ? "CLINICAL" : "AMBIGUOUS";
   }
 
@@ -51,9 +53,15 @@
     return uniqueValues(rates);
   }
 
+  function withoutPattern(text, pattern) {
+    var flags = pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g";
+    return text.replace(new RegExp(pattern.source, flags), " ");
+  }
+
   function observationValue(text, spec, allAbsent, conflicts) {
-    var present = spec[1].test(text);
     var absent = allAbsent || spec[2].test(text);
+    var positiveText = absent && !allAbsent ? withoutPattern(text, spec[2]) : text;
+    var present = spec[1].test(positiveText);
     if (present && absent) {
       conflicts.push("dangerObservations." + spec[0]);
       return "NOT_ASSESSED";
@@ -69,8 +77,9 @@
   }
 
   function respiratoryConcern(text, conflicts) {
-    var present = /\b(?:has|with|reports?|presenting with)?\s*(?:a\s+)?cough\b|\bdifficult breathing\b/i.test(text);
-    var absent = /\b(?:no|without)\s+(?:cough|difficult breathing)\b/i.test(text);
+    var absentPattern = /\b(?:no|without)\s+(?:cough|difficult breathing)\b/i;
+    var absent = absentPattern.test(text);
+    var present = /\b(?:has|with|reports?|presenting with)?\s*(?:a\s+)?cough\b|\bdifficult breathing\b/i.test(absent ? withoutPattern(text, absentPattern) : text);
     if (present && absent) { conflicts.push("respiratoryConcern"); return "NOT_ASSESSED"; }
     return present ? "PRESENT" : absent ? "ABSENT" : "NOT_ASSESSED";
   }
