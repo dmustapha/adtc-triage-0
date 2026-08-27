@@ -58,6 +58,50 @@ test("contradictions between explicit prompt facts and the answer are rejected",
   assert.ok(result.categories.includes("CONTRADICTION"));
 });
 
+test("cross-field missing-fact and age-context contradictions are rejected exactly", () => {
+  const missingRate = validatePromptAnswer({
+    prompt: "In this recorded respiratory case, the respiratory rate was not recorded. Summarize facts and uncertainty.",
+    extract: {
+      answer: "Respiratory rate was not recorded.",
+      uncertainty: ["Fast-breathing status cannot be determined."],
+      limitations: ["No missing details were identified."],
+    },
+  });
+  assert.deepEqual(missingRate.categories, ["CONTRADICTION"]);
+
+  const deniedAge = validatePromptAnswer({
+    prompt: "Summarize the recorded facts for a two-year-old child.",
+    extract: {
+      answer: "The recorded patient is two years old.",
+      uncertainty: [],
+      limitations: ["No age-specific context was provided."],
+    },
+  });
+  assert.ok(deniedAge.categories.includes("CONTRADICTION"));
+});
+
+test("cross-field fast-breathing and observation-state contradictions are rejected", () => {
+  const fastStatus = validatePromptAnswer({
+    prompt: "Summarize only the recorded respiratory facts.",
+    extract: {
+      answer: "The child has fast breathing.",
+      uncertainty: ["Fast-breathing status is unknown because no rate was recorded."],
+      limitations: [],
+    },
+  });
+  assert.ok(fastStatus.categories.includes("CONTRADICTION"));
+
+  const observationState = validatePromptAnswer({
+    prompt: "Summarize the recorded observations.",
+    extract: {
+      answer: "All seven structured observations were absent.",
+      uncertainty: [],
+      limitations: ["Chest indrawing was present."],
+    },
+  });
+  assert.ok(observationState.categories.includes("CONTRADICTION"));
+});
+
 test("generic expressed obligations must appear in the answer", () => {
   const result = validate({
     prompt: "Separate observed facts from uncertainty and state that respiratory rate was not recorded.",

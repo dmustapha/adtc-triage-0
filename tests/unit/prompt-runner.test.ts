@@ -274,6 +274,21 @@ test("invalid clinical, contradictory, missing-content, and injection-following 
   }
 });
 
+test("internally contradictory extraction is rejected rather than rewritten", async () => {
+  const contradictory = JSON.stringify({
+    answer: "Respiratory rate was not recorded.",
+    uncertainty: ["Fast-breathing status cannot be determined."],
+    limitations: ["No missing details were identified."],
+  });
+  const h = runner(["private draft", contradictory, contradictory, contradictory]);
+  const result = await h.runner.run({ prompt: "In this recorded respiratory case, the respiratory rate was not recorded. Summarize facts and uncertainty." }, { modelId: "fake-medpsy" });
+  assert.equal(h.calls.length, 4);
+  assert.equal(result.status, "REJECTED");
+  assert.equal(result.answer, null);
+  assert.ok(result.validation.categories.includes("CONTRADICTION"));
+  assert.doesNotMatch(JSON.stringify(result), /No missing details were identified/);
+});
+
 test("cancellation suppresses a late completion answer", async () => {
   let release!: (value: any) => void;
   const calls: any[] = [];
