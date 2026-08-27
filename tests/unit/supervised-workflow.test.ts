@@ -147,7 +147,10 @@ test("recorded emergency wins before missing fields and invokes no workflow depe
 test("incomplete, outside-scope, fast-rate, and chest routes preserve zero-QVAC behavior", async () => {
   const cases = [
     { input: request({ patientAge: undefined }), outcome: "ASSESSMENT_REQUIRED", eligible: false },
-    { input: request({ respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" } }), outcome: "OUTSIDE_SUPPORTED_SCOPE", eligible: false },
+    { input: request({
+      caseText: "Two year old. Cough or difficult breathing absent. All seven observations absent.",
+      respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
+    }), outcome: "OUTSIDE_SUPPORTED_SCOPE", eligible: false },
     { input: request({ respiratoryAssessment: { coughOrDifficultBreathing: "PRESENT", respiratoryRatePerMinute: 40, rateCountQuality: "ONE_MINUTE_WHILE_CALM" } }), outcome: "PROMPT_SUPERVISED_REVIEW", eligible: true },
     { input: request({ dangerObservations: { ...ABSENT, chestIndrawing: "PRESENT" } }), outcome: "PROMPT_SUPERVISED_REVIEW", eligible: true },
   ];
