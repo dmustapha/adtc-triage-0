@@ -256,10 +256,24 @@
     if (fields.length) focusMissingField(fields[0]);
   }
 
+  function invalidatePromptRun() {
+    if (!promptState || !promptState.abortController) return;
+    var controller = promptState.abortController;
+    promptState.runId += 1;
+    promptState.abortController = null;
+    promptState.jobId = null;
+    promptState.terminal = true;
+    controller.abort();
+    if ($("cancelPrompt")) $("cancelPrompt").hidden = true;
+    if ($("retryPrompt")) $("retryPrompt").hidden = true;
+    if ($("sharedAnswer")) { $("sharedAnswer").textContent = ""; $("sharedAnswer").classList.add("hidden"); }
+  }
+
   function handleUnifiedInput() {
     unifiedState.revision += 1;
     unifiedState.choiceRevision = null;
     unifiedState.routeOverride = null;
+    invalidatePromptRun();
     invalidateClinicalResult();
     unifiedState.candidate = unifiedInput && unifiedInput.extractClinicalCandidate
       ? unifiedInput.extractClinicalCandidate(clinicalInput().value) : null;

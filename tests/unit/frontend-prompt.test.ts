@@ -14,6 +14,7 @@ const promptIds = metadata.test_prompts.map((entry: { prompt_id: string }) => en
 const dom = new JSDOM(html, { url: "http://localhost:3010/app" });
 const page = dom.window.document;
 const requests: Array<{ url: string; init?: RequestInit }> = [];
+let assistResponder = async (_init?: RequestInit) => sseAnswer();
 const globals = globalThis as Record<string, unknown>;
 globals.window = dom.window;
 globals.document = page;
@@ -28,7 +29,8 @@ function sseAnswer(answer = "Safe local answer.") {
 globals.fetch = async (url: string, init?: RequestInit) => {
   if (url === "/health") return new Response(JSON.stringify({ ready: true, chunks: 994, egress: {} }));
   requests.push({ url, init });
-  return sseAnswer();
+  if (url.startsWith("/jobs/")) return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  return assistResponder(init);
 };
 const require = createRequire(import.meta.url);
 (dom.window as any).TriageUnifiedInput = require("../../public/assets/js/unified-input.js");
@@ -84,6 +86,58 @@ test("ambiguous recovery is inline and applies to one input revision", async () 
   input.value = "Another unclear request.";
   frontend.handleUnifiedInput();
   assert.equal(choice.classList.contains("hidden"), true);
+});
+
+test("editing during assist aborts revision N before it can render over revision N plus one", async () => {
+  let release!: () => void;
+  let signal!: AbortSignal;
+  assistResponder = (init) => new Promise<Response>((resolve, reject) => {
+    signal = init?.signal as AbortSignal;
+    release = () => resolve(sseAnswer("Stale revision answer."));
+    signal.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")), { once: true });
+  });
+  input.value = "Explain the first revision.";
+  frontend.handleUnifiedInput();
+  const running = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  input.value = "Explain the second revision.";
+  frontend.handleUnifiedInput();
+  const wasAborted = signal.aborted;
+  if (!wasAborted) release();
+  await running;
+  assert.equal(wasAborted, true);
+  assert.doesNotMatch(page.getElementById("sharedAnswer")?.textContent ?? "", /Stale revision answer/);
+  assistResponder = async () => sseAnswer();
+});
+
+test("Cancel deletes and aborts the owned job, then Retry starts a fresh shared run", async () => {
+  const encoder = new TextEncoder();
+  let assistSignal!: AbortSignal;
+  assistResponder = async (init) => new Response(new ReadableStream({
+    start(controller) {
+      assistSignal = init?.signal as AbortSignal;
+      controller.enqueue(encoder.encode('event: job\ndata: {"id":"job-cancel"}\n\n'));
+      assistSignal.addEventListener("abort", () => controller.error(new DOMException("Aborted", "AbortError")), { once: true });
+    },
+  }), { status: 200 });
+  requests.length = 0;
+  input.value = "Explain cancellation behavior.";
+  frontend.handleUnifiedInput();
+  const running = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  (page.getElementById("cancelPrompt") as HTMLButtonElement).click();
+  await running;
+  assert.equal(requests.some((request) => request.url === "/jobs/job-cancel" && request.init?.method === "DELETE"), true);
+  assert.equal(assistSignal.aborted, true);
+  assert.match(page.getElementById("status")?.textContent ?? "", /Cancelled by user/);
+
+  assistResponder = async () => sseAnswer("Fresh retry answer.");
+  (page.getElementById("retryPrompt") as HTMLButtonElement).click();
+  for (let attempt = 0; attempt < 5 && !/Fresh retry answer/.test(page.getElementById("sharedAnswer")?.textContent ?? ""); attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  assert.equal(requests.filter((request) => request.url === "/assist").length, 2);
+  assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Fresh retry answer/);
 });
 
 test("cancel, retry, safe rendering, and terminal recovery remain bound to shared state", () => {
