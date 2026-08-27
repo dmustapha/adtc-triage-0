@@ -52,6 +52,7 @@ export class ContinuationStore {
     const now = this.now();
     this.pruneExpired(now);
     if (this.activeCount() >= this.capacity) throw new Error("Continuation store capacity reached.");
+    this.pruneTerminalForCapacity();
     const token = this.uniqueToken();
     const expiresAtMs = now + this.ttlMs;
     this.records.set(token, {
@@ -108,6 +109,18 @@ export class ContinuationStore {
     let count = 0;
     for (const record of this.records.values()) if (record.state !== "USED") count += 1;
     return count;
+  }
+
+  private pruneTerminalForCapacity(): void {
+    let terminalCount = 0;
+    for (const record of this.records.values()) if (record.state === "USED") terminalCount += 1;
+    for (const [token, record] of this.records) {
+      if (terminalCount <= this.capacity) return;
+      if (record.state === "USED") {
+        this.records.delete(token);
+        terminalCount -= 1;
+      }
+    }
   }
 
   private uniqueToken(): string {

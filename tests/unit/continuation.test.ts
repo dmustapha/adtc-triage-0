@@ -76,6 +76,17 @@ test("used grants retain replay protection without exhausting active capacity", 
   assert.deepEqual(store.consume(first.token, binding.owner), { ok: false, reason: "USED" });
 });
 
+test("used continuation replay tombstones remain bounded by store capacity", async () => {
+  const { ContinuationStore } = await import("../../src/triage/continuation.js");
+  let sequence = 0;
+  const store = new ContinuationStore({ capacity: 1, randomToken: () => `bounded-${++sequence}` });
+  for (let index = 0; index < 3; index += 1) {
+    const grant = store.issue({ ...binding, recordHash: `record-${index}` }, { index });
+    assert.equal(store.consume(grant.token, binding.owner).ok, true);
+  }
+  assert.ok((store as any).records.size <= 2, "active plus replay records must remain linearly bounded");
+});
+
 test("a reserved grant can be released after retryable admission failure", async () => {
   const { ContinuationStore } = await import("../../src/triage/continuation.js");
   const store = new ContinuationStore({ randomToken: () => "retryable-token" });
