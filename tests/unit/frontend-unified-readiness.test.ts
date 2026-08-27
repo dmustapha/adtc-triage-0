@@ -15,13 +15,15 @@ const globals = globalThis as Record<string, unknown>;
 globals.window = dom.window;
 globals.document = page;
 const triageRequests: Array<{ url: string; init?: RequestInit }> = [];
+let requestResponder = async (_url: string, _init?: RequestInit) =>
+  new Response("event: done\ndata: {}\n\n", { status: 200 });
 globals.fetch = async (url: string, init?: RequestInit) => {
   if (url === "/health") return {
     json: async () => ({ ready: true, chunks: 994, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } }),
     headers: { get: () => null },
   };
   triageRequests.push({ url, init });
-  return new Response("event: done\ndata: {}\n\n", { status: 200 });
+  return requestResponder(url, init);
 };
 (dom.window as any).matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
 (dom.window as any).HTMLElement.prototype.scrollIntoView = function () {};
@@ -30,6 +32,7 @@ const require = createRequire(import.meta.url);
 const frontend = require("../../public/assets/js/triage.js") as {
   updateUnifiedReadiness(): Record<string, unknown>;
   runUnified(): Promise<void>;
+  runAssess(): Promise<void>;
   handleUnifiedInput(): void;
   unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null; presentationRevision: number | null };
   focusMissingField(field: string): void;
@@ -216,4 +219,43 @@ test("a new input revision atomically clears every stale shared-route terminal p
   assert.equal(frontend.clinicalState.continuationToken, null);
   assert.equal(shared.textContent, "");
   assert.equal(status.textContent, "");
+});
+
+test("an aborted clinical stream cannot reclaim a newer general presentation", async () => {
+  const encoder = new TextEncoder();
+  let oldStream!: ReadableStreamDefaultController<Uint8Array>;
+  requestResponder = async (url) => {
+    if (url === "/assist") {
+      return new Response('event: answer\ndata: {"answer":"Current general answer.","uncertainty":[],"limitations":[]}\n\nevent: done\ndata: {}\n\n');
+    }
+    return new Response(new ReadableStream({ start(controller) { oldStream = controller; } }), { status: 200 });
+  };
+  input().value = "Two year old child cannot drink or breastfeed.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  const staleClinicalRun = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  input().value = "Explain what information should be recorded before referral.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  oldStream.enqueue(encoder.encode('event: card\ndata: {"card":{"outcome":"EMERGENCY","finding":"Stale emergency finding","basis":"Old revision","nextAssessmentStep":"Old action","uncertainty":"Old uncertainty"}}\n\n'));
+  oldStream.close();
+  await staleClinicalRun;
+
+  assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Current general answer/);
+  assert.equal(page.getElementById("sharedAnswer")?.dataset.state, "completed");
+  assert.doesNotMatch(page.getElementById("card")?.textContent ?? "", /Stale emergency finding/);
+  assert.equal(page.getElementById("status")?.textContent, "Complete.");
+  assert.equal(frontend.clinicalState.confirmationToken, null);
+  assert.equal(frontend.clinicalState.continuationToken, null);
+
+  requestResponder = async () => new Response('event: card\ndata: {"card":{"outcome":"EMERGENCY","finding":"Current emergency finding","basis":"Current revision","nextAssessmentStep":"Act now","uncertainty":"None"}}\n\n');
+  input().value = "Two year old child cannot drink or breastfeed.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  await frontend.runUnified();
+  assert.match(page.getElementById("card")?.textContent ?? "", /Current emergency finding/);
+  assert.doesNotMatch(page.getElementById("sharedAnswer")?.textContent ?? "", /Current general answer/);
+  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
 });

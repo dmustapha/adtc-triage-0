@@ -70,6 +70,7 @@
     generation: 0,
     confirmationPending: false,
     continuationPending: false,
+    assessLabel: null,
   };
 
   var unifiedInput = typeof window !== "undefined" ? window.TriageUnifiedInput : null;
@@ -982,7 +983,16 @@
     invalidateConfirmation();
     if (interrupted) {
       clinicalState.recordChangedDuringRun = true;
-      assessCtl.abort();
+      var controller = assessCtl;
+      controller.abort();
+      stopReasonTimer();
+      if ($("assess")) {
+        $("assess").disabled = false;
+        if (clinicalState.assessLabel != null) $("assess").innerHTML = clinicalState.assessLabel;
+        $("assess").classList.remove("is-stopping");
+        $("assess").onclick = runUnified;
+      }
+      clinicalState.assessLabel = null;
     }
     if (!hadResult && !interrupted) return;
     result.classList.add("hidden");
@@ -1075,7 +1085,8 @@
   // On a terminal frame, close out the last spinning step so the readout never freezes mid-spin.
   function finishStages() { markActiveDone(); }
 
-  function handleEvent(block) {
+  function handleEvent(block, owner) {
+    if (owner && !ownsClinicalRun(owner)) return;
     // SSE comment frames (keep-alives) start with ":". Ignore them, they carry no event.
     if (block.charAt(0) === ":") return;
     var ev = (block.match(/^event: (.*)$/m) || [])[1];
@@ -1084,7 +1095,7 @@
     var d;
     // A malformed frame must be skipped, not kill the whole stream.
     try { d = JSON.parse(dataLine); } catch (e) {
-      gotTerminal = true;
+      markClinicalTerminal(owner);
       $("err").textContent = "The local assessment response was malformed. Restart the supported app before retrying.";
       $("reasoningWrap").classList.add("hidden");
       return;
@@ -1103,7 +1114,7 @@
       // H-1 staged status: the model has started producing its assessment.
       $("reasonLabel").textContent = t("reason_think");
     } else if (ev === "card" || ev === "assessment_required") {
-      gotTerminal = true;
+      markClinicalTerminal(owner);
       renderCard(d.card);
       if (d.perf) {
         if (d.perf.ttftMs != null) $("hTtft").textContent = (d.perf.ttftMs / 1000).toFixed(1) + " s";
@@ -1115,11 +1126,11 @@
     } else if (ev === "continuation") {
       renderContinuation(d);
     } else if (ev === "abstain") {
-      gotTerminal = true;
+      markClinicalTerminal(owner);
       finishStages();
       renderCard(d.card);
     } else if (ev === "error") {
-      gotTerminal = true;
+      markClinicalTerminal(owner);
       $("err").textContent = d.reason || d.error || "Local assistance is unavailable. Check readiness, then retry.";
       $("reasoningWrap").classList.add("hidden");
     }
@@ -1127,6 +1138,18 @@
   // Set true when a terminal frame (card/abstain/error) arrives, so we can tell a clean
   // finish from a stream that closed early and left a blank card.
   var gotTerminal = false;
+
+  function markClinicalTerminal(owner) {
+    gotTerminal = true;
+    if (owner) owner.terminal = true;
+  }
+
+  function ownsClinicalRun(owner) {
+    return owner.generation === clinicalState.generation &&
+      owner.revision === unifiedState.revision &&
+      owner.presentationRevision === unifiedState.presentationRevision &&
+      owner.controller === assessCtl;
+  }
 
   // ---- H-1: reasoning wait-timer ----
   // On-device reasoning takes seconds; a live elapsed counter reassures the worker the tool is working
@@ -1189,9 +1212,18 @@
     gotTerminal = false;
     invalidateConfirmation();
     clinicalState.recordChangedDuringRun = false;
-    assessCtl = new AbortController();
+    var controller = new AbortController();
+    assessCtl = controller;
+    var owner = {
+      controller: controller,
+      generation: clinicalState.generation,
+      revision: unifiedState.revision,
+      presentationRevision: unifiedState.presentationRevision,
+      terminal: false,
+    };
     // Toggle the button into Stop mode (kept enabled so the worker can abort). Restored in `finally`.
     var assessLabel = $("assess").innerHTML;
+    clinicalState.assessLabel = assessLabel;
     $("assess").innerHTML = ICON.stop + "Stop";
     $("assess").classList.add("is-stopping");
     $("assess").onclick = function () { if (assessCtl) assessCtl.abort(); };
@@ -1216,13 +1248,15 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),
-        signal: assessCtl.signal
+        signal: controller.signal
       });
+      if (!ownsClinicalRun(owner)) return;
       // Guard before reading the stream: a non-2xx or bodyless response has no readable stream.
       if (!r.ok || !r.body) {
         var msg = "Could not run assessment (" + r.status + ").";
         try {
           var j = await r.json();
+          if (!ownsClinicalRun(owner)) return;
           if (j && j.error) msg = j.error;
           if (j && Array.isArray(j.conflicts)) renderMissingReview(j.conflicts);
         } catch (e) {}
@@ -1232,17 +1266,19 @@
       var dec = new TextDecoder();
       for (;;) {
         var res = await reader.read();
+        if (!ownsClinicalRun(owner)) return;
         if (res.done) break;
         buf += dec.decode(res.value, { stream: true });
         var i;
-        while ((i = buf.indexOf("\n\n")) >= 0) { handleEvent(buf.slice(0, i)); buf = buf.slice(i + 2); }
+        while ((i = buf.indexOf("\n\n")) >= 0) { handleEvent(buf.slice(0, i), owner); buf = buf.slice(i + 2); }
       }
       // Stream closed cleanly but no card/abstain/error arrived: do not leave a silent blank card.
-      if (!gotTerminal) {
+      if (!owner.terminal) {
         $("err").textContent = "The assessment did not finish. Try again.";
         $("reasoningWrap").classList.add("hidden");
       }
     } catch (e) {
+      if (!ownsClinicalRun(owner)) return;
       // H-2: a worker-initiated Stop aborts the fetch → AbortError. That is not a failure; show a calm
       // "Stopped." and clear the reasoning box rather than an error.
       if (e && e.name === "AbortError") {
@@ -1257,13 +1293,18 @@
     } finally {
       // Restore the button + timer in finally so a Stop or a mid-stream interruption never leaves the
       // button stuck in Stop mode or the timer running.
-      stopReasonTimer();
-      $("assess").disabled = false;
-      $("assess").innerHTML = assessLabel;
-      $("assess").classList.remove("is-stopping");
-      $("assess").onclick = runUnified;
-      assessCtl = null;
-      $("result").removeAttribute("aria-busy");
+      if (ownsClinicalRun(owner)) {
+        stopReasonTimer();
+        $("assess").disabled = false;
+        $("assess").innerHTML = assessLabel;
+        $("assess").classList.remove("is-stopping");
+        $("assess").onclick = runUnified;
+        assessCtl = null;
+        clinicalState.assessLabel = null;
+        $("result").removeAttribute("aria-busy");
+      } else if (assessCtl === controller) {
+        assessCtl = null;
+      }
     }
   }
   if ($("assess")) $("assess").onclick = runUnified;
@@ -1438,9 +1479,22 @@
 
   async function cancelPrompt() {
     promptState.cancelMessage = null;
-    if (promptState.jobId) {
+    var owner = {
+      runId: promptState.runId,
+      presentationRevision: unifiedState.presentationRevision,
+      jobId: promptState.jobId,
+      controller: promptState.abortController,
+    };
+    function ownsCancellation() {
+      return owner.runId === promptState.runId &&
+        owner.presentationRevision === unifiedState.presentationRevision &&
+        owner.jobId === promptState.jobId &&
+        owner.controller === promptState.abortController;
+    }
+    if (owner.jobId) {
       try {
-        var response = await fetch("/jobs/" + encodeURIComponent(promptState.jobId), { method: "DELETE" });
+        var response = await fetch("/jobs/" + encodeURIComponent(owner.jobId), { method: "DELETE" });
+        if (!ownsCancellation()) return;
         if (response.status === 409) {
           $("status").textContent = "The local job had already finished; waiting for its terminal result.";
           return;
@@ -1451,13 +1505,14 @@
         }
         promptState.cancelMessage = "Cancelled by user.";
       } catch (error) {
+        if (!ownsCancellation()) return;
         $("status").textContent = "Cancellation could not be confirmed; the local run is still active.";
         return;
       }
     } else {
       promptState.cancelMessage = "Stopped before a local job was assigned.";
     }
-    if (promptState.abortController) promptState.abortController.abort();
+    if (ownsCancellation() && owner.controller) owner.controller.abort();
   }
 
   function retryPrompt() {

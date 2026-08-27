@@ -15,6 +15,8 @@ const dom = new JSDOM(html, { url: "http://localhost:3010/app" });
 const page = dom.window.document;
 const requests: Array<{ url: string; init?: RequestInit }> = [];
 let assistResponder = async (_init?: RequestInit) => sseAnswer();
+let jobResponder = async (_url: string, _init?: RequestInit) =>
+  new Response(JSON.stringify({ ok: true }), { status: 200 });
 const globals = globalThis as Record<string, unknown>;
 globals.window = dom.window;
 globals.document = page;
@@ -29,7 +31,7 @@ function sseAnswer(answer = "Safe local answer.") {
 globals.fetch = async (url: string, init?: RequestInit) => {
   if (url === "/health") return new Response(JSON.stringify({ ready: true, chunks: 994, egress: {} }));
   requests.push({ url, init });
-  if (url.startsWith("/jobs/")) return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  if (url.startsWith("/jobs/")) return jobResponder(url, init);
   return assistResponder(init);
 };
 const require = createRequire(import.meta.url);
@@ -166,6 +168,58 @@ test("Cancel deletes and aborts the owned job, then Retry starts a fresh shared 
   assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Fresh retry answer/);
 });
 
+test("a late cancellation response cannot mutate a newer clinical revision", async () => {
+  const encoder = new TextEncoder();
+  const outcomes = [
+    () => new Response(JSON.stringify({ error: "already terminal" }), { status: 409 }),
+    () => new Response(JSON.stringify({ error: "delete failed" }), { status: 500 }),
+    () => Promise.reject(new Error("late network failure")),
+    () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
+  ];
+  for (const outcome of outcomes) {
+    let releaseDelete!: () => void;
+    jobResponder = () => new Promise<Response>((resolve, reject) => {
+      releaseDelete = () => Promise.resolve(outcome()).then(resolve, reject);
+    });
+    assistResponder = async (init) => new Response(new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('event: job\ndata: {"id":"old-job"}\n\n'));
+        (init?.signal as AbortSignal).addEventListener("abort", () => controller.error(new DOMException("Aborted", "AbortError")), { once: true });
+      },
+    }), { status: 200 });
+    input.value = "Explain the old general request.";
+    frontend.handleUnifiedInput();
+    const oldRun = frontend.runUnified();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    (page.getElementById("cancelPrompt") as HTMLButtonElement).click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    input.value = "Two year old child cannot drink or breastfeed.";
+    frontend.handleUnifiedInput();
+    const currentStatus = page.getElementById("status")?.textContent;
+    releaseDelete();
+    await oldRun;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(page.getElementById("status")?.textContent, currentStatus);
+    assert.equal((page.getElementById("cancelPrompt") as HTMLButtonElement).hidden, true);
+    assert.equal((page.getElementById("retryPrompt") as HTMLButtonElement).hidden, true);
+  }
+
+  jobResponder = async () => new Response(JSON.stringify({ error: "already terminal" }), { status: 409 });
+  input.value = "Explain a current cancellable request.";
+  frontend.handleUnifiedInput();
+  const currentRun = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  (page.getElementById("cancelPrompt") as HTMLButtonElement).click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.match(page.getElementById("status")?.textContent ?? "", /already finished/);
+  input.value = "Cleanup current cancellation test.";
+  frontend.handleUnifiedInput();
+  await currentRun;
+  jobResponder = async () => new Response(JSON.stringify({ ok: true }), { status: 200 });
+  assistResponder = async () => sseAnswer();
+});
+
 test("incomplete streams and HTTP or network failures replace progress with terminal shared status", async () => {
   assistResponder = async () => new Response('event: stage\ndata: {"label":"Still working."}\n\n', { status: 200 });
   await submit("Explain an incomplete response.");
@@ -186,8 +240,8 @@ test("incomplete streams and HTTP or network failures replace progress with term
 });
 
 test("cancel, retry, safe rendering, and terminal recovery remain bound to shared state", () => {
-  assert.match(source, /fetch\("\/jobs\/"\s*\+\s*encodeURIComponent\(promptState\.jobId\)[\s\S]*method:\s*"DELETE"/);
-  assert.match(source, /promptState\.abortController\.abort\(\)/);
+  assert.match(source, /fetch\("\/jobs\/"\s*\+\s*encodeURIComponent\(owner\.jobId\)[\s\S]*method:\s*"DELETE"/);
+  assert.match(source, /ownsCancellation\(\)\s*&&\s*owner\.controller[\s\S]*owner\.controller\.abort\(\)/);
   assert.match(source, /function retryPrompt[\s\S]*promptState\.jobId\s*=\s*null[\s\S]*runPrompt\(\)/);
   assert.match(source, /response\.status\s*===\s*409[\s\S]*already finished[\s\S]*return/);
   assert.match(source, /if\s*\(!response\.ok\)[\s\S]*Cancellation could not be confirmed[\s\S]*return/);
