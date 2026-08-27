@@ -167,6 +167,32 @@ test("known structured emergency precedes missing age and fields without routing
   assert.deepEqual(boundaries, []);
 });
 
+test("reviewed narrative conflicts return exact correction fields before routing or MedPsy", async () => {
+  const boundaries: string[] = [];
+  const restore = setTriageExecutionObserver((boundary: string) => { boundaries.push(boundary); });
+  try {
+    const response = await triage("Two year old child with cough, breathing 32 per minute, and no chest indrawing.", {
+      patientAge: { value: 3, unit: "years" },
+      dangerObservations: { ...ABSENT, chestIndrawing: "PRESENT" },
+      respiratoryAssessment: respiratoryAssessment(40),
+      medicationSafety: {
+        allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED",
+        allergyDetails: [], contraindicationDetails: [],
+      },
+      protocolApplicability: { status: "NOT_ASSESSED", details: [] },
+    });
+    assert.equal(response.status, 409);
+    assert.deepEqual((await response.json()).conflicts, [
+      "patientAge",
+      "chestIndrawing",
+      "respiratoryAssessment.respiratoryRatePerMinute",
+    ]);
+    assert.deepEqual(boundaries, []);
+  } finally {
+    restore();
+  }
+});
+
 test("missing breathing rate fails closed with exact missing field before routing or MedPsy", async () => {
   const { events, boundaries } = await observeRequest({
     caseText: "18 month old with cough, alert and drinking",

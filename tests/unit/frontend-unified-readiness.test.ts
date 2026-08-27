@@ -14,10 +14,15 @@ const page = dom.window.document;
 const globals = globalThis as Record<string, unknown>;
 globals.window = dom.window;
 globals.document = page;
-globals.fetch = async () => ({
-  json: async () => ({ ready: true, chunks: 994, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } }),
-  headers: { get: () => null },
-});
+const triageRequests: Array<{ url: string; init?: RequestInit }> = [];
+globals.fetch = async (url: string, init?: RequestInit) => {
+  if (url === "/health") return {
+    json: async () => ({ ready: true, chunks: 994, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } }),
+    headers: { get: () => null },
+  };
+  triageRequests.push({ url, init });
+  return new Response("event: done\ndata: {}\n\n", { status: 200 });
+};
 (dom.window as any).matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
 (dom.window as any).HTMLElement.prototype.scrollIntoView = function () {};
 const require = createRequire(import.meta.url);
@@ -26,7 +31,7 @@ const frontend = require("../../public/assets/js/triage.js") as {
   updateUnifiedReadiness(): Record<string, unknown>;
   runUnified(): Promise<void>;
   handleUnifiedInput(): void;
-  unifiedState: { candidate: Record<string, any> | null; revision: number };
+  unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null };
   focusMissingField(field: string): void;
   clinicalState: { confirmationToken: string | null; continuationToken: string | null };
 };
@@ -128,4 +133,55 @@ test("assessment completion restores the unified handler and dotted conflicts fo
   assert.match(source, /finally\s*\{[\s\S]*?\$\("assess"\)\.onclick\s*=\s*runUnified/);
   frontend.focusMissingField("dangerObservations.chestIndrawing");
   assert.equal(page.activeElement?.getAttribute("name"), "danger-chestIndrawing");
+});
+
+test("only an explicitly reviewed current candidate enters triage through the schema adapter", async () => {
+  triageRequests.length = 0;
+  input().value = "Two year old child with cough. Breathing 40 per minute for one minute while calm. All seven danger and breathing observations were recorded absent.";
+  frontend.handleUnifiedInput();
+
+  await frontend.runUnified();
+  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
+  assert.notEqual(frontend.unifiedState.reviewedRevision, frontend.unifiedState.revision);
+  assert.equal((page.getElementById("dangerDisclosure") as HTMLDetailsElement).open, true);
+
+  await frontend.runUnified();
+  const request = triageRequests.find(({ url }) => url === "/triage");
+  assert.ok(request);
+  const body = JSON.parse(String(request.init?.body));
+  assert.deepEqual(body.patientAge, { value: 2, unit: "years" });
+  assert.deepEqual(body.dangerObservations, {
+    cannotDrinkOrBreastfeed: "ABSENT", vomitsEverything: "ABSENT", convulsions: "ABSENT",
+    lethargicOrUnconscious: "ABSENT", chestIndrawing: "ABSENT", stridorWhenCalm: "ABSENT",
+    lowOxygenOrCentralCyanosis: "ABSENT",
+  });
+  assert.deepEqual(body.respiratoryAssessment, {
+    coughOrDifficultBreathing: "PRESENT",
+    respiratoryRatePerMinute: 40,
+    rateCountQuality: "ONE_MINUTE_WHILE_CALM",
+  });
+  assert.deepEqual(body.medicationSafety, {
+    allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED",
+    allergyDetails: [], contraindicationDetails: [],
+  });
+  assert.deepEqual(body.protocolApplicability, { status: "NOT_ASSESSED", details: [] });
+  assert.equal("candidate" in body, false);
+  assert.equal(frontend.unifiedState.reviewedRevision, frontend.unifiedState.revision);
+});
+
+test("reviewed emergency serialization preserves every unobserved sign as NOT_ASSESSED", async () => {
+  triageRequests.length = 0;
+  input().value = "Two year old child cannot drink or breastfeed.";
+  frontend.handleUnifiedInput();
+
+  await frontend.runUnified();
+  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
+  await frontend.runUnified();
+
+  const request = triageRequests.find(({ url }) => url === "/triage");
+  assert.ok(request);
+  const body = JSON.parse(String(request.init?.body));
+  assert.equal(body.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
+  assert.deepEqual(Object.values(body.dangerObservations).filter((value) => value === "NOT_ASSESSED").length, 6);
+  assert.equal(body.respiratoryAssessment, undefined);
 });

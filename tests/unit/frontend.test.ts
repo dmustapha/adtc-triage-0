@@ -603,6 +603,13 @@ test("H-2: Stop aborts the in-flight assessment, restores the button, and is re-
       respiratoryRatePerMinute: 52,
       rateCountQuality: "ONE_MINUTE_WHILE_CALM",
     },
+    medicationSafety: {
+      allergiesReviewed: "NOT_ASSESSED",
+      contraindicationsReviewed: "NOT_ASSESSED",
+      allergyDetails: [],
+      contraindicationDetails: [],
+    },
+    protocolApplicability: { status: "NOT_ASSESSED", details: [] },
   });
   assert.match(assess.innerHTML, /Stop/, "button is in Stop mode during the run");
   assert.match(assess.className, /is-stopping/, "neutral Stop styling applied");

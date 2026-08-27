@@ -73,7 +73,10 @@
   };
 
   var unifiedInput = typeof window !== "undefined" ? window.TriageUnifiedInput : null;
-  var unifiedState = { candidate: null, route: "AMBIGUOUS", revision: 0, choiceRevision: null, routeOverride: null };
+  var unifiedState = {
+    candidate: null, route: "AMBIGUOUS", revision: 0, choiceRevision: null, routeOverride: null,
+    reviewPresentedRevision: null, reviewedRevision: null,
+  };
 
   function clinicalInput() { return $("case"); }
 
@@ -119,10 +122,9 @@
     var observations = {};
     DANGER_SIGNS.forEach(function (sign) { observations[sign[0]] = selectedDangerValue(sign[0]); });
     var rateText = $("respiratoryRatePerMinute") ? $("respiratoryRatePerMinute").value.trim() : "";
-    var structured = {
-      patientAge: { value: Number($("patientAgeValue").value), unit: $("patientAgeUnit").value },
-      dangerObservations: observations,
-    };
+    var structured = { dangerObservations: observations };
+    var ageText = $("patientAgeValue") ? $("patientAgeValue").value.trim() : "";
+    if (ageText !== "") structured.patientAge = { value: Number(ageText), unit: $("patientAgeUnit").value };
     var respiratoryConcern = selectedRespiratoryConcern();
     var broaderFocus = $("assessmentFocus") && $("assessmentFocus").value === "BROADER_WHO";
     if (!broaderFocus && respiratoryConcern !== "NOT_ASSESSED") {
@@ -148,6 +150,7 @@
   }
 
   function ageBand(age) {
+    if (!age) return "unsupported";
     if (age.unit !== "months" && age.unit !== "years") return "unsupported";
     var months = age.unit === "years" ? age.value * 12 : age.value;
     if (!Number.isFinite(months) || months < 0 || months > 1560) return "unsupported";
@@ -235,7 +238,7 @@
   }
 
   function focusMissingField(field) {
-    field = field.replace(/^dangerObservations\./, "");
+    field = field.replace(/^dangerObservations\./, "").replace(/^respiratoryAssessment\./, "");
     var danger = DANGER_SIGNS.some(function (sign) { return sign[0] === field; });
     var target = danger ? document.querySelector('input[name="danger-' + field + '"]') :
       field === "respiratoryConcern" ? document.querySelector('input[name="respiratory-concern"]') : $(field);
@@ -250,7 +253,10 @@
     labels.rateCountQuality = "Count quality";
     if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = false; $("dangerDisclosure").open = true; }
     if ($("missingReview")) {
-      $("missingReview").textContent = "Review required: " + fields.map(function (field) { return labels[field] || field; }).join(", ") + ".";
+      $("missingReview").textContent = "Review required: " + fields.map(function (field) {
+        var key = field.replace(/^dangerObservations\./, "").replace(/^respiratoryAssessment\./, "");
+        return labels[key] || field;
+      }).join(", ") + ".";
       $("missingReview").classList.remove("hidden");
     }
     if (fields.length) focusMissingField(fields[0]);
@@ -273,6 +279,8 @@
     unifiedState.revision += 1;
     unifiedState.choiceRevision = null;
     unifiedState.routeOverride = null;
+    unifiedState.reviewPresentedRevision = null;
+    unifiedState.reviewedRevision = null;
     invalidatePromptRun();
     invalidateClinicalResult();
     unifiedState.candidate = unifiedInput && unifiedInput.extractClinicalCandidate
@@ -320,11 +328,27 @@
     var route = unifiedState.choiceRevision === unifiedState.revision ? unifiedState.routeOverride : readiness.route;
     if (route === "AMBIGUOUS") { renderIntentChoice(); return; }
     if (route === "GENERAL") { await runPrompt(); return; }
-    if (!updateDangerChecklist()) { renderMissingReview(missingClinicalFields()); return; }
+    var complete = updateDangerChecklist();
+    if (unifiedState.reviewPresentedRevision !== unifiedState.revision) {
+      unifiedState.reviewPresentedRevision = unifiedState.revision;
+      var missing = complete ? [] : missingClinicalFields();
+      if (missing.length) renderMissingReview(missing);
+      else {
+        if ($("dangerDisclosure")) { $("dangerDisclosure").hidden = false; $("dangerDisclosure").open = true; }
+        if ($("missingReview")) {
+          $("missingReview").textContent = "Review the extracted observations, then select Get guidance again to submit this record.";
+          $("missingReview").classList.remove("hidden");
+        }
+      }
+      return;
+    }
+    if (!complete) { renderMissingReview(missingClinicalFields()); return; }
+    unifiedState.reviewedRevision = unifiedState.revision;
     await runAssess();
   }
 
   function handleStructuredEdit() {
+    unifiedState.reviewedRevision = null;
     invalidateClinicalResult();
     updateDangerChecklist();
   }
@@ -1034,11 +1058,37 @@
   // H-2: an AbortController lets the worker stop an in-flight assessment; the Run-assessment button toggles
   // to a Stop button for the duration (mirrors the mic Speak/Stop toggle) and aborts the fetch on click.
   var assessCtl = null;
+  function reviewedClinicalRequest() {
+    if (unifiedInput && unifiedState.reviewedRevision !== unifiedState.revision) return null;
+    var structured = readStructuredDanger();
+    var medication = structured.medicationSafety || {};
+    var applicability = structured.protocolApplicability || {};
+    var request = {
+      caseText: clinicalInput().value.trim(),
+      dangerObservations: structured.dangerObservations,
+      medicationSafety: {
+        allergiesReviewed: medication.allergiesReviewed || "NOT_ASSESSED",
+        contraindicationsReviewed: medication.contraindicationsReviewed || "NOT_ASSESSED",
+        allergyDetails: Array.isArray(medication.allergyDetails) ? medication.allergyDetails.slice() : [],
+        contraindicationDetails: Array.isArray(medication.contraindicationDetails) ? medication.contraindicationDetails.slice() : [],
+      },
+      protocolApplicability: {
+        status: applicability.status || "NOT_ASSESSED",
+        details: Array.isArray(applicability.details) ? applicability.details.slice() : [],
+      },
+    };
+    if (structured.patientAge) request.patientAge = structured.patientAge;
+    if (structured.patientWeightKg != null) request.patientWeightKg = structured.patientWeightKg;
+    if (structured.respiratoryAssessment) request.respiratoryAssessment = structured.respiratoryAssessment;
+    return request;
+  }
+
   async function runAssess() {
-    var caseText = clinicalInput().value.trim();
+    var request = reviewedClinicalRequest();
+    if (!request) return;
+    var caseText = request.caseText;
     if (!caseText) { $("status").textContent = "Describe or record a case first."; clinicalInput().setAttribute("aria-invalid", "true"); clinicalInput().focus(); return; }
     if (!updateDangerChecklist()) { $("status").textContent = $("dangerStatus").textContent || "Complete the recorded assessment first."; return; }
-    var structuredDanger = readStructuredDanger();
     // Re-entrancy guard: a run is already in flight (assessCtl set). The keyboard path (Ctrl/Cmd+Enter)
     // bypasses the button, so without this a second run would overwrite assessCtl + the shared timer
     // interval (stopping the live one) and start a second /triage the single-job engine only queues.
@@ -1072,21 +1122,17 @@
       var r = await fetch("/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          caseText: caseText,
-          patientAge: structuredDanger.patientAge,
-          dangerObservations: structuredDanger.dangerObservations,
-          respiratoryAssessment: structuredDanger.respiratoryAssessment,
-          patientWeightKg: structuredDanger.patientWeightKg,
-          medicationSafety: structuredDanger.medicationSafety,
-          protocolApplicability: structuredDanger.protocolApplicability
-        }),
+        body: JSON.stringify(request),
         signal: assessCtl.signal
       });
       // Guard before reading the stream: a non-2xx or bodyless response has no readable stream.
       if (!r.ok || !r.body) {
         var msg = "Could not run assessment (" + r.status + ").";
-        try { var j = await r.json(); if (j && j.error) msg = j.error; } catch (e) {}
+        try {
+          var j = await r.json();
+          if (j && j.error) msg = j.error;
+          if (j && Array.isArray(j.conflicts)) renderMissingReview(j.conflicts);
+        } catch (e) {}
         throw new Error(msg);
       }
       var reader = r.body.getReader();

@@ -117,6 +117,44 @@ test("initial respiratory result is model-free, emits a separate grant, then con
   assert.equal(confirmed.referenceActions.follow_up.detailCitation.page, 32);
 });
 
+test("confirmed emergency enters triage but never crosses model, retrieval, or QVAC boundaries", async (t) => {
+  const f = await fixture();
+  t.after(() => f.server.close());
+  const response = await post(`${f.base}/triage`, {
+    caseText: "Two year old child cannot drink or breastfeed.",
+    patientAge: { value: 2, unit: "years" },
+    dangerObservations: { ...ABSENT, cannotDrinkOrBreastfeed: "PRESENT" },
+    medicationSafety: {
+      allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED",
+      allergyDetails: [], contraindicationDetails: [],
+    },
+    protocolApplicability: { status: "NOT_ASSESSED", details: [] },
+  });
+  assert.equal(response.status, 200);
+  const events = parseEvents(await response.text());
+  assert.equal(events.find((event) => event.event === "card")?.data.card.outcome, "EMERGENCY");
+  assert.deepEqual(f.calls, []);
+});
+
+test("reviewed structured authority conflicts return exact correction fields before inference", async (t) => {
+  const f = await fixture();
+  t.after(() => f.server.close());
+  const response = await post(`${f.base}/triage`, {
+    ...body,
+    caseText: "Two year old child with cough, breathing 32 per minute, and no chest indrawing.",
+    patientAge: { value: 3, unit: "years" },
+    dangerObservations: { ...ABSENT, chestIndrawing: "PRESENT" },
+  });
+  assert.equal(response.status, 409);
+  const result = await response.json();
+  assert.deepEqual(result.conflicts, [
+    "patientAge",
+    "chestIndrawing",
+    "respiratoryAssessment.respiratoryRatePerMinute",
+  ]);
+  assert.deepEqual(f.calls, []);
+});
+
 test("continuation validates token-only input before queue admission and fails closed by owner/replay", async (t) => {
   const f = await fixture();
   t.after(() => f.server.close());
