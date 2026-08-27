@@ -282,14 +282,12 @@ function continuationRoute(deps: Dependencies) {
         onFirstToken: () => context.publish(() => publish((target) => target.send("first_token", { ttftMs: Date.now() - reasonStartedAt }))),
       }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Supervised respiratory continuation" });
     } catch (error) {
-      if (error instanceof QueueSaturatedError) deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
-      else deps.supervisedWorkflow.commitContinuation?.(parsed.data.token, owner);
+      deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
       if (!queueFailure(response, error)) response.status(503).json({
         error: "Local continuation could not be admitted.", code: "INFERENCE_FAILED", retryable: false,
       });
       return;
     }
-    deps.supervisedWorkflow.commitContinuation?.(parsed.data.token, owner);
     const job = submitted;
     response.setHeader("Cache-Control", "no-store");
     stream = openSse(response, () => job.disconnect());
@@ -301,10 +299,15 @@ function continuationRoute(deps: Dependencies) {
     pendingEffects.splice(0).forEach((effect) => effect(stream!));
     try {
       const result = await job.promise;
+      const committed = deps.supervisedWorkflow.commitContinuation?.(parsed.data.token, owner);
+      if (committed === false) throw new Error("Continuation reservation could not be committed.");
       if (stream.isOpen()) sendAssessment(stream, result, deps);
       stream.send("done", { ok: true });
       stream.finish();
-    } catch (error) { if (stream.isOpen()) safeError(stream, error); }
+    } catch (error) {
+      deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
+      if (stream.isOpen()) safeError(stream, error);
+    }
   };
 }
 

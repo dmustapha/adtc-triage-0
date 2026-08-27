@@ -101,7 +101,11 @@ test("startup prewarm initializes MedPsy before requesting embeddings", async ()
     prewarm.indexOf("orchestrator.getMedpsy()") < prewarm.indexOf("orchestrator.getEmbeddings()"),
     "startup must await MedPsy before requesting embeddings",
   );
-  assert.match(prewarm, /server\.once\("close"[\s\S]*removeListener\("unhandledRejection"[\s\S]*removeListener\("uncaughtException"/);
+  assert.doesNotMatch(
+    prewarm,
+    /process\.(?:on|once)\("(?:unhandledRejection|uncaughtException)"/,
+    "fatal process errors must retain Node's non-zero fail-fast behavior instead of serving unknown state",
+  );
 });
 
 test("documented fallback mode does not acquire the optional embeddings runtime", async () => {

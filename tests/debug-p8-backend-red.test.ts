@@ -124,3 +124,35 @@ test("S5: public assistance identity comes from the injected verified runtime id
 
   assert.deepEqual(result.assistance, { ...expectedIdentity, status: "COMPLETED", retrievalMode: "semantic" });
 });
+
+test("N4: an admitted continuation failure releases its reservation for retry", async (t) => {
+  let commits = 0;
+  let releases = 0;
+  const app = createRestoredApp({
+    supervisedWorkflow: {
+      assess: async () => ({ reviewState: "UNAVAILABLE" }),
+      claimContinuation: () => ({ ok: true, token: "retryable" }),
+      continueClaim: async () => { throw new Error("native inference failed"); },
+      commitContinuation: () => { commits += 1; return true; },
+      releaseContinuation: () => { releases += 1; return true; },
+    },
+    promptRunner: { run: async () => ({ status: "UNAVAILABLE", answer: null }) },
+    confirmationStore: { consume: () => ({ ok: false, reason: "NOT_FOUND" }) },
+    projectReferenceActions: () => ({}),
+    inferenceQueue: new InferenceQueue(),
+    sessionOwner: () => "local-owner",
+  } as any);
+  const server = await new Promise<any>((resolve) => {
+    const listener = app.listen(0, "127.0.0.1", () => resolve(listener));
+  });
+  t.after(() => server.close());
+  const response = await fetch(`http://127.0.0.1:${server.address().port}/triage/continue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: "retryable" }),
+  });
+  await response.text();
+
+  assert.equal(commits, 0, "failed work must not consume the continuation");
+  assert.equal(releases, 1, "failed work must make the continuation retryable");
+});

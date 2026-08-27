@@ -228,16 +228,6 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
 export function startServer(port = config.port) {
   loadModelContract();
   modelContractVerified = true;
-  // Last-line defence: a stray async rejection (e.g. a write to a socket that died at the wrong tick)
-  // must never take the whole server down mid-demo. Log and keep serving.
-  const onUnhandledRejection = (reason: unknown) => {
-    process.stderr.write(`[triage-0] unhandledRejection (ignored, server stays up): ${safeErrorName(reason)}\n`);
-  };
-  const onUncaughtException = (err: Error) => {
-    process.stderr.write(`[triage-0] uncaughtException (ignored, server stays up): ${safeErrorName(err)}\n`);
-  };
-  process.on("unhandledRejection", onUnhandledRejection);
-  process.on("uncaughtException", onUncaughtException);
   const server = app.listen(port, "127.0.0.1", () => {
     const addr = server.address();
     const p = typeof addr === "object" && addr ? addr.port : port;
@@ -251,10 +241,6 @@ export function startServer(port = config.port) {
         "Model-assisted reference lookup is unavailable until the WHO corpus is restored and indexed.\n",
       );
     }
-  });
-  server.once("close", () => {
-    process.removeListener("unhandledRejection", onUnhandledRejection);
-    process.removeListener("uncaughtException", onUncaughtException);
   });
   // F5: pre-warm the models + the embed engine's cold first-call so the FIRST triage is not a 30-45s cold
   // start (the demo's biggest latency risk). Best-effort, serialized via the inference lock so it never
