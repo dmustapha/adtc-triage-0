@@ -37,9 +37,69 @@ const frontend = require("../../public/assets/js/triage.js") as {
   unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null; presentationRevision: number | null };
   focusMissingField(field: string): void;
   renderProvisional(data: Record<string, unknown>): void;
+  renderContinuation(data: Record<string, unknown>): void;
+  sendContinuation(): Promise<void>;
   promptState: { runId: number; abortController: AbortController | null };
   clinicalState: { confirmationToken: string | null; continuationToken: string | null; phase: string };
 };
+
+test("retryable continuation admission restores the same grant and visible action", async () => {
+  triageRequests.length = 0;
+  let attempts = 0;
+  requestResponder = async (url) => {
+    assert.equal(url, "/triage/continue");
+    attempts += 1;
+    if (attempts === 1) {
+      return new Response(JSON.stringify({
+        error: "Local inference queue is full.", code: "QUEUE_BUSY", retryable: true,
+      }), { status: 429, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response([
+      'event: provisional\ndata: {"token":"confirmation-after-retry","classification":"COUGH OR COLD","protocol":"IMCI"}',
+      "event: done\ndata: {}",
+    ].join("\n\n") + "\n\n", { status: 200 });
+  };
+  const token = "same-retryable-continuation-token";
+  frontend.renderContinuation({ eligible: true, token });
+
+  await frontend.sendContinuation();
+  const action = page.getElementById("continueAssessment") as HTMLButtonElement;
+  const restoredAfter429 = {
+    token: frontend.clinicalState.continuationToken,
+    actionVisible: !(page.getElementById("continuationRegion") as HTMLElement).classList.contains("hidden"),
+    actionEnabled: !action.disabled,
+  };
+  await frontend.sendContinuation();
+
+  assert.deepEqual(restoredAfter429, { token, actionVisible: true, actionEnabled: true });
+  assert.equal(attempts, 2, "the restored action must submit the same grant again");
+  assert.deepEqual(triageRequests.map(({ init }) => JSON.parse(String(init?.body)).token), [token, token]);
+  assert.equal(frontend.clinicalState.phase, "PROVISIONAL");
+  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
+});
+
+test("nonretryable and used continuation failures remain fail-closed", async () => {
+  const failures = [
+    { status: 503, body: { error: "Restart required.", code: "RESTART_REQUIRED", retryable: false } },
+    { status: 409, body: { error: "Grant already used.", code: "TOKEN_USED", retryable: false } },
+  ];
+  for (const [index, failure] of failures.entries()) {
+    let calls = 0;
+    requestResponder = async () => {
+      calls += 1;
+      return new Response(JSON.stringify(failure.body), {
+        status: failure.status, headers: { "Content-Type": "application/json" },
+      });
+    };
+    frontend.renderContinuation({ eligible: true, token: `fail-closed-${index}` });
+    await frontend.sendContinuation();
+    await frontend.sendContinuation();
+    assert.equal(frontend.clinicalState.continuationToken, null);
+    assert.equal(page.getElementById("continuationRegion")!.classList.contains("hidden"), true);
+    assert.equal(calls, 1, "a terminal grant must not be replayed");
+  }
+  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
+});
 
 function input(): HTMLTextAreaElement {
   return page.getElementById("case") as HTMLTextAreaElement;

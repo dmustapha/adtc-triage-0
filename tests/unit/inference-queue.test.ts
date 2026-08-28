@@ -220,6 +220,94 @@ test("a never-settling timed-out runner fails queued work and exposes restart-re
   assert.equal(await queue.submit("owner", "assist", async () => "recovered").promise, "recovered");
 });
 
+test("active cancellation of a never-settling runner enters recovery after native grace", async () => {
+  const clock = fakeScheduler();
+  const queue = new InferenceQueue({
+    maxPending: 1,
+    nativeCancelGraceMs: 25,
+    schedule: clock.schedule,
+    clearScheduled: clock.clearScheduled,
+  });
+  const active = queue.submit("owner", "triage", () => new Promise<void>(() => {}));
+  const pending = queue.submit("owner", "assist", async () => "must-not-run");
+  pending.promise.catch(() => {});
+
+  await eventually(() => assert.equal(queue.status(active.id, "owner")?.state, "running"));
+  assert.deepEqual(queue.cancel(active.id, "owner"), { ok: true, state: "cancelled" });
+  await assert.rejects(active.promise, JobCancelledError);
+  clock.fireAll();
+
+  assert.equal(queue.recoveryRequired, true, "cancel must arm native-stall grace");
+  await assert.rejects(pending.promise, QueueRecoveryRequiredError);
+  assert.throws(() => queue.submit("owner", "assist", async () => "blocked"), QueueRecoveryRequiredError);
+});
+
+test("active disconnect of a never-settling runner enters recovery after native grace", async () => {
+  const clock = fakeScheduler();
+  const queue = new InferenceQueue({
+    maxPending: 1,
+    nativeCancelGraceMs: 25,
+    schedule: clock.schedule,
+    clearScheduled: clock.clearScheduled,
+  });
+  const active = queue.submit("owner", "assist", () => new Promise<void>(() => {}));
+  const pending = queue.submit("owner", "triage", async () => "must-not-run");
+  pending.promise.catch(() => {});
+
+  await eventually(() => assert.equal(queue.status(active.id, "owner")?.state, "running"));
+  assert.equal(active.disconnect(), true);
+  await assert.rejects(active.promise, JobDisconnectedError);
+  clock.fireAll();
+
+  assert.equal(queue.recoveryRequired, true, "disconnect must arm native-stall grace");
+  await assert.rejects(pending.promise, QueueRecoveryRequiredError);
+  assert.throws(() => queue.submit("owner", "assist", async () => "blocked"), QueueRecoveryRequiredError);
+});
+
+test("abort-aware cancellation settles inside native grace without poisoning the queue", async () => {
+  const clock = fakeScheduler();
+  const queue = new InferenceQueue({
+    maxPending: 1,
+    nativeCancelGraceMs: 25,
+    schedule: clock.schedule,
+    clearScheduled: clock.clearScheduled,
+  });
+  const active = queue.submit("owner", "triage", ({ signal }) => new Promise<void>((resolve) => {
+    signal.addEventListener("abort", () => resolve(), { once: true });
+  }));
+  const pending = queue.submit("owner", "assist", async () => "next");
+
+  await eventually(() => assert.equal(queue.status(active.id, "owner")?.state, "running"));
+  queue.cancel(active.id, "owner");
+  await assert.rejects(active.promise, JobCancelledError);
+  assert.equal(await pending.promise, "next");
+  clock.fireAll();
+  assert.equal(queue.recoveryRequired, false);
+  assert.equal(await queue.submit("owner", "assist", async () => "healthy").promise, "healthy");
+});
+
+test("abort-aware disconnect settles inside native grace without poisoning the queue", async () => {
+  const clock = fakeScheduler();
+  const queue = new InferenceQueue({
+    maxPending: 1,
+    nativeCancelGraceMs: 25,
+    schedule: clock.schedule,
+    clearScheduled: clock.clearScheduled,
+  });
+  const active = queue.submit("owner", "assist", ({ signal }) => new Promise<void>((resolve) => {
+    signal.addEventListener("abort", () => resolve(), { once: true });
+  }));
+  const pending = queue.submit("owner", "triage", async () => "next");
+
+  await eventually(() => assert.equal(queue.status(active.id, "owner")?.state, "running"));
+  active.disconnect();
+  await assert.rejects(active.promise, JobDisconnectedError);
+  assert.equal(await pending.promise, "next");
+  clock.fireAll();
+  assert.equal(queue.recoveryRequired, false);
+  assert.equal(await queue.submit("owner", "triage", async () => "healthy").promise, "healthy");
+});
+
 test("publishes exactly one terminal notification even after late native rejection", async () => {
   const terminals: string[] = [];
   const clock = fakeScheduler();

@@ -39,6 +39,7 @@ const require = createRequire(import.meta.url);
 const frontend = require("../../public/assets/js/triage.js") as {
   runUnified(): Promise<void>;
   handleUnifiedInput(): void;
+  promptState: { retryable: boolean };
 };
 const input = page.getElementById("case") as HTMLTextAreaElement;
 
@@ -151,6 +152,43 @@ test("editing during assist aborts revision N before it can render over revision
   await running;
   assert.equal(wasAborted, true);
   assert.doesNotMatch(page.getElementById("sharedAnswer")?.textContent ?? "", /Stale revision answer/);
+  assistResponder = async () => sseAnswer();
+});
+
+test("a stale non-2xx assist body cannot change the current revision retry contract", async () => {
+  let releaseStale!: () => void;
+  let call = 0;
+  assistResponder = async () => {
+    call += 1;
+    if (call === 1) {
+      return new Promise<Response>((resolve) => {
+        releaseStale = () => resolve(new Response(JSON.stringify({
+          error: "Old queue was busy", code: "QUEUE_BUSY", retryable: true,
+        }), { status: 429, headers: { "Content-Type": "application/json" } }));
+      });
+    }
+    return new Response(JSON.stringify({
+      error: "Current request is not retryable", code: "RESTART_REQUIRED", retryable: false,
+    }), { status: 503, headers: { "Content-Type": "application/json" } });
+  };
+
+  input.value = "Explain the stale request.";
+  frontend.handleUnifiedInput();
+  const stale = frontend.runUnified();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  input.value = "Explain the current request.";
+  frontend.handleUnifiedInput();
+  await frontend.runUnified();
+  const currentStatus = page.getElementById("status")?.textContent;
+  assert.equal(frontend.promptState.retryable, false);
+  assert.equal((page.getElementById("retryPrompt") as HTMLButtonElement).hidden, true);
+
+  releaseStale();
+  await stale;
+  assert.equal(frontend.promptState.retryable, false, "stale JSON must not mutate current retryability");
+  assert.equal((page.getElementById("retryPrompt") as HTMLButtonElement).hidden, true);
+  assert.equal(page.getElementById("status")?.textContent, currentStatus);
   assistResponder = async () => sseAnswer();
 });
 
