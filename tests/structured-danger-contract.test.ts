@@ -108,14 +108,23 @@ test("public documentation describes respiratory continuation and one-use confir
   const readme = await readFile("README.md", "utf8");
   const report = await readFile("REPORT.md", "utf8");
   const api = await readFile("docs/API.md", "utf8");
+  const architecture = await readFile("ARCHITECTURE.md", "utf8").catch(() => null);
 
   assert.match(readme, /POST[^\n]*`\/triage\/continue`/);
+  if (architecture) assert.match(architecture, /\| `POST \/triage\/continue` \|/);
   assert.match(api, /## `POST \/triage\/continue`/);
   assert.match(api, /replay[^\n]*rejected/i);
   assert.doesNotMatch(api, /replay is idempotent/i);
   assert.match(report, /eligible respiratory[^\n]*explicit continuation/i);
   assert.match(report, /complete[^\n]*management plan/i);
   assert.doesNotMatch(report, /management-plan output is suppressed at server and renderer boundaries/i);
+});
+
+test("README labels the current final-head full gate accurately", async () => {
+  const readme = await readFile("README.md", "utf8");
+
+  assert.match(readme, /latest_full_gate-637%2F637-brightgreen/);
+  assert.doesNotMatch(readme, /latest_full_gate-574%2F574/);
 });
 
 async function historicalRunAggregate(): Promise<string> {

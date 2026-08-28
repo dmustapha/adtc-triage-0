@@ -5,7 +5,7 @@ Triage-0 is a local healthcare review tool for trained or supervised community h
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![QVAC SDK](https://img.shields.io/badge/QVAC_SDK-0.13.3-111827)](https://docs.qvac.tether.io/reference/release-notes/v0.13.x/)
-[![Tests](https://img.shields.io/badge/latest_full_gate-574%2F574-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/latest_full_gate-637%2F637-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 This is an offline localhost product. There is no hosted inference service.
