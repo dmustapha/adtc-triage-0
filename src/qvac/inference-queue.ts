@@ -198,7 +198,8 @@ export class InferenceQueue {
     this.#removePending(job);
     job.controller.abort(new JobCancelledError());
     this.#finishPublic(job, "cancelled", new JobCancelledError());
-    if (job !== this.#active) this.#settleNeverStarted(job);
+    if (job === this.#active) this.#armNativeStallWatchdog(job);
+    else this.#settleNeverStarted(job);
     return { ok: true, state: "cancelled" };
   }
 
@@ -289,6 +290,11 @@ export class InferenceQueue {
   }
 
   #armNativeStallWatchdog(job: InternalJob): void {
+    if (job.nativeSettled || this.#active !== job || job.nativeStallTimer !== undefined) return;
+    if (job.deadlineTimer !== undefined) {
+      this.#clearScheduled(job.deadlineTimer);
+      job.deadlineTimer = undefined;
+    }
     job.nativeStallTimer = this.#schedule(() => {
       if (job.nativeSettled || this.#active !== job) return;
       this.#recoveryRequired = true;
@@ -324,7 +330,8 @@ export class InferenceQueue {
     const error = new JobDisconnectedError();
     job.controller.abort(error);
     this.#finishPublic(job, "disconnected", error);
-    if (job !== this.#active) this.#settleNeverStarted(job);
+    if (job === this.#active) this.#armNativeStallWatchdog(job);
+    else this.#settleNeverStarted(job);
     return true;
   }
 

@@ -968,7 +968,10 @@
     if (!response.ok || !response.body) {
       var failure = { error: "Continuation was not accepted." };
       try { failure = await response.json(); } catch (error) {}
-      throw new Error(failure.error);
+      var continuationError = new Error(failure.error);
+      continuationError.code = failure.code;
+      continuationError.retryable = failure.retryable === true;
+      throw continuationError;
     }
     var buffer = "";
     var reader = response.body.getReader();
@@ -990,6 +993,7 @@
     if (!clinicalState.continuationToken || clinicalState.continuationPending || assessCtl) return;
     var token = clinicalState.continuationToken;
     var generation = clinicalState.generation;
+    var retryable = false;
     beginContinuation();
     try {
       var response = await fetch("/triage/continue", {
@@ -999,16 +1003,22 @@
       await consumeContinuation(response, generation);
     } catch (error) {
       if (generation === clinicalState.generation) {
+        retryable = error && error.retryable === true;
+        if (retryable) {
+          clinicalState.continuationToken = token;
+          $("continuationRegion").classList.remove("hidden");
+        }
         $("err").textContent = error && error.name === "AbortError"
           ? "The supervised continuation was stopped. Run the assessment again for a new one-use grant."
-          : "The deterministic respiratory result remains valid. " + (error.message || "Local continuation was unavailable.");
+          : "The deterministic respiratory result remains valid. " + (error.message || "Local continuation was unavailable.")
+            + (error.code ? " (" + error.code + ")" : "");
       }
     } finally {
       stopReasonTimer();
       assessCtl = null;
       if (generation === clinicalState.generation) {
         clinicalState.continuationPending = false;
-        $("continuationRegion").classList.add("hidden");
+        if (!retryable) $("continuationRegion").classList.add("hidden");
         if ($("continueAssessment")) $("continueAssessment").disabled = false;
       }
     }
@@ -1482,10 +1492,13 @@
     if (!response.ok) {
       var failure = { error: "Local prompt request was not accepted.", code: "REQUEST_REJECTED", retryable: false };
       try { failure = await response.json(); } catch (error) {}
-      promptState.retryable = failure.retryable !== false;
+      if (runId === promptState.runId) promptState.retryable = failure.retryable !== false;
       throw new Error(failure.error + (failure.code ? " (" + failure.code + ")" : ""));
     }
-    if (!response.body) { promptState.retryable = true; throw new Error("The local prompt response had no readable stream."); }
+    if (!response.body) {
+      if (runId === promptState.runId) promptState.retryable = true;
+      throw new Error("The local prompt response had no readable stream.");
+    }
     var buffer = "";
     var reader = response.body.getReader();
     var decoder = new TextDecoder();
