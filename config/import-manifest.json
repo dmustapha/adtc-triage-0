@@ -779,10 +779,10 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "492e80cdb6bdd1019217219f47aa27d9ae2b4392f051f5674448246515830571",
+      "destinationSha256": "24d5157224701840c5bb6a12026e8f87fa6dcbca5a79593cef6f993f657f0091",
       "modification": {
         "status": "modified",
-        "reason": "Kept canonical health identity coverage and changed the real model-backed hero loop to require a narrowed assessment payload with no public classification, plan, or clinical instructions."
+        "reason": "Kept canonical health identity coverage, changed the real model-backed hero loop to require a narrowed assessment payload with no public classification, plan, or clinical instructions, and bound its fixture to the same explicit IPv4 loopback address used by its requests."
       }
     },
     {

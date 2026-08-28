@@ -18,17 +18,21 @@ const { chunkCount } = await import("../../src/rag/store.js");
 
 const skip = chunkCount() > 0 ? false : "store not ingested";
 
-let server: { address(): { port: number } | string | null; close(): void };
+let server: {
+  address(): { address: string; family: string; port: number } | string | null;
+  close(callback?: () => void): void;
+};
 let base = "";
 before(async () => {
   await new Promise<void>((resolveReady) => {
-    server = app.listen(0, () => resolveReady()) as never;
+    server = app.listen(0, "127.0.0.1", () => resolveReady()) as never;
   });
-  const addr = (server as { address(): { port: number } }).address();
+  const addr = server.address();
+  assert.equal(typeof addr === "object" && addr ? addr.address : null, "127.0.0.1");
   base = `http://127.0.0.1:${typeof addr === "object" && addr ? addr.port : 0}`;
 });
 after(async () => {
-  if (server) server.close();
+  if (server) await new Promise<void>((resolveClosed) => server.close(resolveClosed));
   await orchestrator.shutdown();
   rmSync(process.env.TRIAGE0_PERF_DIR!, { recursive: true, force: true });
 });
