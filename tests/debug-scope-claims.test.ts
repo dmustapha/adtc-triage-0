@@ -63,8 +63,10 @@ test("debug: current report keeps any classification explicitly provisional and 
     assert.match(report, /supervised|human confirm/i);
   }
   assert.match(report, /Playwright assertions[^.]*58\/58[^.]*desktop[^.]*375[^.]*320/i);
-  assert.match(readme, /confirmed pneumonia at 375 by 812/i);
-  assert.match(readme, /320-pixel[^.]*not a retained PNG/i);
+  assert.match(readme, /docs\/images\/unified-shell-mobile\.png/);
+  assert.match(readme, /docs\/images\/confirmed-who-plan\.png/);
+  assert.match(readme, /desktop, 375-by-812 and 320-pixel viewports/i);
+  assert.doesNotMatch(readme, /320-pixel[^.]*not a retained PNG/i);
   assert.doesNotMatch(
     `${readme}\n${report}`,
     /(?:screenshots?|PNGs?)[^.\n]*(?:exact[- ]prompt|queue|cancel|retry|320-pixel UAT)/i,

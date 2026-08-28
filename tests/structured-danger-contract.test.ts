@@ -123,8 +123,34 @@ test("public documentation describes respiratory continuation and one-use confir
 test("README labels the current final-head full gate accurately", async () => {
   const readme = await readFile("README.md", "utf8");
 
-  assert.match(readme, /latest_full_gate-637%2F637-brightgreen/);
+  assert.match(readme, /latest_full_gate-639%2F639-brightgreen/);
   assert.doesNotMatch(readme, /latest_full_gate-574%2F574/);
+});
+
+test("README gives any tester an immediate complete workflow and exact submitted checks", async () => {
+  const readme = await readFile("README.md", "utf8");
+  const metadata = JSON.parse(await readFile("metadata.json", "utf8"));
+  const testStart = readme.indexOf("## Test Triage-0 locally");
+  const productStart = readme.indexOf("## What is Triage-0?");
+  assert.ok(testStart > 0 && testStart < productStart, "tester path must precede product architecture");
+  const testerPath = readme.slice(testStart, productStart);
+
+  assert.match(testerPath, /### Complete clinical workflow/);
+  assert.match(testerPath, /### Submitted safety and governance checks/);
+  assert.equal(testerPath.match(/<details>/g)?.length, 2);
+  for (const { prompt } of metadata.test_prompts) {
+    assert.ok(testerPath.includes(`\`\`\`text\n${prompt}\n\`\`\``), "README must provide the exact submitted prompt bytes");
+  }
+  assert.match(testerPath, /15 to 30 minutes/);
+  assert.match(testerPath, /1\.28 GB/);
+  assert.match(testerPath, /`\/health`/);
+  assert.match(testerPath, /994/);
+  assert.match(testerPath, /strict[^\n]*egress/i);
+  assert.match(testerPath, /explicit continuation/i);
+  assert.match(testerPath, /human confirmation/i);
+  assert.match(readme, /docs\/images\/unified-shell-mobile\.png/);
+  assert.match(readme, /docs\/images\/confirmed-who-plan\.png/);
+  assert.doesNotMatch(readme, /574 tests passed/);
 });
 
 async function historicalRunAggregate(): Promise<string> {
