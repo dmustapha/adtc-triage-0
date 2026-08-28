@@ -356,7 +356,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "c0fc0f8d1aca80c473e75d3b5dbb46f4d981cc229288e256237928fac3417f0a",
+      "destinationSha256": "5e24a40de0cb47cd1b76e50e9dba5294779abe735f3d42ed9d88c4616ea39d30",
       "modification": {
         "status": "modified",
         "reason": "Added semantic internal routing for general versus explicit clinical input, one-revision ambiguity clarification, structured review before /triage, shared /assist and clinical result ownership, and truthful cancellation, readiness, and provenance states without exact-prompt branching."
