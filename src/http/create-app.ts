@@ -34,6 +34,13 @@ const JobId = z.string().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/);
 
 type Dependencies = {
   supervisedWorkflow: {
+    guide?(input: unknown, options: {
+      owner: string;
+      signal?: AbortSignal;
+      onStage?: (s: unknown) => void;
+      onCitation?: (c: unknown) => void;
+      onFirstToken?: () => void;
+    }): Promise<{ card: any; classification: string; retrieval: string }>;
     assess(input: unknown, options: {
       owner: string;
       signal?: AbortSignal;
@@ -426,6 +433,51 @@ function confirmationRoute(deps: Dependencies) {
   };
 }
 
+function sendGuide(stream: SseStream, result: { card: any; classification: string }, deps: Dependencies): void {
+  const { plan, ...cardNoPlan } = result.card ?? {};
+  stream.send("card", {
+    card: { ...cardNoPlan, translated: false, source_language: "en" },
+    classification: result.classification,
+    perf: deps.performance?.() ?? null,
+  });
+  if (result.card?.severity && result.card.severity !== "UNKNOWN" && plan) {
+    stream.send("plan", { plan });
+  }
+}
+
+function guideRoute(deps: Dependencies) {
+  return async (request: Request, response: Response): Promise<void> => {
+    const validationError = clinicalValidationError(request.body);
+    if (validationError) { response.status(400).json({ error: validationError }); return; }
+    const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
+    const deferred = deferredStream();
+    const startedAt = Date.now();
+    let job;
+    try {
+      job = deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.guide!(request.body, {
+        owner,
+        signal: context.signal,
+        onStage: (s) => context.publish(() => deferred.publish((st) => st.send("stage", s))),
+        onCitation: (c) => context.publish(() => deferred.publish((st) => st.send("citation", c))),
+        onFirstToken: () => context.publish(() => deferred.publish((st) => st.send("first_token", { ttftMs: Date.now() - startedAt }))),
+      }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Clinical guidance" });
+    } catch (error) {
+      if (!queueFailure(response, error)) response.status(503).json({ error: "Local guidance could not be admitted.", code: "INFERENCE_FAILED", retryable: false });
+      return;
+    }
+    const stream = openSse(response, () => job.disconnect());
+    stream.send("job", { id: job.id, position: job.position });
+    stream.send("stage", { key: job.position ? "queued" : "assess", label: job.position ? "Queued for local inference" : "Reviewing the case" });
+    deferred.attach(stream);
+    try {
+      const result = await job.promise;
+      if (stream.isOpen()) sendGuide(stream, result, deps);
+      stream.send("done", { ok: true });
+      stream.finish();
+    } catch (error) { if (stream.isOpen()) safeError(stream, error); }
+  };
+}
+
 function methodNotAllowed(allow: string) {
   return (_request: Request, response: Response): void => {
     response.setHeader("Allow", allow);
@@ -451,7 +503,7 @@ export function createRestoredApp(deps: Dependencies) {
 }
 
 export function registerRestoredRoutes(app: express.Express, deps: Dependencies): void {
-  app.post("/triage", triageRoute(deps));
+  app.post("/triage", guideRoute(deps));
   app.all("/triage", methodNotAllowed("POST"));
   app.post("/triage/continue", continuationRoute(deps));
   app.all("/triage/continue", methodNotAllowed("POST"));
