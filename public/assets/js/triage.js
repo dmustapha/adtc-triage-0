@@ -14,7 +14,6 @@
   // Inline SVG icons (no emoji in a clinical tool). Decorative: aria-hidden so screen
   // readers skip the path noise; the surrounding text carries the meaning.
   var ICON = {
-    speaker: '<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>',
     guide: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h7M9 13h7M9 17h4"/></svg>',
     alert: '<svg aria-hidden="true" class="sev-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 8v5M12 16.5v.5"/><path d="M10.3 3.8 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/></svg>',
     check: '<svg aria-hidden="true" class="sev-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
@@ -303,7 +302,7 @@
       renderCard(d.card);
     } else if (ev === "error") {
       gotTerminal = true;
-      if ($("err")) $("err").textContent = d.error;
+      if ($("err")) $("err").textContent = d.reason || d.error || "The guidance could not be completed. Try again.";
       if ($("reasoningWrap")) $("reasoningWrap").classList.add("hidden");
     }
   }
