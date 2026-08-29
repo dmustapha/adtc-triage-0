@@ -4,6 +4,7 @@ import {
   evaluateDangerPolicy,
   normalizeDangerObservations,
   normalizePatientAge,
+  type DangerObservationKey,
 } from "./danger-observations.js";
 import { canonicalClinicalRecord, clinicalRecordHash, findNarrativeConflicts, parseClinicalRequest } from "./clinical-record.js";
 import { lookupProtocol, docFor, type ProtocolEntry } from "./protocol-table.js";
@@ -15,6 +16,7 @@ import type { ClinicalAssessmentRequest } from "./schema.js";
 import type { SearchHit } from "../rag/store.js";
 import type { TriageContext, TriageOptions, TriageResult } from "./triage.js";
 import { readModelIdentity } from "../model-contract.js";
+import { extractNarrativeAuthority } from "./narrative-authority.js";
 
 type GroundingResult = {
   groundedHits: SearchHit[];
@@ -183,6 +185,14 @@ function deterministicWithContinuation(
     };
   }
   return result;
+}
+
+/** Emergency danger-sign keys EXPLICITLY present in the free-text narrative (deterministic, no model).
+ *  Mirrors the original Triage-0 danger-sign gate but sourced from the narrative — preserves the
+ *  "confirmed emergency invokes no model" boundary without a structured checklist. */
+export function narrativeEmergencyKeys(caseText: string): DangerObservationKey[] {
+  const authority = extractNarrativeAuthority(caseText);
+  return EMERGENCY_OBSERVATION_KEYS.filter((key) => authority.dangerObservations[key] === "PRESENT");
 }
 
 function provisional(
