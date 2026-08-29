@@ -2,6 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+// @ts-expect-error - jsdom ships no bundled types; matches the existing frontend test harness.
 import { JSDOM } from "jsdom";
 
 const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
