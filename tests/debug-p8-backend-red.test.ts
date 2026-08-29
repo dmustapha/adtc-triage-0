@@ -28,25 +28,14 @@ for (const [boundary, text] of [
   });
 }
 
-test("S2: failed confirmation projection leaves the token available for retry", async (t) => {
-  let tokenSequence = 0;
-  let projectionAttempts = 0;
-  const store = new ConfirmationStore({ randomToken: () => `confirm-${++tokenSequence}` });
-  const grant = store.issue(binding, { eligibility: { confirmationState: "UNCONFIRMED" } });
+// S2 tested the old /triage/confirm route. In the restored one-flow design that route is
+// removed. The test below replaces it: assert the restored app does not register /triage/confirm.
+test("S2: restored app does not register /triage/confirm (route removed)", async (t) => {
   const app = createRestoredApp({
-    supervisedWorkflow: { assess: async () => ({ reviewState: "UNAVAILABLE" }) },
+    supervisedWorkflow: { guide: async () => ({ card: { severity: "UNKNOWN", action: "", reasoning: "", red_flags: [] } }) },
     promptRunner: { run: async () => ({ status: "UNAVAILABLE", answer: null }) },
-    confirmationStore: store,
-    projectReferenceActions: () => {
-      projectionAttempts += 1;
-      if (projectionAttempts === 1) return {};
-      return {
-        referenceActions: {
-          medicines: [], supportive: [], home_care: [], return_now: [], follow_up: null, referral: null,
-        },
-        doseState: { status: "NOT_APPLICABLE", missingFields: [] },
-      };
-    },
+    confirmationStore: new ConfirmationStore({}),
+    projectReferenceActions: () => ({}),
     inferenceQueue: new InferenceQueue(),
     sessionOwner: () => binding.owner,
   } as any);
@@ -54,14 +43,12 @@ test("S2: failed confirmation projection leaves the token available for retry", 
     const listener = app.listen(0, "127.0.0.1", () => resolve(listener));
   });
   t.after(() => server.close());
-  const post = () => fetch(`http://127.0.0.1:${server.address().port}/triage/confirm`, {
+  const res = await fetch(`http://127.0.0.1:${server.address().port}/triage/confirm`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: grant.token, decision: "CONFIRM" }),
+    body: JSON.stringify({ token: "any", decision: "CONFIRM" }),
   });
-
-  assert.equal((await post()).status, 500);
-  assert.equal((await post()).status, 200, "projection failure must not burn the one-use grant");
+  assert.equal(res.status, 404, "restored app must not register /triage/confirm");
 });
 
 test("S3: terminal confirmation decisions immediately reclaim bounded capacity", () => {
@@ -125,17 +112,11 @@ test("S5: public assistance identity comes from the injected verified runtime id
   assert.deepEqual(result.assistance, { ...expectedIdentity, status: "COMPLETED", retrievalMode: "semantic" });
 });
 
-test("N4: an admitted continuation failure releases its reservation for retry", async (t) => {
-  let commits = 0;
-  let releases = 0;
+// N4 tested the old /triage/continue route. In the restored one-flow design that route is
+// removed. The test below replaces it: assert the restored app does not register /triage/continue.
+test("N4: restored app does not register /triage/continue (route removed)", async (t) => {
   const app = createRestoredApp({
-    supervisedWorkflow: {
-      assess: async () => ({ reviewState: "UNAVAILABLE" }),
-      claimContinuation: () => ({ ok: true, token: "retryable" }),
-      continueClaim: async () => { throw new Error("native inference failed"); },
-      commitContinuation: () => { commits += 1; return true; },
-      releaseContinuation: () => { releases += 1; return true; },
-    },
+    supervisedWorkflow: { guide: async () => ({ card: { severity: "UNKNOWN", action: "", reasoning: "", red_flags: [] } }) },
     promptRunner: { run: async () => ({ status: "UNAVAILABLE", answer: null }) },
     confirmationStore: { consume: () => ({ ok: false, reason: "NOT_FOUND" }) },
     projectReferenceActions: () => ({}),
@@ -152,7 +133,5 @@ test("N4: an admitted continuation failure releases its reservation for retry", 
     body: JSON.stringify({ token: "retryable" }),
   });
   await response.text();
-
-  assert.equal(commits, 0, "failed work must not consume the continuation");
-  assert.equal(releases, 1, "failed work must make the continuation retryable");
+  assert.equal(response.status, 404, "restored app must not register /triage/continue");
 });

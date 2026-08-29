@@ -57,7 +57,7 @@
           (eg.strict ? " &middot; egress blocked (strict)" : "") + "</span>"
         );
       }
-      if (h.medpsy) {
+      if (eg.armed && h.medpsy) {
         chips.push('<span class="od-chip">' + ICON.chip + "MedPsy " + esc(String(h.medpsy).toUpperCase()) + " &middot; runs on this Mac</span>");
       }
       if (chips.length) { proof.innerHTML = chips.join(""); proof.hidden = false; }

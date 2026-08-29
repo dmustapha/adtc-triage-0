@@ -120,7 +120,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "51a4a55253db6bd38707d0798cf28bb7401a2db51094af7b3a1a96324f768bfc",
+      "destinationSha256": "1b98875ce1d5e11226dfc2d9d89ea8f25da876abd730ae5087029fc28d92ed85",
       "modification": {
         "status": "modified",
         "reason": "Restored one unified textarea, one Get guidance action, and one shared result region; removed visible assessment and model modes plus submitted-prompt shortcuts; preserved manual paste of the exact two Gate 1 prompts."
@@ -356,10 +356,10 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "5e24a40de0cb47cd1b76e50e9dba5294779abe735f3d42ed9d88c4616ea39d30",
+      "destinationSha256": "ed4866ac30074d0c89ef07ccfedb99ae691a6cbbca906339adfaaf00a7eb8b6b",
       "modification": {
         "status": "modified",
-        "reason": "Added semantic internal routing for general versus explicit clinical input, one-revision ambiguity clarification, structured review before /triage, shared /assist and clinical result ownership, and truthful cancellation, readiness, and provenance states without exact-prompt branching."
+        "reason": "Added semantic internal routing for general versus explicit clinical input, one-revision ambiguity clarification, structured review before /triage, shared /assist and clinical result ownership, and truthful cancellation, readiness, and provenance states without exact-prompt branching. Egress guard gates on-device proof chip display: medpsy chip only shown when eg.armed is true, preventing premature proof claims."
       }
     },
     {
@@ -634,10 +634,10 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "7111086ab37b5d34082c16533043777ac4bf6ffd0dd8f663bf68c843b276da01",
+      "destinationSha256": "08324d8477e4805439ac34923e14c003d7acee665c874e17b31aeb0e5af6c335",
       "modification": {
         "status": "modified",
-        "reason": "Made deterministic respiratory policy the sole public result authority; exposed only neutral assessment fields plus model/runtime/retrieval provenance; kept raw retrieval and classifier output private; made model initialization sequential; rejected record conflicts; and preserved exact method/readiness contracts."
+        "reason": "Made deterministic respiratory policy the sole public result authority; exposed only neutral assessment fields plus model/runtime/retrieval provenance; kept raw retrieval and classifier output private; made model initialization sequential; rejected record conflicts; and preserved exact method/readiness contracts. Removed unused TRIAGE_TIMEOUT_MS constant (one-flow guide() path has no confirm step requiring a dedicated timeout)."
       }
     },
     {
@@ -705,7 +705,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "59a002ab151a642d8f52c256799079e8013755b8afbc29fb7b1d71dd12baf233",
+      "destinationSha256": "805ddc9fac33179f847806a8fd5fcaa71bd0182d639518692ade5b2ebf9ca29c",
       "modification": {
         "status": "modified",
         "reason": "Preserved English QVAC routing and grounding while adding deterministic structured-danger cards, observable runtime boundaries, authoritative structured severity input, and structured-only visible red_flags."
@@ -909,7 +909,7 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "36f3142512f0ad82194b36ac0264025d7bb881430cae680e383d986d31b5615a",
+      "destinationSha256": "263a73e64abd9c7c895d6721b50ff11ee35ef96d618b3ddd706d08fa2d0c0bbf",
       "modification": {
         "status": "modified",
         "reason": "Defined one-input and no-visible-mode shell, manual prompt paste, shared general and clinical result ownership, structured review, keyboard accessibility, cancellation behavior, evidence provenance, readiness, and mobile touch-target regressions."

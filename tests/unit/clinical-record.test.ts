@@ -168,43 +168,10 @@ test("backend narrative authority ignores non-assertions and reports internal co
   }
 });
 
-test("client and server narrative authority agree across the bounded 20-row corpus", async () => {
-  const client = require("../../public/assets/js/unified-input.js") as { extractClinicalCandidate(text: string): any };
-  const { extractNarrativeAuthority } = await import("../../src/triage/narrative-authority.js");
-  const fields = [
-    ["cannotDrinkOrBreastfeed", "Cannot drink or breastfeed"],
-    ["vomitsEverything", "Vomits everything"],
-    ["convulsions", "Convulsions"],
-    ["lethargicOrUnconscious", "Lethargic or unconscious"],
-    ["chestIndrawing", "Chest indrawing"],
-    ["stridorWhenCalm", "Stridor when calm"],
-    ["lowOxygenOrCentralCyanosis", "Low oxygen or central cyanosis"],
-    ["respiratoryConcern", "Cough or difficult breathing"],
-  ] as const;
-  const rows: Array<[string, string, string]> = fields.flatMap(([field, label]) => [
-    [field, `Worker documented ${label} as absent.`, "ABSENT"],
-    [field, `Worker recorded ${label} as present.`, "PRESENT"],
-  ]);
-  rows.push(
-    ["cannotDrinkOrBreastfeed", "All seven observations absent.", "ABSENT"],
-    ["convulsions", "All seven observations absent. Convulsions are present.", "CONFLICT"],
-    ["chestIndrawing", "Possible chest indrawing.", "NOT_ASSESSED"],
-    ["respiratoryConcern", "Cough absent but difficult breathing present.", "CONFLICT"],
-  );
-  assert.equal(rows.length, 20);
-
-  for (const [field, narrative, expected] of rows) {
-    const clientDraft = client.extractClinicalCandidate(narrative);
-    const clientConflict = clientDraft.conflicts.includes(field === "respiratoryConcern" ? field : `dangerObservations.${field}`);
-    const clientValue = clientConflict ? "CONFLICT" : field === "respiratoryConcern"
-      ? clientDraft.respiratoryConcern : clientDraft.dangerObservations[field];
-    const serverDraft = extractNarrativeAuthority(narrative);
-    const serverValue = field === "respiratoryConcern"
-      ? serverDraft.respiratoryConcern : serverDraft.dangerObservations[field as keyof typeof serverDraft.dangerObservations];
-    assert.equal(clientValue, expected, `client: ${narrative}`);
-    assert.equal(serverValue, expected, `server: ${narrative}`);
-  }
-});
+// The "client and server narrative authority" cross-check test was removed in Task 6.
+// extractClinicalCandidate no longer exists in unified-input.js; structured-observation
+// drafting was removed from the browser module. Server-side narrative authority is
+// covered by its own test suite in narrative-authority.test.ts.
 
 test("explicit narrative authority conflicts with reviewed not-assessed structure", async () => {
   const { parseClinicalRequest, canonicalClinicalRecord, findNarrativeConflicts } = await import("../../src/triage/clinical-record.js");

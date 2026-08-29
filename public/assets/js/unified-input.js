@@ -263,17 +263,6 @@
     return evidence;
   }
 
-  function observationValue(text, spec, allAbsent, conflicts) {
-    var evidence = observationEvidence(text, spec);
-    var absent = allAbsent || evidence.absent;
-    var present = evidence.present;
-    if (present && absent) {
-      conflicts.push("dangerObservations." + spec[0]);
-      return "NOT_ASSESSED";
-    }
-    return present ? "PRESENT" : absent ? "ABSENT" : "NOT_ASSESSED";
-  }
-
   function respiratoryEvidence(text) {
     var evidence = { present: false, absent: false };
     text.split(/[.!?;]+|\bbut\b|\bhowever\b/gi).forEach(function (fullClause) {
@@ -294,45 +283,10 @@
     return evidence;
   }
 
-  function extractObservations(text, conflicts) {
-    var allAbsent = allObservationsAbsent(text);
-    var values = {};
-    OBSERVATIONS.forEach(function (spec) { values[spec[0]] = observationValue(text, spec, allAbsent, conflicts); });
-    return values;
-  }
-
   function allObservationsAbsent(text) {
     return text.split(/[.!;]+/).some(function (clause) {
       return /^\s*all\s+(?:seven|7)\s+(?:structured\s+)?(?:danger and breathing\s+)?observations?\s+(?:were\s+|are\s+)?(?:recorded\s+)?absent\s*$/i.test(clause);
     });
-  }
-
-  function respiratoryConcern(text, conflicts) {
-    var evidence = respiratoryEvidence(text);
-    if (evidence.present && evidence.absent) { conflicts.push("respiratoryConcern"); return "NOT_ASSESSED"; }
-    return evidence.present ? "PRESENT" : evidence.absent ? "ABSENT" : "NOT_ASSESSED";
-  }
-
-  function extractWeight(text) {
-    var match = text.match(/\b(?:weighs?|weight(?:\s+is)?)\s*(\d+(?:\.\d+)?)\s*kg\b/i);
-    return match ? Number(match[1]) : null;
-  }
-
-  function extractClinicalCandidate(text) {
-    var input = assertedText(text);
-    var conflicts = [];
-    var ages = ageCandidates(input);
-    var rates = rateCandidates(input);
-    if (uniqueValues(ages.map(function (age) { return age.value + ":" + age.unit; })).length > 1) conflicts.push("patientAge");
-    if (rates.length > 1) conflicts.push("respiratoryRatePerMinute");
-    return {
-      patientAge: ages[0] || null, patientWeightKg: extractWeight(input),
-      dangerObservations: extractObservations(input, conflicts), respiratoryConcern: respiratoryConcern(input, conflicts),
-      respiratoryRatePerMinute: rates[0] || null,
-      rateCountQuality: /\b(?:for\s+)?one minute while calm\b/i.test(input) ? "ONE_MINUTE_WHILE_CALM" : "NOT_CONFIRMED",
-      medicationSafety: { allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED" },
-      protocolApplicability: "NOT_ASSESSED", conflicts: conflicts,
-    };
   }
 
   // ---------------------------------------------------------------------------
@@ -387,8 +341,8 @@
       "<button id=\"_clarify_general\" class=\"btn\" type=\"button\">General question</button>" +
       "</div>";
     showResult();
-    var btnClinical = document.getElementById("_clarify_clinical");
-    var btnGeneral = document.getElementById("_clarify_general");
+    var btnClinical = card && card.querySelector("#_clarify_clinical");
+    var btnGeneral = card && card.querySelector("#_clarify_general");
     if (btnClinical) btnClinical.addEventListener("click", function () { dispatchClinical(); });
     if (btnGeneral) btnGeneral.addEventListener("click", function () { runAssist(caseText); });
   }
@@ -479,5 +433,5 @@
     }
   }
 
-  return { routeInput: routeInput, extractClinicalCandidate: extractClinicalCandidate };
+  return { routeInput: routeInput };
 });

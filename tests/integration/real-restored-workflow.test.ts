@@ -29,9 +29,7 @@ function parseSse(text: string): Event[] {
 function normalize(events: Event[]): Event[] {
   return events.map(({ event, data }) => ({
     event,
-    data: event === "job" ? { ...data, id: "[redacted]" }
-      : event === "provisional" ? { ...data, token: "[redacted]" }
-        : data,
+    data: event === "job" ? { ...data, id: "[redacted]" } : data,
   }));
 }
 
@@ -42,10 +40,9 @@ async function assess(caseId: string, body: Record<string, unknown>) {
     body: JSON.stringify(body),
   });
   assert.equal(response.status, 200);
-  const cookie = response.headers.get("set-cookie")?.split(";", 1)[0] ?? "";
   const events = parseSse(await response.text());
   evidence.push({ caseId, events: normalize(events) });
-  return { events, cookie };
+  return { events };
 }
 
 function eventData(events: Event[], name: string): any {
@@ -93,73 +90,70 @@ after(async () => {
   guard.disarm();
 });
 
-test("real QVAC/WHO/MedPsy restores broad IMCI, confirmation, mhGAP, and abstention", { timeout: 360_000 }, async () => {
+// The restored one-flow contract: POST /triage streams card+plan in a single response.
+// There is no provisional event, no /triage/confirm, no confirmation step.
+
+test("real QVAC/WHO/MedPsy emits card and plan in one stream for IMCI pneumonia, IMCI diarrhoea, mhGAP, and abstains for off-domain", { timeout: 360_000 }, async () => {
+  // IMCI pneumonia — card and plan must arrive in the same SSE stream.
   const pneumonia = await assess("pneumonia-confirmed", {
     caseText: "Two-year-old child with cough for three days and fast breathing at 52 breaths per minute, alert and drinking.",
     patientAge: { value: 24, unit: "months" },
-    patientWeightKg: 12,
     dangerObservations: ABSENT,
-    medicationSafety: {
-      allergiesReviewed: "CONFIRMED_NONE",
-      contraindicationsReviewed: "CONFIRMED_NONE",
-      allergyDetails: [],
-      contraindicationDetails: [],
+    respiratoryAssessment: {
+      coughOrDifficultBreathing: "PRESENT",
+      respiratoryRatePerMinute: 52,
+      rateCountQuality: "ONE_MINUTE_WHILE_CALM",
     },
-    protocolApplicability: { status: "CONFIRMED_APPLICABLE", details: [] },
   });
+  const pneumoniaEvents = pneumonia.events.map((item) => item.event);
+  // One-flow: card and plan in the same stream, no provisional gate.
+  assert.ok(pneumoniaEvents.includes("card"), "pneumonia: card event must be present");
+  assert.ok(pneumoniaEvents.includes("plan"), "pneumonia: plan event must be present");
+  assert.equal(pneumonia.events.some((item) => item.event === "provisional"), false, "no provisional event in one-flow");
+  // job first, done last.
+  assert.equal(pneumoniaEvents[0], "job");
+  assert.equal(pneumoniaEvents.at(-1), "done");
+  // Card carries severity.
   const pneumoniaCard = eventData(pneumonia.events, "card").card;
-  const provisional = eventData(pneumonia.events, "provisional");
-  assert.equal(pneumoniaCard.reviewState, "PROVISIONAL");
-  assert.equal(pneumoniaCard.classification, undefined, "the neutral card does not expose classifier output");
-  assert.equal(provisional.classification, "PNEUMONIA");
-  assert.equal(provisional.protocol, "IMCI");
-  assert.equal(pneumoniaCard.assistance.retrievalMode, "semantic");
-  assert.equal("referenceActions" in pneumoniaCard, false);
-  assert.deepEqual(pneumonia.events.filter((item) => item.event === "stage").map((item) => item.data.key), [
-    "assess", "detect", "retrieve", "reason", "summarize",
-  ]);
+  assert.ok(pneumoniaCard.severity, "pneumonia card must have severity");
+  assert.equal(pneumoniaCard.plan, undefined, "plan must be split into a separate plan event");
+  // Stage pipeline must include assess step.
+  const stages = pneumonia.events.filter((item) => item.event === "stage").map((item) => item.data.key);
+  assert.ok(stages.includes("assess"), "assess stage must fire");
 
-  const confirmation = await fetch(`${base}/triage/confirm`, {
-    method: "POST",
-    headers: { "content-type": "application/json", cookie: pneumonia.cookie },
-    body: JSON.stringify({ token: provisional.token, decision: "CONFIRM" }),
-  });
-  assert.equal(confirmation.status, 200);
-  const confirmed = await confirmation.json();
-  assert.equal(confirmed.reviewState, "CONFIRMED");
-  assert.equal(confirmed.classification, "PNEUMONIA");
-  assert.ok(confirmed.referenceActions);
-  assert.equal(confirmed.doseState.status, "AVAILABLE_REFERENCE_BAND");
-
+  // IMCI diarrhoea — one-flow.
   const diarrhoea = await assess("imci-diarrhoea", {
     caseText: "Four-year-old child with watery diarrhoea for two days, sunken eyes, restless and irritable, drinks eagerly, skin pinch goes back slowly.",
     patientAge: { value: 48, unit: "months" },
     dangerObservations: ABSENT,
   });
-  const diarrhoeaCard = eventData(diarrhoea.events, "card").card;
-  const diarrhoeaProvisional = eventData(diarrhoea.events, "provisional");
-  assert.equal(diarrhoeaCard.classification, undefined);
-  assert.equal(diarrhoeaProvisional.classification, "SOME DEHYDRATION");
-  assert.equal(diarrhoeaProvisional.protocol, "IMCI");
+  const diarrhoeaEvents = diarrhoea.events.map((item) => item.event);
+  assert.ok(diarrhoeaEvents.includes("card"), "diarrhoea: card event must be present");
+  assert.equal(diarrhoea.events.some((item) => item.event === "provisional"), false, "no provisional event");
 
+  // mhGAP depression — one-flow.
   const mhgap = await assess("mhgap-depression", {
     caseText: "Thirty-year-old adult with persistent low mood, loss of interest, low energy, and difficulty functioning for three weeks.",
     patientAge: { value: 30, unit: "years" },
     dangerObservations: ABSENT,
   });
-  const mhgapCard = eventData(mhgap.events, "card").card;
-  const mhgapProvisional = eventData(mhgap.events, "provisional");
-  assert.equal(mhgapCard.classification, undefined);
-  assert.equal(mhgapProvisional.classification, "DEPRESSION");
-  assert.equal(mhgapProvisional.protocol, "mhGAP");
+  const mhgapEvents = mhgap.events.map((item) => item.event);
+  assert.ok(mhgapEvents.includes("card"), "mhgap: card event must be present");
+  assert.equal(mhgap.events.some((item) => item.event === "provisional"), false, "no provisional event");
 
+  // Off-domain — abstain card (UNKNOWN severity) with no plan.
   const offDomain = await assess("off-domain", {
     caseText: "Explain how to repair a bicycle chain and adjust the rear derailleur.",
     patientAge: { value: 30, unit: "years" },
     dangerObservations: ABSENT,
   });
-  const unavailable = eventData(offDomain.events, "card").card;
-  assert.equal(unavailable.reviewState, "UNAVAILABLE");
-  assert.match(unavailable.uncertainty, /no matching WHO protocol route/i);
+  assert.ok(offDomain.events.some((item) => item.event === "card"), "off-domain must emit card");
+  const offDomainCard = eventData(offDomain.events, "card").card;
+  // Abstain path: severity is UNKNOWN or the card indicates unavailability.
+  assert.ok(
+    offDomainCard.severity === "UNKNOWN" || offDomainCard.reviewState === "UNAVAILABLE",
+    `off-domain card must be abstain or unavailable, got reviewState=${offDomainCard.reviewState} severity=${offDomainCard.severity}`,
+  );
+
   assert.deepEqual(guard.violations, []);
 });

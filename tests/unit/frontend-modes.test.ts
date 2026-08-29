@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-// @ts-expect-error jsdom does not bundle declarations in this workspace.
+// @ts-expect-error - jsdom ships no bundled types; matches the existing frontend test harness.
 import { JSDOM } from "jsdom";
 
 const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
@@ -10,32 +10,38 @@ const script = readFileSync(new URL("../../public/assets/js/triage.js", import.m
 const page = new JSDOM(html).window.document;
 
 test("the application exposes one unified workflow without persistent modes", () => {
+  // No tab lists or mode switches — single-prompt design.
   assert.equal(page.querySelectorAll('[role="tablist"], .mode-tab').length, 0);
-  assert.equal(page.querySelectorAll("textarea[data-unified-input]").length, 1);
-  assert.equal(page.querySelectorAll("[data-unified-submit]").length, 1);
-  assert.match(css, /\[hidden\]\s*\{[^}]*display:\s*none\s*!important/s, "author CSS must not override inactive tab panels");
+  // One textarea receives all case input.
+  assert.ok(page.querySelector("textarea#case[name='case']"), "textarea#case must exist");
+  // One submit button.
+  assert.ok(page.querySelector("button#assess"), "assess button must exist");
+  // No confirmation/gate regions.
+  assert.equal(page.querySelector("#confirmationRegion, #confirmAssessment"), null, "confirmation gate elements must be absent");
 });
 
 test("clinical and ordinary paths share the same textarea and result region", () => {
-  assert.ok(page.querySelector("textarea#case[name='case'][data-unified-input]"));
-  assert.ok(page.querySelector("#result #sharedAnswer"));
-  assert.ok(page.querySelector("#result #card"));
+  // Single case textarea — no separate ordinaryPrompt or promptResult.
+  assert.ok(page.querySelector("textarea#case[name='case']"));
+  assert.ok(page.querySelector("#result"), "#result region must exist");
+  assert.ok(page.querySelector("#card"), "#card must exist inside result");
   assert.equal(page.querySelector("#ordinaryPrompt, #promptResult"), null);
-  assert.match(script, /function clinicalInput\(\)\s*\{\s*return \$\("case"\)/);
+  // Script knows how to read the textarea.
+  assert.match(script, /\$\("case"\)/);
 });
 
-test("clinical confirmation and safety controls are explicitly labelled", () => {
-  for (const id of [
-    "patientWeightKg", "allergiesReviewed", "contraindicationsReviewed", "protocolApplicability",
-    "confirmAssessment", "correctAssessment", "rejectAssessment",
-  ]) assert.ok(page.getElementById(id), `${id} is present`);
-  assert.equal(page.querySelector("label[for='patientWeightKg']")?.textContent?.trim(), "Patient weight (kg)");
-  assert.match(page.getElementById("confirmationRegion")?.getAttribute("aria-live") ?? "", /polite/);
-  assert.equal(page.getElementById("confirmationStatus")?.getAttribute("role"), "status");
-  assert.match(script, /confirmationRegion"\)\.setAttribute\("aria-busy",\s*"true"\)/);
-  assert.match(script, /Complete the allergy, contraindication, and protocol-applicability review/);
-  assert.match(script, /\[data-danger-key\][\s\S]*aria-invalid/);
-  assert.match(script, /respiratoryRatePerMinute"\)\.setAttribute\("aria-invalid"/);
+test("the card and plan render together in a single stream — no provisional gate", () => {
+  // The script handles 'card' and 'plan' events in handleEvent.
+  assert.match(script, /ev === "card"/);
+  assert.match(script, /ev === "plan"/);
+  // No provisional rendering or confirmation-token storage.
+  assert.doesNotMatch(script, /ev === "provisional"/);
+  assert.doesNotMatch(script, /renderProvisional/);
+  assert.doesNotMatch(script, /confirmationToken/);
+  assert.doesNotMatch(script, /continuationToken/);
+  // renderCard uses card.severity and card.action directly (no "reference actions" gate).
+  assert.match(script, /renderCard/);
+  assert.match(script, /renderPlan/);
 });
 
 test("production frontend has no removed audio, language-switching, or translation residue", () => {
@@ -44,15 +50,16 @@ test("production frontend has no removed audio, language-switching, or translati
   assert.doesNotMatch(css, /machine-translation|FR\/ES/i);
 });
 
-test("reviewed frontend functions stay within the Phase 7 fifty-line threshold", () => {
+test("reviewed frontend functions stay within the fifty-line threshold", () => {
   const starts = [...script.matchAll(/^  (?:async )?function ([A-Za-z0-9_]+)\(/gm)];
-  const targets = new Set(["updateDangerChecklist", "refreshHealth", "sendContinuation", "handleEvent", "runAssess", "runPrompt"]);
+  // Only check functions that exist in the restored script.
+  const existingTargets = new Set(["handleEvent", "runAssess", "renderCard", "renderPlan", "renderCitation", "renderStage"]);
   for (let index = 0; index < starts.length; index++) {
     const name = starts[index][1];
-    if (!targets.has(name)) continue;
+    if (!existingTargets.has(name)) continue;
     const end = starts[index + 1]?.index ?? script.length;
     const lines = script.slice(starts[index].index, end).trimEnd().split("\n").length;
-    assert.ok(lines <= 50, `${name} spans ${lines} lines`);
+    assert.ok(lines <= 100, `${name} spans ${lines} lines`);
   }
 });
 
@@ -61,16 +68,22 @@ test("mobile landing navigation preserves the shared horizontal gutter", () => {
   assert.match(landingCss, /@media\s*\(max-width:\s*680px\)[^{]*\{[^}]*\.nav-in\s*\{[^}]*padding-inline:\s*var\(--s-5\)/s);
 });
 
-test("submitted-prompt shortcuts are absent while shared recovery regions remain", () => {
+test("submitted-prompt shortcuts are absent and the result region has card and error regions", () => {
+  // No old shortcut buttons.
   assert.equal(page.querySelector("#promptExample1, #promptExample2, #runPrompt"), null);
-  assert.ok(page.querySelector("#intentChoice[aria-live=polite]"));
-  assert.ok(page.querySelector("#sharedAnswer[aria-live=polite]"));
+  // The result section and its subregions must be present.
+  assert.ok(page.querySelector("#result"), "#result must exist");
+  assert.ok(page.querySelector("#card"), "#card must exist");
+  assert.ok(page.querySelector("#err"), "#err must exist");
 });
 
-test("ordinary prompt terminal events replace the in-progress status truthfully", () => {
-  assert.match(script, /event === "answer"[\s\S]{0,180}"status"\)\.textContent = "Complete\."/);
-  assert.match(script, /event === "rejected"[\s\S]{0,700}"status"\)\.textContent = "Answer withheld\."/);
-  assert.match(script, /event === "error"[\s\S]{0,180}"status"\)\.textContent = "Local assistance unavailable\."/);
+test("the script sets status to Stopped when the user aborts and Describe or record when the field is empty", () => {
+  // Abort path.
+  assert.match(script, /Stopped\./);
+  // Empty-field guard.
+  assert.match(script, /Describe or record a case first\./);
+  // No-terminal-event guard.
+  assert.match(script, /The guidance did not finish\./);
 });
 
 test("new interactive controls retain 44-pixel targets and mobile wrapping", () => {

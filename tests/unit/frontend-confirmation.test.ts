@@ -5,47 +5,45 @@ import test from "node:test";
 const source = readFileSync(new URL("../../public/assets/js/triage.js", import.meta.url), "utf8");
 const css = readFileSync(new URL("../../public/assets/css/app.css", import.meta.url), "utf8");
 
-test("clinical confirmation has explicit token-bound client state", () => {
-  assert.match(source, /var clinicalState\s*=\s*\{[\s\S]*phase:\s*"RECORD"[\s\S]*confirmationToken:\s*null[\s\S]*terminal:\s*false/);
-  assert.match(source, /function invalidateConfirmation/);
-  assert.match(source, /function invalidateClinicalResult[\s\S]*invalidateConfirmation\(\)/);
-  assert.match(source, /clinicalInput\(\)[\s\S]*addEventListener\("input"[\s\S]*invalidateClinicalResult/);
+// The restored one-flow design emits card+plan in a single POST /triage stream.
+// There is no provisional review gate, no confirmation token, no /triage/continue or /triage/confirm.
+
+test("no confirmation token or continuation token state exists in the restored frontend", () => {
+  assert.doesNotMatch(source, /confirmationToken/);
+  assert.doesNotMatch(source, /continuationToken/);
+  assert.doesNotMatch(source, /renderProvisional/);
+  assert.doesNotMatch(source, /renderContinuation/);
+  assert.doesNotMatch(source, /clinicalState/);
 });
 
-test("respiratory continuation is explicit and token-only", () => {
-  assert.match(source, /continuationToken:\s*null/);
-  assert.match(source, /fetch\("\/triage\/continue"/);
-  assert.match(source, /JSON\.stringify\(\{\s*token:\s*token\s*\}\)/s);
-  assert.match(source, /Continue to supervised WHO classification/);
-  assert.doesNotMatch(source, /\/triage\/continue[\s\S]{0,700}(?:caseText|respiratoryRatePerMinute|classification):/);
+test("no calls to /triage/continue or /triage/confirm exist in the restored frontend", () => {
+  assert.doesNotMatch(source, /\/triage\/continue/);
+  assert.doesNotMatch(source, /\/triage\/confirm/);
 });
 
-test("confirmation sends only opaque token and decision", () => {
-  assert.match(source, /fetch\("\/triage\/confirm"/);
-  assert.match(source, /var token\s*=\s*clinicalState\.confirmationToken/);
-  assert.match(source, /JSON\.stringify\(\{\s*token:\s*token,\s*decision:\s*decision\s*\}\)/s);
-  assert.doesNotMatch(source, /\/triage\/confirm[\s\S]{0,700}classification:\s*|\/triage\/confirm[\s\S]{0,700}action:\s*/);
+test("the card event renders severity action and plan in one stream without a confirmation step", () => {
+  // card handler present.
+  assert.match(source, /ev === "card"/);
+  // plan handler present and fires after card.
+  assert.match(source, /ev === "plan"/);
+  // renderCard uses card.severity for the severity level display.
+  assert.match(source, /card\.severity/);
+  // renderPlan renders the management plan.
+  assert.match(source, /renderPlan/);
+  // No provisional event handler.
+  assert.doesNotMatch(source, /ev === "provisional"/);
 });
 
-test("provisional classification is rendered as supervised and actions wait for confirmation", () => {
-  assert.match(source, /function renderProvisional/);
-  assert.match(source, /Provisional WHO protocol classification/);
-  assert.match(source, /Human confirmation is required/);
-  assert.match(source, /ev === "provisional"[\s\S]*renderProvisional\(d\)/);
-  assert.match(source, /function renderProvisional[\s\S]*confirmationToken\s*=\s*data\.token/);
-  assert.doesNotMatch(source, /ev === "plan"/);
-});
-
-test("confirmed source actions use text nodes instead of model-authored HTML", () => {
-  assert.match(source, /function renderReferenceActions/);
-  assert.match(source, /textContent/);
-  assert.doesNotMatch(source, /referenceActions[\s\S]{0,500}innerHTML\s*=/);
-  assert.match(source, /doseState/);
-  for (const label of [
-    "Immediate action", "Medicine strength", "Frequency", "Selected source band",
-    "Supportive care", "Home care", "Return immediately", "Follow-up timing", "Assess at follow-up",
-  ]) assert.match(source, new RegExp(label, "i"));
-  assert.match(source, /detailCitation/);
+test("renderCard renders severity, action, and reasoning directly from card fields", () => {
+  // card.action is rendered directly (source-bound, not model-authored HTML).
+  assert.match(source, /card\.action/);
+  // card.reasoning is shown.
+  assert.match(source, /card\.reasoning/);
+  // No referenceActions rendering function.
+  assert.doesNotMatch(source, /renderReferenceActions/);
+  assert.doesNotMatch(source, /referenceActions/);
+  // textContent is used to set card text safely (no innerHTML for user-originated text).
+  assert.match(source, /esc\(/);
 });
 
 test("confirmed dose tables are contained by a shrinkable mobile plan region", () => {

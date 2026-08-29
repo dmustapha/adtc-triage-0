@@ -37,12 +37,12 @@
         <div class="step-label"><span class="step-num">1</span><h2 id="h-describe" class="display">Describe the patient</h2></div>
         <div class="panel">
           <p class="hint">Type the age and what you see.</p>
-          <textarea id="case" name="case" maxlength="4000" aria-label="Patient case or healthcare question" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
+          <textarea id="case" name="case" maxlength="4000" data-unified-input aria-label="Patient case or healthcare question" placeholder="For example: two year old, cough for three days, breathing fast, still drinking."></textarea>
           <div class="seeds" id="seeds" aria-label="Fill an example case">
             <button class="seed" type="button" data-fill="18 month old with cough for three days and difficult breathing; breathing counted at 32 per minute for one minute while calm; alert and drinking.">English example</button>
           </div>
           <div class="actions">
-            <button class="btn btn--primary" id="assess" type="button">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+            <button class="btn btn--primary" id="assess" data-unified-submit type="button">Get guidance<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             <span id="status" class="status" role="status"></span>
           </div>
         </div>

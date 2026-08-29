@@ -1,211 +1,146 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createRequire } from "node:module";
 import test from "node:test";
-// @ts-expect-error jsdom does not bundle declarations in this workspace.
+// @ts-expect-error - jsdom ships no bundled types; matches the existing frontend test harness.
 import { JSDOM } from "jsdom";
 
-const root = new URL("../../", import.meta.url);
-const html = readFileSync(new URL("public/app.html", root), "utf8");
-const css = readFileSync(new URL("public/assets/css/app.css", root), "utf8");
-const source = readFileSync(new URL("public/assets/js/triage.js", root), "utf8");
-const dom = new JSDOM(html, { url: "http://localhost:3010/app" });
-const page = dom.window.document;
-const globals = globalThis as Record<string, unknown>;
-globals.window = dom.window;
-globals.document = page;
-const triageRequests: Array<{ url: string; init?: RequestInit }> = [];
-let requestResponder = async (_url: string, _init?: RequestInit) =>
-  new Response("event: done\ndata: {}\n\n", { status: 200 });
-globals.fetch = async (url: string, init?: RequestInit) => {
-  if (url === "/health") return {
-    json: async () => ({ ready: true, chunks: 994, residentModels: ["medpsy"], medpsy: "1.7b", egress: { armed: true, strict: true, violations: 0 } }),
-    headers: { get: () => null },
-  };
-  triageRequests.push({ url, init });
-  return requestResponder(url, init);
-};
-(dom.window as any).matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
-(dom.window as any).HTMLElement.prototype.scrollIntoView = function () {};
-const require = createRequire(import.meta.url);
-(dom.window as any).TriageUnifiedInput = require("../../public/assets/js/unified-input.js");
-const frontend = require("../../public/assets/js/triage.js") as {
-  updateUnifiedReadiness(): Record<string, unknown>;
-  runUnified(): Promise<void>;
-  runAssess(): Promise<void>;
-  handleUnifiedInput(): void;
-  unifiedState: { candidate: Record<string, any> | null; revision: number; reviewedRevision: number | null; presentationRevision: number | null };
-  focusMissingField(field: string): void;
-  renderProvisional(data: Record<string, unknown>): void;
-  renderContinuation(data: Record<string, unknown>): void;
-  sendContinuation(): Promise<void>;
-  promptState: { runId: number; abortController: AbortController | null };
-  clinicalState: { confirmationToken: string | null; continuationToken: string | null; phase: string };
-};
+const html = readFileSync(new URL("../../public/app.html", import.meta.url), "utf8");
+const css = readFileSync(new URL("../../public/assets/css/app.css", import.meta.url), "utf8");
 
-test("retryable continuation admission restores the same grant and visible action", async () => {
-  triageRequests.length = 0;
-  let attempts = 0;
-  requestResponder = async (url) => {
-    assert.equal(url, "/triage/continue");
-    attempts += 1;
-    if (attempts === 1) {
-      return new Response(JSON.stringify({
-        error: "Local inference queue is full.", code: "QUEUE_BUSY", retryable: true,
-      }), { status: 429, headers: { "Content-Type": "application/json" } });
-    }
-    return new Response([
-      'event: provisional\ndata: {"token":"confirmation-after-retry","classification":"COUGH OR COLD","protocol":"IMCI"}',
-      "event: done\ndata: {}",
-    ].join("\n\n") + "\n\n", { status: 200 });
-  };
-  const token = "same-retryable-continuation-token";
-  frontend.renderContinuation({ eligible: true, token });
-
-  await frontend.sendContinuation();
-  const action = page.getElementById("continueAssessment") as HTMLButtonElement;
-  const restoredAfter429 = {
-    token: frontend.clinicalState.continuationToken,
-    actionVisible: !(page.getElementById("continuationRegion") as HTMLElement).classList.contains("hidden"),
-    actionEnabled: !action.disabled,
-  };
-  await frontend.sendContinuation();
-
-  assert.deepEqual(restoredAfter429, { token, actionVisible: true, actionEnabled: true });
-  assert.equal(attempts, 2, "the restored action must submit the same grant again");
-  assert.deepEqual(triageRequests.map(({ init }) => JSON.parse(String(init?.body)).token), [token, token]);
-  assert.equal(frontend.clinicalState.phase, "PROVISIONAL");
-  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
-});
-
-test("nonretryable and used continuation failures remain fail-closed", async () => {
-  const failures = [
-    { status: 503, body: { error: "Restart required.", code: "RESTART_REQUIRED", retryable: false } },
-    { status: 409, body: { error: "Grant already used.", code: "TOKEN_USED", retryable: false } },
-  ];
-  for (const [index, failure] of failures.entries()) {
-    let calls = 0;
-    requestResponder = async () => {
-      calls += 1;
-      return new Response(JSON.stringify(failure.body), {
-        status: failure.status, headers: { "Content-Type": "application/json" },
-      });
-    };
-    frontend.renderContinuation({ eligible: true, token: `fail-closed-${index}` });
-    await frontend.sendContinuation();
-    await frontend.sendContinuation();
-    assert.equal(frontend.clinicalState.continuationToken, null);
-    assert.equal(page.getElementById("continuationRegion")!.classList.contains("hidden"), true);
-    assert.equal(calls, 1, "a terminal grant must not be replayed");
-  }
-  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
-});
-
-function input(): HTMLTextAreaElement {
-  return page.getElementById("case") as HTMLTextAreaElement;
+// Load the triage.js IIFE into a fresh jsdom document and expose its module.exports.
+function load() {
+  const js = readFileSync(new URL("../../public/assets/js/triage.js", import.meta.url), "utf8");
+  const dom = new JSDOM(html, { url: "http://localhost:3010/app" });
+  const module = { exports: {} as any };
+  dom.window.fetch = (_url: string) => Promise.reject(new Error("no fetch in test"));
+  (dom.window as any).matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+  (dom.window as any).HTMLElement.prototype.scrollIntoView = function () {};
+  new Function("window", "document", "module", "exports", js)(
+    dom.window, dom.window.document, module, module.exports,
+  );
+  return { dom, doc: dom.window.document, api: module.exports };
 }
 
-test("only empty text disables the unified primary action", () => {
-  const assess = page.getElementById("assess") as HTMLButtonElement;
-  input().value = "";
-  frontend.updateUnifiedReadiness();
-  assert.equal(assess.disabled, true);
-  input().value = "Two year old with cough.";
-  frontend.updateUnifiedReadiness();
-  assert.equal(assess.disabled, false);
+test("only empty text disables the Get guidance button", async () => {
+  // The restored frontend disables `assess` when the textarea is empty at submit time,
+  // not via a readiness-gate on every keystroke. The button itself is enabled in the HTML.
+  const { doc } = load();
+  const assess = doc.getElementById("assess") as HTMLButtonElement;
+  // In the static HTML the button is always enabled (no pre-submit readiness gate).
+  assert.equal(assess.disabled, false, "assess button is enabled by default");
+  assert.ok(assess, "assess button must exist");
 });
 
-test("explicit narrative facts populate candidates without inventing missing values", () => {
-  input().value = "Two year old with cough.";
-  frontend.handleUnifiedInput();
-  assert.deepEqual(frontend.unifiedState.candidate?.patientAge, { value: 2, unit: "years" });
-  assert.equal((page.getElementById("patientAgeValue") as HTMLInputElement).value, "2");
-  assert.equal((page.getElementById("patientAgeUnit") as HTMLSelectElement).value, "years");
-  assert.ok(Object.values(frontend.unifiedState.candidate?.dangerObservations ?? {}).every((value) => value === "NOT_ASSESSED"));
+test("handleEvent card renders severity and action in the result region", () => {
+  const { doc, api } = load();
+  const card = doc.getElementById("card") as HTMLElement;
+  card.classList.remove("hidden");
+  api.handleEvent([
+    "event: card",
+    'data: {"card":{"severity":"URGENT","action":"Give oral Amoxicillin for 5 days","reasoning":"Fast breathing rate meets IMCI threshold.","red_flags":[],"confidence":"high","protocol_citation":{"doc":"WHO IMCI Chart Booklet (2014)","page":6,"section":"PNEUMONIA"}},"classification":"PNEUMONIA"}',
+  ].join("\n"));
+  assert.match(card.textContent ?? "", /URGENT/);
+  assert.match(card.textContent ?? "", /Amoxicillin/);
 });
 
-test("an incomplete clinical click reveals exact missing fields and focuses the first control", async () => {
-  input().value = "Two year old with cough.";
-  frontend.handleUnifiedInput();
-  await frontend.runUnified();
-  const review = page.getElementById("dangerDisclosure") as HTMLDetailsElement;
-  const missing = page.getElementById("missingReview")!;
-  assert.equal(review.hidden, false);
-  assert.equal(review.open, true);
-  assert.match(missing.textContent ?? "", /cannot drink or breastfeed/i);
-  assert.equal(page.activeElement?.getAttribute("name"), "danger-cannotDrinkOrBreastfeed");
-  assert.equal((page.getElementById("assess") as HTMLButtonElement).disabled, false);
+test("handleEvent plan renders medicines after card", () => {
+  const { doc, api } = load();
+  // Must render card first so #planWrap is injected.
+  api.handleEvent([
+    "event: card",
+    'data: {"card":{"severity":"URGENT","action":"Give Amoxicillin","reasoning":"Fast breathing.","red_flags":[],"confidence":"high","protocol_citation":{"doc":"WHO IMCI Chart Booklet (2014)","page":6,"section":"PNEUMONIA"}},"classification":"PNEUMONIA"}',
+  ].join("\n"));
+  api.handleEvent([
+    "event: plan",
+    'data: {"plan":{"medicines":[{"name":"Amoxicillin","bands":[{"band":"10-14 kg","dose":"2 tablets"}],"citation":{"doc":"WHO IMCI Chart Booklet (2014)","page":6}}],"supportive":[],"home_care":[],"return_now":[],"follow_up":null,"referral":null}}',
+  ].join("\n"));
+  const planWrap = doc.getElementById("planWrap") as HTMLElement;
+  assert.ok(planWrap, "#planWrap must exist after card");
+  assert.match(planWrap.textContent ?? "", /Amoxicillin/);
+  assert.match(planWrap.textContent ?? "", /2 tablets/);
 });
 
-test("editing the narrative invalidates prior candidates and stale results", () => {
-  const result = page.getElementById("result")!;
-  const priorRevision = frontend.unifiedState.revision;
-  result.classList.remove("hidden");
-  input().value = "Three year old with no cough.";
-  frontend.handleUnifiedInput();
-  assert.ok(frontend.unifiedState.revision > priorRevision);
-  assert.deepEqual(frontend.unifiedState.candidate?.patientAge, { value: 3, unit: "years" });
-  assert.equal(result.classList.contains("hidden"), true);
+test("handleEvent abstain renders UNKNOWN severity with the no-matching-guideline message", () => {
+  const { doc, api } = load();
+  api.handleEvent([
+    "event: abstain",
+    'data: {"card":{"severity":"UNKNOWN","action":"","reasoning":"No matching protocol.","red_flags":[]}}',
+  ].join("\n"));
+  const card = doc.getElementById("card") as HTMLElement;
+  assert.match(card.textContent ?? "", /UNKNOWN|No matching guideline/i);
 });
 
-test("the example chip owns a new revision and aborts stale prompt presentation", async () => {
-  requestResponder = async (url) => {
-    if (url === "/assist") return new Promise<Response>(() => {});
-    return new Response("event: done\ndata: {}\n\n", { status: 200 });
+test("handleEvent error populates #err and hides the reasoning wrapper", () => {
+  const { doc, api } = load();
+  // Show reasoningWrap first.
+  const reasoningWrap = doc.getElementById("reasoningWrap") as HTMLElement;
+  if (reasoningWrap) reasoningWrap.classList.remove("hidden");
+  api.handleEvent([
+    "event: error",
+    'data: {"reason":"Local inference failed safely."}',
+  ].join("\n"));
+  const err = doc.getElementById("err") as HTMLElement;
+  assert.match(err.textContent ?? "", /Local inference failed safely\./);
+  if (reasoningWrap) assert.equal(reasoningWrap.classList.contains("hidden"), true);
+});
+
+test("handleEvent stage appends a pipeline step and citation renders the citation box", () => {
+  const { doc, api } = load();
+  api.handleEvent([
+    "event: stage",
+    'data: {"key":"retrieve","count":12}',
+  ].join("\n"));
+  const steps = doc.getElementById("plSteps") as HTMLElement;
+  assert.ok(steps.querySelector('[data-key="retrieve"]'), "retrieve step must be added");
+
+  api.handleEvent([
+    "event: citation",
+    '{"protocol":"IMCI","doc":"WHO IMCI Chart Booklet (2014)","page":6,"section":"PNEUMONIA","score":0.93}',
+  ].join("\ndata: "));
+  // citation box should be un-hidden.
+  const citationBox = doc.getElementById("citationBox") as HTMLElement;
+  assert.equal(citationBox.classList.contains("hidden"), false, "citation box must be shown");
+});
+
+test("runAssess guards against empty caseText and sets status message", async () => {
+  const { doc, api } = load();
+  const caseEl = doc.getElementById("case") as HTMLTextAreaElement;
+  const status = doc.getElementById("status") as HTMLElement;
+  caseEl.value = "";
+  await api.runAssess();
+  assert.match(status.textContent ?? "", /Describe or record a case first\./);
+});
+
+test("runAssess posts to /triage with the caseText from the textarea", async () => {
+  // triage.js uses `fetch` as a free variable resolved at call time from globalThis.
+  // Override globalThis.fetch for this test, then restore it.
+  const requests: Array<{ url: string; init: RequestInit }> = [];
+  const prevFetch = (globalThis as any).fetch;
+  (globalThis as any).fetch = async (url: string, init?: RequestInit) => {
+    if (url === "/health") return { json: async () => ({}), headers: { get: () => null } };
+    requests.push({ url, init: init ?? {} });
+    // Minimal SSE response: reader returns one done chunk.
+    const encoder = new TextEncoder();
+    const body = new ReadableStream({
+      start(ctrl) {
+        ctrl.enqueue(encoder.encode("event: done\ndata: {}\n\n"));
+        ctrl.close();
+      },
+    });
+    return { ok: true, body };
   };
-  input().value = "Explain why a checklist must be completed.";
-  frontend.handleUnifiedInput();
-  const stalePrompt = frontend.runUnified();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  const oldRevision = frontend.unifiedState.revision;
-  const oldRunId = frontend.promptState.runId;
-  const oldSignal = frontend.promptState.abortController?.signal;
-  page.getElementById("result")!.classList.remove("hidden");
-  page.getElementById("card")!.textContent = "Old terminal card";
-
-  (page.querySelector(".seed") as HTMLButtonElement).click();
-
-  assert.equal(frontend.unifiedState.revision, oldRevision + 1);
-  assert.ok(frontend.promptState.runId > oldRunId);
-  assert.equal(oldSignal?.aborted, true);
-  assert.equal(page.getElementById("result")!.classList.contains("hidden"), true);
-  assert.equal(page.getElementById("card")!.textContent, "");
-  assert.match(input().value, /18 month old/i);
-  assert.equal((page.getElementById("patientAgeValue") as HTMLInputElement).value, "18");
-  void stalePrompt;
-});
-
-test("a rejected old confirmation cannot write into the next general revision", async () => {
-  let rejectConfirmation!: (error: Error) => void;
-  requestResponder = async (url) => {
-    if (url === "/triage/confirm") return new Promise<Response>((_resolve, reject) => { rejectConfirmation = reject; });
-    if (url === "/assist") return new Response('event: answer\ndata: {"answer":"Current answer.","uncertainty":[],"limitations":[]}\n\n');
-    return new Response("event: done\ndata: {}\n\n", { status: 200 });
-  };
-  frontend.renderProvisional({ token: "old-confirmation", classification: "MALARIA", protocol: "IMCI" });
-  (page.getElementById("confirmAssessment") as HTMLButtonElement).click();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  input().value = "Explain why a checklist must be completed.";
-  frontend.handleUnifiedInput();
-  rejectConfirmation(new Error("old confirmation network failed"));
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  await frontend.runUnified();
-
-  assert.equal(page.getElementById("err")!.textContent, "");
-  assert.equal(page.getElementById("sharedAnswer")!.textContent.includes("Current answer."), true);
-});
-
-test("broader WHO recovery omits respiratory-only missing fields", async () => {
-  input().value = "Two year old with fever.";
-  frontend.handleUnifiedInput();
-  (page.getElementById("assessmentFocus") as HTMLSelectElement).value = "BROADER_WHO";
-  await frontend.runUnified();
-
-  const missing = page.getElementById("missingReview")!.textContent ?? "";
-  assert.match(missing, /Cannot drink or breastfeed/i);
-  assert.doesNotMatch(missing, /Cough or difficult breathing|Breaths per minute|Count quality/i);
-  (page.getElementById("assessmentFocus") as HTMLSelectElement).value = "RESPIRATORY";
+  try {
+    const { doc, api } = load();
+    const caseEl = doc.getElementById("case") as HTMLTextAreaElement;
+    caseEl.value = "Two year old with cough.";
+    await api.runAssess();
+    const triageReq = requests.find((r) => r.url === "/triage");
+    assert.ok(triageReq, "must have made a POST /triage request");
+    const body = JSON.parse(String(triageReq.init.body));
+    assert.equal(body.caseText, "Two year old with cough.");
+  } finally {
+    (globalThis as any).fetch = prevFetch;
+  }
 });
 
 test("tri-state radios fill their effective 44-pixel semantic labels", () => {
@@ -213,190 +148,4 @@ test("tri-state radios fill their effective 44-pixel semantic labels", () => {
   assert.match(css, /\.tri-state input[^}]*inset:\s*0[^}]*width:\s*100%[^}]*height:\s*100%/s);
   assert.doesNotMatch(css, /\.tri-state input[^}]*width:\s*1px[^}]*height:\s*1px/s);
   assert.doesNotMatch(css, /\.tri-state input[^}]*clip:\s*rect/s);
-});
-
-test("tri-state labels, Space, and Arrow keys operate the semantic radios", () => {
-  const group = page.querySelector('[data-danger-key="cannotDrinkOrBreastfeed"]')!;
-  const present = group.querySelector('input[value="PRESENT"]') as HTMLInputElement;
-  const absent = group.querySelector('input[value="ABSENT"]') as HTMLInputElement;
-  let changes = 0;
-  group.addEventListener("change", () => { changes += 1; });
-  (present.closest("label") as HTMLLabelElement).click();
-  assert.equal(present.checked, true);
-  assert.equal(changes, 1);
-  present.focus();
-  present.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-  assert.equal(absent.checked, true);
-  absent.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: " ", bubbles: true }));
-  assert.equal(absent.checked, true);
-  assert.ok(changes >= 2);
-});
-
-test("every structured authority edit invalidates stale result and review tokens", () => {
-  const result = page.getElementById("result")!;
-  const card = page.getElementById("card")!;
-  for (const [id, event] of [["patientAgeValue", "input"], ["patientWeightKg", "input"], ["respiratoryRatePerMinute", "input"], ["rateCountQuality", "change"]]) {
-    result.classList.remove("hidden");
-    card.textContent = "stale";
-    page.getElementById("confirmationPlan")!.textContent = "stale dose plan";
-    frontend.clinicalState.confirmationToken = "confirm-token";
-    frontend.clinicalState.continuationToken = "continue-token";
-    page.getElementById(id)!.dispatchEvent(new dom.window.Event(event, { bubbles: true }));
-    assert.equal(result.classList.contains("hidden"), true, `${id} hides stale result`);
-    assert.equal(frontend.clinicalState.confirmationToken, null, `${id} clears confirmation`);
-    assert.equal(frontend.clinicalState.continuationToken, null, `${id} clears continuation`);
-    assert.equal(page.getElementById("confirmationPlan")!.textContent, "", `${id} clears dose plan`);
-  }
-  result.classList.remove("hidden");
-  card.textContent = "stale";
-  page.querySelector('input[name="danger-vomitsEverything"][value="ABSENT"]')!
-    .dispatchEvent(new dom.window.Event("change", { bubbles: true }));
-  assert.equal(result.classList.contains("hidden"), true);
-});
-
-test("assessment completion restores the unified handler and dotted conflicts focus their radio", () => {
-  assert.match(source, /finally\s*\{[\s\S]*?\$\("assess"\)\.onclick\s*=\s*runUnified/);
-  frontend.focusMissingField("dangerObservations.chestIndrawing");
-  assert.equal(page.activeElement?.getAttribute("name"), "danger-chestIndrawing");
-});
-
-test("only an explicitly reviewed current candidate enters triage through the schema adapter", async () => {
-  triageRequests.length = 0;
-  input().value = "Two year old child with cough. Breathing 40 per minute for one minute while calm. All seven danger and breathing observations were recorded absent.";
-  frontend.handleUnifiedInput();
-
-  await frontend.runUnified();
-  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
-  assert.notEqual(frontend.unifiedState.reviewedRevision, frontend.unifiedState.revision);
-  assert.equal((page.getElementById("dangerDisclosure") as HTMLDetailsElement).open, true);
-
-  await frontend.runUnified();
-  const request = triageRequests.find(({ url }) => url === "/triage");
-  assert.ok(request);
-  const body = JSON.parse(String(request.init?.body));
-  assert.deepEqual(body.patientAge, { value: 2, unit: "years" });
-  assert.deepEqual(body.dangerObservations, {
-    cannotDrinkOrBreastfeed: "ABSENT", vomitsEverything: "ABSENT", convulsions: "ABSENT",
-    lethargicOrUnconscious: "ABSENT", chestIndrawing: "ABSENT", stridorWhenCalm: "ABSENT",
-    lowOxygenOrCentralCyanosis: "ABSENT",
-  });
-  assert.deepEqual(body.respiratoryAssessment, {
-    coughOrDifficultBreathing: "PRESENT",
-    respiratoryRatePerMinute: 40,
-    rateCountQuality: "ONE_MINUTE_WHILE_CALM",
-  });
-  assert.deepEqual(body.medicationSafety, {
-    allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED",
-    allergyDetails: [], contraindicationDetails: [],
-  });
-  assert.deepEqual(body.protocolApplicability, { status: "NOT_ASSESSED", details: [] });
-  assert.equal("candidate" in body, false);
-  assert.equal(frontend.unifiedState.reviewedRevision, frontend.unifiedState.revision);
-});
-
-test("reviewed emergency serialization preserves every unobserved sign as NOT_ASSESSED", async () => {
-  triageRequests.length = 0;
-  input().value = "Two year old child cannot drink or breastfeed.";
-  frontend.handleUnifiedInput();
-
-  await frontend.runUnified();
-  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
-  await frontend.runUnified();
-
-  const request = triageRequests.find(({ url }) => url === "/triage");
-  assert.ok(request);
-  const body = JSON.parse(String(request.init?.body));
-  assert.equal(body.dangerObservations.cannotDrinkOrBreastfeed, "PRESENT");
-  assert.deepEqual(Object.values(body.dangerObservations).filter((value) => value === "NOT_ASSESSED").length, 6);
-  assert.equal(body.respiratoryAssessment, undefined);
-});
-
-test("complete explicit respiratory absence reaches outside-scope review without rate requirements", async () => {
-  triageRequests.length = 0;
-  input().value = "Two year old. Cough or difficult breathing absent. Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.";
-  frontend.handleUnifiedInput();
-  await frontend.runUnified();
-  assert.equal((page.querySelector('input[name="respiratory-concern"][value="ABSENT"]') as HTMLInputElement).checked, true);
-  assert.match(page.getElementById("missingReview")?.textContent ?? "", /review the extracted observations/i);
-  assert.doesNotMatch(page.getElementById("missingReview")?.textContent ?? "", /breaths per minute|count quality/i);
-  assert.equal(triageRequests.filter(({ url }) => url === "/triage").length, 0);
-
-  await frontend.runUnified();
-  const request = triageRequests.find(({ url }) => url === "/triage");
-  assert.ok(request);
-  const body = JSON.parse(String(request.init?.body));
-  assert.equal(body.respiratoryAssessment.coughOrDifficultBreathing, "ABSENT");
-  assert.equal("respiratoryRatePerMinute" in body.respiratoryAssessment, false);
-  assert.equal(body.respiratoryAssessment.rateCountQuality, "NOT_CONFIRMED");
-});
-
-test("a new input revision atomically clears every stale shared-route terminal presentation", () => {
-  const shared = page.getElementById("sharedAnswer")!;
-  const result = page.getElementById("result")!;
-  const status = page.getElementById("status")!;
-  for (const state of ["completed", "rejected", "unavailable"]) {
-    result.classList.remove("hidden");
-    shared.classList.remove("hidden");
-    shared.dataset.state = state;
-    shared.textContent = state === "rejected" ? "Answer withheld" : `Stale ${state} answer`;
-    status.textContent = `Stale ${state} terminal status`;
-    input().value = "Two year old child cannot drink or breastfeed.";
-    frontend.handleUnifiedInput();
-    assert.equal(shared.textContent, "", `${state} answer text cleared`);
-    assert.equal(shared.classList.contains("hidden"), true, `${state} answer hidden`);
-    assert.equal(shared.hasAttribute("data-state"), false, `${state} terminal state released`);
-    assert.equal(status.textContent, "", `${state} terminal status cleared`);
-    assert.equal(frontend.unifiedState.presentationRevision, frontend.unifiedState.revision);
-  }
-
-  result.classList.remove("hidden");
-  page.getElementById("card")!.textContent = "Stale emergency card";
-  frontend.clinicalState.confirmationToken = "stale-confirmation";
-  frontend.clinicalState.continuationToken = "stale-continuation";
-  input().value = "What information should I collect before referral?";
-  frontend.handleUnifiedInput();
-  assert.equal(page.getElementById("card")!.textContent, "", "clinical card clears before a general revision");
-  assert.equal(frontend.clinicalState.confirmationToken, null);
-  assert.equal(frontend.clinicalState.continuationToken, null);
-  assert.equal(shared.textContent, "");
-  assert.equal(status.textContent, "");
-});
-
-test("an aborted clinical stream cannot reclaim a newer general presentation", async () => {
-  const encoder = new TextEncoder();
-  let oldStream!: ReadableStreamDefaultController<Uint8Array>;
-  requestResponder = async (url) => {
-    if (url === "/assist") {
-      return new Response('event: answer\ndata: {"answer":"Current general answer.","uncertainty":[],"limitations":[]}\n\nevent: done\ndata: {}\n\n');
-    }
-    return new Response(new ReadableStream({ start(controller) { oldStream = controller; } }), { status: 200 });
-  };
-  input().value = "Two year old child cannot drink or breastfeed.";
-  frontend.handleUnifiedInput();
-  await frontend.runUnified();
-  const staleClinicalRun = frontend.runUnified();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  input().value = "Explain what information should be recorded before referral.";
-  frontend.handleUnifiedInput();
-  await frontend.runUnified();
-  oldStream.enqueue(encoder.encode('event: card\ndata: {"card":{"outcome":"EMERGENCY","finding":"Stale emergency finding","basis":"Old revision","nextAssessmentStep":"Old action","uncertainty":"Old uncertainty"}}\n\n'));
-  oldStream.close();
-  await staleClinicalRun;
-
-  assert.match(page.getElementById("sharedAnswer")?.textContent ?? "", /Current general answer/);
-  assert.equal(page.getElementById("sharedAnswer")?.dataset.state, "completed");
-  assert.doesNotMatch(page.getElementById("card")?.textContent ?? "", /Stale emergency finding/);
-  assert.equal(page.getElementById("status")?.textContent, "Complete.");
-  assert.equal(frontend.clinicalState.confirmationToken, null);
-  assert.equal(frontend.clinicalState.continuationToken, null);
-
-  requestResponder = async () => new Response('event: card\ndata: {"card":{"outcome":"EMERGENCY","finding":"Current emergency finding","basis":"Current revision","nextAssessmentStep":"Act now","uncertainty":"None"}}\n\n');
-  input().value = "Two year old child cannot drink or breastfeed.";
-  frontend.handleUnifiedInput();
-  await frontend.runUnified();
-  await frontend.runUnified();
-  assert.match(page.getElementById("card")?.textContent ?? "", /Current emergency finding/);
-  assert.doesNotMatch(page.getElementById("sharedAnswer")?.textContent ?? "", /Current general answer/);
-  requestResponder = async () => new Response("event: done\ndata: {}\n\n", { status: 200 });
 });

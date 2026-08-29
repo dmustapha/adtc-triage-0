@@ -43,7 +43,6 @@ export const sharedInferenceQueue = new InferenceQueue({ maxPending: 4 });
  *  every case abstain), so this is the real "does ragSearch return hits" signal, surfaced on /health. */
 let ragLive: boolean | null = null;
 let modelContractVerified = false;
-const TRIAGE_TIMEOUT_MS = 300_000; // 5 min — 4B model on CPU needs headroom
 
 /** Log the real error server-side (stderr only) and return a fixed, friendly message — never leak an
  *  absolute model/file path or a raw SDK string to the client (it would show in a judge's screen capture). */
