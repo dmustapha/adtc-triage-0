@@ -30,22 +30,25 @@ test("local app serves truthful health and deterministic emergency SSE without Q
     const boundaries: string[] = [];
     const restore = setTriageExecutionObserver((boundary) => boundaries.push(boundary));
     try {
+      // Narrative-emergency: severity keywords in the free text trigger deterministic
+      // EMERGENCY card + referral plan with NO model execution (boundaries stays []).
       const triage = await fetch(`${base}/triage`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          caseText: "free text says the child is well",
-          dangerObservations: { cannotDrinkOrBreastfeed: "PRESENT" },
+          caseText: "10 month old, lethargic and cannot drink, has convulsions",
         }),
       });
-      const events = await triage.text();
+      const rawEvents = await triage.text();
       assert.equal(triage.status, 200);
       assert.match(triage.headers.get("content-type") ?? "", /text\/event-stream/);
-      assert.match(events, /event: citation/);
-      assert.match(events, /event: card/);
-      assert.match(events, /"outcome":"EMERGENCY"/);
-      assert.doesNotMatch(events, /"severity"|"redFlags"/);
-      assert.match(events, /event: done/);
+      assert.match(rawEvents, /event: citation/);
+      assert.match(rawEvents, /event: card/);
+      assert.match(rawEvents, /event: plan/);
+      assert.match(rawEvents, /event: done/);
+      // One-flow contract: card carries severity, not the old "outcome" field.
+      assert.match(rawEvents, /"severity":"EMERGENCY"/);
+      // Deterministic emergency runs NO model — observer records nothing.
       assert.deepEqual(boundaries, []);
     } finally {
       restore();

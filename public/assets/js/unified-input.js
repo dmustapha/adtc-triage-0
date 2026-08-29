@@ -89,22 +89,6 @@
     return values.filter(function (value, index) { return values.indexOf(value) === index; });
   }
 
-  function ageCandidates(text) {
-    var pattern = /\b(\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(months?|years?)(?:\s+old)?\b/gi;
-    var ages = [];
-    var match;
-    while ((match = pattern.exec(text))) ages.push({ value: numericToken(match[1]), unit: match[2].toLowerCase().startsWith("year") ? "years" : "months" });
-    return ages;
-  }
-
-  function rateCandidates(text) {
-    var pattern = /\b(?:breath(?:ing)?|respiratory\s+rate)(?:\s+(?:is|was|counted\s+at))?\s+(\d{1,3})(?:\s+breaths?)?\s*(?:per|\/)\s*min(?:ute)?\b/gi;
-    var rates = [];
-    var match;
-    while ((match = pattern.exec(text))) rates.push(Number(match[1]));
-    return uniqueValues(rates);
-  }
-
   function assertedText(text) {
     var asserted = maskQuotedSpans(String(text || ""));
     asserted = asserted.replace(/(?:^|[.!;])[^.!;?]*\?/g, " ");

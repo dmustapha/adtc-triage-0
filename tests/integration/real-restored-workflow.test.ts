@@ -149,10 +149,11 @@ test("real QVAC/WHO/MedPsy emits card and plan in one stream for IMCI pneumonia,
   });
   assert.ok(offDomain.events.some((item) => item.event === "card"), "off-domain must emit card");
   const offDomainCard = eventData(offDomain.events, "card").card;
-  // Abstain path: severity is UNKNOWN or the card indicates unavailability.
-  assert.ok(
-    offDomainCard.severity === "UNKNOWN" || offDomainCard.reviewState === "UNAVAILABLE",
-    `off-domain card must be abstain or unavailable, got reviewState=${offDomainCard.reviewState} severity=${offDomainCard.severity}`,
+  // Abstain path: severity must be UNKNOWN (one-flow contract; no reviewState fallback).
+  assert.equal(
+    offDomainCard.severity,
+    "UNKNOWN",
+    `off-domain card must have severity UNKNOWN, got severity=${offDomainCard.severity}`,
   );
 
   assert.deepEqual(guard.violations, []);

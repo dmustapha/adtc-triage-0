@@ -84,12 +84,17 @@ test("/triage rejects invalid records before opening SSE", async (t) => {
   assert.equal(invalid.status, 400);
   assert.doesNotMatch(invalid.headers.get("content-type") ?? "", /event-stream/);
 
-  // Invisible characters in caseText (e.g. null byte) are handled inside guide() /
-  // parseClinicalRequest(), which returns an abstain card with 200 SSE. The HTTP
-  // validation layer (clinicalValidationError) does not check for control characters.
-  // A valid-looking request with an invisible char still opens the SSE stream.
-  // (No separate invisible-char fetch test: the char cannot be reliably embedded in
-  //  source without tooling issues; the abstain path is covered by the one-flow test.)
+  // Invisible control characters in caseText (NUL / non-printable) are caught by the
+  // Zod schema (INVISIBLE_CONTROLS in schema.ts) inside guide() → parseClinicalRequest(),
+  // not by the HTTP pre-stream guard. clinicalValidationError() only checks empty/length/
+  // structured-fields, so it passes and the SSE stream opens (200). The schema parse
+  // inside guide() returns an abstain card instead of a hard error.
+  const invisibleChar = await fetch(`${f.base}/triage`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ caseText: "cough " + String.fromCharCode(0) + " hidden" }),
+  });
+  assert.equal(invisibleChar.status, 200);
+  assert.match(invisibleChar.headers.get("content-type") ?? "", /event-stream/);
 
   // Valid request → 200 SSE (no 409 conflict — age/narrative conflicts are no longer pre-checked).
   const valid = await fetch(`${f.base}/triage`, {
