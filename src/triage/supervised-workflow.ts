@@ -12,8 +12,9 @@ import { evaluateRespiratoryAssessment, type RespiratoryDecision } from "./respi
 import type { ConfirmationBinding, ConfirmationGrant, ConfirmationPayload } from "./confirmation.js";
 import type { ContinuationBinding, ContinuationConsumeResult, ContinuationGrant } from "./continuation.js";
 import type { RouteResult } from "./class-router.js";
-import type { ClinicalAssessmentRequest } from "./schema.js";
+import type { ClinicalAssessmentRequest, TriageCard } from "./schema.js";
 import type { SearchHit } from "../rag/store.js";
+import { assemblePlan, makeAbstainCard, makeStructuredDangerResult, buildPlanFromTable } from "./triage.js";
 import type { TriageContext, TriageOptions, TriageResult } from "./triage.js";
 import { readModelIdentity } from "../model-contract.js";
 import { extractNarrativeAuthority } from "./narrative-authority.js";
@@ -58,6 +59,8 @@ type AssessOptions = {
   onCitation?: (citation: Record<string, unknown>) => void;
   onFirstToken?: () => void;
 };
+
+export type GuideResult = { card: TriageCard; classification: string; retrieval: "semantic" | "keyword" | "abstain" | "deterministic" };
 
 export interface SupervisedAssessmentResult {
   reviewState: "DETERMINISTIC" | "PROVISIONAL" | "UNAVAILABLE";
@@ -340,6 +343,60 @@ export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
       if (deterministic) return deterministicWithContinuation(dependencies, request, deterministic, options.owner);
 
       return assessWithModel(dependencies, request, options);
+    },
+    async guide(input: unknown, options: AssessOptions): Promise<GuideResult> {
+      const parsed = parseClinicalRequest(input);
+      if (!parsed.success) return { card: makeAbstainCard(), classification: "", retrieval: "abstain" };
+      const request = parsed.data;
+
+      // 1) Deterministic emergency from the narrative — no model, no retrieval (safety boundary preserved).
+      if (narrativeEmergencyKeys(request.caseText).length) {
+        const decision = evaluateDangerPolicy(request.patientAge, Object.fromEntries(
+          narrativeEmergencyKeys(request.caseText).map((key) => [key, "PRESENT" as const]),
+        ));
+        const result = makeStructuredDangerResult(decision);
+        const entry = lookupProtocol(result.classification);
+        if (entry) result.card.plan = buildPlanFromTable(entry, "EMERGENCY");
+        options.onStage?.({ key: "assess", label: "Applied deterministic danger-sign policy", detail: "no model" });
+        options.onCitation?.({
+          protocol: result.card.protocol_citation.doc.includes("mhGAP") ? "mhGAP" : "IMCI",
+          doc: result.card.protocol_citation.doc, page: result.card.protocol_citation.page,
+          score: 1, retrieval: "deterministic", provenance: "fixed-policy",
+        });
+        return { card: result.card, classification: result.classification, retrieval: "deterministic" };
+      }
+
+      // 2) Model path — reuses the original runTriage mechanism with streaming.
+      try {
+        const context = await dependencies.getContext();
+        const identity = assistanceIdentity(dependencies);
+        options.onStage?.({ key: "detect", label: "Case received", detail: "on-device" });
+        let shortlist;
+        if (context.embedId) {
+          const route = await dependencies.routeCase(request.caseText, context.embedId);
+          if (route.offDomain) return { card: makeAbstainCard(), classification: "", retrieval: "abstain" };
+          shortlist = route.shortlist;
+        }
+        const grounding = await dependencies.retrieveGrounding(request.caseText, context);
+        const hits = grounding.groundedHits.length ? grounding.groundedHits : grounding.topHits;
+        if (!hits.length) return { card: makeAbstainCard(), classification: "", retrieval: "abstain" };
+        options.onStage?.({ key: "retrieve", label: "Checked local WHO passages", detail: `${grounding.retrieval} retrieval`, count: hits.length });
+        const top = hits[0]!;
+        options.onCitation?.({ protocol: top.protocol, doc: top.citation.title, page: top.citation.page,
+          score: Number(top.score.toFixed(3)), retrieval: grounding.retrieval, provenance: "retrieved-reference" });
+        options.onStage?.({ key: "reason", label: "Reasoning on-device", detail: `${identity.runtime} · on-device` });
+        let firstToken = false;
+        const result = await dependencies.triageFromHits(request.caseText, hits, context, {
+          retrieval: grounding.retrieval, shortlist,
+          onReasonDelta: () => { if (!firstToken) { firstToken = true; options.onFirstToken?.(); } },
+        });
+        options.onStage?.({ key: "classify", label: `Classified: ${result.classification}`, detail: "1 of 27 WHO classes" });
+        result.card.plan = await assemblePlan(result.classification, result.card.severity, hits, context);
+        options.onStage?.({ key: "plan", label: "Built WHO management plan", detail: "grounded in the cited protocol" });
+        return { card: result.card, classification: result.classification, retrieval: result.retrieval };
+      } catch {
+        return { card: makeAbstainCard(), classification: "", retrieval: "abstain" };
+      }
     },
   };
 }

@@ -729,7 +729,7 @@ function drugWindow(chunk: SearchHit | undefined, re: RegExp): string {
  * fuzzy matching, no chance of surfacing the wrong drug or a positional citation fragment. The EMERGENCY
  * invariant guarantees a referral on any escalated case even if the class table itself carries none.
  */
-function buildPlanFromTable(entry: ProtocolEntry, severity: string): ManagementPlan {
+export function buildPlanFromTable(entry: ProtocolEntry, severity: string): ManagementPlan {
   const doc = docFor(entry.protocol);
   const cite = (page: number): PlanCitation => ({ doc, page });
   const plan: ManagementPlan = {
