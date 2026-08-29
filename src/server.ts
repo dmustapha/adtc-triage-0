@@ -27,7 +27,6 @@ import { createRestoredApp, registerRestoredRoutes } from "./http/create-app.js"
 import { createSupervisedWorkflow } from "./triage/supervised-workflow.js";
 import { ConfirmationStore } from "./triage/confirmation.js";
 import { ContinuationStore } from "./triage/continuation.js";
-import { projectReferenceActions } from "./triage/reference-actions.js";
 import { createPromptRunner } from "./prompt/runner.js";
 import { runtimeDiagnostics, safeErrorName } from "./logging.js";
 export { createRestoredApp as createApp };
@@ -196,8 +195,6 @@ registerRestoredRoutes(app, {
       return localPromptRunner.run(input, { ...options, modelId: medpsyId });
     },
   },
-  confirmationStore,
-  projectReferenceActions,
   inferenceQueue: sharedInferenceQueue,
   promptModelId: config.modelId,
   performance: lastCompletionPerf,

@@ -1,7 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from "express";
 import { resolve } from "node:path";
 import { z } from "zod";
-import { parseClinicalRequest, canonicalClinicalRecord, findNarrativeConflicts } from "../triage/clinical-record.js";
 import { PromptRequestSchema } from "../prompt/schema.js";
 import {
   JobCancelledError,
@@ -12,60 +11,26 @@ import {
   QueueSaturatedError,
   type InferenceQueue,
 } from "../qvac/inference-queue.js";
-import { lookupProtocol } from "../triage/protocol-table.js";
-import { EMERGENCY_OBSERVATION_KEYS, normalizeDangerObservations } from "../triage/danger-observations.js";
 import {
   RespiratoryAssessmentRequestSchema,
   StructuredDangerRequestSchema,
-  ConfirmedReferenceResponseSchema,
-  type ClinicalAssessmentRequest,
-  type Severity,
 } from "../triage/schema.js";
 import { browserSessionOwner } from "./session.js";
 import { openSse, type SseStream } from "./sse.js";
-
-const ConfirmationRequest = z.object({
-  token: z.string().min(1).max(500),
-  decision: z.enum(["CONFIRM", "REJECT"]),
-}).strict();
-const ContinuationRequest = z.object({ token: z.string().min(1).max(500) }).strict();
 
 const JobId = z.string().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/);
 
 type Dependencies = {
   supervisedWorkflow: {
-    guide?(input: unknown, options: {
+    guide(input: unknown, options: {
       owner: string;
       signal?: AbortSignal;
       onStage?: (s: unknown) => void;
       onCitation?: (c: unknown) => void;
       onFirstToken?: () => void;
     }): Promise<{ card: any; classification: string; retrieval: string }>;
-    assess(input: unknown, options: {
-      owner: string;
-      signal?: AbortSignal;
-      onStage?: (stage: unknown) => void;
-      onCitation?: (citation: unknown) => void;
-      onFirstToken?: () => void;
-    }): Promise<any>;
-    deterministic?(input: unknown, options?: { owner?: string }): any | null;
-    claimContinuation?(token: string, owner: string): any;
-    commitContinuation?(token: string, owner: string): boolean;
-    releaseContinuation?(token: string, owner: string): boolean;
-    continueClaim?(claim: any, options: {
-      owner: string;
-      signal?: AbortSignal;
-      onStage?: (stage: unknown) => void;
-      onCitation?: (citation: unknown) => void;
-      onFirstToken?: () => void;
-    }): Promise<any>;
   };
   promptRunner: { run(input: unknown, options: { modelId: string; signal?: AbortSignal }): Promise<any> };
-  confirmationStore: {
-    inspect?(token: string, owner: string): any;
-    consume(token: string, owner: string, decision: "CONFIRM" | "REJECT"): any;
-  };
-  projectReferenceActions: (classification: string, severity: Severity, eligibility: any) => any;
   inferenceQueue: InferenceQueue;
   sessionOwner?: (request: Request, response: Response) => string;
   promptModelId?: string;
@@ -79,52 +44,6 @@ function securityHeaders(_request: Request, response: Response, next: NextFuncti
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("Referrer-Policy", "no-referrer");
   next();
-}
-
-const PUBLIC_CARD_FIELDS = [
-  "outcome", "finding", "basis", "nextAssessmentStep", "matchedCriteria", "missingFields",
-  "recorded", "thresholdComparison", "emergencyObservations", "sourceRule", "assistance", "uncertainty",
-  "reviewState", "recordedFacts", "inferredFacts",
-] as const;
-
-function publicCard(result: Record<string, unknown>): Record<string, unknown> {
-  return Object.fromEntries(PUBLIC_CARD_FIELDS.filter((key) => result[key] !== undefined).map((key) => [key, result[key]]));
-}
-
-function sendAssessment(stream: SseStream, result: any, deps: Dependencies): void {
-  for (const citation of result.citations ?? []) {
-    stream.send("citation", {
-      protocol: result.protocol,
-      ...citation,
-      score: 1,
-      retrieval: result.assistance?.retrievalMode ?? "keyword",
-      provenance: "fixed-protocol",
-    });
-  }
-  stream.send("card", { card: publicCard(result), attempts: result.attempts ?? 0, perf: deps.performance?.() ?? null });
-  if (result.reviewState === "PROVISIONAL" && result.confirmation?.token) {
-    stream.send("provisional", {
-      token: result.confirmation.token,
-      expiresAt: result.confirmation.expiresAt,
-      classification: result.classification,
-      protocol: result.protocol,
-    });
-  }
-}
-
-function sendDeterministic(stream: SseStream, result: any): void {
-  const card = { ...publicCard(result), assistance: { status: "NOT_RUN", runtime: null, model: null } };
-  stream.send("stage", { key: "assess", label: "Applied deterministic recorded-observation policy" });
-  if (result.outcome === "ASSESSMENT_REQUIRED") stream.send("assessment_required", { card });
-  else {
-    stream.send("citation", { ...result.sourceRule, protocol: "IMCI", retrieval: "deterministic", provenance: "fixed-policy", score: 1 });
-    stream.send("card", { card, attempts: 0 });
-  }
-  if (result.continuation?.eligible && result.continuation.token) {
-    stream.send("continuation", result.continuation);
-  }
-  stream.send("done", { ok: true });
-  stream.finish();
 }
 
 function queueFailure(response: Response, error: unknown): boolean {
@@ -204,156 +123,6 @@ function deferredStream(): DeferredStream {
   };
 }
 
-function triageInput(deps: Dependencies, request: Request, response: Response): { data: ClinicalAssessmentRequest; owner: string } | null {
-  const validationError = clinicalValidationError(request.body);
-  if (validationError) { response.status(400).json({ error: validationError }); return null; }
-  const parsed = parseClinicalRequest(request.body);
-  if (!parsed.success) { response.status(400).json({ error: "Invalid clinical assessment." }); return null; }
-  const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
-  const observations = normalizeDangerObservations(parsed.data.dangerObservations);
-  const hasEmergency = EMERGENCY_OBSERVATION_KEYS.some((key) => observations[key] === "PRESENT");
-  const emergency = hasEmergency ? deps.supervisedWorkflow.deterministic?.(parsed.data, { owner }) : null;
-  if (emergency?.outcome === "EMERGENCY") {
-    response.setHeader("Cache-Control", "no-store");
-    sendDeterministic(openSse(response, () => undefined), emergency);
-    return null;
-  }
-  const conflicts = findNarrativeConflicts(canonicalClinicalRecord(parsed.data));
-  if (conflicts.length) {
-    response.status(409).json({
-      error: "The description conflicts with the structured assessment. Correct the patient record before continuing.",
-      conflicts: conflicts.map((field) => field.replace(/^dangerObservations\./, "")),
-    });
-    return null;
-  }
-  const deterministic = deps.supervisedWorkflow.deterministic?.(parsed.data, { owner });
-  if (!deterministic) return { data: parsed.data, owner };
-  response.setHeader("Cache-Control", "no-store");
-  sendDeterministic(openSse(response, () => undefined), deterministic);
-  return null;
-}
-
-function submitAssessment(deps: Dependencies, data: ClinicalAssessmentRequest, owner: string, deferred: DeferredStream) {
-  const startedAt = Date.now();
-  return deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.assess(data, {
-    owner,
-    signal: context.signal,
-    onStage: (stage: unknown) => context.publish(() => deferred.publish((stream) => stream.send("stage", stage))),
-    onCitation: (citation: unknown) => context.publish(() => deferred.publish((stream) => stream.send("citation", citation))),
-    onFirstToken: () => context.publish(() => deferred.publish((stream) => stream.send("first_token", { ttftMs: Date.now() - startedAt }))),
-  }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Clinical assessment" });
-}
-
-async function streamAssessment(response: Response, deps: Dependencies, job: ReturnType<Dependencies["inferenceQueue"]["submit"]>, deferred: DeferredStream) {
-  const stream = openSse(response, () => job.disconnect());
-  stream.send("job", { id: job.id, position: job.position });
-  stream.send("stage", { key: job.position ? "queued" : "assess", label: job.position ? "Queued for local inference" : "Reviewing recorded assessment" });
-  deferred.attach(stream);
-  try {
-    const result = await job.promise;
-    if (stream.isOpen()) sendAssessment(stream, result, deps);
-    stream.send("done", { ok: true });
-    stream.finish();
-  } catch (error) { if (stream.isOpen()) safeError(stream, error); }
-}
-
-function triageRoute(deps: Dependencies) {
-  return async (request: Request, response: Response): Promise<void> => {
-    const input = triageInput(deps, request, response);
-    if (!input) return;
-    const deferred = deferredStream();
-    let job;
-    try {
-      job = submitAssessment(deps, input.data, input.owner, deferred);
-    } catch (error) {
-      if (!queueFailure(response, error)) response.status(503).json({
-        error: "Local assessment could not be admitted.", code: "INFERENCE_FAILED", retryable: false,
-      });
-      return;
-    }
-    await streamAssessment(response, deps, job, deferred);
-  };
-}
-
-function continuationFailure(response: Response, reason: string): void {
-  const statuses: Record<string, number> = {
-    NOT_FOUND: 404, EXPIRED: 410, USED: 409, OWNER_MISMATCH: 403, BINDING_MISMATCH: 409,
-  };
-  response.status(statuses[reason] ?? 409).json({
-    error: "Respiratory continuation could not be started.", reason,
-  });
-}
-
-function continuationClaim(deps: Dependencies, request: Request, response: Response) {
-  const parsed = ContinuationRequest.safeParse(request.body);
-  if (!parsed.success) { response.status(400).json({ error: "Invalid continuation request." }); return null; }
-  const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
-  const claim = deps.supervisedWorkflow.claimContinuation?.(parsed.data.token, owner);
-  if (!claim?.ok) { continuationFailure(response, String(claim?.reason ?? "NOT_FOUND")); return null; }
-  if (deps.supervisedWorkflow.continueClaim) return { claim, owner, token: parsed.data.token };
-  deps.supervisedWorkflow.releaseContinuation?.(parsed.data.token, owner);
-  continuationFailure(response, "NOT_FOUND");
-  return null;
-}
-
-function submitContinuation(deps: Dependencies, input: NonNullable<ReturnType<typeof continuationClaim>>, deferred: DeferredStream) {
-  const startedAt = Date.now();
-  return deps.inferenceQueue.submit(input.owner, "triage", (context) => deps.supervisedWorkflow.continueClaim!(input.claim, {
-    owner: input.owner,
-    signal: context.signal,
-    onStage: (stage: unknown) => context.publish(() => deferred.publish((stream) => stream.send("stage", stage))),
-    onCitation: (citation: unknown) => context.publish(() => deferred.publish((stream) => stream.send("citation", citation))),
-    onFirstToken: () => context.publish(() => deferred.publish((stream) => stream.send("first_token", { ttftMs: Date.now() - startedAt }))),
-  }), { deadlineMs: deps.triageDeadlineMs ?? 300_000, label: "Supervised respiratory continuation" });
-}
-
-async function streamContinuation(
-  response: Response,
-  deps: Dependencies,
-  input: NonNullable<ReturnType<typeof continuationClaim>>,
-  job: ReturnType<Dependencies["inferenceQueue"]["submit"]>,
-  deferred: DeferredStream,
-): Promise<void> {
-  response.setHeader("Cache-Control", "no-store");
-  const stream = openSse(response, () => job.disconnect());
-  stream.send("job", { id: job.id, position: job.position });
-  stream.send("stage", {
-    key: job.position ? "queued" : "assess",
-    label: job.position ? "Queued for local inference" : "Continuing supervised WHO review",
-  });
-  deferred.attach(stream);
-  try {
-    const result = await job.promise;
-    const committed = deps.supervisedWorkflow.commitContinuation?.(input.token, input.owner);
-    if (committed === false) throw new Error("Continuation reservation could not be committed.");
-    if (stream.isOpen()) sendAssessment(stream, result, deps);
-    stream.send("done", { ok: true });
-    stream.finish();
-  } catch (error) {
-    deps.supervisedWorkflow.releaseContinuation?.(input.token, input.owner);
-    if (stream.isOpen()) safeError(stream, error);
-  }
-}
-
-function continuationRoute(deps: Dependencies) {
-  return async (request: Request, response: Response): Promise<void> => {
-    const input = continuationClaim(deps, request, response);
-    if (!input) return;
-    const deferred = deferredStream();
-    let job;
-    try {
-      job = submitContinuation(deps, input, deferred);
-    } catch (error) {
-      deps.supervisedWorkflow.releaseContinuation?.(input.token, input.owner);
-      if (!queueFailure(response, error)) response.status(503).json({
-        error: "Local continuation could not be admitted.", code: "INFERENCE_FAILED", retryable: false,
-      });
-      return;
-    }
-    await streamContinuation(response, deps, input, job, deferred);
-  };
-}
-
 function assistRoute(deps: Dependencies) {
   return async (request: Request, response: Response): Promise<void> => {
     const parsed = PromptRequestSchema.safeParse(request.body);
@@ -388,51 +157,6 @@ function assistRoute(deps: Dependencies) {
   };
 }
 
-function confirmationRoute(deps: Dependencies) {
-  return (request: Request, response: Response): void => {
-    const parsed = ConfirmationRequest.safeParse(request.body);
-    if (!parsed.success) { response.status(400).json({ error: "Invalid confirmation request." }); return; }
-    const owner = (deps.sessionOwner ?? browserSessionOwner)(request, response);
-    response.setHeader("Cache-Control", "no-store");
-    const inspected = parsed.data.decision === "CONFIRM" && deps.confirmationStore.inspect
-      ? deps.confirmationStore.inspect(parsed.data.token, owner)
-      : deps.confirmationStore.consume(parsed.data.token, owner, parsed.data.decision);
-    if (!inspected.ok) {
-      const statuses: Record<string, number> = {
-        NOT_FOUND: 404, EXPIRED: 410, USED: 409, OWNER_MISMATCH: 403, BINDING_MISMATCH: 409,
-      };
-      const status = statuses[String(inspected.reason)] ?? 409;
-      response.status(status).json({ error: "Confirmation could not be applied.", reason: inspected.reason });
-      return;
-    }
-    if (parsed.data.decision === "REJECT") { response.json({ reviewState: "REJECTED" }); return; }
-    const entry = lookupProtocol(inspected.binding.classification);
-    const eligibility = inspected.payload?.eligibility ?? { confirmationState: "CONFIRMED" };
-    const projected = deps.projectReferenceActions(inspected.binding.classification, entry?.severity ?? "UNKNOWN", { ...eligibility, confirmationState: "CONFIRMED" });
-    const severity = inspected.binding.fixedSeverity ?? entry?.severity ?? "UNKNOWN";
-    const immediateAction = projected.referenceActions?.immediateAction;
-    const candidate = {
-      reviewState: "CONFIRMED" as const,
-      classification: inspected.binding.classification,
-      protocol: inspected.binding.protocol,
-      severity,
-      ...(immediateAction ? { immediateAction } : {}),
-      ...projected,
-    };
-    const publicResult = ConfirmedReferenceResponseSchema.safeParse(candidate);
-    if (!publicResult.success) { response.status(500).json({ error: "Confirmed source actions failed public validation." }); return; }
-    if (deps.confirmationStore.inspect) {
-      const consumed = deps.confirmationStore.consume(parsed.data.token, owner, "CONFIRM");
-      if (!consumed.ok) {
-        const status = consumed.reason === "OWNER_MISMATCH" ? 403 : consumed.reason === "EXPIRED" ? 410 : 409;
-        response.status(status).json({ error: "Confirmation could not be applied.", reason: consumed.reason });
-        return;
-      }
-    }
-    response.json(publicResult.data);
-  };
-}
-
 function sendGuide(stream: SseStream, result: { card: any; classification: string }, deps: Dependencies): void {
   const { plan, ...cardNoPlan } = result.card ?? {};
   stream.send("card", {
@@ -454,7 +178,7 @@ function guideRoute(deps: Dependencies) {
     const startedAt = Date.now();
     let job;
     try {
-      job = deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.guide!(request.body, {
+      job = deps.inferenceQueue.submit(owner, "triage", (context) => deps.supervisedWorkflow.guide(request.body, {
         owner,
         signal: context.signal,
         onStage: (s) => context.publish(() => deferred.publish((st) => st.send("stage", s))),
@@ -505,10 +229,6 @@ export function createRestoredApp(deps: Dependencies) {
 export function registerRestoredRoutes(app: express.Express, deps: Dependencies): void {
   app.post("/triage", guideRoute(deps));
   app.all("/triage", methodNotAllowed("POST"));
-  app.post("/triage/continue", continuationRoute(deps));
-  app.all("/triage/continue", methodNotAllowed("POST"));
-  app.post("/triage/confirm", confirmationRoute(deps));
-  app.all("/triage/confirm", methodNotAllowed("POST"));
   app.post("/assist", assistRoute(deps));
   app.all("/assist", methodNotAllowed("POST"));
   app.delete("/jobs/:id", (request, response) => {
