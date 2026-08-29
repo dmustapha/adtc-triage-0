@@ -5,6 +5,64 @@
 })(typeof window !== "undefined" ? window : globalThis, function () {
   "use strict";
 
+  // ---------------------------------------------------------------------------
+  // routeInput: pure text classifier.
+  // Returns "CLINICAL", "GENERAL", or "AMBIGUOUS".
+  // No special-casing of exact submitted-prompt bytes.
+  // ---------------------------------------------------------------------------
+
+  var GENERAL_KEYWORDS = /\b(?:explain|summari[sz]e|compare|why|what|how|define|list|describe|outline)\b|\?/i;
+
+  var AGE_TOKEN = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?|weeks?|days?)\s+old\b/i;
+
+  var SYMPTOM_CUES = [
+    /\bcough\b/i,
+    /\bfever\b/i,
+    /\bbreath(?:ing|less)\b/i,
+    /\bdiarrho?ea\b/i,
+    /\bvomit(?:ing|s)?\b/i,
+    /\bconvulsion\b/i,
+    /\brash\b/i,
+    /\bdrinking\b/i,
+    /\blethargic\b/i,
+    /\bchest indrawing\b/i,
+    /\bstridor\b/i,
+    /\bcyanosis\b/i,
+    /\bunconscious\b/i,
+  ];
+
+  function hasObservationEvidence(text) {
+    // Returns true if the assertedText contains any structured observation or respiratory evidence.
+    var input = assertedText(text);
+    if (allObservationsAbsent(input)) return true;
+    var authoritySegments = observationSegments(input)
+      .filter(function (clause) { return !clauseNonAuthority(clause); });
+    var authorityInput = authoritySegments.join(" ");
+    return OBSERVATIONS.some(function (spec) {
+      var ev = observationEvidence(authorityInput, spec);
+      return ev.present || ev.absent;
+    }) || (function () {
+      var rv = respiratoryEvidence(authorityInput);
+      return rv.present || rv.absent;
+    })();
+  }
+
+  function routeInput(text) {
+    var t = String(text || "").trim();
+    if (!t) return "AMBIGUOUS";
+    if (GENERAL_KEYWORDS.test(t)) return "GENERAL";
+    if (AGE_TOKEN.test(t)) return "CLINICAL";
+    var symptomCount = SYMPTOM_CUES.reduce(function (n, re) { return n + (re.test(t) ? 1 : 0); }, 0);
+    if (symptomCount >= 2) return "CLINICAL";
+    // Fall through to structured observation detection.
+    if (hasObservationEvidence(t)) return "CLINICAL";
+    return "AMBIGUOUS";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Structured extraction — kept for backward-compatibility with tests.
+  // ---------------------------------------------------------------------------
+
   var OBSERVATIONS = [
     ["cannotDrinkOrBreastfeed", /\b(?:can|able to|still)\s+(?:drink|breastfeed)|\bdrinking well\b/i, /\b(?:cannot|can't|unable to)\s+(?:drink(?:\s+or\s+breastfeed)?|breastfeed)\b/i, true],
     ["vomitsEverything", /\b(?:does not|doesn't|not) vomit everything\b|\bno vomiting\b/i, /\bvomits? everything\b/i, true],
@@ -21,25 +79,6 @@
     false,
   ];
   var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
-
-  function routeInput(text) {
-    var input = assertedText(text).trim();
-    if (!input) return "AMBIGUOUS";
-    if (/^(?:please\s+)?(?:explain|summari[sz]e|compare|define|list|outline|state|describe|why\b|what\b|how\b)/i.test(input)) return "GENERAL";
-    var authorityInput = observationSegments(input)
-      .filter(function (clause) { return !clauseNonAuthority(clause); }).join(" ");
-    if (allObservationsAbsent(input)) return "CLINICAL";
-    var age = /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*[- ]?\s*(?:months?|years?)(?:\s+old)?\b/i.test(authorityInput);
-    var person = /\b(?:patient|child|infant|baby|boy|girl|woman|man|adult)\b/i.test(authorityInput);
-    var finding = /\b(?:cough|breath(?:ing|less)|fever|diarrh(?:oea|ea)|vomit|convulsion|lethargic|unconscious|stridor|cyanosis|sunken eyes|depression)\b/i.test(authorityInput);
-    if (OBSERVATIONS.some(function (spec) {
-      var evidence = observationEvidence(authorityInput, spec);
-      return evidence.present || evidence.absent;
-    })) return "CLINICAL";
-    var respiratory = respiratoryEvidence(authorityInput);
-    if (respiratory.present || respiratory.absent) return "CLINICAL";
-    return (finding && (age || person)) ? "CLINICAL" : "AMBIGUOUS";
-  }
 
   function numericToken(token) {
     var normalized = String(token).toLowerCase();
@@ -88,7 +127,7 @@
   }
 
   function maskQuotedSpans(text) {
-    var closes = { "'": "'", "\"": "\"", "‘": "’", "“": "”" };
+    var closes = { "‘": "’", "'": "'", "\"": "\"", "“": "”" };
     var output = "";
     for (var index = 0; index < text.length;) {
       var close = closes[text[index]];
@@ -294,6 +333,150 @@
       medicationSafety: { allergiesReviewed: "NOT_ASSESSED", contraindicationsReviewed: "NOT_ASSESSED" },
       protocolApplicability: "NOT_ASSESSED", conflicts: conflicts,
     };
+  }
+
+  // ---------------------------------------------------------------------------
+  // DOM wiring — capture-phase interceptor on #assess.
+  // Lazy: all getElementById calls are guarded so this module loads safely in
+  // a test environment where document.getElementById returns null.
+  // ---------------------------------------------------------------------------
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function showResult() {
+    var result = typeof document !== "undefined" && document.getElementById("result");
+    if (result) result.classList.remove("hidden");
+  }
+
+  function renderAssistAnswer(data) {
+    // Render /assist `answer` event into #card region.
+    var card = typeof document !== "undefined" && document.getElementById("card");
+    var err = typeof document !== "undefined" && document.getElementById("err");
+    if (!card) return;
+    if (err) err.textContent = "";
+    card.classList.remove("hidden");
+    var text = (data && data.answer) ? esc(data.answer) : "";
+    var uncertainty = (data && data.uncertainty && data.uncertainty.length)
+      ? "<ul class=\"flags\">" + data.uncertainty.map(function (u) { return "<li>" + esc(u) + "</li>"; }).join("") + "</ul>"
+      : "";
+    card.innerHTML = "<div class=\"action\">" + text + "</div>" + uncertainty;
+    showResult();
+  }
+
+  function renderAssistRejected(data) {
+    var err = typeof document !== "undefined" && document.getElementById("err");
+    if (err) err.textContent = (data && data.reason) || "This question could not be answered.";
+    showResult();
+  }
+
+  function renderClarification(caseText) {
+    // Render inline AMBIGUOUS clarification into #card.
+    var card = typeof document !== "undefined" && document.getElementById("card");
+    var err = typeof document !== "undefined" && document.getElementById("err");
+    if (!card) return;
+    if (err) err.textContent = "";
+    card.classList.remove("hidden");
+    card.innerHTML =
+      "<div class=\"action\">Assess this as a patient case, or answer it as a general question?" +
+      "</div><div style=\"margin-top:12px;display:flex;gap:10px\">" +
+      "<button id=\"_clarify_clinical\" class=\"btn btn--primary\" type=\"button\">Patient case</button>" +
+      "<button id=\"_clarify_general\" class=\"btn\" type=\"button\">General question</button>" +
+      "</div>";
+    showResult();
+    var btnClinical = document.getElementById("_clarify_clinical");
+    var btnGeneral = document.getElementById("_clarify_general");
+    if (btnClinical) btnClinical.addEventListener("click", function () { dispatchClinical(); });
+    if (btnGeneral) btnGeneral.addEventListener("click", function () { runAssist(caseText); });
+  }
+
+  function dispatchClinical() {
+    // Fire a new click that bypasses the capture interceptor (assessEl.onclick = runAssess in triage.js).
+    var assessEl = typeof document !== "undefined" && document.getElementById("assess");
+    if (!assessEl) return;
+    // Remove our interceptor, dispatch a synthetic click, then re-attach.
+    assessEl.removeEventListener("click", captureInterceptor, true);
+    assessEl.click();
+    assessEl.addEventListener("click", captureInterceptor, true);
+  }
+
+  async function runAssist(text) {
+    var card = typeof document !== "undefined" && document.getElementById("card");
+    var err = typeof document !== "undefined" && document.getElementById("err");
+    if (card) { card.classList.remove("hidden"); card.innerHTML = "<div class=\"action muted\">Thinking…</div>"; }
+    if (err) err.textContent = "";
+    showResult();
+    var buf = "";
+    try {
+      var r = await fetch("/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text }),
+      });
+      if (!r.ok || !r.body) {
+        var msg = "Could not get an answer (" + r.status + ").";
+        try { var j = await r.json(); if (j && j.error) msg = j.error; } catch (e2) {}
+        if (err) err.textContent = msg;
+        if (card) card.classList.add("hidden");
+        return;
+      }
+      var reader = r.body.getReader();
+      var dec = new TextDecoder();
+      for (;;) {
+        var res = await reader.read();
+        if (res.done) break;
+        buf += dec.decode(res.value, { stream: true });
+        var i;
+        while ((i = buf.indexOf("\n\n")) >= 0) {
+          var block = buf.slice(0, i);
+          buf = buf.slice(i + 2);
+          if (block.charAt(0) === ":") continue;
+          var evMatch = block.match(/^event: (.*)$/m);
+          var dataLine = block.match(/^data: (.*)$/m);
+          if (!evMatch || !dataLine) continue;
+          var ev = evMatch[1];
+          var d;
+          try { d = JSON.parse(dataLine[1]); } catch (e3) { continue; }
+          if (ev === "answer") renderAssistAnswer(d);
+          else if (ev === "rejected") renderAssistRejected(d);
+        }
+      }
+    } catch (e) {
+      if (err) err.textContent = "Could not get an answer. " + (e && e.message ? e.message : "");
+      if (card) card.classList.add("hidden");
+    }
+  }
+
+  function captureInterceptor(e) {
+    var ta = typeof document !== "undefined" && document.getElementById("case");
+    var text = ta ? ta.value.trim() : "";
+    if (!text) return; // empty — let triage.js handle the "describe a case first" message
+    var route = routeInput(text);
+    if (route === "CLINICAL") return; // proceed to triage.js runAssess
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (route === "GENERAL") {
+      runAssist(text);
+    } else {
+      renderClarification(text);
+    }
+  }
+
+  // Attach the capture-phase interceptor once the DOM is available.
+  // Guard: only run DOM wiring when document exists (not in test/node environments).
+  if (typeof document !== "undefined" && document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", function () {
+      var assessEl = document.getElementById("assess");
+      if (assessEl) assessEl.addEventListener("click", captureInterceptor, true);
+    });
+    // If DOMContentLoaded already fired (script loaded after DOM is ready):
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+      var assessEl = document.getElementById("assess");
+      if (assessEl) assessEl.addEventListener("click", captureInterceptor, true);
+    }
   }
 
   return { routeInput: routeInput, extractClinicalCandidate: extractClinicalCandidate };
