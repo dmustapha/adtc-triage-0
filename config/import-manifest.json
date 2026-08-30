@@ -359,7 +359,7 @@
       "destinationSha256": "f87e5a3059d09335e35f87de6bf01c71281ddd315929eebb9c175ef34d4d63a1",
       "modification": {
         "status": "modified",
-        "reason": "2026-08-29 original-Triage-0 parity restore: single-prompt streaming render (stage readout, WHO citation, severity card + full weight-band-dosed cited plan) consuming the one-flow SSE contract (job/stage/citation/first_token/card/plan/done); English-only (i18n/STT/TTS removed); honest on-device stage label; Ctrl/Cmd+Enter routes through the /triage-vs-/assist interceptor; egress guard gates the on-device proof chip (medpsy chip only when eg.armed)."
+        "reason": "Semantic internal routing for general versus explicit clinical input with one-revision ambiguity clarification. 2026-08-29 original-Triage-0 parity restore: single-prompt streaming render (stage readout, WHO citation, severity card + full weight-band-dosed cited plan) consuming the one-flow SSE contract (job/stage/citation/first_token/card/plan/done); English-only (i18n/STT/TTS removed); honest on-device stage label; Ctrl/Cmd+Enter routes through the /triage-vs-/assist interceptor; egress guard gates the on-device proof chip (medpsy chip only when eg.armed)."
       }
     },
     {
