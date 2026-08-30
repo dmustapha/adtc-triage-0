@@ -389,6 +389,7 @@
   }
 
   function captureInterceptor(e) {
+    if (document.getElementById("assess") && document.getElementById("assess").classList.contains("is-stopping")) return;
     var ta = typeof document !== "undefined" && document.getElementById("case");
     var text = ta ? ta.value.trim() : "";
     if (!text) return; // empty — let triage.js handle the "describe a case first" message

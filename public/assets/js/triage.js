@@ -239,7 +239,7 @@
     detect: "on-device langdetect",
     translate_in: "on-device Bergamot NMT",
     retrieve: "semantic retrieval",
-    reason: "MedPsy 1.7B · GPU",
+    reason: "MedPsy 1.7B · on-device",
     classify: "1 of 27 WHO classes",
     translate_out: "on-device NMT",
     plan: "grounded in the cited protocol"
@@ -405,7 +405,7 @@
   if ($("assess")) $("assess").onclick = runAssess;
   // Ctrl/Cmd+Enter from the case box submits.
   if ($("case")) $("case").addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runAssess(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); if ($("assess").classList.contains("is-stopping")) return; $("assess").click(); }
   });
 
   // Test hook (browser-safe: `module` is undefined in the browser, so this is a no-op there).

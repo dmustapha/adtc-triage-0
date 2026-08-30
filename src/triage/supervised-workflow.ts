@@ -350,9 +350,10 @@ export function createSupervisedWorkflow(dependencies: WorkflowDependencies) {
       const request = parsed.data;
 
       // 1) Deterministic emergency from the narrative — no model, no retrieval (safety boundary preserved).
-      if (narrativeEmergencyKeys(request.caseText).length) {
+      const emergencyKeys = narrativeEmergencyKeys(request.caseText);
+      if (emergencyKeys.length) {
         const decision = evaluateDangerPolicy(request.patientAge, Object.fromEntries(
-          narrativeEmergencyKeys(request.caseText).map((key) => [key, "PRESENT" as const]),
+          emergencyKeys.map((key) => [key, "PRESENT" as const]),
         ));
         const result = makeStructuredDangerResult(decision);
         const entry = lookupProtocol(result.classification);
