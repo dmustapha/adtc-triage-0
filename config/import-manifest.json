@@ -742,10 +742,10 @@
       "classification": "modified-for-adtc",
       "purpose": "Pinned baseline requiring the documented ADTC scope/runtime adaptation",
       "destinationStatus": "present",
-      "destinationSha256": "4e422bdb3f5a79e461c77660d9110c81bd6ae09ad3de4c0580d7afe4bd5a04a6",
+      "destinationSha256": "d43972c64bf442cf90720ff6c42b2376458e281875d4dc0c0c0993a0bd8c423f",
       "modification": {
         "status": "modified",
-        "reason": "Added exact JSON 405 and Allow-header coverage, truthful header-only empty telemetry CSV behavior, narrative/structured conflict rejection, and a regression proving a bare listener reports liveness but not product readiness."
+        "reason": "Added exact JSON 405 and Allow-header coverage, truthful header-only empty telemetry CSV behavior, narrative/structured conflict rejection, and a regression proving a bare listener reports liveness but not product readiness. (2026-08-29: reconciled stale destinationSha256 to the actual unchanged committed file content — pre-existing drift in the submission commit, file itself untouched.)"
       }
     },
     {
