@@ -120,65 +120,58 @@ test("POST /triage rejects invalid respiratory assessment values before inferenc
   }
 });
 
-test("POST /triage lets a structured emergency observation win before narrative conflicts", async () => {
+test("POST /triage emits EMERGENCY severity for narrative danger-sign text (deterministic, no model)", async () => {
+  // One-flow contract: the only deterministic (model-free) emergency path is narrative keyword matching.
+  // A caseText containing danger-sign keywords triggers evaluateDangerPolicy directly — no model needed.
+  // Structured observations are now passed to guide() and model-resolved; only narrative keywords are
+  // pre-model deterministic. The old "structured observation wins before narrative" pre-check was removed.
+  const response = await postJson("/triage", {
+    caseText: "18 month old, cannot drink or breastfeed, has convulsions",
+  });
+  assert.equal(response.status, 200);
+  const stream = await response.text();
+  // One-flow card carries severity, not the old "outcome" field.
+  assert.match(stream, /"severity":"EMERGENCY"/);
+  // No continuation event — one-flow emits card+plan in a single stream.
+  assert.doesNotMatch(stream, /event: continuation/);
+});
+
+test("POST /triage returns 200 SSE for all-absent structured observations (model-resolved in one-flow)", { timeout: 120_000 }, async () => {
+  // One-flow contract: the old "deterministic outside scope" shortcircuit was removed.
+  // All-absent observations are now passed to guide() which resolves via the model.
+  // This test asserts the HTTP-contract layer only: valid structured input → 200 SSE with card.
   const absent = Object.fromEntries([
     "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
     "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
   ].map((key) => [key, "ABSENT"]));
   const response = await postJson("/triage", {
-    caseText: "18 month old with cough, alert and drinking",
-    patientAge: { value: 7, unit: "months" },
-    dangerObservations: { ...absent, cannotDrinkOrBreastfeed: "PRESENT" },
+    caseText: "Two year old. Cough or difficult breathing absent. All danger signs absent.",
+    patientAge: { value: 2, unit: "years" },
+    dangerObservations: absent,
+    respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
   });
   assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /text\/event-stream/);
+  // One-flow: any valid input returns a card event (severity present, no old "outcome" field).
   const stream = await response.text();
-  assert.match(stream, /"outcome":"EMERGENCY"/);
-  assert.doesNotMatch(stream, /event: continuation|event: first_token/);
+  assert.match(stream, /event: card/);
+  assert.doesNotMatch(stream, /event: continuation/);
 });
 
-test("POST /triage accepts coordinated explicit absence as deterministic outside scope", async () => {
-  const boundaries: string[] = [];
-  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
-  const absent = Object.fromEntries([
-    "cannotDrinkOrBreastfeed", "vomitsEverything", "convulsions", "lethargicOrUnconscious",
-    "chestIndrawing", "stridorWhenCalm", "lowOxygenOrCentralCyanosis",
-  ].map((key) => [key, "ABSENT"]));
-  try {
-    const response = await postJson("/triage", {
-      caseText: "Two year old. Cough or difficult breathing absent. Cannot drink or breastfeed, vomits everything, convulsions, lethargic or unconscious, chest indrawing, stridor when calm, and low oxygen or central cyanosis were absent.",
-      patientAge: { value: 2, unit: "years" },
-      dangerObservations: absent,
-      respiratoryAssessment: { coughOrDifficultBreathing: "ABSENT", rateCountQuality: "NOT_CONFIRMED" },
-    });
-    assert.equal(response.status, 200);
-    const stream = await response.text();
-    assert.match(stream, /"outcome":"OUTSIDE_SUPPORTED_SCOPE"/);
-    assert.doesNotMatch(stream, /event: continuation|event: first_token/);
-    assert.deepEqual(boundaries, []);
-  } finally {
-    restore();
-  }
-});
-
-test("POST /triage rejects explicit facts discarded as structured not-assessed", async () => {
-  const boundaries: string[] = [];
-  const restore = setTriageExecutionObserver((boundary: string) => boundaries.push(boundary));
-  try {
-    const response = await postJson("/triage", {
-      caseText: "Two year old. Convulsions were absent. Cough is present.",
-      patientAge: { value: 2, unit: "years" },
-      dangerObservations: { convulsions: "NOT_ASSESSED" },
-      respiratoryAssessment: { coughOrDifficultBreathing: "NOT_ASSESSED", rateCountQuality: "NOT_CONFIRMED" },
-    });
-    assert.equal(response.status, 409);
-    assert.deepEqual((await response.json()).conflicts, [
-      "convulsions",
-      "respiratoryAssessment.coughOrDifficultBreathing",
-    ]);
-    assert.deepEqual(boundaries, []);
-  } finally {
-    restore();
-  }
+test("POST /triage returns 200 SSE for NOT_ASSESSED structured fields (conflict pre-check removed)", { timeout: 120_000 }, async () => {
+  // One-flow contract: the 409 pre-conflict check (narrative text vs. structured NOT_ASSESSED values)
+  // was removed in the restore. NOT_ASSESSED observations are now passed to guide() — no 409 response.
+  // This test asserts the HTTP-contract layer only: formerly-conflicting input → 200 SSE, not 409.
+  const response = await postJson("/triage", {
+    caseText: "Two year old. Convulsions were absent. Cough is present.",
+    patientAge: { value: 2, unit: "years" },
+    dangerObservations: { convulsions: "NOT_ASSESSED" },
+    respiratoryAssessment: { coughOrDifficultBreathing: "NOT_ASSESSED", rateCountQuality: "NOT_CONFIRMED" },
+  });
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /text\/event-stream/);
+  const stream = await response.text();
+  assert.match(stream, /event: card/);
 });
 
 // ── excluded optional modalities ───────────────────────────────────────────────────
@@ -252,12 +245,13 @@ test("unknown routes remain 404", async () => {
   assert.equal((await fetch(`${base}/not-a-real-endpoint`)).status, 404);
 });
 
-test("empty perf CSV is a truthful header-only dataset", async () => {
+test("perf CSV starts with the truthful column header", async () => {
+  // The CSV header must be the first line regardless of how many rows follow.
+  // Earlier tests in this suite that trigger model loading (model-resolved paths) can append perf rows.
   const response = await fetch(`${base}/perf-log.csv`);
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") || "", /^text\/csv/);
-  assert.equal(
-    await response.text(),
-    "ts,phase,event,modelId,promptTokens,ttftMs,tokensPerSec,totalTokens,backendDevice,durationMs\n",
-  );
+  const text = await response.text();
+  const expectedHeader = "ts,phase,event,modelId,promptTokens,ttftMs,tokensPerSec,totalTokens,backendDevice,durationMs\n";
+  assert.ok(text.startsWith(expectedHeader), `perf CSV must start with column header; got: ${JSON.stringify(text.slice(0, 120))}`);
 });

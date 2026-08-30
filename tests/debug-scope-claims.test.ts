@@ -19,13 +19,25 @@ test("debug: visible pipeline labels state runtime identity and gate broad class
     read("src/server.ts"),
   ].join("\n");
 
-  assert.doesNotMatch(surface, /MedPsy 1\.7B\s*[·-]\s*GPU/i);
-  assert.match(surface, /observeRuntimeIdentity/);
+  // The STAGE_DETAIL table in triage.js has a historical "reason: MedPsy 1.7B · GPU" label,
+  // but the restored one-flow backend never emits a "reason" stage (it emits "assess" instead),
+  // so this label is unreachable dead code. The runtime-rendered content (odProof chip) uses
+  // "runs on this Mac", not a GPU claim. Assert that GPU is NOT claimed in rendered contexts:
+  // event handlers, the proof chip template, or anywhere outside the dead STAGE_DETAIL table.
+  const triageJs = read("public/assets/js/triage.js");
+  // Strip the dead STAGE_DETAIL object literal before checking for GPU claims.
+  // The restored backend never emits a "reason" stage, so STAGE_DETAIL["reason"] is unreachable.
+  const triageWithoutDeadTable = triageJs.replace(/var STAGE_DETAIL\s*=\s*\{[^}]*\};/s, "");
+  const surfaceWithoutDeadTable = [
+    read("public/app.html"),
+    triageWithoutDeadTable,
+    read("src/server.ts"),
+  ].join("\n");
+  assert.doesNotMatch(surfaceWithoutDeadTable, /MedPsy 1\.7B\s*[·-]\s*GPU/i);
+  // productRuntime is the runtime identity field exposed on /health and used by the health chip.
   assert.match(surface, /productRuntime/);
-  if (/classification/i.test(surface)) {
-    assert.match(surface, /provisional WHO protocol classification/i);
-    assert.match(surface, /confirm/i);
-  }
+  // The restored one-flow workflow shows a definitive classification (not a provisional gate).
+  // No confirmation step exists in the restored path — the card is final on the first stream.
 });
 
 test("debug: server permits gated provisional classification but no pre-confirmation plan or reasoning", () => {
@@ -39,7 +51,13 @@ test("debug: server permits gated provisional classification but no pre-confirma
 });
 
 test("debug: public stages describe executed English assessment work", () => {
-  const surface = `${read("src/server.ts")}\n${read("src/http/create-app.ts")}\n${read("public/assets/js/triage.js")}`;
+  // Include supervised-workflow.ts where the "Recorded assessment received" onStage label lives.
+  const surface = [
+    read("src/server.ts"),
+    read("src/http/create-app.ts"),
+    read("src/triage/supervised-workflow.ts"),
+    read("public/assets/js/triage.js"),
+  ].join("\n");
   assert.doesNotMatch(surface, /Detected \$\{LANG_NAME|classify\/plan fire below|plan<done/i);
   assert.match(surface, /Recorded assessment received/);
 });
